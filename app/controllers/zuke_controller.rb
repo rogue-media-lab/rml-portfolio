@@ -3,13 +3,18 @@ class ZukeController < ApplicationController
 
   def music
     if current_user
-      @songs = Song.left_joins(:users).where(users: { id: nil })
-                   .includes(:album, :artist)
-                   .with_attached_image
-                   .with_attached_audio_file
-      # @songs = current_user.songs.includes(:album, :artist)
-      #                      .with_attached_image
-      #                      .with_attached_audio_file
+      # @songs = Song.left_joins(:users).where(users: { id: nil })
+      #              .includes(:album, :artist)
+      #              .with_attached_image
+      #              .with_attached_audio_file
+      @songs = current_user.songs.includes(:album, :artist)
+                           .with_attached_image
+                           .with_attached_audio_file
+      if @songs.empty?
+        redirect_to root_path, notice: "No songs found for the current user."
+        return
+      end
+
     elsif current_milk_admin
       @songs = Song.includes(:album, :artist)
                    .with_attached_image
