@@ -1,10 +1,15 @@
 <!-- Music Player -->
-<div data-controller="music--player" class="flex flex-col w-full">
+<div data-controller="music--player" class="relative flex flex-col w-full">
+  <!-- Settings Menu (positioned absolutely over banner) -->
+  <div class="absolute z-50" style="top: 1rem; right: 1rem;">
+    <%= render partial: "zuke/components/player/settings_menu" %>
+  </div>
+
   <!-- Banner Section -->
   <!-- This partial will change the default banner image to the song's or playlist's image -->
-  <%= render "zuke/components/player/banner", 
-             banner_image: @banner_image, 
-             title: @banner_title, 
+  <%= render "zuke/components/player/banner",
+             banner_image: @banner_image,
+             title: @banner_title,
              subtitle: @banner_subtitle %>
 
   <div class="flex justify-center items-center bg-black text-white p-2 md:p-4">

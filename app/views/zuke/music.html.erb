@@ -1,15 +1,10 @@
 <section class="flex justify-center items-center bg-zinc-900 w-full min-h-screen">
   <div class="flex w-full max-w-5xl">
-    <!-- Sidebar (hidden on mobile, visible on md+) -->
-    <div class="hidden md:block">
-      <%= render "zuke/components/sidebar/root" %>
-    </div>
-
     <!-- Main Content Area (full width on mobile, flexible on desktop) -->
     <div class="bg-gray-700 relative flex flex-col h-screen w-full">
       <!-- Music Player (fixed height) -->
       <div class="sticky top-0 z-20 bg-[#856144]">
-        <%= render partial: "shared/music_player" %>
+        <%= render partial: "zuke/components/music_player" %>
       </div>
 
       <!-- Scrollable Turbo Frame Content -->
