@@ -38,6 +38,7 @@ Rails.application.routes.draw do
       member do
         delete :destroy_image
         delete :destroy_file
+        delete :destroy_banner_video
       end
     end
 

@@ -3,6 +3,16 @@
      data-controller="music--banner music--banner-height"
      data-music--banner-target="container"
      data-music--banner-height-target="banner">
+    <!-- Dynamic Video (hidden by default, shown if video enabled and available) -->
+    <video data-music--banner-target="video"
+           class="hidden w-full h-full object-cover"
+           autoplay
+           loop
+           muted
+           playsinline
+           preload="metadata">
+    </video>
+
     <!-- Dynamic Image -->
     <%= image_tag(
       banner_image || "home-banner.jpg",

@@ -29,11 +29,12 @@ class ZukeController < ApplicationController
     @songs_data = @songs.map do |song|
       {
         id: song.id,
-        url: song.audio_file.attached? ? url_for(song.audio_file) : nil,
+        url: song.audio_file.attached? ? rails_blob_url(song.audio_file) : nil,
         title: song.title,
         artist: song.artist.name,
-        banner: song.image.attached? ? url_for(song.image) : nil,
-        bannerMobile: song.image.attached? ? url_for(song.mobile_image_variant) : nil,
+        banner: song.image.attached? ? rails_blob_url(song.image) : nil,
+        bannerMobile: song.image.attached? ? rails_blob_url(song.mobile_image_variant) : nil,
+        bannerVideo: song.banner_video.attached? ? rails_blob_url(song.banner_video) : nil,
         imageCredit: song.image_credit,
         imageCreditUrl: song.image_credit_url,
         imageLicense: song.image_license,

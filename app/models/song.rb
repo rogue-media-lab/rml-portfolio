@@ -1,5 +1,6 @@
 class Song < ApplicationRecord
   has_one_attached :image
+  has_one_attached :banner_video
   has_one_attached :audio_file
   belongs_to :artist
   belongs_to :album, optional: true, inverse_of: :songs
@@ -77,10 +78,15 @@ class Song < ApplicationRecord
   private
 
   def calculate_mobile_crop
-    # Source dimensions (adjust these if your images have different dimensions)
-    source_width = 1024
-    source_height = 574
-    target_size = 574 # Square crop
+    return [ 0, 0, 640, 640 ] unless image.attached?
+
+    # Get actual image dimensions from blob metadata
+    metadata = image.blob.metadata
+    source_width = metadata["width"] || 1024
+    source_height = metadata["height"] || 574
+
+    # Use the smaller dimension for square crop
+    target_size = [ source_width, source_height ].min
 
     # Get focal point (defaults to center if not set)
     fx = (focal_point_x || 0.5) * source_width

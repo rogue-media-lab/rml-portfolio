@@ -51,6 +51,22 @@
       </div>
       <%= form.file_field :audio_file, class: "block w-full text-sm border rounded-lg cursor-pointer text-base-dark focus:outline-hidden bg-gray-100 border-gray-100" %>
     </div>
+
+    <div class="rounded-md p-2">
+      <div class="flex items-center my-4">
+        <%= form.label :banner_video, "Select Banner Video (optional)" %>&nbsp;
+        <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 6H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1Zm7 11-6-2V9l6-2v10Z"/>
+        </svg>
+        <span class="text-sm ml-2 text-gray-500">MP4 format, same dimensions as image</span>
+      </div>
+      <%= form.file_field :banner_video, accept: "video/mp4", class: "block w-full text-sm border rounded-lg cursor-pointer text-base-dark focus:outline-hidden bg-gray-100 border-gray-100" %>
+      <% if song.persisted? && song.banner_video.attached? %>
+        <p class="text-sm text-green-600 mt-2">✓ Video attached: <%= song.banner_video.filename %></p>
+        <%= link_to "Remove video", destroy_banner_video_milk_admin_song_path(song), class: "text-sm text-red-500 hover:text-red-700 mt-1 inline-block", data: { turbo_method: :delete, turbo_confirm: "Remove banner video?" } %>
+      <% end %>
+    </div>
+
     <%= form.hidden_field :focal_point_x,
         value: song.focal_point_x || 0.5,
         data: { focal_point_picker_target: "xInput" } %>

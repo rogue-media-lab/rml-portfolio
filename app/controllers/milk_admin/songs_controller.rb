@@ -3,7 +3,7 @@ class MilkAdmin::SongsController < ApplicationController
   # Ensure milk admin is logged in for CRUD actions
   before_action :authenticate_milk_admin!
   # Set song for methods that need it
-  before_action :set_song, only: [ :edit, :update, :destroy, :destroy_image, :destroy_file ]
+  before_action :set_song, only: [ :edit, :update, :destroy, :destroy_image, :destroy_file, :destroy_banner_video ]
 
   # GET /milk_admin/songs
   #
@@ -192,6 +192,18 @@ class MilkAdmin::SongsController < ApplicationController
     end
   end
 
+  def destroy_banner_video
+    @song.banner_video.purge_later
+
+    respond_to do |format|
+      if @song.banner_video.attached?
+        format.html { redirect_to edit_milk_admin_song_path(@song), notice: "Banner video removed." }
+      else
+        format.html { redirect_to edit_milk_admin_song_path(@song), alert: "No banner video to remove." }
+      end
+    end
+  end
+
   # DELETE /milk_admin/songs/1/destroy_file
   #
   # Destroys the associated audio file from the song - aws-s3.
@@ -227,6 +239,7 @@ class MilkAdmin::SongsController < ApplicationController
   def song_params
     params.require(:song).permit(:image,
                                   :audio_file,
+                                  :banner_video,
                                   :title,
                                   :focal_point_x,
                                   :focal_point_y,

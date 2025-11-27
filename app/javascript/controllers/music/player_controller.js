@@ -194,6 +194,11 @@ export default class extends Controller {
       this.updateTimeDisplay(0)
       this.hideLoadingIndicator()
       this.dispatchStateChange()
+
+      // Notify that audio is ready - safe to load video now
+      window.dispatchEvent(new CustomEvent("audio:ready", {
+        detail: { url: this.currentUrl }
+      }))
     } catch (error) {
       console.error("Error handling track ready:", error)
       this.handleAudioError()
@@ -253,14 +258,22 @@ export default class extends Controller {
   handlePlayRequest(e) {
     try {
       const {
-        id, url, title, artist, banner, bannerMobile, playOnLoad = false, updateBanner,
+        id, url, title, artist, banner, bannerMobile, bannerVideo, playOnLoad = false, updateBanner,
         imageCredit, imageCreditUrl, imageLicense, audioSource, audioLicense, additionalCredits
       } = e.detail
 
       this.setCurrentIndex(id)
 
+      // Start audio loading FIRST (priority)
+      if (!this.wavesurfer || this.currentUrl !== url) {
+        this.loadTrack(url, playOnLoad)
+      } else {
+        this.togglePlayback()
+      }
+
+      // Then update UI (non-blocking, can happen in parallel)
       if (updateBanner !== false) {
-        this.updateBanner({ banner, bannerMobile, title, artist })
+        this.updateBanner({ banner, bannerMobile, bannerVideo, title, artist })
       }
 
       // Update credits display
@@ -274,12 +287,6 @@ export default class extends Controller {
         audioLicense,
         additionalCredits
       })
-
-      if (!this.wavesurfer || this.currentUrl !== url) {
-        this.loadTrack(url, playOnLoad)
-      } else {
-        this.togglePlayback()
-      }
     } catch (error) {
       console.error("Error handling play event:", error)
       this.handleAudioError()
@@ -298,6 +305,7 @@ export default class extends Controller {
         artist: song.artist,
         banner: song.banner,
         bannerMobile: song.bannerMobile,
+        bannerVideo: song.bannerVideo,
         autoplay: true,
         updateBanner: true
       }
@@ -354,6 +362,7 @@ export default class extends Controller {
       this.updateBanner({
         banner: song.banner,
         bannerMobile: song.bannerMobile,
+        bannerVideo: song.bannerVideo,
         title: song.title,
         artist: song.artist
       });
@@ -513,11 +522,12 @@ export default class extends Controller {
    * Update banner display
    * @param {Object} details - Banner details
    */
-  updateBanner({ banner, bannerMobile, title, artist }) {
+  updateBanner({ banner, bannerMobile, bannerVideo, title, artist }) {
     document.dispatchEvent(new CustomEvent("music:banner:update", {
       detail: {
         image: banner,
         imageMobile: bannerMobile,
+        video: bannerVideo,
         title: title || "Unknown Track",
         subtitle: artist || "Unknown Artist"
       }

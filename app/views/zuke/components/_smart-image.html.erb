@@ -1,10 +1,11 @@
 <div data-controller="music--smart-image"
      data-music--smart-image-id-value="<%= song.id %>"
-     data-music--smart-image-url-value="<%= url_for(song.audio_file) if song.audio_file.attached? %>"
+     data-music--smart-image-url-value="<%= rails_blob_url(song.audio_file) if song.audio_file.attached? %>"
      data-music--smart-image-title-value="<%= song.title %>"
      data-music--smart-image-artist-value="<%= song.artist.name %>"
-     data-music--smart-image-banner-value="<%= song.image.attached? ? url_for(song.image) : '' %>"
-     data-music--smart-image-banner-mobile-value="<%= song.image.attached? ? url_for(song.mobile_image_variant) : '' %>"
+     data-music--smart-image-banner-value="<%= song.image.attached? ? rails_blob_url(song.image) : '' %>"
+     data-music--smart-image-banner-mobile-value="<%= song.image.attached? ? rails_blob_url(song.mobile_image_variant) : '' %>"
+     data-music--smart-image-banner-video-value="<%= song.banner_video.attached? ? rails_blob_url(song.banner_video) : '' %>"
      data-music--smart-image-image-credit-value="<%= song.image_credit || '' %>"
      data-music--smart-image-image-credit-url-value="<%= song.image_credit_url || '' %>"
      data-music--smart-image-image-license-value="<%= song.image_license || '' %>"
@@ -13,7 +14,7 @@
      data-music--smart-image-additional-credits-value="<%= song.additional_credits || '' %>">
 
   <% if song.image.attached? %>
-    <%= image_tag url_for(song.image),
+    <%= image_tag rails_blob_url(song.image),
         class: "rounded-lg w-full aspect-square object-cover border-2 border-gray-200 cursor-pointer hover:border-sky-400 transition-colors",
         alt: "Album cover for: #{song.title}",
         aria: { label: "Album cover for: #{song.title}" },
