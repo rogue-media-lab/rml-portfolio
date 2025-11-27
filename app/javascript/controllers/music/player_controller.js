@@ -98,11 +98,25 @@ export default class extends Controller {
   // ========================
 
   /**
+   * Detect if running on mobile device
+   * @returns {boolean}
+   */
+  isMobile() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+  }
+
+  /**
    * Initialize WaveSurfer audio instance
    * Creates and configures the WaveSurfer player with visualization options
    */
   initializeWaveSurfer() {
     try {
+      // Use MediaElement backend on mobile for better autoplay support
+      // WebAudio backend has stricter autoplay restrictions on mobile browsers
+      const backend = this.isMobile() ? "MediaElement" : "WebAudio"
+
+      console.log(`Initializing WaveSurfer with ${backend} backend (Mobile: ${this.isMobile()})`)
+
       this.wavesurfer = WaveSurfer.create({
         container: this.waveformTarget,
         waveColor: "#00B1D1",
@@ -117,7 +131,7 @@ export default class extends Controller {
         barGap: 1,
         barRadius: 2,
         responsive: true,
-        backend: "WebAudio"
+        backend: backend
       })
       this.setupWaveSurferEvents()
     } catch (error) {
@@ -230,6 +244,8 @@ export default class extends Controller {
    * Handle track ending naturally
    */
   async handleTrackEnd() {
+    console.log("Track ended - Auto-advance:", this.autoAdvanceValue, "Queue length:", this.currentQueue.length)
+
     this.handlePause()
     this.resetPlayback()
     window.dispatchEvent(new CustomEvent("audio:ended", {
@@ -237,20 +253,27 @@ export default class extends Controller {
     }))
 
     if (this.autoAdvanceValue && this.currentQueue.length > 0) {
-      // Resume AudioContext for mobile Safari
+      console.log("Attempting to play next track...")
+      // Resume AudioContext for mobile Safari (WebAudio backend only)
       await this.ensureAudioContextResumed()
       this.playNext()
+    } else {
+      console.log("Not advancing - Auto-advance disabled or empty queue")
     }
   }
 
   /**
-   * Ensure AudioContext is resumed (critical for mobile Safari)
+   * Ensure AudioContext is resumed (critical for mobile Safari with WebAudio backend)
    */
   async ensureAudioContextResumed() {
     try {
-      const backend = this.wavesurfer?.getMediaElement?.()
-      if (backend && backend.context && backend.context.state === 'suspended') {
-        await backend.context.resume()
+      // Only needed for WebAudio backend
+      if (this.isMobile()) {
+        const mediaElement = this.wavesurfer?.getMediaElement?.()
+        if (mediaElement && mediaElement.context && mediaElement.context.state === 'suspended') {
+          console.log("Resuming suspended AudioContext...")
+          await mediaElement.context.resume()
+        }
       }
     } catch (error) {
       console.warn("Could not resume AudioContext:", error)
@@ -339,26 +362,33 @@ export default class extends Controller {
    * Play the next song in queue
    */
   playNext() {
-    if (this.currentQueue.length === 0) return;
-    
+    console.log("playNext called - Current index:", this.currentIndex, "Queue length:", this.currentQueue.length)
+
+    if (this.currentQueue.length === 0) {
+      console.warn("Cannot play next - queue is empty")
+      return;
+    }
+
     // Calculate next index safely
     const nextIndex = (this.currentIndex + 1) % this.currentQueue.length;
-    
+
     // Verify we're actually moving to a new track
     if (nextIndex === this.currentIndex && this.currentQueue.length > 1) {
       this.currentIndex = 0; // Wrap around to start
     } else {
       this.currentIndex = nextIndex;
     }
-    
+
     const nextSong = this.currentQueue[this.currentIndex];
-    
+
+    console.log("Next song:", nextSong?.title, "at index:", this.currentIndex)
+
     // Verify we have a valid song to play
     if (!nextSong || nextSong.url === this.currentUrl) {
       console.warn("Invalid next song or same as current");
       return;
     }
-    
+
     this.playSongFromQueue(nextSong);
   }
 
@@ -372,6 +402,8 @@ export default class extends Controller {
 
   playSongFromQueue(song) {
     try {
+      console.log("playSongFromQueue called with:", song?.title)
+
       if (!song || !song.url) {
         console.error("Invalid song object in queue");
         return;
@@ -408,22 +440,32 @@ export default class extends Controller {
       // Dispatch play request
       this.dispatchTrackChange(song.url)
 
+      console.log("Loading track:", song.url)
+
       // Load and play immediately - no setTimeout delay
       // This keeps the user gesture context alive for mobile Safari
       this.wavesurfer.load(song.url);
       this.wavesurfer.once('ready', () => {
+        console.log("Track ready, attempting to play...")
+
         // Use promise-based play() to handle autoplay blocking
         const playPromise = this.wavesurfer.play();
 
         // Handle play promise for mobile Safari autoplay restrictions
         if (playPromise !== undefined) {
-          playPromise.catch((error) => {
-            console.warn("Autoplay blocked by browser:", error);
-            // Optionally dispatch event to show "Click to continue" UI
-            document.dispatchEvent(new CustomEvent("player:autoplay-blocked", {
-              detail: { song: song }
-            }));
-          });
+          playPromise
+            .then(() => {
+              console.log("Playback started successfully")
+            })
+            .catch((error) => {
+              console.error("Autoplay blocked by browser:", error);
+              // Optionally dispatch event to show "Click to continue" UI
+              document.dispatchEvent(new CustomEvent("player:autoplay-blocked", {
+                detail: { song: song }
+              }));
+            });
+        } else {
+          console.log("Play promise undefined - playback should have started")
         }
       });
 
