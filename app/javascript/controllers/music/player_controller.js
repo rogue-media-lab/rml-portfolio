@@ -156,7 +156,14 @@ export default class extends Controller {
   setupEventListeners() {
     // Existing listeners
     window.addEventListener("player:play-requested", this.handlePlayRequest.bind(this));
-    document.addEventListener("player:play", () => this.wavesurfer.play());
+    document.addEventListener("player:play", () => {
+      const playPromise = this.wavesurfer.play()
+      if (playPromise !== undefined) {
+        playPromise.catch((error) => {
+          console.warn("Play blocked:", error)
+        })
+      }
+    });
     document.addEventListener("player:pause", () => this.wavesurfer.pause());
 
     document.addEventListener("player:auto-advance:changed", (event) => {
@@ -222,7 +229,7 @@ export default class extends Controller {
   /**
    * Handle track ending naturally
    */
-  handleTrackEnd() {
+  async handleTrackEnd() {
     this.handlePause()
     this.resetPlayback()
     window.dispatchEvent(new CustomEvent("audio:ended", {
@@ -230,7 +237,23 @@ export default class extends Controller {
     }))
 
     if (this.autoAdvanceValue && this.currentQueue.length > 0) {
+      // Resume AudioContext for mobile Safari
+      await this.ensureAudioContextResumed()
       this.playNext()
+    }
+  }
+
+  /**
+   * Ensure AudioContext is resumed (critical for mobile Safari)
+   */
+  async ensureAudioContextResumed() {
+    try {
+      const backend = this.wavesurfer?.getMediaElement?.()
+      if (backend && backend.context && backend.context.state === 'suspended') {
+        await backend.context.resume()
+      }
+    } catch (error) {
+      console.warn("Could not resume AudioContext:", error)
     }
   }
 
@@ -385,13 +408,24 @@ export default class extends Controller {
       // Dispatch play request
       this.dispatchTrackChange(song.url)
 
-      // Load with small delay to ensure cleanup
-      setTimeout(() => {
-        this.wavesurfer.load(song.url);
-        this.wavesurfer.once('ready', () => {
-          this.wavesurfer.play();
-        });
-      }, 50);
+      // Load and play immediately - no setTimeout delay
+      // This keeps the user gesture context alive for mobile Safari
+      this.wavesurfer.load(song.url);
+      this.wavesurfer.once('ready', () => {
+        // Use promise-based play() to handle autoplay blocking
+        const playPromise = this.wavesurfer.play();
+
+        // Handle play promise for mobile Safari autoplay restrictions
+        if (playPromise !== undefined) {
+          playPromise.catch((error) => {
+            console.warn("Autoplay blocked by browser:", error);
+            // Optionally dispatch event to show "Click to continue" UI
+            document.dispatchEvent(new CustomEvent("player:autoplay-blocked", {
+              detail: { song: song }
+            }));
+          });
+        }
+      });
 
     } catch (error) {
       console.error("Error playing from queue:", error);
@@ -461,7 +495,12 @@ export default class extends Controller {
   setupPlayOnLoad(playOnLoad) {
     if (playOnLoad) {
       this.wavesurfer.once("ready", () => {
-        this.wavesurfer.play()
+        const playPromise = this.wavesurfer.play()
+        if (playPromise !== undefined) {
+          playPromise.catch((error) => {
+            console.warn("Autoplay blocked on load:", error)
+          })
+        }
       })
     }
   }
