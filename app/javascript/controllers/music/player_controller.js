@@ -99,10 +99,24 @@ export default class extends Controller {
 
   /**
    * Detect if running on mobile device
+   * Uses multiple detection methods for better accuracy
    * @returns {boolean}
    */
   isMobile() {
-    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+    // Check user agent for mobile devices
+    const mobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+
+    // Check for touch-only devices (excludes laptops with touchscreens)
+    const isTouchDevice = ('ontouchstart' in window) &&
+                          (navigator.maxTouchPoints > 0) &&
+                          !window.matchMedia("(pointer: fine)").matches
+
+    // Check screen width as secondary indicator (typical phone/tablet sizes)
+    const isSmallScreen = window.innerWidth <= 768
+
+    // Consider it mobile if: (mobile UA OR touch-only device) AND small screen
+    // This prevents laptops from being detected as mobile
+    return (mobileUA || isTouchDevice) && isSmallScreen
   }
 
   /**
@@ -111,11 +125,11 @@ export default class extends Controller {
    */
   initializeWaveSurfer() {
     try {
-      // Use MediaElement backend on mobile for better autoplay support
-      // WebAudio backend has stricter autoplay restrictions on mobile browsers
-      const backend = this.isMobile() ? "MediaElement" : "WebAudio"
+      // IMPORTANT: Use MediaElement backend so EQ can create its own Web Audio chain
+      // WebAudio backend hides audio nodes, making EQ impossible
+      const backend = "MediaElement"
 
-      console.log(`Initializing WaveSurfer with ${backend} backend (Mobile: ${this.isMobile()})`)
+      console.log(`Initializing WaveSurfer with ${backend} backend (for EQ compatibility)`)
 
       this.wavesurfer = WaveSurfer.create({
         container: this.waveformTarget,

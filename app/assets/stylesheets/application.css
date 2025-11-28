@@ -8,3 +8,38 @@
  *
  * Consider organizing styles into separate files for maintainability.
  */
+
+/* EQ Slider Styles */
+.eq-slider {
+  -webkit-appearance: slider-vertical;
+  appearance: slider-vertical;
+  writing-mode: bt-lr; /* Old IE / Firefox */
+  writing-mode: vertical-lr; /* Modern browsers */
+  height: 120px;
+  width: 8px;
+  background: linear-gradient(to top, #14b8a6 0%, #14b8a6 50%, #4b5563 50%, #4b5563 100%);
+  outline: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.eq-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 12px;
+  background: #14b8a6;
+  cursor: pointer;
+  border-radius: 3px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.eq-slider::-moz-range-thumb {
+  width: 20px;
+  height: 12px;
+  background: #14b8a6;
+  cursor: pointer;
+  border-radius: 3px;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}

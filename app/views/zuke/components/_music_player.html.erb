@@ -1,9 +1,26 @@
 <!-- Music Player -->
-<div data-controller="music--player" class="relative flex flex-col w-full">
+<div data-controller="music--player music--equalizer" class="relative flex flex-col w-full">
   <!-- Settings Menu (positioned absolutely over banner) -->
   <div class="absolute z-50" style="top: 1rem; right: 1rem;">
     <%= render partial: "zuke/components/player/settings_menu" %>
   </div>
+
+  <!-- Equalizer Button (positioned below settings menu) -->
+  <button data-action="click->music--equalizer#togglePanel"
+          data-music--equalizer-target="trigger"
+          class="absolute z-50 bg-black/50 hover:bg-black/70 p-2 rounded-full transition-all duration-300"
+          style="top: 4rem; right: 1rem;"
+          aria-label="Equalizer"
+          type="button">
+    <svg data-music--equalizer-target="triggerIcon"
+         class="w-6 h-6 text-white transition-colors duration-300"
+         fill="none"
+         stroke="currentColor"
+         viewBox="0 0 24 24"
+         xmlns="http://www.w3.org/2000/svg">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
+    </svg>
+  </button>
 
   <!-- Banner Section -->
   <!-- This partial will change the default banner image to the song's or playlist's image -->
@@ -11,6 +28,9 @@
              banner_image: @banner_image,
              title: @banner_title,
              subtitle: @banner_subtitle %>
+
+  <!-- EQ Panel Overlay (positioned over banner) -->
+  <%= render "zuke/components/player/equalizer_panel" %>
 
   <div class="flex justify-center items-center bg-black text-white p-2 md:p-4">
     <div class="flex items-center w-full max-w-4xl gap-4">

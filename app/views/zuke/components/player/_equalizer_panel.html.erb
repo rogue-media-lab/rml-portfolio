@@ -1,0 +1,139 @@
+<!-- EQ Panel (overlay positioned over banner) -->
+<div data-music--equalizer-target="panel"
+     class="hidden absolute top-0 left-0 right-0 z-40 flex items-center justify-center p-4"
+     style="height: 275px;">
+
+  <!-- Panel Background with Semi-Transparent Overlay -->
+  <div class="bg-black/95 backdrop-blur-sm rounded-lg shadow-xl border border-gray-600 w-full max-w-4xl p-4 sm:p-6 flex flex-col" style="height: 250px;">
+
+    <!-- WebAudio Not Available Message -->
+    <div data-music--equalizer-target="unavailableMessage"
+         class="hidden flex-1 flex items-center justify-center">
+      <div class="text-center text-gray-400 px-6">
+        <svg class="w-16 h-16 mx-auto mb-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+        </svg>
+        <h3 class="text-lg font-semibold text-white mb-2">Equalizer Not Available</h3>
+        <p class="text-sm">The equalizer requires Web Audio API, which is not available on this device or browser.</p>
+        <p class="text-sm mt-2">Try using a desktop browser for full EQ functionality.</p>
+      </div>
+    </div>
+
+    <!-- Header -->
+    <div data-music--equalizer-target="headerContent"
+         class="flex items-center justify-between mb-4">
+      <h3 class="text-white font-semibold text-lg flex items-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
+        </svg>
+        Equalizer
+      </h3>
+
+      <div class="flex items-center gap-2">
+        <!-- Active Song Indicator (shown when song has custom EQ) -->
+        <span data-music--equalizer-target="songIndicator"
+              class="hidden text-xs text-teal-400 px-2 py-1 bg-teal-900/30 rounded border border-teal-700">
+          Custom EQ Active
+        </span>
+
+        <!-- Close Button -->
+        <button data-action="click->music--equalizer#togglePanel"
+                class="text-gray-400 hover:text-white transition-colors"
+                aria-label="Close Equalizer"
+                type="button">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div data-music--equalizer-target="mainContent"
+         class="flex-1 flex gap-4 min-h-0">
+
+      <!-- Left Side: 10-Band Sliders -->
+      <div class="flex-1 flex flex-col min-h-0">
+        <div class="flex justify-between items-end gap-2 flex-1">
+          <%
+            frequencies = [32, 64, 125, 250, 500, 1000, 2000, 4000, 8000, 16000]
+            frequencies.each_with_index do |freq, index|
+          %>
+            <div class="flex flex-col items-center gap-1 flex-1" style="min-height: 140px;">
+              <!-- Frequency Label -->
+              <span class="text-white text-xs font-medium">
+                <%= freq >= 1000 ? "#{freq/1000}k" : freq %>
+              </span>
+
+              <!-- Gain Display -->
+              <span data-music--equalizer-target="gainDisplay<%= index %>"
+                    class="text-teal-400 text-xs font-mono">
+                0dB
+              </span>
+
+              <!-- Vertical Slider -->
+              <div class="flex-1 flex items-center justify-center w-full" style="min-height: 100px;">
+                <input type="range"
+                       data-music--equalizer-target="band<%= index %>"
+                       data-frequency="<%= freq %>"
+                       data-action="input->music--equalizer#updateBand"
+                       min="-12"
+                       max="12"
+                       step="1"
+                       value="0"
+                       class="eq-slider"
+                       aria-label="<%= freq >= 1000 ? "#{freq/1000}kHz" : "#{freq}Hz" %> band">
+              </div>
+
+              <!-- Hz Label -->
+              <span class="text-gray-500 text-xs">Hz</span>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Right Side: Presets & Controls -->
+      <div class="w-40 flex flex-col gap-2">
+        <div class="text-white text-xs font-semibold">Presets</div>
+
+        <!-- Preset Buttons -->
+        <div class="space-y-1 flex-1 overflow-y-auto pr-1">
+          <%
+            presets = ["Flat", "Rock", "Pop", "Jazz", "Classical", "Electronic", "Bass Boost", "Treble Boost"]
+            presets.each do |preset|
+          %>
+            <button data-action="click->music--equalizer#applyPreset"
+                    data-preset="<%= preset.parameterize %>"
+                    class="w-full px-2 py-1.5 text-left text-xs text-white bg-gray-700 hover:bg-teal-600 rounded transition-colors border border-gray-600 hover:border-teal-500">
+              <%= preset %>
+            </button>
+          <% end %>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex gap-1 pt-2 border-t border-gray-700">
+          <!-- Save for Current Song -->
+          <button data-action="click->music--equalizer#saveForSong"
+                  data-music--equalizer-target="saveButton"
+                  class="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 text-xs text-white bg-teal-600 hover:bg-teal-700 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  title="Save for Song">
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/>
+            </svg>
+            <span>Save</span>
+          </button>
+
+          <!-- Reset Button -->
+          <button data-action="click->music--equalizer#reset"
+                  class="flex-1 flex items-center justify-center gap-1 px-2 py-1.5 text-xs text-gray-300 bg-gray-800 hover:bg-red-900 hover:text-white rounded transition-colors border border-gray-700 hover:border-red-700"
+                  title="Reset to Flat">
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+            </svg>
+            <span>Reset</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
