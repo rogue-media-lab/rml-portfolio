@@ -73,7 +73,7 @@ group :test do
 end
 
 # Store images in S3
-gem "aws-sdk-s3", "~> 1.183"
+gem "aws-sdk-s3", "~> 1.205"
 
 # ViewComponents
 gem "view_component"
