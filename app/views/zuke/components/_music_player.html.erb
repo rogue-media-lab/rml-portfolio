@@ -32,7 +32,9 @@
   <!-- EQ Panel Overlay (positioned over banner) -->
   <%= render "zuke/components/player/equalizer_panel" %>
 
-  <div class="flex justify-center items-center bg-black text-white p-2 md:p-4">
+  <div data-controller="music--waveform-position"
+       data-music--waveform-position-target="container"
+       class="relative flex justify-center items-center bg-black text-white p-2 md:p-4 transition-all duration-500">
     <div class="flex items-center w-full max-w-4xl gap-4">
 
       <%= render "zuke/components/player/time_display" do %>

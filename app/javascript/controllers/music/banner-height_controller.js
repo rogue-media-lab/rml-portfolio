@@ -13,6 +13,10 @@ export default class extends Controller {
     if (savedState !== null) {
       this.expandedValue = savedState === "true"
     }
+    // Dispatch initial state after a short delay to ensure other controllers are connected
+    setTimeout(() => {
+      this.dispatchHeightChangeEvent(this.expandedValue)
+    }, 100)
   }
 
   toggle(event) {
@@ -35,6 +39,8 @@ export default class extends Controller {
     this.bannerTarget.style.height = "100vh"
     // Rotate arrow to point up
     this.arrowTarget.style.transform = "rotate(180deg)"
+    // Dispatch event for other controllers to respond
+    this.dispatchHeightChangeEvent(true)
   }
 
   collapse() {
@@ -42,5 +48,13 @@ export default class extends Controller {
     this.bannerTarget.style.height = "275px"
     // Reset arrow to point down
     this.arrowTarget.style.transform = "rotate(0deg)"
+    // Dispatch event for other controllers to respond
+    this.dispatchHeightChangeEvent(false)
+  }
+
+  dispatchHeightChangeEvent(expanded) {
+    window.dispatchEvent(new CustomEvent("music:banner:height-changed", {
+      detail: { expanded: expanded }
+    }))
   }
 }
