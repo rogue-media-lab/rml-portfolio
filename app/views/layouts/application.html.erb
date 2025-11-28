@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Zuke">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     <%= display_meta_tags(default_meta_tags) %>
@@ -15,7 +17,14 @@
     <%= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
 
     <link rel="icon" href="/icon.png" type="image/png">
-    <link rel="apple-touch-icon" href="/icon.png">
+    <link rel="apple-touch-icon" href="/icon-192x192.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/icon-192x192.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/icon-192x192.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="/icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/icon-72x72.png">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
