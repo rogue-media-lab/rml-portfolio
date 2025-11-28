@@ -57,6 +57,7 @@ Rails.application.routes.draw do
   resources :zuke, only: [ :index ], controller: "zuke" do
     collection do
       get "music", to: "zuke#music", as: :music_list  # This creates the route for /zuke/music
+      get "songs", to: "zuke#songs", as: :music_songs  # For turbo frame loading of songs
       get "artists", to: "zuke#artists", as: :music_artists
       get "albums", to: "zuke#albums", as: :music_albums
       get "genres", to: "zuke#genres", as: :music_genres

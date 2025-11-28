@@ -1,8 +1,9 @@
 <div class="relative w-full overflow-hidden transition-all duration-500 ease-in-out"
-     style="height: 250px;"
+     style="height: 275px;"
      data-controller="music--banner music--banner-height"
      data-music--banner-target="container"
      data-music--banner-height-target="banner">
+
     <!-- Dynamic Video (hidden by default, shown if video enabled and available) -->
     <video data-music--banner-target="video"
            class="hidden w-full h-full object-cover"
@@ -26,9 +27,9 @@
      data-music--banner-target="overlay">
       <div>
         <h2 class="text-[#FFC9A4] text-xl sm:text-2xl md:text-4xl font-bold"
-            data-music--banner-target="title"><%= title || "Welcome back Dev3027" %></h2>
+            data-music--banner-target="title"><%= title || "Welcome to Zuke" %></h2>
         <p class="text-[#FFC9A4] text-sm sm:text-base"
-          data-music--banner-target="subtitle"><%= subtitle || "Please consider making me available to everyone." %></p>
+          data-music--banner-target="subtitle"><%= subtitle || "A music player for your music!" %></p>
       </div>
     </div>
 

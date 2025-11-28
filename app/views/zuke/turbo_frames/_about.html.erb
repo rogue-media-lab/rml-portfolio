@@ -1,15 +1,18 @@
 <%= turbo_frame_tag "music-frame" do %>
-  <div class="kanit p-8 rounded-sm text-gray-950 bg-white/80 m-4">
-    <h1 class="text-3xl font-bold mb-6">About Music Found</h1>
+  <div class="kanit p-8 rounded-sm text-gray-100 border-white m-4">
+    <h1 class="text-3xl font-bold mb-6 text-milk-light">Zuke Music Player</h1>
 
-    <h2 class="text-lg font-medium mb-2">A modern web-based music player inspired by the Microsoft Zune, built for control, nostalgia, and personal expression.</h2>
+    <h2 class="text-lg font-medium mb-2 text-milk-light">A modern web-based music player inspired by the Microsoft Zune, built for control, nostalgia, and personal expression.</h2>
 
-    <p>Music Found is a self-hosted music player designed to let you manage and enjoy your collection your way. Upload your music, customize metadata, organize playlists, and associate visuals—album art, GIFs, or video clips—to create a richer listening experience. With an integrated EQ, waveform visualization, and a secure API for future expansion, it's a passion project bridging the gap between nostalgia and modern web tech.</p>
+    <p>Music Found is a self-hosted music player designed to let you manage and enjoy your collection your way. Upload your music, customize metadata, organize playlists, and associate visuals like album art, GIFs, or video clips—to create a richer listening experience. With an integrated EQ, waveform visualization, and a secure API for future expansion, it's a passion project bridging the gap between nostalgia and modern web tech.</p>
 
-    <h2 class="text-lg font-medium mt-2">Why I Built This</h2>
-    <p>I wanted more than just a playlist scrubber. I missed the tactile feel of organizing music visually—the way Zune's UI celebrated album art and discovery. Streaming services don't always respect how I associate sounds with memories, visuals, or even specific EQ settings. Music Found is my answer: a place to tweak metadata, boost bass for hip-hop, crisp up vocals for jazz, or pair a song with a GIF that captures its vibe.</p>
+    <h2 class="text-lg font-medium mt-2 text-milk-light">Why I Built This</h2>
+    <p>I have the music I love, but I wanted a way to enjoy it that felt more personal and tactile than streaming services. Zuke is my attempt to create that experience. One where you can upload your own music, tag it with your own metadata, and associate it with visuals that mean something to you. Only I know what a song does for my mood. I miss being able to adjust the frequency values, album art, or the ability to customize my player. So many things have been given up in the move to streaming. Music lost its taste. I want to feel comfortably numb again.</p>
 
-    <h2 class="text-lg font-medium mt-2">Technical Stack</h2>
+    <h2 class="text-lg font-medium mt-2 text-milk-light">Looking Forward</h2>
+    <p>This player is fun to play with here in the Lab, but is a feature for Soundscape. Soundscape is a social music platform where both music and digital artists can share music with friends, and discover new music from others. Think of it as BandCamp meets Deviant Art. I picture a new social experiment where young music artist and digital artists of images and video collaborate to create a new kind of music experience.</p>
+
+    <h2 class="text-lg font-medium mt-2 text-milk-light">Technical Stack</h2>
     <ul>
       <li>Backend: Ruby on Rails (API + Admin)</li>
       <li>Frontend: Turbo Frames for seamless navigation, Stimulus for interactivity</li>
@@ -19,19 +22,23 @@
       <li>Extras: Waveform visualization, WavesurferJS, Devise/Rails-secured API endpoints</li>
     </ul>
 
-    <h2 class="text-lg font-medium mt-2">Features</h2>
+    <h2 class="text-lg font-medium mt-2 text-milk-light">Features</h2>
     <ul>
       <li>Upload and tag music, artists, and albums</li>
       <li>Custom metadata editing (even after upload)</li>
-      <li>Playlist creation with drag-and-drop</li>
+      <li>Credits dropdown for artist/album info</li>
       <li>Audio waveform visualization</li>
+      <li>Auto Advance to next track</li>
+      <li>Auto play selected track</li>
       <li>Parametric EQ for fine-tuned listening</li>
       <li>Associate images/GIFs/video clips with tracks</li>
-      <li>Admin dashboard for bulk management</li>
+      <li>Option to play video if available</li>
+      <li>Coordinate system for plotting the image focus</li>
+      <li>Admin dashboard</li>
       <li>Secure API for future mobile app integration</li>
     </ul>
 
-    <p class="mt-3"><em>Music Found is a love letter to the way music should feel: personal, tactile, and yours.</em></p>
+    <p class="mt-3"><em>Zuke is a love letter to the way music should feel: personal, tactile, and yours.</em></p>
 
   </div>
 <% end %>

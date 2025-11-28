@@ -14,8 +14,9 @@
 
   <div class="flex justify-center items-center bg-black text-white p-2 md:p-4">
     <div class="flex items-center w-full max-w-4xl gap-4">
+
       <%= render "zuke/components/player/time_display" do %>
-        <div class="flex flex-col flex-1 md:w-96 md:flex-initial min-w-0">
+        <div class="flex flex-col flex-1 md:w-full md:flex-initial min-w-0">
           <div class="mx-auto w-full" data-music--player-target="waveform"></div>
           <div class="h-1 bg-gray-700 relative">
             <div data-music--player-target="loadingProgress"
@@ -26,10 +27,6 @@
         </div>
       <% end %>
 
-      <div class="hidden md:flex items-center flex-shrink-0">
-        <!-- Replace the old buttons with: -->
-        <%= render "zuke/components/player/playback_controls", playing: @playing %>
-      </div>
     </div>
   </div>
 

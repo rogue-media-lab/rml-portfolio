@@ -60,6 +60,10 @@ export default class extends Controller {
 
   // Prevent menu from closing when clicking inside it
   preventClose(event) {
+    // Don't stop propagation for links - let Turbo handle them
+    if (event.target.tagName === 'A' || event.target.closest('a')) {
+      return
+    }
     event.stopPropagation()
   }
 }

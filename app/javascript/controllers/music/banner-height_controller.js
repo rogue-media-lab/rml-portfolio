@@ -38,8 +38,8 @@ export default class extends Controller {
   }
 
   collapse() {
-    // Set banner to default 250px height
-    this.bannerTarget.style.height = "250px"
+    // Set banner to default 275px height
+    this.bannerTarget.style.height = "275px"
     // Reset arrow to point down
     this.arrowTarget.style.transform = "rotate(0deg)"
   }

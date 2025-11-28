@@ -35,6 +35,8 @@
   --color-st-logo: url('st-logo.svg');
 }
 
+@variant dark (.dark &);
+
 /*
 
 @layer components {

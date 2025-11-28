@@ -80,4 +80,41 @@ class ZukeController < ApplicationController
   def about
     render partial: "zuke/turbo_frames/about", formats: [ :html ]
   end
+
+  def songs
+    if current_user
+      @songs = current_user.songs.includes(:album, :artist)
+                           .with_attached_image
+                           .with_attached_audio_file
+    elsif current_milk_admin
+      @songs = Song.includes(:album, :artist)
+                   .with_attached_image
+                   .with_attached_audio_file
+    else
+      @songs = Song.left_joins(:users).where(users: { id: nil })
+                   .includes(:album, :artist)
+                   .with_attached_image
+                   .with_attached_audio_file
+    end
+
+    @songs_data = @songs.map do |song|
+      {
+        id: song.id,
+        url: song.audio_file.attached? ? rails_blob_url(song.audio_file) : nil,
+        title: song.title,
+        artist: song.artist.name,
+        banner: song.image.attached? ? rails_blob_url(song.image) : nil,
+        bannerMobile: song.image.attached? ? rails_blob_url(song.mobile_image_variant) : nil,
+        bannerVideo: song.banner_video.attached? ? rails_blob_url(song.banner_video) : nil,
+        imageCredit: song.image_credit,
+        imageCreditUrl: song.image_credit_url,
+        imageLicense: song.image_license,
+        audioSource: song.audio_source,
+        audioLicense: song.audio_license,
+        additionalCredits: song.additional_credits
+      }
+    end.to_json
+
+    render partial: "zuke/turbo_frames/index", formats: [ :html ]
+  end
 end
