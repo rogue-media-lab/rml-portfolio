@@ -1,10 +1,9 @@
 <!-- EQ Panel (overlay positioned over banner) -->
 <div data-music--equalizer-target="panel"
-     class="hidden absolute top-0 left-0 right-0 z-40 flex items-center justify-center p-4"
-     style="height: 275px;">
+     class="hidden absolute top-0 left-0 right-0 z-40 flex items-center justify-center p-4 md:h-[275px]">
 
   <!-- Panel Background with Semi-Transparent Overlay -->
-  <div class="bg-black/95 backdrop-blur-sm rounded-lg shadow-xl border border-gray-600 w-full max-w-4xl p-4 sm:p-6 flex flex-col" style="height: 250px;">
+  <div class="bg-black/95 backdrop-blur-sm rounded-lg shadow-xl border border-gray-600 w-full max-w-4xl p-4 sm:p-6 flex flex-col md:h-[250px]">
 
     <!-- WebAudio Not Available Message -->
     <div data-music--equalizer-target="unavailableMessage"
@@ -38,7 +37,7 @@
 
         <!-- Close Button -->
         <button data-action="click->music--equalizer#togglePanel"
-                class="text-gray-400 hover:text-white transition-colors"
+                class="hidden md:block text-gray-400 hover:text-white transition-colors"
                 aria-label="Close Equalizer"
                 type="button">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -50,16 +49,16 @@
 
     <!-- Main Content Area -->
     <div data-music--equalizer-target="mainContent"
-         class="flex-1 flex gap-4 min-h-0">
+         class="flex-1 flex flex-col md:flex-row gap-4 min-h-0">
 
       <!-- Left Side: 10-Band Sliders -->
-      <div class="flex-1 flex flex-col min-h-0">
+      <div class="flex-1 flex flex-col md:min-h-0">
         <div class="flex justify-between items-end gap-2 flex-1">
           <%
             frequencies = [32, 64, 125, 250, 500, 1000, 2000, 4000, 8000, 16000]
             frequencies.each_with_index do |freq, index|
           %>
-            <div class="flex flex-col items-center gap-1 flex-1" style="min-height: 140px;">
+            <div class="flex flex-col items-center gap-1 flex-1 min-h-[100px] md:min-h-[140px]">
               <!-- Frequency Label -->
               <span class="text-white text-xs font-medium">
                 <%= freq >= 1000 ? "#{freq/1000}k" : freq %>
@@ -72,7 +71,7 @@
               </span>
 
               <!-- Vertical Slider -->
-              <div class="flex-1 flex items-center justify-center w-full" style="min-height: 100px;">
+              <div class="flex-1 flex items-center justify-center w-full min-h-[70px] md:min-h-[100px]">
                 <input type="range"
                        data-music--equalizer-target="band<%= index %>"
                        data-frequency="<%= freq %>"
@@ -93,18 +92,18 @@
       </div>
 
       <!-- Right Side: Presets & Controls -->
-      <div class="w-40 flex flex-col gap-2">
+      <div class="w-full md:w-40 flex flex-col gap-2">
         <div class="text-white text-xs font-semibold">Presets</div>
 
         <!-- Preset Buttons -->
-        <div class="space-y-1 flex-1 overflow-y-auto pr-1">
+        <div class="grid grid-cols-2 md:grid-cols-1 gap-1 md:flex-1 md:overflow-y-auto pr-1">
           <%
             presets = ["Flat", "Rock", "Pop", "Jazz", "Classical", "Electronic", "Bass Boost", "Treble Boost"]
             presets.each do |preset|
           %>
             <button data-action="click->music--equalizer#applyPreset"
                     data-preset="<%= preset.parameterize %>"
-                    class="w-full px-2 py-1.5 text-left text-xs text-white bg-gray-700 hover:bg-teal-600 rounded transition-colors border border-gray-600 hover:border-teal-500">
+                    class="w-full px-2 py-1.5 text-center md:text-left text-xs text-white bg-gray-700 hover:bg-teal-600 rounded transition-colors border border-gray-600 hover:border-teal-500">
               <%= preset %>
             </button>
           <% end %>
