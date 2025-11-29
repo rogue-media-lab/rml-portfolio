@@ -9,6 +9,9 @@ class Song < ApplicationRecord
   has_many :genres, through: :song_genres
   has_and_belongs_to_many :users
 
+  has_many :playlist_songs, dependent: :destroy
+  has_many :playlists, through: :playlist_songs
+
   accepts_nested_attributes_for :artist
   accepts_nested_attributes_for :album
 

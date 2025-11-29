@@ -1,0 +1,29 @@
+<%= turbo_frame_tag "music-frame" do %>
+  <div class="w-full flex flex-col m-auto text-gray-100">
+    <h2 class="kanit font-medium mx-4 py-2">Playlists</h2>
+    <hr class="mb-3 mx-4">
+
+    <% if @playlists.any? %>
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 p-3 sm:p-4">
+        <% @playlists.each do |playlist| %>
+          <%= link_to playlist_path(playlist), data: { turbo_frame: "music-frame" }, class: "block bg-slate-800 hover:bg-slate-700 rounded-lg p-4 transition-colors" do %>
+            <div class="flex flex-col">
+              <h3 class="text-lg font-semibold mb-2"><%= playlist.name %></h3>
+              <% if playlist.description.present? %>
+                <p class="text-sm text-gray-400 mb-2 line-clamp-2"><%= playlist.description %></p>
+              <% end %>
+              <p class="text-sm text-gray-500"><%= pluralize(playlist.songs.count, "song") %></p>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="flex flex-col items-center justify-center p-8 text-center">
+        <svg class="w-16 h-16 text-gray-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path>
+        </svg>
+        <p class="text-gray-400">No playlists available yet.</p>
+      </div>
+    <% end %>
+  </div>
+<% end %>

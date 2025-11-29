@@ -1,0 +1,7 @@
+<%= turbo_frame_tag "dashboard_content" do %>
+  <h2 class="text-3xl font-bold text-gray-900 mb-6">New Playlist</h2>
+
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 max-w-2xl">
+    <%= render "form", playlist: @playlist %>
+  </div>
+<% end %>

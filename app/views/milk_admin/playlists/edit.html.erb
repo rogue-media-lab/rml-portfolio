@@ -1,0 +1,66 @@
+<%= turbo_frame_tag "dashboard_content" do %>
+  <h2 class="text-3xl font-bold text-gray-900 mb-6">Edit Playlist: <%= @playlist.name %></h2>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Playlist Info Form -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <h3 class="text-xl font-semibold text-gray-900 mb-4">Playlist Details</h3>
+      <%= render "form", playlist: @playlist %>
+    </div>
+
+    <!-- Manage Songs -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <h3 class="text-xl font-semibold text-gray-900 mb-4">Manage Songs</h3>
+
+      <!-- Current Songs in Playlist -->
+      <div class="mb-6">
+        <h4 class="text-lg font-medium text-gray-900 mb-3">Current Songs (<%= @playlist.songs.count %>)</h4>
+        <% if @playlist.ordered_songs.any? %>
+          <div class="space-y-2 max-h-64 overflow-y-auto">
+            <% @playlist.ordered_songs.each do |song| %>
+              <div class="bg-gray-50 rounded p-3 flex justify-between items-center">
+                <div>
+                  <p class="font-medium text-gray-900"><%= song.title %></p>
+                  <p class="text-sm text-gray-600"><%= song.artist_name %></p>
+                </div>
+                <%= button_to "Remove", remove_song_milk_admin_playlist_path(@playlist, song_id: song.id),
+                    method: :delete,
+                    class: "text-red-600 hover:text-red-700 text-sm font-medium",
+                    data: { turbo_confirm: "Remove #{song.title} from this playlist?" } %>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <p class="text-gray-600 text-sm">No songs in this playlist yet.</p>
+        <% end %>
+      </div>
+
+      <!-- Add Songs -->
+      <div>
+        <h4 class="text-lg font-medium text-gray-900 mb-3">Add Songs</h4>
+        <% if @available_songs.any? %>
+          <%= form_with url: add_song_milk_admin_playlist_path(@playlist), method: :post do |form| %>
+            <div class="flex gap-2">
+              <%= form.select :song_id,
+                  options_from_collection_for_select(@available_songs, :id, ->(song) { "#{song.artist_name} - #{song.title}" }),
+                  { prompt: "Select a song to add" },
+                  class: "flex-1 px-4 py-2 rounded-md bg-white border border-gray-300 focus:border-sky-500 focus:ring-2 focus:ring-sky-500 focus:outline-none" %>
+              <%= form.submit "Add", class: "px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-md cursor-pointer font-medium" %>
+            </div>
+          <% end %>
+        <% else %>
+          <p class="text-gray-600 text-sm">All songs have been added to this playlist!</p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-6">
+    <%= link_to milk_admin_playlists_path, data: { turbo_frame: "dashboard_content" }, class: "inline-flex items-center gap-2 px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-900 rounded-lg font-medium transition-colors" do %>
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+      </svg>
+      Back to Playlists
+    <% end %>
+  </div>
+<% end %>

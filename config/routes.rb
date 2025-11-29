@@ -42,6 +42,13 @@ Rails.application.routes.draw do
       end
     end
 
+    resources :playlists do
+      member do
+        post :add_song
+        delete "remove_song/:song_id", action: :remove_song, as: :remove_song
+      end
+    end
+
     resources :pills, only: [ :index, :new, :create, :edit, :update, :destroy ]
   end
 
@@ -64,6 +71,9 @@ Rails.application.routes.draw do
       get "about", to: "zuke#about", as: :music_about
     end
   end
+
+  # Public Playlists routes (for Zuke music player)
+  resources :playlists, only: [ :index, :show ]
 
 
   # root for hermits

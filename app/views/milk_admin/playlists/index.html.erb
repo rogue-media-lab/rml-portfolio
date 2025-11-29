@@ -1,0 +1,51 @@
+<%= turbo_frame_tag "dashboard_content" do %>
+  <div class="flex items-center justify-between mb-6">
+    <h2 class="text-3xl font-bold text-gray-900">Playlists</h2>
+    <%= link_to new_milk_admin_playlist_path, data: { turbo_frame: "dashboard_content" }, class: "inline-flex items-center gap-2 px-5 py-3 bg-sky-700 hover:bg-sky-600 text-white rounded-lg font-medium transition-colors" do %>
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+      </svg>
+      New Playlist
+    <% end %>
+  </div>
+
+  <p class="text-gray-600 mb-6">
+    Create and manage your music playlists.
+  </p>
+
+  <div class="flex flex-col gap-4">
+    <% if @playlists.any? %>
+      <% @playlists.each do |playlist| %>
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div class="flex justify-between items-start">
+            <div class="flex-1">
+              <h3 class="text-xl font-semibold text-gray-900 mb-2"><%= playlist.name %></h3>
+              <% if playlist.description.present? %>
+                <p class="text-gray-600 mb-2"><%= playlist.description %></p>
+              <% end %>
+              <p class="text-sm text-gray-500"><%= pluralize(playlist.songs.count, "song") %></p>
+            </div>
+
+            <div class="flex gap-2">
+              <%= link_to edit_milk_admin_playlist_path(playlist), data: { turbo_frame: "dashboard_content" }, class: "inline-flex items-center py-2 px-3 text-sm font-medium text-center text-white rounded-lg bg-blue-600 hover:bg-blue-700" do %>
+                <svg class="w-6 h-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.779 17.779 4.36 19.918 6.5 13.5m4.279 4.279 8.364-8.643a3.027 3.027 0 0 0-2.14-5.165 3.03 3.03 0 0 0-2.14.886L6.5 13.5m4.279 4.279L6.499 13.5m2.14 2.14 6.213-6.504M12.75 7.04 17 11.28"/>
+                </svg>
+              <% end %>
+
+              <%= button_to milk_admin_playlist_path(playlist), class: "inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-red-600 hover:bg-red-700", method: :delete, data: { turbo_confirm: "Are you sure you want to delete this playlist?" } do %>
+                <svg class="w-6 h-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 7h14m-9 3v8m4-8v8M10 3h4a1 1 0 0 1 1 1v3H9V4a1 1 0 0 1 1-1ZM6 7h12v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V7Z"/>
+                </svg>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    <% else %>
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 text-center">
+        <p class="text-gray-600">No playlists yet. Create your first playlist!</p>
+      </div>
+    <% end %>
+  </div>
+<% end %>

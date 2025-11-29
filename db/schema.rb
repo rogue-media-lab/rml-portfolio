@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_16_194602) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_28_234027) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -178,6 +178,26 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_16_194602) do
     t.datetime "updated_at", null: false
     t.string "group"
     t.index ["resume_id"], name: "index_pills_on_resume_id"
+  end
+
+  create_table "playlist_songs", force: :cascade do |t|
+    t.bigint "playlist_id", null: false
+    t.bigint "song_id", null: false
+    t.integer "position"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["playlist_id", "song_id"], name: "index_playlist_songs_on_playlist_id_and_song_id", unique: true
+    t.index ["playlist_id"], name: "index_playlist_songs_on_playlist_id"
+    t.index ["position"], name: "index_playlist_songs_on_position"
+    t.index ["song_id"], name: "index_playlist_songs_on_song_id"
+  end
+
+  create_table "playlists", force: :cascade do |t|
+    t.string "name"
+    t.text "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_playlists_on_name"
   end
 
   create_table "projects", force: :cascade do |t|
@@ -428,6 +448,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_16_194602) do
   add_foreign_key "hermit_videos", "hermits"
   add_foreign_key "milk_admin_profiles", "milk_admins"
   add_foreign_key "pills", "resumes"
+  add_foreign_key "playlist_songs", "playlists"
+  add_foreign_key "playlist_songs", "songs"
   add_foreign_key "projects", "resumes"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_claimed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade

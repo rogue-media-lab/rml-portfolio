@@ -29,6 +29,13 @@
         <span class="font-medium">Songs</span>
       <% end %>
 
+      <%= link_to milk_admin_playlists_path, data: { turbo_frame: "dashboard_content" }, class: "flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-800 transition-colors" do %>
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M15 6H3v2h12V6zm0 4H3v2h12v-2zM3 16h8v-2H3v2zM17 6v8.18c-.31-.11-.65-.18-1-.18-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3V8h3V6h-5z"/>
+        </svg>
+        <span class="font-medium">Playlists</span>
+      <% end %>
+
       <%= link_to milk_admin_projects_path, data: { turbo_frame: "dashboard_content" }, class: "flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-800 transition-colors" do %>
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"></path>

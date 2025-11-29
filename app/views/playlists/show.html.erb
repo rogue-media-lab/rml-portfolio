@@ -1,0 +1,57 @@
+<%= turbo_frame_tag "music-frame" do %>
+  <div class="w-full flex flex-col m-auto text-gray-100">
+    <!-- Back button and playlist header -->
+    <div class="mx-4 py-2">
+      <%= link_to playlists_path, data: { turbo_frame: "music-frame" }, class: "inline-flex items-center text-sm text-gray-400 hover:text-gray-200 mb-2" do %>
+        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+        Back to Playlists
+      <% end %>
+      <h2 class="kanit font-medium"><%= @playlist.name %></h2>
+      <% if @playlist.description.present? %>
+        <p class="text-sm text-gray-400 mt-1"><%= @playlist.description %></p>
+      <% end %>
+    </div>
+    <hr class="mb-3 mx-4">
+
+    <% if @songs.any? %>
+      <%
+        @songs_data = @songs.map do |song|
+          {
+            id: song.id,
+            url: song.audio_file.attached? ? rails_blob_url(song.audio_file) : nil,
+            title: song.title,
+            artist: song.artist.name,
+            banner: song.image.attached? ? rails_blob_url(song.image) : nil,
+            bannerMobile: song.image.attached? ? rails_blob_url(song.mobile_image_variant) : nil,
+            bannerVideo: song.banner_video.attached? ? rails_blob_url(song.banner_video) : nil,
+            imageCredit: song.image_credit,
+            imageCreditUrl: song.image_credit_url,
+            imageLicense: song.image_license,
+            audioSource: song.audio_source,
+            audioLicense: song.audio_license,
+            additionalCredits: song.additional_credits
+          }
+        end.to_json
+      %>
+
+      <div data-controller="music--song-list"
+           data-music--song-list-songs-value="<%= @songs_data %>"
+           class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 p-3 sm:p-4">
+        <% @songs.each do |song| %>
+          <div class="flex justify-center">
+            <%= render partial: "zuke/components/smart-image", locals: { controller_name: "smart-image", song: song } %>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="flex flex-col items-center justify-center p-8 text-center">
+        <svg class="w-16 h-16 text-gray-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"></path>
+        </svg>
+        <p class="text-gray-400">This playlist is empty.</p>
+      </div>
+    <% end %>
+  </div>
+<% end %>

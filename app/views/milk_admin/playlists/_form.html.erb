@@ -1,0 +1,27 @@
+<%= form_with(model: [:milk_admin, playlist], local: true, class: "space-y-4") do |form| %>
+  <% if playlist.errors.any? %>
+    <div class="bg-red-50 border border-red-400 text-red-700 px-4 py-3 rounded-lg">
+      <h3 class="font-semibold mb-2"><%= pluralize(playlist.errors.count, "error") %> prohibited this playlist from being saved:</h3>
+      <ul class="list-disc list-inside text-sm">
+        <% playlist.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :name, class: "block text-sm font-medium text-gray-700 mb-2" %>
+    <%= form.text_field :name, class: "w-full px-4 py-2 rounded-md bg-white border border-gray-300 focus:border-sky-500 focus:ring-2 focus:ring-sky-500 focus:outline-none" %>
+  </div>
+
+  <div class="field">
+    <%= form.label :description, class: "block text-sm font-medium text-gray-700 mb-2" %>
+    <%= form.text_area :description, rows: 4, class: "w-full px-4 py-2 rounded-md bg-white border border-gray-300 focus:border-sky-500 focus:ring-2 focus:ring-sky-500 focus:outline-none" %>
+  </div>
+
+  <div class="actions flex gap-2">
+    <%= form.submit class: "px-5 py-2 bg-sky-600 hover:bg-sky-700 text-white rounded-lg cursor-pointer font-medium transition-colors" %>
+    <%= link_to "Cancel", milk_admin_playlists_path, data: { turbo_frame: "dashboard_content" }, class: "px-5 py-2 bg-gray-200 hover:bg-gray-300 text-gray-900 rounded-lg font-medium transition-colors" %>
+  </div>
+<% end %>
