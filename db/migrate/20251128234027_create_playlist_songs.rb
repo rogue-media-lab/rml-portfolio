@@ -8,7 +8,7 @@ class CreatePlaylistSongs < ActiveRecord::Migration[8.0]
       t.timestamps
     end
 
-    add_index :playlist_songs, [:playlist_id, :song_id], unique: true
+    add_index :playlist_songs, [ :playlist_id, :song_id ], unique: true
     add_index :playlist_songs, :position
   end
 end

@@ -1,6 +1,6 @@
 class MilkAdmin::PlaylistsController < ApplicationController
   before_action :authenticate_milk_admin!
-  before_action :set_playlist, only: [:show, :edit, :update, :destroy, :add_song, :remove_song]
+  before_action :set_playlist, only: [ :show, :edit, :update, :destroy, :add_song, :remove_song ]
 
   def index
     @playlists = Playlist.includes(:songs).order(created_at: :desc)

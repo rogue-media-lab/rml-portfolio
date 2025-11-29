@@ -1,5 +1,5 @@
 class PlaylistsController < ApplicationController
-  before_action :set_playlist, only: [:show]
+  before_action :set_playlist, only: [ :show ]
 
   # GET /playlists
   # Shows all playlists
