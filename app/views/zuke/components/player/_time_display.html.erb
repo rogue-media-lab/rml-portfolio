@@ -1,5 +1,7 @@
 <div data-controller="music--time-display" class="flex items-center w-full">
-  <div data-music--time-display-target="current" class="mx-2 w-[3.5rem] text-center font-mono">0:00</div>
+  <div data-music--time-display-target="duration" class="block md:hidden mx-2 w-14 text-center font-mono">0:00</div>
+  <div data-music--time-display-target="current" class="hidden md:block mx-2 w-14 text-center font-mono">0:00</div>
   <%= yield %> <!-- This yields the waveform content -->
-  <div data-music--time-display-target="duration" class="mx-2 w-[3.5rem] text-center font-mono">0:00</div>
+  <div class="md:hidden flex items-center m-2"><%= render "zuke/components/player/play_pause_button" %></div>
+  <div data-music--time-display-target="duration" class="hidden md:block mx-2 w-14 text-center font-mono">0:00</div>
 </div>
