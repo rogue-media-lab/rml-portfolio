@@ -53,6 +53,12 @@ export default class extends Controller {
       console.log("🎵 SONG-LIST: player:play-requested event received, updating queue")
       this.updatePlayerQueue()
     })
+
+    // Respond to queue requests from player (critical for Service Worker reloads)
+    document.addEventListener("player:queue:request", () => {
+      console.log("🎵 SONG-LIST: player:queue:request received, sending queue")
+      this.updatePlayerQueue()
+    })
   }
 
   updatePlayerQueue() {

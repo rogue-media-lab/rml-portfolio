@@ -81,8 +81,14 @@ export default class extends Controller {
     document.dispatchEvent(new CustomEvent("player:shuffle:changed", {
       detail: { enabled: this.shuffleValue }
     }));
-  
-    // 4. Queue listener remains important!
+
+    // 4. REQUEST queue from song-list controller
+    console.log("🎵 PLAYER: Requesting queue from song-list controller")
+    setTimeout(() => {
+      document.dispatchEvent(new CustomEvent("player:queue:request"))
+    }, 50)
+
+    // 5. Queue listener remains important!
     document.addEventListener("player:queue:updated", (event) => {
       
       // Improved queue update with validation
