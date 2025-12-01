@@ -30,6 +30,7 @@ export default class extends Controller {
    */
   static values = {
     autoAdvance: { type: Boolean, default: false },
+    shuffle: { type: Boolean, default: false },
   }
 
 
@@ -57,12 +58,16 @@ export default class extends Controller {
 
     const playOnLoad = localStorage.getItem("audioPlayOnLoad") === "true";
     this.playOnLoadValue = playOnLoad;
-    
+
+    const shuffle = localStorage.getItem("playerShuffle") === "true";
+    this.shuffleValue = shuffle;
+
     // 2. Initialize queue state
     this.currentQueue = [];
     this.currentIndex = -1;
     this.currentUrl = null;
-  
+    this.recentlyPlayed = []; // Track recently played songs for shuffle
+
     // 3. Sync initial states
     document.dispatchEvent(new CustomEvent("player:auto-advance:changed", {
       detail: { enabled: this.autoAdvanceValue }
@@ -70,6 +75,10 @@ export default class extends Controller {
 
     document.dispatchEvent(new CustomEvent("player:play-on-load:changed", {
       detail: { enabled: this.playOnLoadValue }
+    }));
+
+    document.dispatchEvent(new CustomEvent("player:shuffle:changed", {
+      detail: { enabled: this.shuffleValue }
     }));
   
     // 4. Queue listener remains important!
@@ -201,11 +210,15 @@ export default class extends Controller {
     document.addEventListener("player:play-on-load:changed", (event) => {
       this.playOnLoadValue = event.detail.enabled
     })
-  
+
+    document.addEventListener("player:shuffle:changed", (event) => {
+      this.shuffleValue = event.detail.enabled
+    })
+
     // Add the queue update listener
     document.addEventListener("player:queue:updated", (event) => {
       this.currentQueue = event.detail.queue;
-      
+
       // Sync index if we"re already playing a song
       if (this.currentUrl) {
         const currentSong = this.currentQueue.find(song => song.url === this.currentUrl);
@@ -214,6 +227,15 @@ export default class extends Controller {
         }
       }
     });
+
+    // Listen for sync requests and broadcast current state
+    window.addEventListener("player:sync-request", () => {
+      if (this.currentUrl) {
+        window.dispatchEvent(new CustomEvent("audio:changed", {
+          detail: { url: this.currentUrl }
+        }))
+      }
+    })
   }
 
   // ========================
@@ -258,21 +280,39 @@ export default class extends Controller {
    * Handle track ending naturally
    */
   async handleTrackEnd() {
-    console.log("Track ended - Auto-advance:", this.autoAdvanceValue, "Queue length:", this.currentQueue.length)
+    console.log("🎵 Track ended - Auto-advance:", this.autoAdvanceValue, "Shuffle:", this.shuffleValue, "Queue length:", this.currentQueue.length)
 
-    this.handlePause()
-    this.resetPlayback()
+    // Dispatch ended event BEFORE state changes
     window.dispatchEvent(new CustomEvent("audio:ended", {
       detail: { url: this.currentUrl }
     }))
 
+    // Update play/pause state
+    this.handlePause()
+
+    // Check if we should auto-advance
     if (this.autoAdvanceValue && this.currentQueue.length > 0) {
-      console.log("Attempting to play next track...")
-      // Resume AudioContext for mobile Safari (WebAudio backend only)
-      await this.ensureAudioContextResumed()
-      this.playNext()
+      console.log("✅ Auto-advance enabled - attempting to play next track...")
+
+      try {
+        // Resume AudioContext for mobile Safari (WebAudio backend only)
+        await this.ensureAudioContextResumed()
+
+        // Small delay to ensure clean state transition
+        setTimeout(() => {
+          console.log("▶️ Calling playNext()...")
+          this.playNext()
+        }, 100)
+
+      } catch (error) {
+        console.error("❌ Error during auto-advance:", error)
+        // Reset on error
+        this.resetPlayback()
+      }
     } else {
-      console.log("Not advancing - Auto-advance disabled or empty queue")
+      console.log("⏸️ Not advancing - Auto-advance:", this.autoAdvanceValue, "Queue:", this.currentQueue.length)
+      // Only reset if we're NOT advancing
+      this.resetPlayback()
     }
   }
 
@@ -376,34 +416,103 @@ export default class extends Controller {
    * Play the next song in queue
    */
   playNext() {
-    console.log("playNext called - Current index:", this.currentIndex, "Queue length:", this.currentQueue.length)
+    console.log("🔄 playNext() called - Index:", this.currentIndex, "Queue:", this.currentQueue.length, "Shuffle:", this.shuffleValue)
 
     if (this.currentQueue.length === 0) {
-      console.warn("Cannot play next - queue is empty")
+      console.warn("⚠️ Cannot play next - queue is empty")
       return;
     }
 
-    // Calculate next index safely
-    const nextIndex = (this.currentIndex + 1) % this.currentQueue.length;
-
-    // Verify we're actually moving to a new track
-    if (nextIndex === this.currentIndex && this.currentQueue.length > 1) {
-      this.currentIndex = 0; // Wrap around to start
-    } else {
-      this.currentIndex = nextIndex;
+    if (!Array.isArray(this.currentQueue)) {
+      console.error("❌ Queue is not an array!", this.currentQueue)
+      return;
     }
 
+    let nextIndex;
+
+    if (this.shuffleValue) {
+      // Shuffle mode: pick random song avoiding recently played
+      nextIndex = this.getRandomIndex();
+    } else {
+      // Normal mode: sequential playback
+      nextIndex = (this.currentIndex + 1) % this.currentQueue.length;
+
+      // Verify we're actually moving to a new track
+      if (nextIndex === this.currentIndex && this.currentQueue.length > 1) {
+        nextIndex = 0; // Wrap around to start
+      }
+    }
+
+    this.currentIndex = nextIndex;
     const nextSong = this.currentQueue[this.currentIndex];
 
-    console.log("Next song:", nextSong?.title, "at index:", this.currentIndex)
+    console.log("🎶 Next song selected:", nextSong?.title, "by", nextSong?.artist, "at index:", this.currentIndex)
 
     // Verify we have a valid song to play
-    if (!nextSong || nextSong.url === this.currentUrl) {
-      console.warn("Invalid next song or same as current");
+    if (!nextSong) {
+      console.error("❌ Next song is null/undefined at index:", nextIndex)
       return;
     }
 
+    if (!nextSong.url) {
+      console.error("❌ Next song has no URL:", nextSong)
+      return;
+    }
+
+    if (nextSong.url === this.currentUrl) {
+      console.warn("⚠️ Next song is same as current - skipping")
+      return;
+    }
+
+    // Track recently played for shuffle
+    this.trackRecentlyPlayed(nextIndex);
+
+    console.log("✅ Calling playSongFromQueue() for:", nextSong.title)
     this.playSongFromQueue(nextSong);
+  }
+
+  /**
+   * Get random index avoiding recently played songs
+   */
+  getRandomIndex() {
+    const queueLength = this.currentQueue.length;
+
+    // If queue is small, just pick random
+    if (queueLength <= 3) {
+      return Math.floor(Math.random() * queueLength);
+    }
+
+    // Build available indices (excluding recently played)
+    const maxRecent = Math.min(5, Math.floor(queueLength / 3)); // Track last 5 or 1/3 of queue
+    const recentSet = new Set(this.recentlyPlayed.slice(-maxRecent));
+
+    const availableIndices = [];
+    for (let i = 0; i < queueLength; i++) {
+      if (!recentSet.has(i) && i !== this.currentIndex) {
+        availableIndices.push(i);
+      }
+    }
+
+    // If no available indices (shouldn't happen), reset recently played
+    if (availableIndices.length === 0) {
+      this.recentlyPlayed = [];
+      return Math.floor(Math.random() * queueLength);
+    }
+
+    // Pick random from available
+    return availableIndices[Math.floor(Math.random() * availableIndices.length)];
+  }
+
+  /**
+   * Track recently played song index
+   */
+  trackRecentlyPlayed(index) {
+    this.recentlyPlayed.push(index);
+
+    // Keep only last 10
+    if (this.recentlyPlayed.length > 10) {
+      this.recentlyPlayed.shift();
+    }
   }
 
   playPrevious() {
@@ -416,10 +525,10 @@ export default class extends Controller {
 
   playSongFromQueue(song) {
     try {
-      console.log("playSongFromQueue called with:", song?.title)
+      console.log("🎵 playSongFromQueue() called with:", song?.title)
 
       if (!song || !song.url) {
-        console.error("Invalid song object in queue");
+        console.error("❌ Invalid song object in queue:", song);
         return;
       }
 
@@ -454,13 +563,13 @@ export default class extends Controller {
       // Dispatch play request
       this.dispatchTrackChange(song.url)
 
-      console.log("Loading track:", song.url)
+      console.log("📥 Loading track:", song.title, "URL:", song.url.substring(0, 50) + "...")
 
       // Load and play immediately - no setTimeout delay
       // This keeps the user gesture context alive for mobile Safari
       this.wavesurfer.load(song.url);
       this.wavesurfer.once('ready', () => {
-        console.log("Track ready, attempting to play...")
+        console.log("✅ Track ready, attempting to play...")
 
         // Use promise-based play() to handle autoplay blocking
         const playPromise = this.wavesurfer.play();
@@ -469,17 +578,18 @@ export default class extends Controller {
         if (playPromise !== undefined) {
           playPromise
             .then(() => {
-              console.log("Playback started successfully")
+              console.log("🎉 Playback started successfully for:", song.title)
             })
             .catch((error) => {
-              console.error("Autoplay blocked by browser:", error);
+              console.error("🚫 Autoplay blocked by browser:", error);
+              console.log("ℹ️ User interaction required to continue playback")
               // Optionally dispatch event to show "Click to continue" UI
               document.dispatchEvent(new CustomEvent("player:autoplay-blocked", {
                 detail: { song: song }
               }));
             });
         } else {
-          console.log("Play promise undefined - playback should have started")
+          console.log("✅ Play promise undefined - playback should have started")
         }
       });
 

@@ -9,8 +9,16 @@ export default class extends Controller {
 
   updateDisplay(event) {
     const { current, duration } = event.detail
-    this.currentTarget.textContent = this.formatTime(current)
-    this.durationTarget.textContent = `-${this.formatTime(duration - current)}`
+
+    // Update all current time displays (if multiple exist)
+    this.currentTargets.forEach(target => {
+      target.textContent = this.formatTime(current)
+    })
+
+    // Update all duration displays (mobile and desktop)
+    this.durationTargets.forEach(target => {
+      target.textContent = `-${this.formatTime(duration - current)}`
+    })
   }
 
   formatTime(seconds) {

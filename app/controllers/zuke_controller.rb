@@ -117,4 +117,73 @@ class ZukeController < ApplicationController
 
     render partial: "zuke/turbo_frames/index", formats: [ :html ]
   end
+
+  def search
+    @query = params[:q]
+    query = @query
+
+    # Return empty results if query is blank or too short
+    if query.blank? || query.length < 3
+      @songs = []
+      @artists = []
+      @albums = []
+      render partial: "zuke/turbo_frames/search_results", formats: [ :html ]
+      return
+    end
+
+    # Get base songs with proper scoping based on user
+    base_songs = if current_user
+      current_user.songs
+    elsif current_milk_admin
+      Song.all
+    else
+      Song.left_joins(:users).where(users: { id: nil })
+    end
+
+    # Search songs by title, artist name, or album title
+    @songs = base_songs.joins(:artist)
+                       .left_joins(:album)
+                       .where(
+                         "songs.title ILIKE :query OR artists.name ILIKE :query OR albums.title ILIKE :query",
+                         query: "%#{query}%"
+                       )
+                       .includes(:album, :artist)
+                       .with_attached_image
+                       .with_attached_audio_file
+                       .distinct
+                       .limit(10)
+
+    # Use Ransack for artists and albums
+    @artists_q = Artist.ransack(name_cont: query)
+    @albums_q = Album.ransack(title_cont: query)
+
+    @artists = @artists_q.result
+                         .includes(:songs)
+                         .limit(5)
+
+    @albums = @albums_q.result
+                       .includes(:artist, :songs)
+                       .limit(5)
+
+    # Prepare songs data for player
+    @songs_data = @songs.map do |song|
+      {
+        id: song.id,
+        url: song.audio_file.attached? ? rails_blob_url(song.audio_file) : nil,
+        title: song.title,
+        artist: song.artist.name,
+        banner: song.image.attached? ? rails_blob_url(song.image) : nil,
+        bannerMobile: song.image.attached? ? rails_blob_url(song.mobile_image_variant) : nil,
+        bannerVideo: song.banner_video.attached? ? rails_blob_url(song.banner_video) : nil,
+        imageCredit: song.image_credit,
+        imageCreditUrl: song.image_credit_url,
+        imageLicense: song.image_license,
+        audioSource: song.audio_source,
+        audioLicense: song.audio_license,
+        additionalCredits: song.additional_credits
+      }
+    end.to_json
+
+    render partial: "zuke/turbo_frames/search_results", formats: [ :html ]
+  end
 end

@@ -9,4 +9,9 @@ class Album < ApplicationRecord
 
   validates :title, presence: true
   validates :title, uniqueness: { scope: :artist_id, case_sensitive: false }
+
+  # Ransack: Allow searching on specific attributes
+  def self.ransackable_attributes(auth_object = nil)
+    ["title", "created_at", "updated_at"]
+  end
 end

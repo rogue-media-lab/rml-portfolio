@@ -41,9 +41,10 @@ export default class extends Controller {
       this.videoTarget.load() // Force clear
     }
 
-    // Choose the appropriate image based on screen size
-    const isMobile = window.innerWidth < 768
-    const selectedImage = (isMobile && imageMobile) ? imageMobile : (image || null)
+    // Choose the appropriate image based on device type (not just screen width)
+    // Check for mobile device using multiple signals
+    const isMobileDevice = this.isMobileDevice()
+    const selectedImage = (isMobileDevice && imageMobile) ? imageMobile : (image || null)
 
     // Always update image if we have a valid URL and it's different
     if (selectedImage && selectedImage !== '') {
@@ -114,5 +115,22 @@ export default class extends Controller {
       this.imageTarget.classList.remove("hidden")
       this.imageTarget.style.opacity = 1
     }
+  }
+
+  /**
+   * Detect if running on mobile device
+   * Uses multiple detection methods for better accuracy
+   * @returns {boolean}
+   */
+  isMobileDevice() {
+    // Check user agent for mobile devices
+    const mobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+
+    // Check for touch support (primary indicator)
+    const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0)
+
+    // Return true if either mobile UA or touch device
+    // This ensures mobile detection works even in fullscreen landscape mode
+    return mobileUA || isTouchDevice
   }
 }

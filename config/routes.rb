@@ -69,6 +69,7 @@ Rails.application.routes.draw do
       get "albums", to: "zuke#albums", as: :music_albums
       get "genres", to: "zuke#genres", as: :music_genres
       get "about", to: "zuke#about", as: :music_about
+      get "search", to: "zuke#search", as: :search  # Search across songs, artists, albums
     end
   end
 
