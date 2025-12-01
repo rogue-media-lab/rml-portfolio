@@ -22,6 +22,7 @@ export default class extends Controller {
         song?.id && song?.url && song?.title
       )
 
+      this.setupEventListeners() // Set up event listeners BEFORE initial update
       this.updatePlayerQueue() // Initial update
 
       // Request player to broadcast current state for new song cards
@@ -49,6 +50,11 @@ export default class extends Controller {
       console.error("Invalid songsArray - resetting")
       this.songsArray = []
     }
+
+    console.log("🎵 QUEUE UPDATE: Updating player queue with", this.songsArray.length, "songs")
+    console.log("🎵 QUEUE UPDATE: First song:", this.songsArray[0]?.title || "none")
+    console.log("🎵 QUEUE UPDATE: Last song:", this.songsArray[this.songsArray.length - 1]?.title || "none")
+
     document.dispatchEvent(new CustomEvent("player:queue:updated", {
       detail: { queue: [...this.songsArray] } // Spread operator clones array
     }))
