@@ -35,6 +35,12 @@
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
     <%#= render "shared/dark_mode_check" %>
+
+    <%# Mobile debugging console - Enable with ?debug=true in URL %>
+    <% if Rails.env.development? || params[:debug] == "true" %>
+      <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+      <script>eruda.init();</script>
+    <% end %>
   </head>
 
   <body class="bg-base-light text-base-dark dark:bg-base-dark dark:text-white">
