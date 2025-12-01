@@ -22,7 +22,7 @@ class Song < ApplicationRecord
 
   # Ransack: Allow searching on specific attributes
   def self.ransackable_attributes(auth_object = nil)
-    ["title", "created_at", "updated_at"]
+    [ "title", "created_at", "updated_at" ]
   end
 
   # Custom nested attribute setters to find or create associated records

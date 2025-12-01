@@ -12,6 +12,6 @@ class Album < ApplicationRecord
 
   # Ransack: Allow searching on specific attributes
   def self.ransackable_attributes(auth_object = nil)
-    ["title", "created_at", "updated_at"]
+    [ "title", "created_at", "updated_at" ]
   end
 end
