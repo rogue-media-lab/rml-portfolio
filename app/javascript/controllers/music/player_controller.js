@@ -31,6 +31,7 @@ export default class extends Controller {
   static values = {
     autoAdvance: { type: Boolean, default: false },
     shuffle: { type: Boolean, default: false },
+    repeatMode: { type: String, default: "off" }, // 'off', 'all', 'one'
   }
 
 
@@ -62,6 +63,10 @@ export default class extends Controller {
 
     const shuffle = localStorage.getItem("playerShuffle") === "true";
     this.shuffleValue = shuffle;
+
+    // Initialize repeat mode (migrates from old auto-advance if needed)
+    const repeatMode = localStorage.getItem("playerRepeat") || (autoAdvance ? "all" : "off");
+    this.repeatModeValue = repeatMode;
 
     // 2. Initialize queue state
     this.currentQueue = [];
@@ -256,6 +261,11 @@ export default class extends Controller {
       this.shuffleValue = event.detail.enabled
     })
 
+    document.addEventListener("player:repeat:changed", (event) => {
+      this.repeatModeValue = event.detail.mode
+      console.log("🔁 Player received repeat mode change:", this.repeatModeValue)
+    })
+
     // Add the queue update listener
     document.addEventListener("player:queue:updated", (event) => {
       this.currentQueue = event.detail.queue;
@@ -345,7 +355,7 @@ export default class extends Controller {
    * Handle track ending naturally
    */
   handleTrackEnd() {
-    console.log("🎵 Track ended - Auto-advance:", this.autoAdvanceValue, "Shuffle:", this.shuffleValue, "Queue length:", this.currentQueue.length)
+    console.log("🎵 Track ended - Repeat:", this.repeatModeValue, "Shuffle:", this.shuffleValue, "Queue length:", this.currentQueue.length)
 
     // Dispatch ended event BEFORE state changes
     window.dispatchEvent(new CustomEvent("audio:ended", {
@@ -355,24 +365,37 @@ export default class extends Controller {
     // Update play/pause state
     this.handlePause()
 
-    // Check if we should auto-advance
-    if (this.autoAdvanceValue && this.currentQueue.length > 0) {
-      console.log("✅ Auto-advance enabled - attempting to play next track...")
-
+    // Handle repeat modes
+    if (this.repeatModeValue === 'one') {
+      // Repeat One: replay the same song
+      console.log("🔁 Repeat One - replaying current track")
+      try {
+        this.wavesurfer.seekTo(0)
+        const playPromise = this.wavesurfer.play()
+        if (playPromise !== undefined) {
+          playPromise.catch((error) => {
+            console.warn("🚫 Repeat One autoplay blocked:", error)
+          })
+        }
+      } catch (error) {
+        console.error("❌ Error repeating track:", error)
+        this.resetPlayback()
+      }
+    } else if (this.repeatModeValue === 'all' && this.currentQueue.length > 0) {
+      // Repeat All: play next track (loops back to start)
+      console.log("🔁 Repeat All - playing next track...")
       try {
         // CRITICAL: Call playNext() immediately to preserve iOS gesture context
         // setTimeout would break the autoplay permission on iOS Safari
         console.log("▶️ Calling playNext() immediately...")
         this.playNext()
-
       } catch (error) {
-        console.error("❌ Error during auto-advance:", error)
-        // Reset on error
+        console.error("❌ Error during repeat all:", error)
         this.resetPlayback()
       }
     } else {
-      console.log("⏸️ Not advancing - Auto-advance:", this.autoAdvanceValue, "Queue:", this.currentQueue.length)
-      // Only reset if we're NOT advancing
+      // Repeat Off: stop playback
+      console.log("⏸️ Repeat Off - stopping playback")
       this.resetPlayback()
     }
   }

@@ -1,0 +1,20 @@
+<button data-controller="music--repeat"
+        data-action="click->music--repeat#toggle"
+        class="relative inline-flex items-center justify-center w-12 h-6 rounded-full transition-colors bg-gray-600 hover:bg-gray-500"
+        aria-label="Repeat: Off">
+
+  <!-- Repeat Icon (two arrows in a circle) -->
+  <svg data-music--repeat-target="icon"
+       class="w-4 h-4 text-gray-400"
+       fill="currentColor"
+       viewBox="0 0 24 24"
+       xmlns="http://www.w3.org/2000/svg">
+    <path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/>
+  </svg>
+
+  <!-- "1" Badge (shown only in repeat-one mode) -->
+  <span data-music--repeat-target="badge"
+        class="hidden absolute -top-1 -right-1 bg-green-500 text-white text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center">
+    1
+  </span>
+</button>

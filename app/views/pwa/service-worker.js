@@ -1,5 +1,5 @@
 // Zuke Music Player Service Worker
-const CACHE_VERSION = 'zuke-v2';
+const CACHE_VERSION = 'zuke-v3'; // Bumped for repeat mode feature
 const CACHE_ASSETS = [
   '/zuke/music',
   '/icon.png'
