@@ -51,7 +51,8 @@ export default class extends Controller {
   connect() {
     this.initializeWaveSurfer();
     this.setupEventListeners();
-  
+    this.setupMobileAudioContext();
+
     // 1. Initialize playback state from localStorage
     const autoAdvance = localStorage.getItem("playerAutoAdvance") === "true";
     this.autoAdvanceValue = autoAdvance;
@@ -173,13 +174,47 @@ export default class extends Controller {
     this.wavesurfer.on("play", this.handlePlay.bind(this))
     this.wavesurfer.on("pause", this.handlePause.bind(this))
     this.wavesurfer.on("finish", this.handleTrackEnd.bind(this))
-    
+
     // Loading events
     this.wavesurfer.on("loading", this.handleLoadingProgress.bind(this))
     this.wavesurfer.on("error", this.handleAudioError.bind(this))
-    
+
     // Time updates
     this.wavesurfer.on("timeupdate", this.updateTimeDisplay.bind(this))
+  }
+
+  /**
+   * Set up mobile audio context handling
+   * Ensures audio continues playing when screen locks or app is backgrounded
+   */
+  setupMobileAudioContext() {
+    if (!this.isMobile()) {
+      console.log("🎵 MOBILE AUDIO: Not on mobile, skipping context setup")
+      return
+    }
+
+    console.log("🎵 MOBILE AUDIO: Setting up mobile audio handling for MediaElement backend")
+
+    // For MediaElement backend, we need to ensure the HTML5 audio element is properly configured
+    // The Media Session API will handle most of the background playback
+
+    // Listen for visibility changes to handle app backgrounding
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && this.wavesurfer?.isPlaying()) {
+        console.log("🎵 MOBILE AUDIO: App visible again, verifying playback state")
+
+        // Ensure audio element is playing
+        const mediaElement = this.wavesurfer.getMediaElement()
+        if (mediaElement && mediaElement.paused && this.wavesurfer.isPlaying()) {
+          console.log("🎵 MOBILE AUDIO: Resuming paused media element")
+          mediaElement.play().catch(error => {
+            console.warn("🎵 MOBILE AUDIO: Could not resume playback:", error)
+          })
+        }
+      }
+    })
+
+    console.log("🎵 MOBILE AUDIO: Mobile audio handlers configured")
   }
 
   // ========================
@@ -235,6 +270,30 @@ export default class extends Controller {
           detail: { url: this.currentUrl }
         }))
       }
+    })
+
+    // Media Session API event handlers
+    document.addEventListener("player:next:requested", (event) => {
+      console.log("🎵 PLAYER: Next track requested via", event.detail?.source || 'unknown')
+      this.playNext()
+    })
+
+    document.addEventListener("player:prev:requested", (event) => {
+      console.log("🎵 PLAYER: Previous track requested via", event.detail?.source || 'unknown')
+      this.playPrevious()
+    })
+
+    // Seek handlers for Media Session API
+    document.addEventListener("player:seek:forward", (event) => {
+      const seconds = event.detail.seconds || 10
+      console.log("🎵 PLAYER: Seek forward requested:", seconds, "seconds")
+      this.seekRelative(seconds)
+    })
+
+    document.addEventListener("player:seek:backward", (event) => {
+      const seconds = event.detail.seconds || 10
+      console.log("🎵 PLAYER: Seek backward requested:", seconds, "seconds")
+      this.seekRelative(-seconds)
     })
   }
 
@@ -605,6 +664,21 @@ export default class extends Controller {
    */
   togglePlayback() {
     this.wavesurfer.playPause()
+  }
+
+  /**
+   * Seek relative to current position
+   * @param {number} seconds - Number of seconds to seek (positive = forward, negative = backward)
+   */
+  seekRelative(seconds) {
+    if (!this.wavesurfer) return
+
+    const currentTime = this.wavesurfer.getCurrentTime()
+    const duration = this.wavesurfer.getDuration()
+    const newTime = Math.max(0, Math.min(duration, currentTime + seconds))
+
+    console.log("🎵 PLAYER: Seeking from", currentTime, "to", newTime)
+    this.wavesurfer.seekTo(newTime / duration)
   }
 
   // ========================
