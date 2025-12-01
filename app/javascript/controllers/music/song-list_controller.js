@@ -8,9 +8,14 @@ export default class extends Controller {
   }
 
   connect() {
+    console.log("🎵 SONG-LIST: Controller connected")
+
     try {
+      console.log("🎵 SONG-LIST: Raw songsValue:", this.songsValue?.substring(0, 100) + "...")
+
       // Parse JSON and validate
       const parsed = JSON.parse(this.songsValue)
+      console.log("🎵 SONG-LIST: Parsed songs:", parsed?.length || 0)
 
       // Ensure we have an array
       if (!Array.isArray(parsed)) {
@@ -22,6 +27,9 @@ export default class extends Controller {
         song?.id && song?.url && song?.title
       )
 
+      console.log("🎵 SONG-LIST: Filtered songs array:", this.songsArray.length)
+      console.log("🎵 SONG-LIST: First song:", this.songsArray[0]?.title || "none")
+
       this.setupEventListeners() // Set up event listeners BEFORE initial update
       this.updatePlayerQueue() // Initial update
 
@@ -31,15 +39,18 @@ export default class extends Controller {
       }, 100)
 
     } catch (error) {
-      console.error("Song list initialization failed:", error)
+      console.error("🎵 SONG-LIST: Initialization failed:", error)
+      console.error("🎵 SONG-LIST: Error details:", error.message, error.stack)
       this.songsArray = [] // Fallback to empty array
     }
   }
 
   setupEventListeners() {
-    
+    console.log("🎵 SONG-LIST: Setting up event listeners")
+
     // Update queue when any song is played
     document.addEventListener("player:play-requested", () => {
+      console.log("🎵 SONG-LIST: player:play-requested event received, updating queue")
       this.updatePlayerQueue()
     })
   }
