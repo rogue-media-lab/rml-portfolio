@@ -338,7 +338,7 @@ export default class extends Controller {
   /**
    * Handle track ending naturally
    */
-  async handleTrackEnd() {
+  handleTrackEnd() {
     console.log("🎵 Track ended - Auto-advance:", this.autoAdvanceValue, "Shuffle:", this.shuffleValue, "Queue length:", this.currentQueue.length)
 
     // Dispatch ended event BEFORE state changes
@@ -354,14 +354,10 @@ export default class extends Controller {
       console.log("✅ Auto-advance enabled - attempting to play next track...")
 
       try {
-        // Resume AudioContext for mobile Safari (WebAudio backend only)
-        await this.ensureAudioContextResumed()
-
-        // Small delay to ensure clean state transition
-        setTimeout(() => {
-          console.log("▶️ Calling playNext()...")
-          this.playNext()
-        }, 100)
+        // CRITICAL: Call playNext() immediately to preserve iOS gesture context
+        // setTimeout would break the autoplay permission on iOS Safari
+        console.log("▶️ Calling playNext() immediately...")
+        this.playNext()
 
       } catch (error) {
         console.error("❌ Error during auto-advance:", error)
