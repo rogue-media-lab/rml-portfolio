@@ -1,0 +1,57 @@
+<%= form_with(model: [:milk_admin, hermit], local: true) do |form| %>
+  <% if hermit.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(hermit.errors.count, "error") %> prohibited this hermit from being saved:</h2>
+
+      <ul>
+        <% hermit.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :alias %>
+    <%= form.text_field :alias %>
+  </div>
+
+  <div class="field">
+    <%= form.label :first_name %>
+    <%= form.text_field :first_name %>
+  </div>
+
+  <div class="field">
+    <%= form.label :last_name %>
+    <%= form.text_field :last_name %>
+  </div>
+
+  <div class="field">
+    <%= form.label :youtube %>
+    <%= form.text_field :youtube %>
+  </div>
+
+  <div class="field">
+    <%= form.label :twitch %>
+    <%= form.text_field :twitch %>
+  </div>
+
+  <div class="field">
+    <%= form.label :twitter %>
+    <%= form.text_field :twitter %>
+  </div>
+
+  <div class="field">
+    <%= form.label :instagram %>
+    <%= form.text_field :instagram %>
+  </div>
+
+  <div class="field">
+    <%= form.label :quote %>
+    <%= form.text_area :quote %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit %>
+  </div>
+<% end %>

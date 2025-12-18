@@ -1,0 +1,36 @@
+<%= turbo_frame_tag "dashboard_content" do %>
+  <div class="flex justify-between items-center mb-4">
+    <h1 class="text-3xl">Hermit Videos</h1>
+    <%= link_to "New Hermit Video", new_milk_admin_hermit_video_path, data: { turbo_frame: "dashboard_content" }, class: "btn btn-primary" %>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="min-w-full bg-white">
+      <thead class="bg-gray-800 text-white">
+        <tr>
+          <th class="w-1/4 py-3 px-4 uppercase font-semibold text-sm">Thumbnail</th>
+          <th class="w-1/4 py-3 px-4 uppercase font-semibold text-sm">Title</th>
+          <th class="w-1/8 py-3 px-4 uppercase font-semibold text-sm">Season</th>
+          <th class="w-1/8 py-3 px-4 uppercase font-semibold text-sm">Episode</th>
+          <th class="w-1/4 py-3 px-4 uppercase font-semibold text-sm">Hermit</th>
+          <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="text-gray-700">
+        <% @hermit_videos.each do |hermit_video| %>
+          <tr>
+            <td class="w-1/4 py-3 px-4"><img src="<%= hermit_video.thumbnail_url %>" alt="<%= hermit_video.title %>" class="h-16 w-auto" /></td>
+            <td class="w-1/4 py-3 px-4"><%= hermit_video.title %></td>
+            <td class="w-1/8 py-3 px-4"><%= hermit_video.season %></td>
+            <td class="w-1/8 py-3 px-4"><%= hermit_video.episode %></td>
+            <td class="w-1/4 py-3 px-4"><%= hermit_video.hermit.alias %></td>
+            <td class="text-left py-3 px-4">
+              <%= link_to "Edit", edit_milk_admin_hermit_video_path(hermit_video), data: { turbo_frame: "dashboard_content" }, class: "text-blue-500 hover:text-blue-700" %>
+              <%= link_to "Delete", milk_admin_hermit_video_path(hermit_video), data: { "turbo-method": :delete, "turbo-confirm": "Are you sure?" }, class: "text-red-500 hover:text-red-700 ml-4" %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% end %>

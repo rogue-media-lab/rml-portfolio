@@ -89,3 +89,5 @@ gem "sitemap_generator"
 
 # For friendly URLs
 gem "friendly_id"
+
+gem "google-api-client", "~> 0.53.0"

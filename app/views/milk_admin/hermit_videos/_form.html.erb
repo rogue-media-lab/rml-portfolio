@@ -1,0 +1,47 @@
+<%= form_with(model: [:milk_admin, hermit_video], local: true) do |form| %>
+  <% if hermit_video.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(hermit_video.errors.count, "error") %> prohibited this hermit_video from being saved:</h2>
+
+      <ul>
+        <% hermit_video.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :hermit_id %>
+    <%= form.collection_select :hermit_id, @hermits, :id, :alias, prompt: "Select a Hermit" %>
+  </div>
+
+  <div class="field">
+    <%= form.label :youtube_video_id %>
+    <%= form.text_field :youtube_video_id %>
+  </div>
+
+  <div class="field">
+    <%= form.label :title %>
+    <%= form.text_field :title %>
+  </div>
+
+  <div class="field">
+    <%= form.label :thumbnail_url %>
+    <%= form.text_field :thumbnail_url %>
+  </div>
+
+  <div class="field">
+    <%= form.label :season %>
+    <%= form.number_field :season %>
+  </div>
+
+  <div class="field">
+    <%= form.label :episode %>
+    <%= form.number_field :episode %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit %>
+  </div>
+<% end %>

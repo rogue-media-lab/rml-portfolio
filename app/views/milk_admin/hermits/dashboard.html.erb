@@ -1,0 +1,32 @@
+<%= turbo_frame_tag "dashboard_content" do %>
+  <div class="flex justify-between items-center mb-4">
+    <h1 class="text-3xl">Hermits</h1>
+    <%= link_to "New Hermit", new_milk_admin_hermit_path, data: { turbo_frame: "dashboard_content" }, class: "btn btn-primary" %>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="min-w-full bg-white">
+      <thead class="bg-gray-800 text-white">
+        <tr>
+          <th class="py-3 px-4 uppercase font-semibold text-sm">Alias</th>
+          <th class="py-3 px-4 uppercase font-semibold text-sm">Name</th>
+          <th class="py-3 px-4 uppercase font-semibold text-sm">YouTube</th>
+          <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="text-gray-700">
+        <% @hermits.each do |hermit| %>
+          <tr>
+            <td class="py-3 px-4"><%= hermit.alias %></td>
+            <td class="py-3 px-4"><%= hermit.first_name %> <%= hermit.last_name %></td>
+            <td class="py-3 px-4"><%= hermit.youtube %></td>
+            <td class="text-left py-3 px-4">
+              <%= link_to "Edit", edit_milk_admin_hermit_path(hermit), data: { turbo_frame: "dashboard_content" }, class: "text-blue-500 hover:text-blue-700" %>
+              <%= link_to "Delete", milk_admin_hermit_path(hermit), data: { "turbo-method": :delete, "turbo-confirm": "Are you sure?" }, class: "text-red-500 hover:text-red-700 ml-4" %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+<% end %>

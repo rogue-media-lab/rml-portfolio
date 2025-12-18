@@ -49,6 +49,12 @@ Rails.application.routes.draw do
       end
     end
 
+    get "hermit_videos/dashboard", to: "hermit_videos#dashboard", as: :hermit_videos_dashboard
+    resources :hermit_videos, only: [ :index, :new, :create, :edit, :update, :destroy ]
+
+    get "hermits/dashboard", to: "hermits#dashboard", as: :hermits_dashboard
+    resources :hermits, only: [ :index, :new, :create, :edit, :update, :destroy ]
+
     resources :pills, only: [ :index, :new, :create, :edit, :update, :destroy ]
   end
 
