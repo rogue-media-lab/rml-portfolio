@@ -9,7 +9,7 @@
     <div data-controller="music--song-list"
           data-music--song-list-songs-value="<%= @songs_data %>"
           class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 p-3 sm:p-4">
-      <% @songs.each do |song| %>
+      <% @songs_for_display.each do |song| %>
         <div class="flex justify-center">
           <%= render partial: "zuke/components/smart-image", locals: { controller_name: "smart-image", song: song } %>
         </div>

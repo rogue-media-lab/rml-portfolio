@@ -1,5 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 import WaveSurfer from "wavesurfer.js"
+import Hls from "hls.js"
 
 /**
  * Global Audio Player Controller
@@ -441,36 +442,15 @@ export default class extends Controller {
    */
   handlePlayRequest(e) {
     try {
-      const {
-        id, url, title, artist, banner, bannerMobile, bannerVideo, playOnLoad = false, updateBanner,
-        imageCredit, imageCreditUrl, imageLicense, audioSource, audioLicense, additionalCredits
-      } = e.detail
+      const song = e.detail
+      this.setCurrentIndex(song.id)
 
-      this.setCurrentIndex(id)
-
-      // Start audio loading FIRST (priority)
-      if (!this.wavesurfer || this.currentUrl !== url) {
-        this.loadTrack(url, playOnLoad)
+      if (!this.wavesurfer || this.currentUrl !== song.url) {
+        // Always use playSongFromQueue to handle HLS and regular files
+        this.playSongFromQueue(song);
       } else {
         this.togglePlayback()
       }
-
-      // Then update UI (non-blocking, can happen in parallel)
-      if (updateBanner !== false) {
-        this.updateBanner({ banner, bannerMobile, bannerVideo, title, artist })
-      }
-
-      // Update credits display
-      this.updateCredits({
-        title,
-        artist,
-        imageCredit,
-        imageCreditUrl,
-        imageLicense,
-        audioSource,
-        audioLicense,
-        additionalCredits
-      })
     } catch (error) {
       console.error("Error handling play event:", error)
       this.handleAudioError()
@@ -644,39 +624,41 @@ export default class extends Controller {
       // Set current URL before loading
       this.currentUrl = song.url;
 
-      // Dispatch play request
-      this.dispatchTrackChange(song.url)
+      // Dispatch track change event
+      this.dispatchTrackChange(song.url);
 
-      console.log("📥 Loading track:", song.title, "URL:", song.url.substring(0, 50) + "...")
+      console.log("📥 Loading track:", song.title, "URL:", song.url.substring(0, 80) + "...")
 
-      // Load and play immediately - no setTimeout delay
-      // This keeps the user gesture context alive for mobile Safari
-      this.wavesurfer.load(song.url);
-      this.wavesurfer.once('ready', () => {
-        console.log("✅ Track ready, attempting to play...")
-
-        // Use promise-based play() to handle autoplay blocking
-        const playPromise = this.wavesurfer.play();
-
-        // Handle play promise for mobile Safari autoplay restrictions
-        if (playPromise !== undefined) {
-          playPromise
-            .then(() => {
-              console.log("🎉 Playback started successfully for:", song.title)
-            })
-            .catch((error) => {
-              console.error("🚫 Autoplay blocked by browser:", error);
-              console.log("ℹ️ User interaction required to continue playback")
-              // Optionally dispatch event to show "Click to continue" UI
-              document.dispatchEvent(new CustomEvent("player:autoplay-blocked", {
-                detail: { song: song }
-              }));
+      // Conditional HLS loading for SoundCloud
+      if (song.audioSource === 'SoundCloud' && Hls.isSupported()) {
+        console.log("HLS stream detected, using global Hls object.");
+        const hls = new Hls();
+        hls.loadSource(song.url);
+        hls.attachMedia(this.wavesurfer.getMediaElement());
+        hls.on(Hls.Events.MANIFEST_PARSED, () => {
+          console.log("✅ HLS manifest parsed, attempting to play...");
+          const playPromise = this.wavesurfer.play();
+          if (playPromise !== undefined) {
+            playPromise.catch((error) => {
+              console.error("🚫 HLS autoplay blocked by browser:", error);
+              document.dispatchEvent(new CustomEvent("player:autoplay-blocked", { detail: { song } }));
             });
-        } else {
-          console.log("✅ Play promise undefined - playback should have started")
-        }
-      });
-
+          }
+        });
+      } else {
+        // Fallback for regular files
+        this.wavesurfer.load(song.url);
+        this.wavesurfer.once('ready', () => {
+          console.log("✅ Track ready, attempting to play...");
+          const playPromise = this.wavesurfer.play();
+          if (playPromise !== undefined) {
+            playPromise.catch((error) => {
+              console.error("🚫 Autoplay blocked by browser:", error);
+              document.dispatchEvent(new CustomEvent("player:autoplay-blocked", { detail: { song } }));
+            });
+          }
+        });
+      }
     } catch (error) {
       console.error("Error playing from queue:", error);
       this.handleAudioError();
@@ -709,27 +691,6 @@ export default class extends Controller {
   // ========================
   //  Track Loading
   // ========================
-
-  /**
-   * Load a new audio track
-   * @param {string} url - Audio file URL
-   * @param {boolean} [playOnLoad=false] - Whether to playOnLoad when loaded
-   */
-  loadTrack(url, playOnLoad = false) {
-    try {
-      this.resetPlayback()
-      this.showLoadingIndicator()
-      this.dispatchTrackChange(url)
-      
-      setTimeout(() => {
-        this.wavesurfer.load(url)
-      }, 100)
-      this.setupPlayOnLoad(playOnLoad)
-    } catch (error) {
-      console.error("Error loading track:", error)
-      this.handleAudioError()
-    }
-  }
 
   /**
    * Reset playback state before loading new track

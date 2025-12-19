@@ -2,31 +2,24 @@ class ZukeController < ApplicationController
   def index; end
 
   def music
-    if current_user
-      # @songs = Song.left_joins(:users).where(users: { id: nil })
-      #              .includes(:album, :artist)
-      #              .with_attached_image
-      #              .with_attached_audio_file
-      @songs = current_user.songs.includes(:album, :artist)
+    # 1. Load local songs from the database
+    local_songs = if current_user
+      current_user.songs.includes(:album, :artist)
                            .with_attached_image
                            .with_attached_audio_file
-      if @songs.empty?
-        redirect_to root_path, notice: "No songs found for the current user."
-        return
-      end
-
     elsif current_milk_admin
-      @songs = Song.includes(:album, :artist)
+      Song.includes(:album, :artist)
                    .with_attached_image
                    .with_attached_audio_file
     else
-      @songs = Song.left_joins(:users).where(users: { id: nil })
+      Song.left_joins(:users).where(users: { id: nil })
                    .includes(:album, :artist)
                    .with_attached_image
                    .with_attached_audio_file
     end
 
-    @songs_data = @songs.map do |song|
+    # 2. Format local songs into a standard hash
+    local_song_hashes = local_songs.map do |song|
       {
         id: song.id,
         url: song.audio_file.attached? ? rails_blob_url(song.audio_file) : nil,
@@ -42,7 +35,18 @@ class ZukeController < ApplicationController
         audioLicense: song.audio_license,
         additionalCredits: song.additional_credits
       }
-    end.to_json
+    end
+
+    # 3. Fetch and format tracks from SoundCloud
+    soundcloud_service = SoundCloudService.new
+    soundcloud_tracks = soundcloud_service.search('synthwave') # Test query
+    soundcloud_song_hashes = soundcloud_tracks.map do |track|
+      SoundCloudSongPresenter.new(track).to_song_hash
+    end
+
+    # 4. Create a unified list for the view and the player
+    @songs_for_display = local_song_hashes + soundcloud_song_hashes
+    @songs_data = @songs_for_display.to_json
   end
 
   def artists

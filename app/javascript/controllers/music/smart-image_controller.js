@@ -58,6 +58,9 @@ export default class extends Controller {
 
 
   handleSongChange(e) {
+    // If this smart image doesn't have a target, do nothing.
+    if (!this.hasPlayButtonTarget) return;
+
     // Only highlight if this is the current song
     if (e.detail.url === this.urlValue) {
       this.playButtonTarget.classList.add("border-lime-500")
