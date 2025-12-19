@@ -28,7 +28,7 @@ class MilkAdmin::HermitVideosController < ApplicationController
     respond_to do |format|
       if @hermit_video.save
         redirect_path = turbo_frame_request? ? milk_admin_hermit_videos_dashboard_path : @hermit_video
-        format.html { redirect_to redirect_path, notice: 'Hermit video was successfully created.' }
+        format.html { redirect_to redirect_path, notice: "Hermit video was successfully created." }
         format.json { render :show, status: :created, location: @hermit_video }
       else
         format.html { render :new, status: :unprocessable_entity, layout: !turbo_frame_request? }
@@ -41,7 +41,7 @@ class MilkAdmin::HermitVideosController < ApplicationController
     respond_to do |format|
       if @hermit_video.update(hermit_video_params)
         redirect_path = turbo_frame_request? ? milk_admin_hermit_videos_dashboard_path : @hermit_video
-        format.html { redirect_to redirect_path, notice: 'Hermit video was successfully updated.' }
+        format.html { redirect_to redirect_path, notice: "Hermit video was successfully updated." }
         format.json { render :show, status: :ok, location: @hermit_video }
       else
         format.html { render :edit, status: :unprocessable_entity, layout: !turbo_frame_request? }
@@ -53,7 +53,7 @@ class MilkAdmin::HermitVideosController < ApplicationController
   def destroy
     @hermit_video.destroy
     respond_to do |format|
-      format.html { redirect_to milk_admin_hermit_videos_dashboard_path, notice: 'Hermit video was successfully destroyed.' }
+      format.html { redirect_to milk_admin_hermit_videos_dashboard_path, notice: "Hermit video was successfully destroyed." }
       format.json { head :no_content }
     end
   end

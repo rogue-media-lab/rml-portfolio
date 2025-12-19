@@ -1,4 +1,4 @@
-require 'google/apis/youtube_v3'
+require "google/apis/youtube_v3"
 
 # Fetches and processes videos from a hermit's YouTube channel.
 class YoutubeService
@@ -23,12 +23,12 @@ class YoutubeService
 
   def get_uploads_playlist_id(handle)
     # First, search for the channel by its handle to get the channel ID
-    search_response = @youtube.list_searches('snippet', q: handle, type: 'channel', max_results: 1)
+    search_response = @youtube.list_searches("snippet", q: handle, type: "channel", max_results: 1)
     channel_id = search_response.items.first&.id&.channel_id
     return nil unless channel_id
 
     # Then, use the channel ID to get the uploads playlist ID
-    channel_response = @youtube.list_channels('contentDetails', id: channel_id)
+    channel_response = @youtube.list_channels("contentDetails", id: channel_id)
     channel_response.items.first&.content_details&.related_playlists&.uploads
   rescue Google::Apis::ClientError => e
     Rails.logger.error "YouTube API error while fetching channel details: #{e.message}"
@@ -39,7 +39,7 @@ class YoutubeService
     videos = []
     next_page_token = nil
     loop do
-      response = @youtube.list_playlist_items('snippet', playlist_id: playlist_id, max_results: 50, page_token: next_page_token)
+      response = @youtube.list_playlist_items("snippet", playlist_id: playlist_id, max_results: 50, page_token: next_page_token)
       videos.concat(response.items)
       next_page_token = response.next_page_token
       break unless next_page_token
@@ -70,8 +70,8 @@ class YoutubeService
   def extract_season_and_episode(title)
     # This is a simple regex, it might need to be adjusted based on the video title format
     match = title.match(/Season (\d+).*Episode (\d+)/i)
-    return [nil, nil] unless match
+    return [ nil, nil ] unless match
 
-    [match[1].to_i, match[2].to_i]
+    [ match[1].to_i, match[2].to_i ]
   end
 end

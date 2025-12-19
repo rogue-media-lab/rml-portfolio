@@ -27,7 +27,7 @@ class MilkAdmin::HermitsController < ApplicationController
     respond_to do |format|
       if @hermit.save
         redirect_path = turbo_frame_request? ? milk_admin_hermits_dashboard_path : @hermit
-        format.html { redirect_to redirect_path, notice: 'Hermit was successfully created.' }
+        format.html { redirect_to redirect_path, notice: "Hermit was successfully created." }
         format.json { render :show, status: :created, location: @hermit }
       else
         format.html { render :new, status: :unprocessable_entity, layout: !turbo_frame_request? }
@@ -40,7 +40,7 @@ class MilkAdmin::HermitsController < ApplicationController
     respond_to do |format|
       if @hermit.update(hermit_params)
         redirect_path = turbo_frame_request? ? milk_admin_hermits_dashboard_path : @hermit
-        format.html { redirect_to redirect_path, notice: 'Hermit was successfully updated.' }
+        format.html { redirect_to redirect_path, notice: "Hermit was successfully updated." }
         format.json { render :show, status: :ok, location: @hermit }
       else
         format.html { render :edit, status: :unprocessable_entity, layout: !turbo_frame_request? }
@@ -52,7 +52,7 @@ class MilkAdmin::HermitsController < ApplicationController
   def destroy
     @hermit.destroy
     respond_to do |format|
-      format.html { redirect_to milk_admin_hermits_dashboard_path, notice: 'Hermit was successfully destroyed.' }
+      format.html { redirect_to milk_admin_hermits_dashboard_path, notice: "Hermit was successfully destroyed." }
       format.json { head :no_content }
     end
   end
