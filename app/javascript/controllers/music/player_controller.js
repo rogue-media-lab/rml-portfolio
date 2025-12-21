@@ -528,13 +528,17 @@ export default class extends Controller {
       }
       const waveformData = await response.json();
       
-      // SoundCloud JSON data is typically an array of integers in a "data" or "samples" key.
-      // We need to normalize them to floats between 0 and 1.
-      const peaks = waveformData.data || waveformData.samples || [];
+      const rawPeaks = waveformData.data || waveformData.samples || [];
+      // Defensively filter for only valid numbers.
+      const peaks = rawPeaks.filter(p => typeof p === 'number');
+
       if (peaks.length === 0) return [];
 
       const maxPeak = Math.max(...peaks);
-      if (maxPeak === 0) return new Array(peaks.length).fill(0);
+      // Ensure maxPeak is a valid, finite number before dividing by it.
+      if (!isFinite(maxPeak) || maxPeak === 0) {
+        return new Array(peaks.length).fill(0);
+      }
 
       const normalizedPeaks = peaks.map(p => p / maxPeak);
       return normalizedPeaks;
