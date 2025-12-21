@@ -54,3 +54,41 @@ This was the final key.
 **Conclusion:** The root cause was a combination of a module format incompatibility and a network race condition. By serving both libraries locally, we eliminated the loading latency, which allowed the `importmap` system to correctly process both modules before our player code executed. This achieved a final solution that is not only functional but also robust, maintainable, and idiomatic to a modern Rails application.
 
 This project is a testament to persistent, collaborative, and detailed-oriented problem-solving.
+
+## Chapter 7: The Waveform Perfected
+
+With streaming playback achieved, a final challenge remained: WaveSurfer could not generate a complete waveform for HLS streams, as it never has the full audio file at once. This broke the player's core visualizer for all streamed tracks.
+
+- **The Discovery:** We investigated the SoundCloud API response and found a `waveform_url`, which provides pre-computed peak data. This was the key to solving the problem.
+
+- **The Implementation Cycle:** The implementation was a multi-step process of debugging and refinement:
+    1.  **Initial Implementation:** We first updated the backend presenter and frontend controllers to pass the `waveform_url` to the player.
+    2.  **Format Handling:** We discovered the `waveform_url` could point to either a `.json` file of peak data or a `.png` image. The player controller was updated to handle both formats, fetching JSON directly or extracting data from the PNG via an off-screen canvas.
+    3.  **Loading Sequence:** A critical race condition emerged between WaveSurfer and HLS.js fighting for control of the audio element. We determined the correct, non-interfering order of operations: first load the peaks into WaveSurfer, *then* attach HLS.js to the media element, and finally call `play()` once the HLS manifest is parsed.
+    4.  **Resampling:** The pre-computed peaks from SoundCloud, while plentiful, did not match the density required by our player's rendering settings, resulting in a "blocky" waveform. The final piece of the puzzle was to write a resampling function. This function intelligently down-samples the dense peak data to the exact number of bars that can be drawn in the player, preserving the maximum peak of each segment to maintain the waveform's "spiky" visual intensity.
+
+- **Final Result:** The Zuke player now seamlessly displays a detailed, visually consistent waveform for all tracks, local or streamed, fulfilling the project's original vision. The player controller is robust, with documented logic to handle the complex interactions between WaveSurfer, HLS.js, and pre-computed peak data.
+
+## Chapter 8: The Likes Playlist & API Workarounds
+
+With the core streaming and waveform display working, the next goal was to personalize the experience by integrating a user's liked songs from SoundCloud.
+
+- **The Vision:** The user, Mason Roberts, wanted to see their SoundCloud "Likes" as a new, playable playlist directly within the Zuke player's existing "Playlists" section. A key constraint was modularity: the new logic should not be added to the existing `SoundCloudService`.
+
+- **The Solution:**
+    1.  **Virtual Playlist:** We modified the `PlaylistsController` to create a "virtual" playlist. This `OpenStruct` object appears in the UI like a normal playlist but is not saved in the database. It's identified by the special ID `soundcloud-likes`.
+    2.  **Dedicated Service:** To respect the modularity constraint, we created a new `app/services/soundcloud_likes_service.rb`. This service is solely responsible for fetching the liked tracks. It first uses the SoundCloud API's `/resolve` endpoint to find the user's ID from their profile URL, then calls the `/users/{id}/likes` endpoint to get the list of tracks.
+    3.  **Cached Song Count:** To avoid slowing down the playlist index page with an API call every time, we implemented a 15-minute cache for the song count, providing a balance between performance and accuracy.
+
+- **The 403 Forbidden Challenge:** A major hurdle appeared during testing. After playing one or two songs from the Likes playlist, subsequent tracks would fail to load with a 403 Forbidden error. We determined this was a server-side restriction from SoundCloud due to our use of an unauthorized public client ID, which results in temporary, expiring stream URLs.
+
+- **The "Just-in-Time" Refresh Workaround:** The user suggested a brilliant workaround: refresh the track data just before it plays. We implemented this "just-in-time" mechanism:
+    1.  **Backend Endpoint:** A new route (`/zuke/refresh_soundcloud_track/:id`) and a corresponding `refresh_soundcloud_track` action were added to the `ZukeController`. This endpoint takes a SoundCloud track ID, calls the `SoundCloudService` to get fresh data (including a new stream URL), and returns it as JSON.
+    2.  **Frontend Logic:** The `player_controller.js` was updated. Before playing a SoundCloud track, it now `await`s a `fetch` call to the new refresh endpoint. It then updates the song object in its queue with the fresh data before proceeding to play.
+
+- **Final Bug Fixes (State Management):** This new refresh logic introduced a series of subtle state management bugs, which we fixed iteratively:
+    1.  **Active Song Indicator:** The "now playing" border on song images broke because it was comparing dynamic stream URLs. We fixed this by dispatching the stable `song.id` in the `audio:changed` event and using the ID for comparison in the `smart-image-controller`.
+    2.  **Play/Pause Toggle:** Clicking a playing SoundCloud song would restart it instead of pausing. We refined the logic in `handlePlayRequest` to correctly check if the clicked song was already loaded in the player (either playing or paused) and only toggle playback in that case.
+    3.  **Local File Playback:** The final bug was that local files stopped playing. We traced this to a fundamental state management issue where the `song-list-controller` was incorrectly re-sending its stale, initial queue to the player on every click, overwriting the player's authoritative queue. We fixed this by removing the responsible event listener, making the player's queue the single source of truth during a playback session.
+
+- **Current Status:** The SoundCloud Likes playlist is now fully functional. It appears seamlessly in the UI, displays an accurate (cached) song count, and reliably plays through the entire list by refreshing each track's authorization on demand. The play/pause and active song indicators also work as expected for all track types.

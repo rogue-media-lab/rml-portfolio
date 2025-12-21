@@ -6,13 +6,13 @@
     <% if @playlists.any? %>
       <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 p-3 sm:p-4">
         <% @playlists.each do |playlist| %>
-          <%= link_to playlist_path(playlist), data: { turbo_frame: "music-frame" }, class: "block bg-slate-800 hover:bg-slate-700 rounded-lg p-4 transition-colors" do %>
+          <%= link_to playlist_path(id: playlist.id), data: { turbo_frame: "music-frame" }, class: "block bg-slate-800 hover:bg-slate-700 rounded-lg p-4 transition-colors" do %>
             <div class="flex flex-col">
               <h3 class="text-lg font-semibold mb-2"><%= playlist.name %></h3>
               <% if playlist.description.present? %>
                 <p class="text-sm text-gray-400 mb-2 line-clamp-2"><%= playlist.description %></p>
               <% end %>
-              <p class="text-sm text-gray-500"><%= pluralize(playlist.songs.count, "song") %></p>
+              <p class="text-sm text-gray-500"><%= pluralize(playlist.try(:song_count) || playlist.songs.count, "song") %></p>
             </div>
           <% end %>
         <% end %>

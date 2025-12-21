@@ -16,7 +16,9 @@ export default class extends Controller {
     imageLicense: String,
     audioSource: String,
     audioLicense: String,
-    additionalCredits: String
+    additionalCredits: String,
+    waveformUrl: String, // Add waveformUrl
+    duration: Number,    // Add duration
   }
 
   connect() {
@@ -49,7 +51,9 @@ export default class extends Controller {
         imageLicense: this.imageLicenseValue,
         audioSource: this.audioSourceValue,
         audioLicense: this.audioLicenseValue,
-        additionalCredits: this.additionalCreditsValue
+        additionalCredits: this.additionalCreditsValue,
+        waveformUrl: this.waveformUrlValue, // Pass waveformUrl
+        duration: this.durationValue,       // Pass duration
       }
     }))
 
@@ -61,8 +65,8 @@ export default class extends Controller {
     // If this smart image doesn't have a target, do nothing.
     if (!this.hasPlayButtonTarget) return;
 
-    // Only highlight if this is the current song
-    if (e.detail.url === this.urlValue) {
+    // Only highlight if this is the current song, using the stable song ID
+    if (e.detail.id === this.idValue) {
       this.playButtonTarget.classList.add("border-lime-500")
     } else {
       this.playButtonTarget.classList.remove("border-lime-500")

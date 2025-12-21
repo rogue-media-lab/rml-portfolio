@@ -48,12 +48,6 @@ export default class extends Controller {
   setupEventListeners() {
     console.log("🎵 SONG-LIST: Setting up event listeners")
 
-    // Update queue when any song is played
-    document.addEventListener("player:play-requested", () => {
-      console.log("🎵 SONG-LIST: player:play-requested event received, updating queue")
-      this.updatePlayerQueue()
-    })
-
     // Respond to queue requests from player (critical for Service Worker reloads)
     document.addEventListener("player:queue:request", () => {
       console.log("🎵 SONG-LIST: player:queue:request received, sending queue")

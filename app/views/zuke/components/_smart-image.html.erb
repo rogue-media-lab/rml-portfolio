@@ -11,7 +11,9 @@
      data-music--smart-image-image-license-value="<%= song[:imageLicense] || '' %>"
      data-music--smart-image-audio-source-value="<%= song[:audioSource] || '' %>"
      data-music--smart-image-audio-license-value="<%= song[:audioLicense] || '' %>"
-     data-music--smart-image-additional-credits-value="<%= song[:additionalCredits] || '' %>">
+     data-music--smart-image-additional-credits-value="<%= song[:additionalCredits] || '' %>"
+     data-music--smart-image-waveform-url-value="<%= song[:waveformUrl] || '' %>"
+     data-music--smart-image-duration-value="<%= song[:duration] || 0 %>">
 
   <% if song[:banner].present? %>
     <%= image_tag song[:banner],

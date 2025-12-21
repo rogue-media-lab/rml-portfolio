@@ -33,6 +33,7 @@ export default class extends Controller {
     autoAdvance: { type: Boolean, default: false },
     shuffle: { type: Boolean, default: false },
     repeatMode: { type: String, default: "off" }, // 'off', 'all', 'one'
+    waveformUrl: { type: String, default: "" }, // Added for SoundCloud waveforms
   }
 
 
@@ -326,7 +327,6 @@ export default class extends Controller {
     try {
       this.updateTimeDisplay(0)
       this.hideLoadingIndicator()
-      this.dispatchStateChange()
 
       // Notify that audio is ready - safe to load video now
       window.dispatchEvent(new CustomEvent("audio:ready", {
@@ -442,18 +442,27 @@ export default class extends Controller {
    */
   handlePlayRequest(e) {
     try {
-      const song = e.detail
-      this.setCurrentIndex(song.id)
+      const songFromEvent = e.detail;
+      // Use a type-insensitive comparison for the ID
+      const requestedIndex = this.currentQueue.findIndex(s => String(s.id) === String(songFromEvent.id));
 
-      if (!this.wavesurfer || this.currentUrl !== song.url) {
-        // Always use playSongFromQueue to handle HLS and regular files
-        this.playSongFromQueue(song);
+      // If the clicked song is the one currently loaded in the player, just toggle playback.
+      if (requestedIndex !== -1 && requestedIndex === this.currentIndex && this.wavesurfer && this.wavesurfer.getMediaElement()) {
+        this.togglePlayback();
       } else {
-        this.togglePlayback()
+        // Otherwise, it's a new song.
+        this.currentIndex = requestedIndex;
+        const songToPlay = this.currentQueue[this.currentIndex];
+        if (songToPlay) {
+          this.playSongFromQueue(songToPlay);
+        } else {
+          // Fallback for safety, if the song wasn't found in the queue.
+          this.playSongFromQueue(songFromEvent);
+        }
       }
     } catch (error) {
-      console.error("Error handling play event:", error)
-      this.handleAudioError()
+      console.error("Error handling play event:", error);
+      this.handleAudioError();
     }
   }
 
@@ -474,6 +483,194 @@ export default class extends Controller {
         updateBanner: true
       }
     }))
+  }
+
+  /**
+   * Play the next song in queue
+   */
+  /**
+   * Orchestrates waveform peak extraction by detecting the URL format.
+   * @param {string} waveformUrl - The URL of the waveform data (.png or .json).
+   * @returns {Promise<number[]>} A promise that resolves with an array of normalized peak values.
+   */
+  /**
+   * Orchestrates waveform peak extraction by detecting the URL format.
+   * SoundCloud's API can provide either a JSON file with peak data or a PNG
+   * image of the waveform. This method handles both cases.
+   * @param {string} waveformUrl - The URL of the waveform data (.png or .json).
+   * @returns {Promise<number[]>} A promise that resolves with an array of normalized peak values.
+   */
+  async extractPeaks(waveformUrl) {
+    if (!waveformUrl) return [];
+
+    if (waveformUrl.endsWith('.json')) {
+      console.log("Waveform URL is JSON, fetching directly.");
+      return this._fetchJsonPeaks(waveformUrl);
+    } else if (waveformUrl.endsWith('.png')) {
+      console.log("Waveform URL is PNG, extracting from image.");
+      return this._extractPeaksFromPng(waveformUrl);
+    } else {
+      console.warn("Unknown waveform URL format:", waveformUrl);
+      return [];
+    }
+  }
+
+  /**
+   * Fetches waveform data from a JSON file and normalizes it.
+   * @param {string} jsonUrl - The URL of the waveform JSON file.
+   * @returns {Promise<number[]>} A promise resolving to an array of normalized peaks.
+   */
+  async _fetchJsonPeaks(jsonUrl) {
+    try {
+      const response = await fetch(jsonUrl);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const waveformData = await response.json();
+      
+      // SoundCloud JSON data is typically an array of integers in a "data" or "samples" key.
+      // We need to normalize them to floats between 0 and 1.
+      const peaks = waveformData.data || waveformData.samples || [];
+      if (peaks.length === 0) return [];
+
+      const maxPeak = Math.max(...peaks);
+      if (maxPeak === 0) return new Array(peaks.length).fill(0);
+
+      const normalizedPeaks = peaks.map(p => p / maxPeak);
+      return normalizedPeaks;
+
+    } catch (error) {
+      console.error("Failed to fetch or process JSON peaks:", error);
+      return [];
+    }
+  }
+
+  /**
+   * Extracts waveform peaks from a SoundCloud PNG image.
+   * @param {string} imageUrl - The URL of the waveform PNG image.
+   * @returns {Promise<number[]>} A promise that resolves with an array of normalized peak values (0-1).
+   */
+  async _extractPeaksFromPng(imageUrl) {
+    return new Promise((resolve, reject) => {
+      if (!imageUrl) {
+        return resolve([]); // No image URL, resolve with empty peaks
+      }
+
+      const img = new Image();
+      img.crossOrigin = 'anonymous'; // Important for CORS if image is on different domain
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
+
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const data = imageData.data;
+        const peaks = [];
+        const totalColumns = canvas.width;
+        const halfHeight = canvas.height / 2; // Waveform usually symmetric around center
+
+        for (let i = 0; i < totalColumns; i++) {
+          let topY = halfHeight; // Start from center, go up
+          let bottomY = halfHeight; // Start from center, go down
+          let foundTop = false;
+          let foundBottom = false;
+
+          // Scan upwards from center for the top edge of the waveform
+          for (let y = halfHeight; y >= 0; y--) {
+            const alpha = data[((y * totalColumns + i) * 4) + 3];
+            if (alpha > 0) {
+              topY = y;
+              foundTop = true;
+              break;
+            }
+          }
+
+          // Scan downwards from center for the bottom edge of the waveform
+          for (let y = halfHeight; y < canvas.height; y++) {
+            const alpha = data[((y * totalColumns + i) * 4) + 3];
+            if (alpha > 0) {
+              bottomY = y;
+              foundBottom = true;
+              break;
+            }
+          }
+          
+          let peakValue = 0;
+          if (foundTop && foundBottom) {
+              const topDeviation = halfHeight - topY;
+              const bottomDeviation = bottomY - halfHeight;
+              peakValue = Math.max(topDeviation, bottomDeviation) / halfHeight;
+          }
+          peaks.push(peakValue);
+        }
+        resolve(peaks);
+      };
+      img.onerror = (e) => {
+        console.error("Error loading waveform image:", imageUrl, e);
+        reject(e); // Reject with the error event
+      };
+      img.src = imageUrl;
+    });
+  }
+
+  /**
+   * Resamples an array of peaks to a new, desired length. This is the core
+   * logic to ensure pre-computed waveforms look consistent with analyzed ones.
+   * - Down-samples by finding the maximum peak in each segment to preserve spikiness.
+   * - Up-samples by using linear interpolation to create smooth transitions.
+   * @param {number[]} peaks - The original array of peak data.
+   * @param {number} newLength - The desired length for the new array.
+   * @returns {number[]} The resampled array of peaks.
+   */
+  _resamplePeaks(peaks, newLength) {
+    if (peaks.length === 0 || newLength <= 0) {
+      return [];
+    }
+
+    // If lengths are the same, no work needed
+    if (peaks.length === newLength) {
+      return peaks;
+    }
+
+    const newPeaks = new Array(newLength);
+    
+    // Down-sampling (find max peak in segment)
+    if (peaks.length > newLength) {
+      const newPeaks = new Array(newLength);
+      const factor = peaks.length / newLength;
+      for (let i = 0; i < newLength; i++) {
+        const start = Math.floor(i * factor);
+        const end = Math.floor((i + 1) * factor);
+        let max = 0;
+        for (let j = start; j < end; j++) {
+          if (peaks[j] > max) {
+            max = peaks[j];
+          }
+        }
+        newPeaks[i] = max;
+      }
+      return newPeaks;
+    } 
+    // Up-sampling (interpolating)
+    else {
+      const newPeaks = new Array(newLength);
+      const spring = (peaks.length - 1) / (newLength - 1);
+      newPeaks[0] = peaks[0];
+      newPeaks[newLength - 1] = peaks[peaks.length - 1];
+
+      for (let i = 1; i < newLength - 1; i++) {
+        const index = i * spring;
+        const i_lo = Math.floor(index);
+        const i_hi = Math.ceil(index);
+        const p_lo = peaks[i_lo];
+        const p_hi = peaks[i_hi];
+        const weight = index - i_lo;
+        newPeaks[i] = p_lo * (1 - weight) + p_hi * weight;
+      }
+      return newPeaks;
+    }
   }
 
   /**
@@ -587,8 +784,42 @@ export default class extends Controller {
     this.playSongFromQueue(prevSong)
   }
 
-  playSongFromQueue(song) {
+  async playSongFromQueue(song) {
     try {
+      // If the song is from SoundCloud, refresh its data to get a fresh stream URL
+      if (song.audioSource === 'SoundCloud') {
+        console.log("🔄 Refreshing SoundCloud track:", song.title);
+        try {
+          const response = await fetch(`/zuke/refresh_soundcloud_track/${song.id}`);
+          if (response.ok) {
+            const refreshedSongData = await response.json();
+            console.log("✅ Refreshed data received:", refreshedSongData);
+            // Update the song object with the fresh data
+            Object.assign(song, refreshedSongData);
+
+            // Also update the song in the main queue
+            const songInQueue = this.currentQueue.find(s => s.id === song.id);
+            if (songInQueue) {
+              Object.assign(songInQueue, refreshedSongData);
+            }
+          } else {
+            console.error("❌ Failed to refresh SoundCloud track. Status:", response.status);
+            // Proceed with the potentially expired URL, it might still work.
+          }
+        } catch (error) {
+          console.error("❌ Error refreshing SoundCloud track:", error);
+        }
+      }
+
+      // Destroy previous HLS instance if it exists. This is crucial to prevent
+      // the old HLS instance from interfering with the playback of subsequent
+      // tracks, especially non-HLS local files.
+      if (this.hls) {
+        console.log("Destroying previous HLS instance.");
+        this.hls.destroy();
+        this.hls = null;
+      }
+
       console.log("🎵 playSongFromQueue() called with:", song?.title)
 
       if (!song || !song.url) {
@@ -625,16 +856,50 @@ export default class extends Controller {
       this.currentUrl = song.url;
 
       // Dispatch track change event
-      this.dispatchTrackChange(song.url);
+      this.dispatchTrackChange(song);
 
       console.log("📥 Loading track:", song.title, "URL:", song.url.substring(0, 80) + "...")
 
       // Conditional HLS loading for SoundCloud
       if (song.audioSource === 'SoundCloud' && Hls.isSupported()) {
+        // The loading process for HLS tracks with pre-computed peaks is sensitive
+        // to the order of operations to avoid race conditions between Wavesurfer and HLS.js.
+        // The correct sequence is:
+        // 1. Get raw peaks from the SoundCloud API (JSON or PNG).
+        // 2. Resample peaks to match the density required by the player's settings.
+        // 3. Load the resampled peaks into Wavesurfer with the empty media element.
+        // 4. Attach HLS.js to the media element and load the stream source.
+        // 5. Play the audio only after the HLS manifest has been parsed.
         console.log("HLS stream detected, using global Hls object.");
+        
+        // 1. Get raw peaks first
+        const rawPeaks = song.waveformUrl ? await this.extractPeaks(song.waveformUrl) : [];
+        
+        // 2. Resample peaks to match the density defined by minPxPerSec
+        const minPxPerSec = this.wavesurfer.options.minPxPerSec || 50;
+        const barWidth = this.wavesurfer.options.barWidth || 2;
+        const barGap = this.wavesurfer.options.barGap || 1;
+        const totalWidth = song.duration * minPxPerSec;
+        const numBars = Math.floor(totalWidth / (barWidth + barGap));
+        
+        console.log(`Resampling peaks: original ${rawPeaks.length}, target bars ${numBars} for duration ${song.duration}s`);
+        const peaks = this._resamplePeaks(rawPeaks, numBars);
+
+        // 3. Load peaks into wavesurfer with the empty media element
+        if (this.wavesurfer && peaks.length > 0) {
+          this.wavesurfer.load(this.wavesurfer.getMediaElement(), peaks, song.duration);
+          console.log(`Peaks loaded and resampled from ${rawPeaks.length} to ${peaks.length} points.`);
+        } else if (this.wavesurfer) {
+          console.warn("No peaks extracted or waveformUrl was empty.");
+        }
+        
+        // 4. Set up HLS
         const hls = new Hls();
         hls.loadSource(song.url);
         hls.attachMedia(this.wavesurfer.getMediaElement());
+        this.hls = hls;
+
+        // 5. Play when HLS is ready
         hls.on(Hls.Events.MANIFEST_PARSED, () => {
           console.log("✅ HLS manifest parsed, attempting to play...");
           const playPromise = this.wavesurfer.play();
@@ -709,9 +974,9 @@ export default class extends Controller {
    * Dispatch track change event
    * @param {string} url - New track URL
    */
-  dispatchTrackChange(url) {
-    this.currentUrl = url
-    window.dispatchEvent(new CustomEvent("audio:changed", { detail: { url } }))
+  dispatchTrackChange(song) {
+    this.currentUrl = song.url
+    window.dispatchEvent(new CustomEvent("audio:changed", { detail: { url: song.url, id: song.id } }))
   }
 
   /**

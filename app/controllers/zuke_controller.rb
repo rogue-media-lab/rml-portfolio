@@ -33,19 +33,14 @@ class ZukeController < ApplicationController
         imageLicense: song.image_license,
         audioSource: song.audio_source,
         audioLicense: song.audio_license,
-        additionalCredits: song.additional_credits
+        additionalCredits: song.additional_credits,
+        waveformUrl: nil, # Local songs don't have a pre-generated waveform from an API
+        duration: song.audio_file.attached? ? (song.audio_file.metadata["duration"] || 0) : 0
       }
     end
 
-    # 3. Fetch and format tracks from SoundCloud
-    soundcloud_service = SoundCloudService.new
-    soundcloud_tracks = soundcloud_service.search('synthwave') # Test query
-    soundcloud_song_hashes = soundcloud_tracks.map do |track|
-      SoundCloudSongPresenter.new(track).to_song_hash
-    end
-
-    # 4. Create a unified list for the view and the player
-    @songs_for_display = local_song_hashes + soundcloud_song_hashes
+    # 3. Create a unified list for the view and the player
+    @songs_for_display = local_song_hashes
     @songs_data = @songs_for_display.to_json
   end
 
@@ -100,8 +95,7 @@ class ZukeController < ApplicationController
                    .with_attached_image
                    .with_attached_audio_file
     end
-
-    @songs_data = @songs.map do |song|
+    @songs_for_display = @songs.map do |song|
       {
         id: song.id,
         url: song.audio_file.attached? ? rails_blob_url(song.audio_file) : nil,
@@ -115,9 +109,12 @@ class ZukeController < ApplicationController
         imageLicense: song.image_license,
         audioSource: song.audio_source,
         audioLicense: song.audio_license,
-        additionalCredits: song.additional_credits
+        additionalCredits: song.additional_credits,
+        waveformUrl: nil,
+        duration: song.audio_file.attached? ? (song.audio_file.metadata['duration'] || 0) : 0
       }
-    end.to_json
+    end
+    @songs_data = @songs_for_display.to_json
 
     render partial: "zuke/turbo_frames/index", formats: [ :html ]
   end
@@ -144,18 +141,27 @@ class ZukeController < ApplicationController
       Song.left_joins(:users).where(users: { id: nil })
     end
 
-    # Search songs by title, artist name, or album title
-    @songs = base_songs.joins(:artist)
-                       .left_joins(:album)
-                       .where(
-                         "songs.title ILIKE :query OR artists.name ILIKE :query OR albums.title ILIKE :query",
-                         query: "%#{query}%"
-                       )
-                       .includes(:album, :artist)
-                       .with_attached_image
-                       .with_attached_audio_file
-                       .distinct
-                       .limit(10)
+    # Search local songs by title, artist name, or album title
+    local_songs = base_songs.joins(:artist)
+                            .left_joins(:album)
+                            .where(
+                              "songs.title ILIKE :query OR artists.name ILIKE :query OR albums.title ILIKE :query",
+                              query: "%#{query}%"
+                            )
+                            .includes(:album, :artist)
+                            .with_attached_image
+                            .with_attached_audio_file
+                            .distinct
+                            .limit(10)
+
+    # --- SoundCloud Search ---
+    soundcloud_service = SoundCloudService.new
+    soundcloud_tracks = soundcloud_service.search(query)
+    soundcloud_songs = soundcloud_tracks.map do |track|
+      SoundCloudSongPresenter.new(track).to_song_hash
+    end
+    # --- End SoundCloud Search ---
+
 
     # Use Ransack for artists and albums
     @artists_q = Artist.ransack(name_cont: query)
@@ -169,8 +175,8 @@ class ZukeController < ApplicationController
                        .includes(:artist, :songs)
                        .limit(5)
 
-    # Prepare songs data for player
-    @songs_data = @songs.map do |song|
+    # Prepare local songs data for player
+    local_songs_data = local_songs.map do |song|
       {
         id: song.id,
         url: song.audio_file.attached? ? rails_blob_url(song.audio_file) : nil,
@@ -184,10 +190,33 @@ class ZukeController < ApplicationController
         imageLicense: song.image_license,
         audioSource: song.audio_source,
         audioLicense: song.audio_license,
-        additionalCredits: song.additional_credits
+        additionalCredits: song.additional_credits,
+        waveformUrl: nil,
+        duration: song.audio_file.attached? ? (song.audio_file.metadata["duration"] || 0) : 0
       }
-    end.to_json
+    end
+
+    # --- Combine Results ---
+    @songs = local_songs
+    @songs_for_display = local_songs_data + soundcloud_songs
+    @songs_data = @songs_for_display.to_json
+    # --- End Combine Results ---
 
     render partial: "zuke/turbo_frames/search_results", formats: [ :html ]
+  end
+
+  # GET /zuke/refresh_soundcloud_track/:id
+  # Fetches fresh data for a SoundCloud track, including a new stream URL.
+  def refresh_soundcloud_track
+    track_id = params[:id].to_s.gsub("soundcloud-", "")
+    service = SoundCloudService.new
+    track_data = service.get_track(track_id)
+
+    if track_data
+      song_hash = SoundCloudSongPresenter.new(track_data).to_song_hash
+      render json: song_hash
+    else
+      render json: { error: "Track not found" }, status: :not_found
+    end
   end
 end

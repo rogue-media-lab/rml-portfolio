@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-require 'net/http'
-require 'uri'
-require 'json'
+require "net/http"
+require "uri"
+require "json"
 
 # Handles all communication with the SoundCloud API.
 class SoundCloudService
-  BASE_URL = 'https://api-v2.soundcloud.com'
+  BASE_URL = "https://api-v2.soundcloud.com"
   CLIENT_ID = Rails.application.credentials.soundcloud[:client_id]
 
   # Searches for tracks on SoundCloud based on a query.
@@ -25,7 +25,7 @@ class SoundCloudService
     response = Net::HTTP.get_response(uri)
 
     if response.is_a?(Net::HTTPSuccess)
-      JSON.parse(response.body)['collection']
+      JSON.parse(response.body)["collection"]
     else
       Rails.logger.error "SoundCloud API Error: #{response.code} #{response.message}"
       []
@@ -47,5 +47,27 @@ class SoundCloudService
     # 4. Construct the final, authorized URL.
     puts "Fetching stream URL for track: #{track_id}"
     nil # Return nil for now.
+  end
+
+  # Fetches a single track from the SoundCloud API.
+  #
+  # @param track_id [String] The ID of the SoundCloud track.
+  # @return [Hash, nil] A hash representing the track object, or nil if not found.
+  def get_track(track_id)
+    uri = URI("#{BASE_URL}/tracks/#{track_id}")
+    params = { client_id: CLIENT_ID }
+    uri.query = URI.encode_www_form(params)
+
+    response = Net::HTTP.get_response(uri)
+
+    if response.is_a?(Net::HTTPSuccess)
+      JSON.parse(response.body)
+    else
+      Rails.logger.error "SoundCloud API Error (get_track): #{response.code} #{response.message}"
+      nil
+    end
+  rescue JSON::ParserError => e
+    Rails.logger.error "SoundCloud JSON Parse Error (get_track): #{e.message}"
+    nil
   end
 end

@@ -10,5 +10,3 @@ pin "trix"
 pin "@rails/actiontext", to: "actiontext.esm.js"
 pin "wavesurfer.js", to: "https://esm.sh/wavesurfer.js"
 pin "hls.js", to: "https://esm.sh/hls.js"
-
-

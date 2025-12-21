@@ -76,6 +76,7 @@ Rails.application.routes.draw do
       get "genres", to: "zuke#genres", as: :music_genres
       get "about", to: "zuke#about", as: :music_about
       get "search", to: "zuke#search", as: :search  # Search across songs, artists, albums
+      get "refresh_soundcloud_track/:id", to: "zuke#refresh_soundcloud_track", as: :refresh_soundcloud_track
     end
   end
 

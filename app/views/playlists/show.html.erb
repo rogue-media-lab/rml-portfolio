@@ -17,23 +17,29 @@
 
     <% if @songs.any? %>
       <%
-        @songs_data = @songs.map do |song|
-          {
-            id: song.id,
-            url: song.audio_file.attached? ? rails_blob_url(song.audio_file) : nil,
-            title: song.title,
-            artist: song.artist.name,
-            banner: song.image.attached? ? rails_blob_url(song.image) : nil,
-            bannerMobile: song.image.attached? ? rails_blob_url(song.mobile_image_variant) : nil,
-            bannerVideo: song.banner_video.attached? ? rails_blob_url(song.banner_video) : nil,
-            imageCredit: song.image_credit,
-            imageCreditUrl: song.image_credit_url,
-            imageLicense: song.image_license,
-            audioSource: song.audio_source,
-            audioLicense: song.audio_license,
-            additionalCredits: song.additional_credits
-          }
-        end.to_json
+        # For SoundCloud likes, @songs_data is already a JSON string.
+        # For local playlists, we need to build it from the ActiveRecord objects.
+        unless @songs_data.present?
+          @songs_data = @songs.map do |song|
+            {
+              id: song.id,
+              url: song.audio_file.attached? ? rails_blob_url(song.audio_file) : nil,
+              title: song.title,
+              artist: song.artist.name,
+              banner: song.image.attached? ? rails_blob_url(song.image) : nil,
+              bannerMobile: song.image.attached? ? rails_blob_url(song.mobile_image_variant) : nil,
+              bannerVideo: song.banner_video.attached? ? rails_blob_url(song.banner_video) : nil,
+              imageCredit: song.image_credit,
+              imageCreditUrl: song.image_credit_url,
+              imageLicense: song.image_license,
+              audioSource: song.audio_source,
+              audioLicense: song.audio_license,
+              additionalCredits: song.additional_credits,
+              waveformUrl: nil, # Local songs don't have waveform data from an API
+              duration: song.audio_file.attached? ? (song.audio_file.metadata['duration'] || 0) : 0
+            }
+          end.to_json
+        end
       %>
 
       <div data-controller="music--song-list"
@@ -41,7 +47,8 @@
            class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 p-3 sm:p-4">
         <% @songs.each do |song| %>
           <div class="flex justify-center">
-            <%= render partial: "zuke/components/smart-image", locals: { controller_name: "smart-image", song: song } %>
+            <%# The smart-image partial works with both ActiveRecord objects and hashes %>
+            <%= render partial: "zuke/components/smart-image", locals: { song: song } %>
           </div>
         <% end %>
       </div>

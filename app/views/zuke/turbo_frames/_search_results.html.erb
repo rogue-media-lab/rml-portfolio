@@ -8,26 +8,26 @@
     <div class="mx-4 py-2">
       <h2 class="kanit font-medium">Search Results</h2>
       <p class="text-sm text-gray-400">
-        <%= @songs.count + @artists.count + @albums.count %> results found
+        <%= @songs_for_display.count + @artists.count + @albums.count %> results found
       </p>
     </div>
     <hr class="mb-4 mx-4">
 
     <!-- Songs Section -->
-    <% if @songs.any? %>
+    <% if @songs_for_display.any? %>
       <div class="mb-6">
         <h3 class="kanit font-medium text-lg mx-4 mb-3 flex items-center gap-2">
           <svg class="w-5 h-5 text-lime-400" fill="currentColor" viewBox="0 0 24 24">
             <path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.37 4.37 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z"></path>
           </svg>
-          Songs (<%= @songs.count %>)
+          Songs (<%= @songs_for_display.count %>)
         </h3>
         <div data-controller="music--song-list"
              data-music--song-list-songs-value="<%= @songs_data %>"
              class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 px-4">
-          <% @songs.each do |song| %>
+          <% @songs_for_display.each do |song| %>
             <div class="flex justify-center">
-              <%= render partial: "zuke/components/smart-image", locals: { controller_name: "smart-image", song: song } %>
+              <%= render partial: "zuke/components/smart-image", locals: { song: song } %>
             </div>
           <% end %>
         </div>
@@ -83,12 +83,12 @@
     <% end %>
 
     <!-- No Results Message -->
-    <% if @songs.empty? && @artists.empty? && @albums.empty? %>
+    <% if @songs_for_display.empty? && @artists.empty? && @albums.empty? %>
       <div class="text-center py-12 px-4">
         <svg class="w-16 h-16 mx-auto text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
         </svg>
-        <h3 class="text-xl font-medium text-gray-400 mb-2">No results found</h3>
+        <h3 class="text-xl font-medium text-gray-400 mb-2">No results found for "<%= @query %>"</h3>
         <p class="text-gray-500">Try searching for something else</p>
       </div>
     <% end %>
