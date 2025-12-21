@@ -7,7 +7,7 @@ require "json"
 # Handles all communication with the SoundCloud API.
 class SoundCloudService
   BASE_URL = "https://api-v2.soundcloud.com"
-  CLIENT_ID = CLIENT_ID = ENV["SOUNDCLOUD_CLIENT_ID"] || Rails.application.credentials.dig(:soundcloud, :client_id)
+  CLIENT_ID = ENV["SOUNDCLOUD_CLIENT_ID"] || Rails.application.credentials.dig(:soundcloud, :client_id)
 
   # Searches for tracks on SoundCloud based on a query.
   #
