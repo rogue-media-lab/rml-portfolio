@@ -625,11 +625,10 @@ export default class extends Controller {
    * @returns {number[]} The resampled array of peaks.
    */
   _resamplePeaks(peaks, newLength) {
-    if (peaks.length === 0 || newLength <= 0) {
+    if (!Array.isArray(peaks) || peaks.length === 0 || newLength <= 0) {
       return [];
     }
 
-    // If lengths are the same, no work needed
     if (peaks.length === newLength) {
       return peaks;
     }
@@ -638,14 +637,14 @@ export default class extends Controller {
     
     // Down-sampling (find max peak in segment)
     if (peaks.length > newLength) {
-      const newPeaks = new Array(newLength);
       const factor = peaks.length / newLength;
       for (let i = 0; i < newLength; i++) {
         const start = Math.floor(i * factor);
         const end = Math.floor((i + 1) * factor);
         let max = 0;
         for (let j = start; j < end; j++) {
-          if (peaks[j] > max) {
+          // Ensure peak is a valid number before comparison
+          if (typeof peaks[j] === 'number' && peaks[j] > max) {
             max = peaks[j];
           }
         }
@@ -655,17 +654,19 @@ export default class extends Controller {
     } 
     // Up-sampling (interpolating)
     else {
-      const newPeaks = new Array(newLength);
       const spring = (peaks.length - 1) / (newLength - 1);
-      newPeaks[0] = peaks[0];
-      newPeaks[newLength - 1] = peaks[peaks.length - 1];
+      newPeaks[0] = Number(peaks[0]) || 0;
+      newPeaks[newLength - 1] = Number(peaks[peaks.length - 1]) || 0;
 
       for (let i = 1; i < newLength - 1; i++) {
         const index = i * spring;
         const i_lo = Math.floor(index);
         const i_hi = Math.ceil(index);
-        const p_lo = peaks[i_lo];
-        const p_hi = peaks[i_hi];
+        
+        // Ensure peaks are numbers, default to 0 if not
+        const p_lo = Number(peaks[i_lo]) || 0;
+        const p_hi = Number(peaks[i_hi]) || 0;
+        
         const weight = index - i_lo;
         newPeaks[i] = p_lo * (1 - weight) + p_hi * weight;
       }
