@@ -42,8 +42,8 @@ class SoundcloudLikesService
   private
 
   def client_id
-    @client_id ||= Rails.application.credentials.dig(:soundcloud, :client_id).tap do |id|
-      Rails.logger.error "SoundCloud client_id is not configured." if id.nil?
+    @client_id ||= (ENV['SOUNDCLOUD_CLIENT_ID'] || Rails.application.credentials.dig(:soundcloud, :client_id)).tap do |id|
+      Rails.logger.error "SoundCloud client_id is not configured in ENV or credentials." if id.nil?
     end
   end
 
