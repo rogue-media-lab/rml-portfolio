@@ -9,7 +9,7 @@ class PlaylistsController < ApplicationController
     local_playlists = Playlist.includes(:songs).order(:name)
 
     # Get the song count for SoundCloud Likes, using a 15-minute cache
-    soundcloud_likes_count = Rails.cache.fetch('soundcloud_likes_count', expires_in: 15.minutes) do
+    soundcloud_likes_count = Rails.cache.fetch("soundcloud_likes_count", expires_in: 15.minutes) do
       SoundcloudLikesService.fetch_likes.count
     end
 

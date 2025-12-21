@@ -111,7 +111,7 @@ class ZukeController < ApplicationController
         audioLicense: song.audio_license,
         additionalCredits: song.additional_credits,
         waveformUrl: nil,
-        duration: song.audio_file.attached? ? (song.audio_file.metadata['duration'] || 0) : 0
+        duration: song.audio_file.attached? ? (song.audio_file.metadata["duration"] || 0) : 0
       }
     end
     @songs_data = @songs_for_display.to_json
