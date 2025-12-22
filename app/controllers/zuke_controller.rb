@@ -7,15 +7,18 @@ class ZukeController < ApplicationController
       current_user.songs.includes(:album, :artist)
                            .with_attached_image
                            .with_attached_audio_file
+                           .with_attached_waveform_data
     elsif current_milk_admin
       Song.includes(:album, :artist)
                    .with_attached_image
                    .with_attached_audio_file
+                   .with_attached_waveform_data
     else
       Song.left_joins(:users).where(users: { id: nil })
                    .includes(:album, :artist)
                    .with_attached_image
                    .with_attached_audio_file
+                   .with_attached_waveform_data
     end
 
     # 2. Format local songs into a standard hash
@@ -26,6 +29,7 @@ class ZukeController < ApplicationController
         title: song.title,
         artist: song.artist.name,
         banner: song.image.attached? ? rails_blob_url(song.image) : nil,
+        grid_banner: song.image.attached? ? rails_blob_url(song.grid_image_variant) : nil,
         bannerMobile: song.image.attached? ? rails_blob_url(song.mobile_image_variant) : nil,
         bannerVideo: song.banner_video.attached? ? rails_blob_url(song.banner_video) : nil,
         imageCredit: song.image_credit,
@@ -34,7 +38,7 @@ class ZukeController < ApplicationController
         audioSource: song.audio_source,
         audioLicense: song.audio_license,
         additionalCredits: song.additional_credits,
-        waveformUrl: nil, # Local songs don't have a pre-generated waveform from an API
+        waveformUrl: song.waveform_data.attached? ? rails_blob_url(song.waveform_data) : nil,
         duration: song.audio_file.attached? ? (song.audio_file.metadata["duration"] || 0) : 0
       }
     end
@@ -85,15 +89,18 @@ class ZukeController < ApplicationController
       @songs = current_user.songs.includes(:album, :artist)
                            .with_attached_image
                            .with_attached_audio_file
+                           .with_attached_waveform_data
     elsif current_milk_admin
       @songs = Song.includes(:album, :artist)
                    .with_attached_image
                    .with_attached_audio_file
+                   .with_attached_waveform_data
     else
       @songs = Song.left_joins(:users).where(users: { id: nil })
                    .includes(:album, :artist)
                    .with_attached_image
                    .with_attached_audio_file
+                   .with_attached_waveform_data
     end
     @songs_for_display = @songs.map do |song|
       {
@@ -102,6 +109,7 @@ class ZukeController < ApplicationController
         title: song.title,
         artist: song.artist.name,
         banner: song.image.attached? ? rails_blob_url(song.image) : nil,
+        grid_banner: song.image.attached? ? rails_blob_url(song.grid_image_variant) : nil,
         bannerMobile: song.image.attached? ? rails_blob_url(song.mobile_image_variant) : nil,
         bannerVideo: song.banner_video.attached? ? rails_blob_url(song.banner_video) : nil,
         imageCredit: song.image_credit,
@@ -110,7 +118,7 @@ class ZukeController < ApplicationController
         audioSource: song.audio_source,
         audioLicense: song.audio_license,
         additionalCredits: song.additional_credits,
-        waveformUrl: nil,
+        waveformUrl: song.waveform_data.attached? ? rails_blob_url(song.waveform_data) : nil,
         duration: song.audio_file.attached? ? (song.audio_file.metadata["duration"] || 0) : 0
       }
     end
@@ -151,6 +159,7 @@ class ZukeController < ApplicationController
                             .includes(:album, :artist)
                             .with_attached_image
                             .with_attached_audio_file
+                            .with_attached_waveform_data
                             .distinct
                             .limit(10)
 
@@ -183,6 +192,7 @@ class ZukeController < ApplicationController
         title: song.title,
         artist: song.artist.name,
         banner: song.image.attached? ? rails_blob_url(song.image) : nil,
+        grid_banner: song.image.attached? ? rails_blob_url(song.grid_image_variant) : nil,
         bannerMobile: song.image.attached? ? rails_blob_url(song.mobile_image_variant) : nil,
         bannerVideo: song.banner_video.attached? ? rails_blob_url(song.banner_video) : nil,
         imageCredit: song.image_credit,
@@ -191,7 +201,7 @@ class ZukeController < ApplicationController
         audioSource: song.audio_source,
         audioLicense: song.audio_license,
         additionalCredits: song.additional_credits,
-        waveformUrl: nil,
+        waveformUrl: song.waveform_data.attached? ? rails_blob_url(song.waveform_data) : nil,
         duration: song.audio_file.attached? ? (song.audio_file.metadata["duration"] || 0) : 0
       }
     end

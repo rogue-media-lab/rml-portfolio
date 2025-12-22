@@ -916,8 +916,33 @@ export default class extends Controller {
           }
         });
       } else {
-        // Fallback for regular files
-        this.wavesurfer.load(song.url);
+        // Logic for local files with pre-computed waveforms
+        if (song.waveformUrl) {
+          console.log("Local file with waveformUrl detected.");
+          
+          // 1. Get raw peaks from our own JSON file
+          const rawPeaks = await this._fetchJsonPeaks(song.waveformUrl);
+
+          // 2. Resample peaks to match the density defined by minPxPerSec
+          const minPxPerSec = this.wavesurfer.options.minPxPerSec || 50;
+          const barWidth = this.wavesurfer.options.barWidth || 2;
+          const barGap = this.wavesurfer.options.barGap || 1;
+          const totalWidth = song.duration * minPxPerSec;
+          const numBars = Math.floor(totalWidth / (barWidth + barGap));
+          
+          console.log(`Resampling peaks for local file: original ${rawPeaks.length}, target bars ${numBars} for duration ${song.duration}s`);
+          const peaks = this._resamplePeaks(rawPeaks, numBars);
+
+          // 3. Load audio URL with pre-computed peaks
+          this.wavesurfer.load(song.url, peaks, song.duration);
+
+        } else {
+          // Fallback for local files without a waveform (e.g., old files)
+          console.log("Local file without waveformUrl, loading directly.");
+          this.wavesurfer.load(song.url);
+        }
+
+        // Common playback logic for all local files
         this.wavesurfer.once('ready', () => {
           console.log("✅ Track ready, attempting to play...");
           const playPromise = this.wavesurfer.play();

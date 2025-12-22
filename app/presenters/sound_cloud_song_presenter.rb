@@ -8,13 +8,15 @@ class SoundCloudSongPresenter
   end
 
   def to_song_hash
+    artwork_url = @track["artwork_url"]
     {
       id: "soundcloud-#{@track['id']}",
       url: stream_url,
       title: @track["title"],
       artist: @track.dig("user", "username"),
-      banner: @track["artwork_url"]&.gsub("large", "t500x500"),
-      bannerMobile: nil, # SoundCloud API doesn't provide a separate mobile banner
+      banner: artwork_url&.gsub("large", "t500x500"),
+      grid_banner: artwork_url&.gsub("large", "t300x300"),
+      bannerMobile: artwork_url&.gsub("large", "t500x500"),
       bannerVideo: nil,  # No video component for SoundCloud tracks
       imageCredit: nil,
       imageCreditUrl: nil,

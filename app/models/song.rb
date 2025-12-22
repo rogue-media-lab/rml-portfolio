@@ -2,6 +2,7 @@ class Song < ApplicationRecord
   has_one_attached :image
   has_one_attached :banner_video
   has_one_attached :audio_file
+  has_one_attached :waveform_data
   belongs_to :artist
   belongs_to :album, optional: true, inverse_of: :songs
 
@@ -19,6 +20,8 @@ class Song < ApplicationRecord
   delegate :title, to: :album, prefix: true
 
   before_validation :associate_album_artist
+
+  after_commit :schedule_waveform_generation, on: %i[create update]
 
   # Ransack: Allow searching on specific attributes
   def self.ransackable_attributes(auth_object = nil)
@@ -83,7 +86,20 @@ class Song < ApplicationRecord
     )
   end
 
+  def grid_image_variant
+    return unless image.attached?
+    image.variant(resize_to_limit: [400, 400], format: :webp)
+  end
+
   private
+
+  def schedule_waveform_generation
+    # Trigger job only when a new audio file is attached.
+    # The blob's `saved_change_to_id?` confirms it was just created.
+    if audio_file.attached? && audio_file.attachment.blob.saved_change_to_id?
+      GenerateWaveformJob.perform_later(self)
+    end
+  end
 
   def calculate_mobile_crop
     return [ 0, 0, 640, 640 ] unless image.attached?

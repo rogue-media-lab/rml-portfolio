@@ -65,8 +65,10 @@ export default class extends Controller {
     // If this smart image doesn't have a target, do nothing.
     if (!this.hasPlayButtonTarget) return;
 
-    // Only highlight if this is the current song, using the stable song ID
-    if (e.detail.id === this.idValue) {
+    // Coerce both IDs to strings for a reliable comparison,
+    // as the event detail ID might be a number (for local tracks) while the
+    // value on the controller is always a string.
+    if (String(e.detail.id) === this.idValue) {
       this.playButtonTarget.classList.add("border-lime-500")
     } else {
       this.playButtonTarget.classList.remove("border-lime-500")

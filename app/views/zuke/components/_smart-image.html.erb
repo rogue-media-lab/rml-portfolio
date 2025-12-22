@@ -4,6 +4,7 @@
      data-music--smart-image-title-value="<%= song[:title] %>"
      data-music--smart-image-artist-value="<%= song[:artist] %>"
      data-music--smart-image-banner-value="<%= song[:banner] %>"
+     data-music--smart-image-grid-banner-value="<%= song[:grid_banner] %>"
      data-music--smart-image-banner-mobile-value="<%= song[:bannerMobile] %>"
      data-music--smart-image-banner-video-value="<%= song[:bannerVideo] %>"
      data-music--smart-image-image-credit-value="<%= song[:imageCredit] || '' %>"
@@ -15,8 +16,8 @@
      data-music--smart-image-waveform-url-value="<%= song[:waveformUrl] || '' %>"
      data-music--smart-image-duration-value="<%= song[:duration] || 0 %>">
 
-  <% if song[:banner].present? %>
-    <%= image_tag song[:banner],
+  <% if song[:grid_banner].present? %>
+    <%= image_tag song[:grid_banner],
         class: "rounded-lg w-full aspect-square object-cover border-2 border-gray-200 cursor-pointer hover:border-sky-400 transition-colors",
         alt: "Album cover for: #{song[:title]}",
         aria: { label: "Album cover for: #{song[:title]}" },

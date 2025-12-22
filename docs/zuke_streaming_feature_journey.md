@@ -92,3 +92,27 @@ With the core streaming and waveform display working, the next goal was to perso
     3.  **Local File Playback:** The final bug was that local files stopped playing. We traced this to a fundamental state management issue where the `song-list-controller` was incorrectly re-sending its stale, initial queue to the player on every click, overwriting the player's authoritative queue. We fixed this by removing the responsible event listener, making the player's queue the single source of truth during a playback session.
 
 - **Current Status:** The SoundCloud Likes playlist is now fully functional. It appears seamlessly in the UI, displays an accurate (cached) song count, and reliably plays through the entire list by refreshing each track's authorization on demand. The play/pause and active song indicators also work as expected for all track types.
+
+## Chapter 9: The Streaming Trinity - Optimizing Local Files
+
+With SoundCloud streaming perfected, the performance gap between streamed tracks and locally-hosted S3 files became apparent. Local files felt "heavy" and slow to load, and their waveforms were generated client-side, causing a noticeable delay. To solve this, we implemented a plan based on "The Streaming Trinity": a CDN, Byte-Range Requests, and Pre-calculated Metadata.
+
+-   **Pre-calculated Metadata (Waveforms):** This was the core of the implementation.
+    1.  **Tooling:** We first installed `audiowaveform`, a C++ utility, into the application's Docker image, making it available at runtime.
+    2.  **Background Job:** A new `GenerateWaveformJob` was created. This Active Job is automatically triggered via an `after_commit` hook on the `Song` model whenever a new local audio file is uploaded.
+    3.  **The Process:** The job downloads the audio file from S3 to a temporary location, runs `audiowaveform` to generate a small JSON file containing the peak data, and attaches this JSON back to the `Song` record via a new `waveform_data` Active Storage attachment.
+    4.  **Frontend Integration:** The `player_controller.js` was significantly refactored. The logic previously used for SoundCloud's pre-computed peaks was adapted and applied to local files. The controller now checks if a local `song` object has a `waveformUrl`. If it does, it fetches the JSON, resamples the peaks to fit the player's dimensions, and loads the waveform instantly. This eliminates the client-side analysis delay entirely.
+
+-   **Image Optimization:** We noticed that the cover art images in the grid view were not being optimized.
+    1.  **New Variant:** A new `grid_image_variant` was added to the `Song` model, creating a 400x400px `.webp` version of the cover art.
+    2.  **View Updates:** All controllers and views that build the song list for the player were updated to use this new variant, ensuring that smaller, faster-loading images are used in the grid UI.
+
+-   **Bug Fixes:** The new changes uncovered two subtle bugs:
+    1.  **SoundCloud Images:** The change to use the `grid_image_variant` in the UI broke the images for SoundCloud tracks, which didn't provide this key. We fixed this by updating the `SoundCloudSongPresenter` to generate a `grid_banner` key with an appropriately sized image URL from SoundCloud.
+    2.  **Local Track Highlighting:** The "now playing" border highlight failed for local tracks. We traced this to a type-mismatch in JavaScript (`123 === "123"` is false). The `smart-image_controller.js` was fixed to coerce both IDs to strings before comparison, making the selection logic reliable for all track types.
+
+-   **Infrastructure (Guidance):** Finally, we prepared for the other two parts of the Trinity.
+    1.  **CDN:** The user confirmed a CloudFront CDN was placed in front of the S3 bucket.
+    2.  **CORS for Byte-Range Requests:** We provided an updated S3 CORS policy to expose the `Content-Range` and `Accept-Ranges` headers, which is the final step required to enable true streaming and seeking for the local audio files.
+
+**Current Status:** The application code is now fully optimized for high-performance streaming of local files. Once a new audio file is uploaded, its waveform will be generated on the server and load instantly in the player, and all associated images will be served as optimized variants.

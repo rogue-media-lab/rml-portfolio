@@ -39,7 +39,13 @@ class PlaylistsController < ApplicationController
       end.compact # Remove any nil entries from skipped tracks
       @songs_data = @songs.to_json
     else
-      @songs = @playlist.ordered_songs.includes(:artist, :album, image_attachment: :blob)
+      @songs = @playlist.ordered_songs.includes(
+        :artist, :album,
+        { audio_file_attachment: :blob },
+        { image_attachment: :blob }, # For mobile_image_variant
+        :banner_video_attachment,
+        { waveform_data_attachment: :blob }
+      )
       # @songs_data will be generated in the view for local playlists
     end
     render layout: false if turbo_frame_request?
