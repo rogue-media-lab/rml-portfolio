@@ -37,7 +37,7 @@ class GenerateWaveformJob < ApplicationJob
         song.waveform_data.attach(
           io: File.open(output_path),
           filename: "#{song.title.parameterize}_waveform.json",
-          content_type: 'application/json'
+          content_type: "application/json"
         )
       else
         # If the command failed for any reason, log an error for debugging purposes.

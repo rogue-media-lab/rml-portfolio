@@ -88,7 +88,7 @@ class Song < ApplicationRecord
 
   def grid_image_variant
     return unless image.attached?
-    image.variant(resize_to_limit: [400, 400], format: :webp)
+    image.variant(resize_to_limit: [ 400, 400 ], format: :webp)
   end
 
   private
