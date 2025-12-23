@@ -26,9 +26,9 @@ class SoundCloudSongPresenterTest < ActiveSupport::TestCase
   test "to_song_hash formats track data correctly" do
     # We need to stub the network call inside stream_url method
     # Since stream_url is private and called by to_song_hash, we can stub Net::HTTP
-    
+
     mock_response = Minitest::Mock.new
-    mock_response.expect :is_a?, true, [Net::HTTPSuccess]
+    mock_response.expect :is_a?, true, [ Net::HTTPSuccess ]
     mock_response.expect :body, '{"url": "https://final.stream.url/playlist.m3u8"}'
 
     Net::HTTP.stub :get_response, mock_response do
@@ -43,17 +43,17 @@ class SoundCloudSongPresenterTest < ActiveSupport::TestCase
       assert_equal 60.0, hash[:duration]
       assert_equal "SoundCloud", hash[:audioSource]
     end
-    
+
     mock_response.verify
   end
 
   test "to_song_hash handles missing stream url gracefully" do
     # Remove transcodings to simulate no stream available
     @track_data["media"] = nil
-    
+
     presenter = SoundCloudSongPresenter.new(@track_data)
     hash = presenter.to_song_hash
-    
+
     assert_nil hash[:url]
   end
 end

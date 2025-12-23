@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-# This concern provides a standardized interface for authentication and 
-# authorization within the Zuke music player module. By centralizing 
-# these checks, we make the Zuke module portable; when moving to a 
-# new platform, you only need to update this concern to match the 
+# This concern provides a standardized interface for authentication and
+# authorization within the Zuke music player module. By centralizing
+# these checks, we make the Zuke module portable; when moving to a
+# new platform, you only need to update this concern to match the
 # host application's authentication system (e.g., swapping milk_admin for user).
 module ZukeAuth
   extend ActiveSupport::Concern
@@ -15,7 +15,7 @@ module ZukeAuth
 
   private
 
-  # Returns true if the currently logged-in entity has administrative 
+  # Returns true if the currently logged-in entity has administrative
   # privileges over the music collection.
   def zuke_admin?
     # In the Portfolio, administrators are MilkAdmins.

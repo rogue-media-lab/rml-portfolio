@@ -7,7 +7,7 @@ class GenerateWaveformJobTest < ActiveJob::TestCase
     # Ensure no attachments exist initially to start clean
     @song.waveform_data.purge if @song.waveform_data.attached?
     @song.audio_file.purge if @song.audio_file.attached?
-    
+
     # Attach a dummy audio file
     @song.audio_file.attach(
       io: StringIO.new("dummy audio content"),

@@ -29,7 +29,7 @@ class ArtistTest < ActiveSupport::TestCase
   test "should destroy associated songs when destroyed" do
     artist = Artist.create!(name: "The Beatles")
     artist.songs.create!(title: "Hey Jude", audio_source: "test.mp3")
-    
+
     assert_difference("Song.count", -1) do
       artist.destroy
     end
@@ -38,7 +38,7 @@ class ArtistTest < ActiveSupport::TestCase
   test "should destroy associated albums when destroyed" do
     artist = Artist.create!(name: "The Beatles")
     artist.albums.create!(title: "Abbey Road")
-    
+
     assert_difference("Album.count", -1) do
       artist.destroy
     end

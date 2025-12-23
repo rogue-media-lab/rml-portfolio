@@ -39,7 +39,7 @@ class AlbumTest < ActiveSupport::TestCase
   test "should destroy associated songs when destroyed" do
     album = Album.create!(title: "The Wall", artist: @artist)
     album.songs.create!(title: "Another Brick in the Wall", artist: @artist)
-    
+
     assert_difference("Song.count", -1) do
       album.destroy
     end

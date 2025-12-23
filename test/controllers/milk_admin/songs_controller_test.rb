@@ -36,12 +36,12 @@ class MilkAdmin::SongsControllerTest < ActionDispatch::IntegrationTest
   test "should create song" do
     sign_in @admin
     assert_difference("Song.count") do
-      post milk_admin_songs_url, params: { 
-        song: { 
+      post milk_admin_songs_url, params: {
+        song: {
           title: "New Song",
           artist_attributes: { name: "New Artist" },
           album_attributes: { title: "New Album" }
-        } 
+        }
       }
     end
 
