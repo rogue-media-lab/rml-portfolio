@@ -924,6 +924,18 @@ export default class extends Controller {
           }
         });
       } else {
+        // Common playback logic for all local files
+        this.wavesurfer.once('ready', () => {
+          console.log("✅ Track ready, attempting to play...");
+          const playPromise = this.wavesurfer.play();
+          if (playPromise !== undefined) {
+            playPromise.catch((error) => {
+              console.error("🚫 Autoplay blocked by browser:", error);
+              document.dispatchEvent(new CustomEvent("player:autoplay-blocked", { detail: { song } }));
+            });
+          }
+        });
+
         // Logic for local files with pre-computed waveforms
         if (song.waveformUrl) {
           console.log("Local file with waveformUrl detected.");
@@ -949,18 +961,6 @@ export default class extends Controller {
           console.log("Local file without waveformUrl, loading directly.");
           this.wavesurfer.load(song.url);
         }
-
-        // Common playback logic for all local files
-        this.wavesurfer.once('ready', () => {
-          console.log("✅ Track ready, attempting to play...");
-          const playPromise = this.wavesurfer.play();
-          if (playPromise !== undefined) {
-            playPromise.catch((error) => {
-              console.error("🚫 Autoplay blocked by browser:", error);
-              document.dispatchEvent(new CustomEvent("player:autoplay-blocked", { detail: { song } }));
-            });
-          }
-        });
       }
     } catch (error) {
       console.error("Error playing from queue:", error);
