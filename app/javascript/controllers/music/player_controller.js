@@ -42,6 +42,7 @@ export default class extends Controller {
    * @type {?string}
    */
   currentUrl = null
+  isChangingTrack = false
 
   // ========================
   //  Lifecycle Methods
@@ -364,6 +365,8 @@ export default class extends Controller {
    * Handle track ending naturally
    */
   handleTrackEnd() {
+    if (this.isChangingTrack) return;
+    
     console.log("🎵 Track ended - Repeat:", this.repeatModeValue, "Shuffle:", this.shuffleValue, "Queue length:", this.currentQueue.length)
 
     // Dispatch ended event BEFORE state changes
@@ -799,6 +802,8 @@ export default class extends Controller {
 
   async playSongFromQueue(song) {
     try {
+      this.isChangingTrack = true;
+
       // If the song is from SoundCloud, refresh its data to get a fresh stream URL
       if (song.audioSource === 'SoundCloud') {
         console.log("🔄 Refreshing SoundCloud track:", song.title);
@@ -917,10 +922,15 @@ export default class extends Controller {
           console.log("✅ HLS manifest parsed, attempting to play...");
           const playPromise = this.wavesurfer.play();
           if (playPromise !== undefined) {
-            playPromise.catch((error) => {
+            playPromise.then(() => {
+              this.isChangingTrack = false;
+            }).catch((error) => {
               console.error("🚫 HLS autoplay blocked by browser:", error);
+              this.isChangingTrack = false;
               document.dispatchEvent(new CustomEvent("player:autoplay-blocked", { detail: { song } }));
             });
+          } else {
+            this.isChangingTrack = false;
           }
         });
       } else {
@@ -929,10 +939,16 @@ export default class extends Controller {
           console.log("✅ Track ready, attempting to play...");
           const playPromise = this.wavesurfer.play();
           if (playPromise !== undefined) {
-            playPromise.catch((error) => {
+            playPromise.then(() => {
+              // Reset flag after successful play
+              this.isChangingTrack = false;
+            }).catch((error) => {
               console.error("🚫 Autoplay blocked by browser:", error);
+              this.isChangingTrack = false;
               document.dispatchEvent(new CustomEvent("player:autoplay-blocked", { detail: { song } }));
             });
+          } else {
+            this.isChangingTrack = false;
           }
         });
 
