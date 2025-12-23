@@ -50,7 +50,7 @@ export default class extends Controller {
   currentSongUrl = null
   currentGains = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
   
-  // URL to match
+  // URL to match (stripped of query params)
   matchSongUrl = null
 
   connect() {
@@ -309,10 +309,19 @@ export default class extends Controller {
     this.currentSongUrl = event.detail.url
     console.log("EQ: Song changed to:", this.currentSongUrl)
 
-    this.matchSongUrl = this.currentSongUrl.split("?t=")[0]
+    this.matchSongUrl = this.getStorageKey(this.currentSongUrl)
     
     this.updateSaveButtonState()
     this.updateTriggerIconColor()
+  }
+
+  /**
+   * Helper to get a stable storage key from a URL
+   * Strips query parameters (S3 signatures, timestamps, etc.)
+   */
+  getStorageKey(url) {
+    if (!url) return null;
+    return url.split("?")[0];
   }
 
   /**
@@ -506,8 +515,8 @@ export default class extends Controller {
     // Get EQ settings from localStorage
     const settings = this.getEQSettings()
 
-    // strip url
-    this.matchSongUrl = this.currentSongUrl.split("?t=")[0]
+    // Use consistent storage key
+    this.matchSongUrl = this.getStorageKey(this.currentSongUrl)
 
     // Save current gains for this song
     settings[this.matchSongUrl] = {

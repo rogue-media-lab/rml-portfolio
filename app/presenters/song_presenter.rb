@@ -12,18 +12,10 @@ class SongPresenter
   end
 
   def to_song_hash
-    # Audio needs a direct URL for the player. We append a timestamp to force
-    # the browser to treat this as a fresh request, bypassing any cached
-    # responses that might be missing CORS headers.
-    audio_url = @song.audio_file.attached? ? @song.audio_file.url : nil
-    if audio_url
-      separator = audio_url.include?("?") ? "&" : "?"
-      audio_url = "#{audio_url}#{separator}t=#{Time.current.to_i}"
-    end
-
     {
       id: @song.id,
-      url: audio_url,
+      # Audio needs a direct URL for the player
+      url: @song.audio_file.attached? ? @song.audio_file.url : nil,
       title: @song.title,
       artist: @song.artist&.name,
       # Images can use the redirecting blob URL, which is stable
