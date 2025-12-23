@@ -10,7 +10,13 @@
     <% @songs.each do |song| %>
       <div class="flex flex-col justify-between h-[400px] m-1 bg-white border border-gray-200 rounded-lg shadow-xs dark:bg-gray-800 dark:border-gray-700">
           <a href="#">
-              <%= image_tag url_for(song.image), class: "rounded-t-lg h-44" %>
+            <% if song.image.attached? %>
+              <%= image_tag url_for(song.image), class: "rounded-t-lg h-44 w-full object-cover" %>
+            <% else %>
+              <div class="h-44 w-full bg-gray-200 flex items-center justify-center rounded-t-lg">
+                <span class="text-gray-500">No Image</span>
+              </div>
+            <% end %>
           </a>
           <div class="p-1 h-full">
               <a href="#">

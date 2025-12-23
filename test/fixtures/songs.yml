@@ -2,10 +2,17 @@
 
 one:
   artist: first_artist
-  title: "MyString"
+  title: "First Song"
   album: first_album
 
 two:
   artist: second_artist
-  title: "MyString"
+  title: "Second Song"
   album: second_album
+
+<% 25.times do |i| %>
+rock_song_<%= i %>:
+  artist: first_artist
+  title: "Rock Song <%= i %>"
+  album: first_album
+<% end %>

@@ -1,1 +1,0 @@
-Redirecting to /wavesurfer.js@7.12.1/dist/wavesurfer.min.js

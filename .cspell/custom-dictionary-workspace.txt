@@ -4,3 +4,5 @@ Kyst
 noopener
 noreferrer
 Zuke
+ILIKE
+soundcloud

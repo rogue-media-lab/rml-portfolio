@@ -168,8 +168,16 @@ export default class extends Controller {
         barGap: 1,
         barRadius: 2,
         responsive: true,
-        backend: backend
+        backend: backend,
+        crossOrigin: "anonymous"
       })
+
+      // Force crossOrigin on the media element
+      const media = this.wavesurfer.getMediaElement()
+      if (media) {
+        media.crossOrigin = "anonymous"
+      }
+      
       this.setupWaveSurferEvents()
     } catch (error) {
       console.error("WaveSurfer initialization failed:", error)

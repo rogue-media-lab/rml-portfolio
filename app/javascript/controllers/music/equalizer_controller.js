@@ -49,6 +49,9 @@ export default class extends Controller {
   // Current state
   currentSongUrl = null
   currentGains = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+  
+  // URL to match
+  matchSongUrl = null
 
   connect() {
     // Listen for player events
@@ -305,6 +308,9 @@ export default class extends Controller {
   handleSongChange(event) {
     this.currentSongUrl = event.detail.url
     console.log("EQ: Song changed to:", this.currentSongUrl)
+
+    this.matchSongUrl = this.currentSongUrl.split("?t=")[0]
+    
     this.updateSaveButtonState()
     this.updateTriggerIconColor()
   }
@@ -500,15 +506,18 @@ export default class extends Controller {
     // Get EQ settings from localStorage
     const settings = this.getEQSettings()
 
+    // strip url
+    this.matchSongUrl = this.currentSongUrl.split("?t=")[0]
+
     // Save current gains for this song
-    settings[this.currentSongUrl] = {
+    settings[this.matchSongUrl] = {
       gains: [...this.currentGains],
       timestamp: Date.now()
     }
 
     // Save back to localStorage
     localStorage.setItem("zuke_eq_settings", JSON.stringify(settings))
-    console.log("EQ: Saved settings for song:", this.currentSongUrl, "Gains:", this.currentGains)
+    console.log("EQ: Saved settings for song:", this.matchSongUrl, "Gains:", this.currentGains)
 
     // Update indicator
     this.updateSongIndicator()
@@ -517,7 +526,7 @@ export default class extends Controller {
     this.showSaveFeedback()
 
     // Dispatch event so song cards can update their indicators
-    console.log("EQ: Dispatching equalizer:saved event for:", this.currentSongUrl)
+    console.log("EQ: Dispatching equalizer:saved event for:", this.matchSongUrl)
     document.dispatchEvent(new CustomEvent("equalizer:saved", {
       detail: { url: this.currentSongUrl }
     }))
@@ -527,13 +536,13 @@ export default class extends Controller {
   }
 
   /**
-   * Load saved EQ settings for current song
+   * Load saved EQ settings for current songF
    */
   loadSongSettings() {
-    if (!this.currentSongUrl) return
+    if (!this.matchSongUrl) return
 
     const settings = this.getEQSettings()
-    const songSettings = settings[this.currentSongUrl]
+    const songSettings = settings[this.matchSongUrl]
 
     if (songSettings && songSettings.gains) {
       // Apply saved gains
@@ -552,17 +561,17 @@ export default class extends Controller {
    * Remove saved settings for current song
    */
   removeSongSettings() {
-    if (!this.currentSongUrl) return
+    if (!this.matchSongUrl) return
 
     const settings = this.getEQSettings()
-    delete settings[this.currentSongUrl]
+    delete settings[this.matchSongUrl]
     localStorage.setItem("zuke_eq_settings", JSON.stringify(settings))
 
     this.updateSongIndicator()
 
     // Dispatch event so song cards can update
     document.dispatchEvent(new CustomEvent("equalizer:removed", {
-      detail: { url: this.currentSongUrl }
+      detail: { url: this.matchSongUrl }
     }))
 
     // Update trigger icon color
@@ -585,7 +594,7 @@ export default class extends Controller {
   /**
    * Check if current song has saved settings
    */
-  hasSavedSettings(url = this.currentSongUrl) {
+  hasSavedSettings(url = this.matchSongUrl) {
     if (!url) return false
     const settings = this.getEQSettings()
     return !!settings[url]

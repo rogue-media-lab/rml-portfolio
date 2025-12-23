@@ -1,9 +1,15 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+# Associations for songs and genres
 
-rock_song_genre:
+song_one_rock:
   song: one
   genre: rock
 
-pop_song_genre:
+song_two_pop:
   song: two
   genre: pop
+
+<% 25.times do |i| %>
+rock_song_<%= i %>_genre:
+  song: rock_song_<%= i %>
+  genre: rock
+<% end %>

@@ -1,7 +1,8 @@
 # Blog Controller for Milk Admin
 class MilkAdmin::SongsController < ApplicationController
+  include ZukeAuth
   # Ensure milk admin is logged in for CRUD actions
-  before_action :authenticate_milk_admin!
+  before_action :authenticate_zuke_admin!
   # Set song for methods that need it
   before_action :set_song, only: [ :edit, :update, :destroy, :destroy_image, :destroy_file, :destroy_banner_video ]
 
