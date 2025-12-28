@@ -2,4 +2,7 @@ libvips
 libsndfile1
 libmad0
 libid3tag0
+libboost-program-options1.83.0
+libboost-filesystem1.83.0
+libboost-regex1.83.0
 https://ppa.launchpadcontent.net/chris-needham/ppa/ubuntu/pool/main/a/audiowaveform/audiowaveform_1.10.2-1noble1_amd64.deb
