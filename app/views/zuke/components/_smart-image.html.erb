@@ -17,14 +17,22 @@
      data-music--smart-image-duration-value="<%= song[:duration] || 0 %>">
 
   <% if song[:grid_banner].present? %>
-    <%= image_tag song[:grid_banner],
-        class: "rounded-lg w-full aspect-square object-cover border-2 border-gray-200 cursor-pointer hover:border-sky-400 transition-colors",
-        alt: "Album cover for: #{song[:title]}",
-        aria: { label: "Album cover for: #{song[:title]}" },
-        data: {
-          music__smart_image_target: "playButton",
-          action: "click->music--smart-image#playRequest"
-        } %>
+    <div class="group rounded-lg border-2 border-gray-200 cursor-pointer hover:border-sky-400 transition-colors bg-gray-900"
+         data-music__smart_image_target="playButton"
+         data-action="click->music--smart-image#playRequest">
+      <%= image_tag song[:grid_banner],
+          class: "rounded-t-lg w-full aspect-square object-cover",
+          alt: "Album cover for: #{song[:title]}",
+          aria: { label: "Album cover for: #{song[:title]}" } %>
+      <div class="flex flex-col p-2 text-center">
+        <div class="text-xs font-medium text-gray-200 truncate" title="<%= song[:title] %>">
+          <%= truncate(song[:title], length: 15) %>
+        </div>
+        <div class="text-[10px] text-gray-400 truncate" title="<%= song[:artist] %>">
+          <%= truncate(song[:artist], length: 15) %>
+        </div>
+      </div>
+    </div>
   <% else %>
     <div class="rounded-lg w-full aspect-square border-2 border-gray-200 cursor-pointer bg-gray-800 flex items-center justify-center hover:border-sky-400 transition-colors"
          data-music__smart_image_target="playButton"
