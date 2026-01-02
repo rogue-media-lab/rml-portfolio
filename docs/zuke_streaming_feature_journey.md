@@ -186,3 +186,25 @@ With the player feature-complete, we conducted a rigorous "Portability Audit" to
     4.  **Job Testing:** We implemented unit tests for `GenerateWaveformJob`, mocking the system calls to `audiowaveform` to ensure the file attachment logic is sound without requiring the binary in the test environment.
 
 **Current Status:** The Zuke Music Player is now a self-contained, robust, and documented module. It is decoupled from the specific user model of the Portfolio, its assets are served locally for maximum stability, and its infrastructure requirements are clearly defined. It is ready for export.
+
+## Chapter 12: PWA Polish & Waveform Stabilization
+
+Upon deploying the "final" version to a mobile environment, we encountered several platform-specific issues that required deep infrastructure and configuration fixes.
+
+- **The PWA Assets Issue:** The mobile PWA install prompt was missing its "Rich Install UI" banner images.
+    - **Fix:** We renamed the screenshot files in `public/` to a consistent naming scheme (`screenshot-1.png`, etc.) and updated the `manifest.json.erb` to explicitly list them with the correct dimensions and `form_factor: "wide"`.
+    - **Mobile Variants:** The player's banner image was failing to load on mobile because the `Song` model relies on `image.variant` for mobile optimization. This failed silently because the server environment (Heroku) was missing `libvips`. We added `libvips` to the `Aptfile`.
+
+- **The Waveform Crash (Backend):** The `audiowaveform` binary failed to run on the Heroku-24 stack due to missing shared libraries.
+    - **Diagnosis:** The binary from the Ubuntu 24.04 (Noble) PPA required specific versions of system libraries that were not present in the base image.
+    - **Fix:** We meticulously identified and added the required dependencies to the `Aptfile`: `libsndfile1`, `libmad0`, `libid3tag0`, and critically, the Boost 1.83 libraries (`libboost-program-options1.83.0`, etc.).
+
+- **The Waveform Display Bug (Frontend):** Even after the binary was fixed, the waveform failed to appear in the player.
+    - **Diagnosis:** A dual failure occurred. First, the browser blocked the `fetch()` request for the waveform JSON due to S3 CORS restrictions. Second, for files where the waveform fetch failed (or the file was new), the player crashed with "channelData must be a non-empty array".
+    - **Root Cause (Crash):** The crash happened because `ActiveStorage::Analyzers` were explicitly disabled in `production.rb`. This meant uploaded audio files had a `duration` of `0`. When the player tried to resample the waveform based on this 0 duration, it created an empty data set, causing WaveSurfer to crash.
+    - **The Fixes:**
+        1.  **CORS Proxy:** We updated `SongPresenter` to use `rails_storage_proxy_url` for the waveform JSON. This routes the request through the Rails app, bypassing S3 CORS entirely.
+        2.  **Enable Analysis:** We re-enabled Active Storage Analyzers in `production.rb` and added `ffmpeg` to the `Aptfile` to ensure future uploads have correct metadata.
+        3.  **Resilience:** We patched `player_controller.js` to gracefully handle cases where `song.duration` is 0 by falling back to the raw waveform data instead of crashing.
+
+**Result:** The PWA now installs with full rich assets, and the player reliably generates, serves, and displays waveforms for all tracks on all devices.
