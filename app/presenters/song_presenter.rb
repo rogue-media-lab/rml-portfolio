@@ -29,7 +29,7 @@ class SongPresenter
       audioSource: @song.audio_source,
       audioLicense: @song.audio_license,
       additionalCredits: @song.additional_credits,
-      waveformUrl: url_for_blob(@song.waveform_data),
+      waveformUrl: proxy_url_for_blob(@song.waveform_data),
       duration: @song.audio_file.attached? ? (@song.audio_file.metadata["duration"] || 0) : 0
     }
   end
@@ -41,6 +41,13 @@ class SongPresenter
     return nil unless attachment.attached?
 
     rails_blob_url(attachment)
+  end
+
+  # Generates a proxy URL for a blob to avoid CORS issues with fetch().
+  def proxy_url_for_blob(attachment)
+    return nil unless attachment.attached?
+
+    rails_storage_proxy_url(attachment)
   end
 
   # Generates a stable, redirecting URL for a processed variant.
