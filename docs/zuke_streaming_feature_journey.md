@@ -226,3 +226,20 @@ Just when we thought the player was perfect, two frustrating bugs surfaced durin
     - **The Fix:** We refactored `PlaylistsController#show` to run local songs through the `SongPresenter` as well. Now, the view receives the exact same normalized data structure regardless of the song's source, and images render correctly everywhere.
 
 **Current Status:** The player is now rock-solid. Playback starts reliably on click and auto-advance, regardless of file type (local vs. streamed), and the UI handles data from all sources consistently.
+
+## Chapter 14: Final Polish
+
+With the critical systems functioning, we focused on refining the user experience and ensuring the application's documentation matched its new capabilities.
+
+-   **Smart Image Border (Selection Feedback):**
+    -   **The Issue:** The user noticed that the active song border (a lime-green highlight) was no longer functioning correctly. It was failing to indicate which song was selected.
+    -   **The Attempted Fix:** We briefly tried to make the border reflect the *playing* state (Green = Playing, White = Paused), but this proved confusing and broke the immediate visual feedback of selection.
+    -   **The Resolution:** We reverted the logic to strictly track **Selection**. Now, clicking a song immediately highlights it with the border, regardless of whether it is playing, loading, or paused. This provides instant, reliable feedback to the user about which track is active in the player.
+
+-   **Documentation Update (The About Page):**
+    -   **The Update:** The "About" page within the player was outdated. We rewrote the "Technical Stack" and "Features" sections to proudly list the advanced technologies implemented during this journey:
+        -   **Hybrid Library:** The ability to mix local uploads with SoundCloud tracks.
+        -   **Instant Waveforms:** Server-side pre-calculation using `audiowaveform`.
+        -   **Optimized Streaming:** The "Streaming Trinity" of S3, CloudFront CDN, and Byte-Range requests.
+        -   **Mobile PWA:** The installable nature of the app.
+    -   **The Impact:** The About page now accurately reflects the modern, hybrid nature of the Zuke Music Player, serving as both a user guide and a technical showcase.
