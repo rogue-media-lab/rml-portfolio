@@ -58,12 +58,41 @@ export default class extends Controller {
     window.addEventListener("audio:changed", this.handleSongChange.bind(this))
     window.addEventListener("player:state:changed", this.handlePlayerState.bind(this))
     window.addEventListener("audio:ready", this.handleAudioReady.bind(this))
+    window.addEventListener("player:user-interaction", this.resumeAudioContext.bind(this))
 
     // Try to hook into WaveSurfer initialization
     this.setupWaveSurferIntegration()
 
     // Initialize as disabled until audio is ready
     this.updateSaveButtonState()
+  }
+
+  /**
+   * Resume (or create) AudioContext on user interaction
+   * Critical for mobile audio to work
+   */
+  resumeAudioContext() {
+    console.log("EQ: User interaction detected - checking AudioContext")
+    
+    if (!this.audioContext) {
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext
+        if (AudioContext) {
+          this.audioContext = new AudioContext()
+          console.log("EQ: Created AudioContext on user interaction")
+        }
+      } catch (e) {
+        console.warn("EQ: Could not create AudioContext:", e)
+      }
+    }
+
+    if (this.audioContext && this.audioContext.state === 'suspended') {
+      this.audioContext.resume().then(() => {
+        console.log("EQ: AudioContext resumed successfully")
+      }).catch(e => {
+        console.warn("EQ: Failed to resume AudioContext:", e)
+      })
+    }
   }
 
   /**
@@ -249,6 +278,7 @@ export default class extends Controller {
     window.removeEventListener("audio:changed", this.handleSongChange.bind(this))
     window.removeEventListener("player:state:changed", this.handlePlayerState.bind(this))
     window.removeEventListener("audio:ready", this.handleAudioReady.bind(this))
+    window.removeEventListener("player:user-interaction", this.resumeAudioContext.bind(this))
     this.destroyFilters()
   }
 

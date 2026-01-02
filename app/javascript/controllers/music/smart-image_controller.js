@@ -35,6 +35,10 @@ export default class extends Controller {
     const playOnLoad = localStorage.getItem("audioPlayOnLoad") === "true"
     const updateBanner = true
 
+    // Dispatch interaction event FIRST to allow audio context resumption
+    // This is critical for mobile/PWA to unlock audio on user gesture
+    window.dispatchEvent(new CustomEvent("player:user-interaction"))
+
     window.dispatchEvent(new CustomEvent("player:play-requested", {
       detail: {
         id: this.idValue,
