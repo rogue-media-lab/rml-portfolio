@@ -4,7 +4,7 @@
 
     <h2 class="text-lg font-medium mb-2 text-milk-light">A modern web-based music player inspired by the Microsoft Zune, built for control, nostalgia, and personal expression.</h2>
 
-    <p>Music Found is a self-hosted music player designed to let you manage and enjoy your collection your way. Upload your music, customize metadata, organize playlists, and associate visuals like album art, GIFs, or video clips—to create a richer listening experience. With an integrated EQ, waveform visualization, and a secure API for future expansion, it's a passion project bridging the gap between nostalgia and modern web tech.</p>
+    <p>Music Found is a self-hosted music player designed to let you manage and enjoy your collection your way. It combines a personal library with hybrid streaming discovery, allowing you to upload your own music, customize metadata, organize playlists, and seamlessly integrate tracks from SoundCloud. With an integrated EQ, instant waveform visualization, and a secure API, it's a passion project bridging the gap between nostalgia and modern web tech.</p>
 
     <h2 class="text-lg font-medium mt-2 text-milk-light">Why I Built This</h2>
     <p>I have the music I love, but I wanted a way to enjoy it that felt more personal and tactile than streaming services. Zuke is my attempt to create that experience. One where you can upload your own music, tag it with your own metadata, and associate it with visuals that mean something to you. Only I know what a song does for my mood. I miss being able to adjust the frequency values, album art, or the ability to customize my player. So many things have been given up in the move to streaming. Music lost its taste. I want to feel comfortably numb again.</p>
@@ -15,27 +15,25 @@
     <h2 class="text-lg font-medium mt-2 text-milk-light">Technical Stack</h2>
     <ul>
       <li>Backend: Ruby on Rails (API + Admin)</li>
-      <li>Frontend: Turbo Frames for seamless navigation, Stimulus for interactivity</li>
-      <li>Database: PostgreSQL (for relational metadata)</li>
-      <li>Storage: AWS S3 (scalable audio/image hosting)</li>
-      <li>Deployment: Heroku (easy CI/CD setup)</li>
-      <li>Extras: Waveform visualization, WavesurferJS, Devise/Rails-secured API endpoints</li>
+      <li>Frontend: Turbo Frames, Stimulus, HLS.js</li>
+      <li>Database: PostgreSQL (metadata)</li>
+      <li>Storage: AWS S3 + CloudFront CDN (streaming)</li>
+      <li>Audio Processing: audiowaveform (C++) for peak generation</li>
+      <li>Integration: SoundCloud API</li>
+      <li>Deployment: Heroku (Docker/Aptfile configured)</li>
     </ul>
 
     <h2 class="text-lg font-medium mt-2 text-milk-light">Features</h2>
     <ul>
-      <li>Upload and tag music, artists, and albums</li>
-      <li>Custom metadata editing (even after upload)</li>
-      <li>Credits dropdown for artist/album info</li>
-      <li>Audio waveform visualization</li>
-      <li>Auto Advance to next track</li>
-      <li>Auto play selected track</li>
-      <li>Parametric EQ for fine-tuned listening</li>
-      <li>Associate images/GIFs/video clips with tracks</li>
-      <li>Option to play video if available</li>
-      <li>Coordinate system for plotting the image focus</li>
-      <li>Admin dashboard</li>
-      <li>Secure API for future mobile app integration</li>
+      <li>Hybrid Library: Mix local uploads with SoundCloud tracks</li>
+      <li>Instant Waveforms: Server-side pre-calculation for zero-latency visuals</li>
+      <li>Optimized Streaming: Byte-range requests and CDN delivery</li>
+      <li>Parametric EQ: Fine-tuned frequency control for all audio sources</li>
+      <li>Smart Metadata: Custom editing, auto-tagging, and credit management</li>
+      <li>Visuals: Associate images, GIFs, or video clips with tracks</li>
+      <li>Mobile PWA: Installable as a native-like app</li>
+      <li>Auto Advance & Shuffle</li>
+      <li>Admin Dashboard</li>
     </ul>
 
     <p class="mt-3"><em>Zuke is a love letter to the way music should feel: personal, tactile, and yours.</em></p>

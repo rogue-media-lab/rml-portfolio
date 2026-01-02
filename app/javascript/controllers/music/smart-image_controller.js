@@ -24,10 +24,15 @@ export default class extends Controller {
   connect() {
     // Only keep track of current song
     window.addEventListener("audio:changed", this.handleSongChange.bind(this))
+    window.addEventListener("player:state:changed", this.handleStateChange.bind(this))
+    
+    this.isSelected = false
+    this.isPlaying = false
   }
 
   disconnect() {
     window.removeEventListener("audio:changed", this.handleSongChange)
+    window.removeEventListener("player:state:changed", this.handleStateChange)
   }
 
   playRequest(e) {
@@ -62,13 +67,24 @@ export default class extends Controller {
 
 
   handleSongChange(e) {
-    // If this smart image doesn't have a target, do nothing.
-    if (!this.hasPlayButtonTarget) return;
+    // Coerce both IDs to strings for a reliable comparison
+    this.isSelected = String(e.detail.id) === this.idValue
+    
+    // When song changes, playing state usually resets or we wait for state change
+    // But we should update appearance immediately to show selection if needed
+    // Note: The player might not have fired 'playing' yet for the new song
+    this.updateAppearance()
+  }
 
-    // Coerce both IDs to strings for a reliable comparison,
-    // as the event detail ID might be a number (for local tracks) while the
-    // value on the controller is always a string.
-    if (String(e.detail.id) === this.idValue) {
+  handleStateChange(e) {
+    this.isPlaying = e.detail.playing
+    this.updateAppearance()
+  }
+
+  updateAppearance() {
+    if (!this.hasPlayButtonTarget) return
+
+    if (this.isSelected && this.isPlaying) {
       this.playButtonTarget.classList.add("border-lime-500")
     } else {
       this.playButtonTarget.classList.remove("border-lime-500")

@@ -208,3 +208,21 @@ Upon deploying the "final" version to a mobile environment, we encountered sever
         3.  **Resilience:** We patched `player_controller.js` to gracefully handle cases where `song.duration` is 0 by falling back to the raw waveform data instead of crashing.
 
 **Result:** The PWA now installs with full rich assets, and the player reliably generates, serves, and displays waveforms for all tracks on all devices.
+
+## Chapter 13: The Race Condition & The Equalizer Clash
+
+Just when we thought the player was perfect, two frustrating bugs surfaced during user testing: "Play on Load" was failing for local tracks (songs loaded but didn't play), and playlist images were disappearing for local playlists.
+
+- **The "Play on Load" Mystery:**
+    - **The Symptoms:** Clicking a song would update the banner and load bar, but the song wouldn't start. Manually clicking play worked. However, auto-advance (when a song finished) often failed to start the next track.
+    - **The First Fix (Logic):** We first refactored the playback logic to explicitly handle the `playOnLoad` preference, forcing it to `true` during auto-advance. This helped, but didn't fully solve it.
+    - **The Second Fix (Race Condition):** We discovered a race condition. The event listener waiting for the "Track Ready" signal was being set up *before* the asynchronous waveform fetch was complete. This meant it could catch a "ready" signal from the *previous* track or a cleared state, firing too early. We moved the listener attachment to *after* the fetch, ensuring it only caught the *new* track's ready event.
+    - **The Final Fix (The EQ Clash):** Even with correct logic, tracks sometimes stayed silent. The logs showed the player was "playing," but no sound came out. The culprit? **The Equalizer.** Both the Player and the Equalizer were listening for the `ready` event. The Player would start playback, but milliseconds later, the Equalizer would disconnect the audio node to rebuild its filter graph, effectively "unplugging" the playing audio.
+    - **The Solution:** We added a **100ms delay** to the playback command. This tiny pause allows the Equalizer to finish its wiring work *before* the music starts, ensuring a solid connection.
+
+- **The Missing Playlist Images:**
+    - **The Issue:** Local playlists (like "Family Fun") showed blank squares instead of cover art, while the "SoundCloud Likes" playlist looked perfect.
+    - **The Diagnosis:** It was a data consistency issue. SoundCloud tracks were processed through a Presenter that returned clean Hashes with URL strings. Local tracks were passed as raw ActiveRecord objects. The view expected the Hash structure (specifically keys like `grid_banner`), which didn't exist on the raw objects.
+    - **The Fix:** We refactored `PlaylistsController#show` to run local songs through the `SongPresenter` as well. Now, the view receives the exact same normalized data structure regardless of the song's source, and images render correctly everywhere.
+
+**Current Status:** The player is now rock-solid. Playback starts reliably on click and auto-advance, regardless of file type (local vs. streamed), and the UI handles data from all sources consistently.
