@@ -960,17 +960,23 @@ export default class extends Controller {
           const rawPeaks = await this._fetchJsonPeaks(song.waveformUrl);
 
           // 2. Resample peaks to match the density defined by minPxPerSec
-          const minPxPerSec = this.wavesurfer.options.minPxPerSec || 50;
-          const barWidth = this.wavesurfer.options.barWidth || 2;
-          const barGap = this.wavesurfer.options.barGap || 1;
-          const totalWidth = song.duration * minPxPerSec;
-          const numBars = Math.floor(totalWidth / (barWidth + barGap));
-          
-          console.log(`Resampling peaks for local file: original ${rawPeaks.length}, target bars ${numBars} for duration ${song.duration}s`);
-          const peaks = this._resamplePeaks(rawPeaks, numBars);
+          let peaks = rawPeaks;
+          if (song.duration && song.duration > 0) {
+            const minPxPerSec = this.wavesurfer.options.minPxPerSec || 50;
+            const barWidth = this.wavesurfer.options.barWidth || 2;
+            const barGap = this.wavesurfer.options.barGap || 1;
+            const totalWidth = song.duration * minPxPerSec;
+            const numBars = Math.floor(totalWidth / (barWidth + barGap));
+            
+            console.log(`Resampling peaks for local file: original ${rawPeaks.length}, target bars ${numBars} for duration ${song.duration}s`);
+            peaks = this._resamplePeaks(rawPeaks, numBars);
+          } else {
+            console.warn("Song duration is 0 or missing, using raw peaks without resampling.");
+          }
 
           // 3. Load audio URL with pre-computed peaks
-          this.wavesurfer.load(song.url, peaks, song.duration);
+          // Use undefined for duration if it's 0 so WaveSurfer can auto-detect from media
+          this.wavesurfer.load(song.url, peaks, song.duration || undefined);
 
         } else {
           // Fallback for local files without a waveform (e.g., old files)
