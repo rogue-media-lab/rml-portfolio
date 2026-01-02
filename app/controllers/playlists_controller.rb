@@ -46,7 +46,7 @@ class PlaylistsController < ApplicationController
         :banner_video_attachment,
         { waveform_data_attachment: :blob }
       )
-      
+
       @songs = song_records.map { |song| SongPresenter.new(song).to_song_hash }
       @songs_data = @songs.to_json
     end
