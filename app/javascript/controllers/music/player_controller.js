@@ -464,11 +464,15 @@ export default class extends Controller {
         // Otherwise, it's a new song.
         this.currentIndex = requestedIndex;
         const songToPlay = this.currentQueue[this.currentIndex];
+        
+        // Determine playOnLoad preference from event or fallback to controller value
+        const shouldPlay = songFromEvent.hasOwnProperty('playOnLoad') ? songFromEvent.playOnLoad : this.playOnLoadValue;
+        
         if (songToPlay) {
-          this.playSongFromQueue(songToPlay);
+          this.playSongFromQueue(songToPlay, shouldPlay);
         } else {
           // Fallback for safety, if the song wasn't found in the queue.
-          this.playSongFromQueue(songFromEvent);
+          this.playSongFromQueue(songFromEvent, shouldPlay);
         }
       }
     } catch (error) {
@@ -491,7 +495,8 @@ export default class extends Controller {
         bannerMobile: song.bannerMobile,
         bannerVideo: song.bannerVideo,
         autoplay: true,
-        updateBanner: true
+        updateBanner: true,
+        playOnLoad: true // Explicitly request play
       }
     }))
   }
@@ -745,7 +750,7 @@ export default class extends Controller {
     this.trackRecentlyPlayed(nextIndex);
 
     console.log("✅ Calling playSongFromQueue() for:", nextSong.title)
-    this.playSongFromQueue(nextSong);
+    this.playSongFromQueue(nextSong, true); // Force play for auto-advance
   }
 
   /**
@@ -797,10 +802,10 @@ export default class extends Controller {
     
     this.currentIndex = (this.currentIndex - 1 + this.currentQueue.length) % this.currentQueue.length
     const prevSong = this.currentQueue[this.currentIndex]
-    this.playSongFromQueue(prevSong)
+    this.playSongFromQueue(prevSong, true) // Force play for previous button
   }
 
-  async playSongFromQueue(song) {
+  async playSongFromQueue(song, playOnLoad = this.playOnLoadValue) {
     try {
       this.isChangingTrack = true;
 
@@ -838,7 +843,7 @@ export default class extends Controller {
         this.hls = null;
       }
 
-      console.log("🎵 playSongFromQueue() called with:", song?.title)
+      console.log("🎵 playSongFromQueue() called with:", song?.title, "playOnLoad:", playOnLoad)
 
       if (!song || !song.url) {
         console.error("❌ Invalid song object in queue:", song);
@@ -877,6 +882,28 @@ export default class extends Controller {
       this.dispatchTrackChange(song);
 
       console.log("📥 Loading track:", song.title, "URL:", song.url.substring(0, 80) + "...")
+
+      // Shared playback logic
+      const attemptPlayback = () => {
+        if (playOnLoad) {
+          console.log("✅ Play on load is active. Attempting to play...");
+          const playPromise = this.wavesurfer.play();
+          if (playPromise !== undefined) {
+            playPromise.then(() => {
+              this.isChangingTrack = false;
+            }).catch((error) => {
+              console.error("🚫 Autoplay blocked by browser or failed:", error);
+              this.isChangingTrack = false;
+              document.dispatchEvent(new CustomEvent("player:autoplay-blocked", { detail: { song, error } }));
+            });
+          } else {
+            this.isChangingTrack = false;
+          }
+        } else {
+           console.log("⏸️ Play on load is inactive. Waiting for user interaction.");
+           this.isChangingTrack = false;
+        }
+      };
 
       // Conditional HLS loading for SoundCloud
       if (song.audioSource === 'SoundCloud' && Hls.isSupported()) {
@@ -919,37 +946,14 @@ export default class extends Controller {
 
         // 5. Play when HLS is ready
         hls.on(Hls.Events.MANIFEST_PARSED, () => {
-          console.log("✅ HLS manifest parsed, attempting to play...");
-          const playPromise = this.wavesurfer.play();
-          if (playPromise !== undefined) {
-            playPromise.then(() => {
-              this.isChangingTrack = false;
-            }).catch((error) => {
-              console.error("🚫 HLS autoplay blocked by browser:", error);
-              this.isChangingTrack = false;
-              document.dispatchEvent(new CustomEvent("player:autoplay-blocked", { detail: { song } }));
-            });
-          } else {
-            this.isChangingTrack = false;
-          }
+          console.log("✅ HLS manifest parsed, checking playback preference...");
+          attemptPlayback();
         });
       } else {
         // Common playback logic for all local files
         this.wavesurfer.once('ready', () => {
-          console.log("✅ Track ready, attempting to play...");
-          const playPromise = this.wavesurfer.play();
-          if (playPromise !== undefined) {
-            playPromise.then(() => {
-              // Reset flag after successful play
-              this.isChangingTrack = false;
-            }).catch((error) => {
-              console.error("🚫 Autoplay blocked by browser:", error);
-              this.isChangingTrack = false;
-              document.dispatchEvent(new CustomEvent("player:autoplay-blocked", { detail: { song } }));
-            });
-          } else {
-            this.isChangingTrack = false;
-          }
+          console.log("✅ Track ready, checking playback preference...");
+          attemptPlayback();
         });
 
         // Logic for local files with pre-computed waveforms
