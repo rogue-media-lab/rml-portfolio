@@ -908,7 +908,12 @@ export default class extends Controller {
       const setupReadyListener = () => {
         this.wavesurfer.once('ready', () => {
           console.log("✅ Track ready, checking playback preference...");
-          attemptPlayback();
+          // CRITICAL: Delay playback attempt to allow EQ controller to finish rebuilding
+          // the audio graph (which happens on the same 'ready' event).
+          // Without this, the EQ reconnecting the node cuts the audio.
+          setTimeout(() => {
+            attemptPlayback();
+          }, 100);
         });
       };
 
