@@ -904,6 +904,13 @@ export default class extends Controller {
            this.isChangingTrack = false;
         }
       };
+      
+      const setupReadyListener = () => {
+        this.wavesurfer.once('ready', () => {
+          console.log("✅ Track ready, checking playback preference...");
+          attemptPlayback();
+        });
+      };
 
       // Conditional HLS loading for SoundCloud
       if (song.audioSource === 'SoundCloud' && Hls.isSupported()) {
@@ -950,12 +957,6 @@ export default class extends Controller {
           attemptPlayback();
         });
       } else {
-        // Common playback logic for all local files
-        this.wavesurfer.once('ready', () => {
-          console.log("✅ Track ready, checking playback preference...");
-          attemptPlayback();
-        });
-
         // Logic for local files with pre-computed waveforms
         if (song.waveformUrl) {
           console.log("Local file with waveformUrl detected.");
@@ -979,12 +980,15 @@ export default class extends Controller {
           }
 
           // 3. Load audio URL with pre-computed peaks
+          // Setup listener strictly before loading but AFTER async fetch
+          setupReadyListener();
           // Use undefined for duration if it's 0 so WaveSurfer can auto-detect from media
           this.wavesurfer.load(song.url, peaks, song.duration || undefined);
 
         } else {
           // Fallback for local files without a waveform (e.g., old files)
           console.log("Local file without waveformUrl, loading directly.");
+          setupReadyListener();
           this.wavesurfer.load(song.url);
         }
       }
