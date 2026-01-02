@@ -392,6 +392,12 @@ export default class extends Controller {
   handlePlayerState(event) {
     // Update save button state based on whether a song is playing
     this.updateSaveButtonState()
+
+    // Ensure AudioContext is running if playing
+    // This fixes the issue where lock screen 'Play' button wouldn't resume audio
+    if (event.detail.playing) {
+      this.resumeAudioContext()
+    }
   }
 
   /**

@@ -177,6 +177,9 @@ export default class extends Controller {
       const media = this.wavesurfer.getMediaElement()
       if (media) {
         media.crossOrigin = "anonymous"
+        // Critical for iOS background audio and inline playback
+        media.setAttribute("playsinline", "")
+        media.setAttribute("webkit-playsinline", "")
       }
       
       this.setupWaveSurferEvents()
