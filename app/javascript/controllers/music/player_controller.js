@@ -457,11 +457,18 @@ export default class extends Controller {
   waitForEqualizerThenPlay(playCallback) {
     const isMobileOrPWA = this.isMobile() || this.isPWA()
 
-    // On mobile/PWA: EQ is disabled, play immediately to preserve gesture
+    // On mobile/PWA: Check if user has enabled EQ
     if (isMobileOrPWA) {
-      console.log("📱 Mobile/PWA: EQ disabled, playing immediately")
-      playCallback()
-      return
+      const mobileEQEnabled = localStorage.getItem("mobileEQEnabled") === "true"
+
+      if (!mobileEQEnabled) {
+        console.log("📱 Mobile/PWA: EQ disabled (background playback mode), playing immediately")
+        playCallback()
+        return
+      } else {
+        console.log("📱 Mobile/PWA: EQ enabled, waiting for initialization (background playback disabled)")
+        // Fall through to desktop EQ logic
+      }
     }
 
     // Desktop: Check if EQ is already connected (from previous track)
@@ -473,16 +480,18 @@ export default class extends Controller {
       )
 
       if (eqController?.isConnected) {
-        console.log("⚡ Desktop: EQ already connected, playing immediately")
+        console.log("⚡ EQ already connected, playing immediately")
         playCallback()
         return
       }
     }
 
-    // Desktop: EQ not ready yet, wait for signal with timeout
-    const timeout = 100
+    // Desktop or Mobile with EQ enabled: EQ not ready yet, wait for signal with timeout
+    const isMobileWithEQ = (this.isMobile() || this.isPWA()) && localStorage.getItem("mobileEQEnabled") === "true"
+    const timeout = isMobileWithEQ ? 50 : 100 // Shorter timeout for mobile to preserve gesture
 
-    console.log(`⏳ Desktop: Waiting for EQ initialization (${timeout}ms timeout)...`)
+    const deviceType = isMobileWithEQ ? "Mobile/PWA (EQ mode)" : "Desktop"
+    console.log(`⏳ ${deviceType}: Waiting for EQ initialization (${timeout}ms timeout)...`)
 
     let timeoutId
     let handled = false
@@ -492,7 +501,7 @@ export default class extends Controller {
       handled = true
       clearTimeout(timeoutId)
       document.removeEventListener('equalizer:ready', handleReady)
-      console.log("✅ Desktop: EQ ready signal received, playing now")
+      console.log(`✅ ${deviceType}: EQ ready signal received, playing now`)
       playCallback()
     }
 
@@ -504,7 +513,7 @@ export default class extends Controller {
       if (handled) return
       handled = true
       document.removeEventListener('equalizer:ready', handleReady)
-      console.log(`⏰ Desktop: EQ timeout (${timeout}ms), playing anyway`)
+      console.log(`⏰ ${deviceType}: EQ timeout (${timeout}ms), playing anyway`)
       playCallback()
     }, timeout)
   }

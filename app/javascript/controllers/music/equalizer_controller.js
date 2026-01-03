@@ -56,21 +56,35 @@ export default class extends Controller {
   connect() {
     // Check for mobile first
     if (this.isMobile()) {
-      console.log("EQ: Mobile device detected - disabling Equalizer to preserve background playback")
+      // Check if user has explicitly enabled mobile EQ
+      const mobileEQEnabled = localStorage.getItem("mobileEQEnabled") === "true"
 
-      if (this.hasUnavailableMessageTarget) {
-        this.unavailableMessageTarget.textContent = "Equalizer is disabled on mobile devices. iOS requires native HTML5 audio for background playback and lock screen controls. The Web Audio API (required for EQ) conflicts with these features."
-        this.unavailableMessageTarget.classList.remove("hidden")
+      if (!mobileEQEnabled) {
+        console.log("EQ: Mobile device detected - EQ disabled (background playback mode)")
+
+        // Hide the EQ trigger button completely on mobile when disabled
+        if (this.hasTriggerTarget) {
+          this.triggerTarget.classList.add("hidden")
+          console.log("EQ: Trigger button hidden on mobile")
+        }
+
+        if (this.hasUnavailableMessageTarget) {
+          this.unavailableMessageTarget.textContent = "Equalizer is disabled to preserve background playback. Enable 'Mobile EQ' in settings to use the equalizer (disables background playback)."
+          this.unavailableMessageTarget.classList.remove("hidden")
+        }
+
+        if (this.hasHeaderContentTarget) this.headerContentTarget.classList.add("hidden")
+        if (this.hasMainContentTarget) this.mainContentTarget.classList.add("hidden")
+        if (this.hasPanelTarget) this.panelTarget.classList.add("hidden")
+
+        // Stop here - do not attach listeners or hook into audio
+        return
+      } else {
+        console.log("EQ: Mobile device with EQ enabled - initializing (background playback disabled)")
       }
-
-      if (this.hasHeaderContentTarget) this.headerContentTarget.classList.add("hidden")
-      if (this.hasMainContentTarget) this.mainContentTarget.classList.add("hidden")
-
-      // Stop here - do not attach listeners or hook into audio
-      return
+    } else {
+      console.log("EQ: Desktop device - enabling Equalizer")
     }
-
-    console.log("EQ: Desktop device - enabling Equalizer")
 
     // Listen for player events
     window.addEventListener("audio:changed", this.handleSongChange.bind(this))
