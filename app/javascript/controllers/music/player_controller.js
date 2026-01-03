@@ -451,6 +451,57 @@ export default class extends Controller {
   }
 
   /**
+   * Smart EQ coordination: Wait for EQ to be ready before playing
+   * Uses event-based coordination with timeout fallback to preserve user gesture
+   */
+  waitForEqualizerThenPlay(playCallback) {
+    // Check if EQ is already connected (from previous track)
+    const eqElement = document.querySelector('[data-controller*="music--equalizer"]')
+    if (eqElement) {
+      const eqController = this.application.getControllerForElementAndIdentifier(
+        eqElement,
+        "music--equalizer"
+      )
+
+      if (eqController?.isConnected) {
+        console.log("⚡ EQ already connected, playing immediately")
+        playCallback()
+        return
+      }
+    }
+
+    // EQ not ready yet, wait for signal with timeout
+    const isMobileOrPWA = this.isMobile() || this.isPWA()
+    const timeout = isMobileOrPWA ? 30 : 100 // Shorter timeout for mobile to preserve gesture
+
+    console.log(`⏳ Waiting for EQ initialization (${timeout}ms timeout)...`)
+
+    let timeoutId
+    let handled = false
+
+    const handleReady = () => {
+      if (handled) return
+      handled = true
+      clearTimeout(timeoutId)
+      document.removeEventListener('equalizer:ready', handleReady)
+      console.log("✅ EQ ready signal received, playing now")
+      playCallback()
+    }
+
+    // Listen for EQ ready event
+    document.addEventListener('equalizer:ready', handleReady, { once: true })
+
+    // Timeout fallback
+    timeoutId = setTimeout(() => {
+      if (handled) return
+      handled = true
+      document.removeEventListener('equalizer:ready', handleReady)
+      console.log(`⏰ EQ timeout (${timeout}ms), playing anyway`)
+      playCallback()
+    }, timeout)
+  }
+
+  /**
    * Dispatch player state change event
    * @param {boolean} [playing] - Optional play/pause state
    */
@@ -929,23 +980,12 @@ export default class extends Controller {
         this.wavesurfer.once('ready', () => {
           console.log("✅ Track ready, checking playback preference...");
 
-          // CRITICAL: In mobile/PWA mode, skip the delay to preserve user gesture for autoplay
-          // The EQ is already disabled on mobile (see equalizer_controller.js), so we don't
-          // need to wait for it to rebuild its audio graph.
-          // In desktop mode, delay playback to allow EQ controller to finish rebuilding
-          // the audio graph (which happens on the same 'ready' event).
-          // Without this delay on desktop, the EQ reconnecting the node cuts the audio.
-          const isMobileOrPWA = this.isMobile() || this.isPWA();
-
-          if (isMobileOrPWA) {
-            console.log("📱 Mobile/PWA mode: Attempting playback immediately (no EQ delay)");
-            attemptPlayback();
-          } else {
-            console.log("💻 Desktop mode: Delaying playback 100ms for EQ initialization");
-            setTimeout(() => {
-              attemptPlayback();
-            }, 100);
-          }
+          // CRITICAL: Wait for EQ to be ready, but use smart timing to preserve user gesture
+          // - On first track: EQ needs ~50ms to build audio graph
+          // - On subsequent tracks: EQ is already built, just loads settings
+          // - In PWA/mobile: Use shorter timeout (30ms) to preserve gesture chain
+          // - In desktop: Use longer timeout (100ms) for safety
+          this.waitForEqualizerThenPlay(attemptPlayback);
         });
       };
 
@@ -992,19 +1032,8 @@ export default class extends Controller {
         hls.on(Hls.Events.MANIFEST_PARSED, () => {
           console.log("✅ HLS manifest parsed, checking playback preference...");
 
-          // CRITICAL: For PWA/mobile, play immediately to preserve user gesture
-          // For desktop, delay for EQ initialization
-          const isMobileOrPWA = this.isMobile() || this.isPWA();
-
-          if (isMobileOrPWA) {
-            console.log("📱 Mobile/PWA mode: HLS attempting playback immediately");
-            attemptPlayback();
-          } else {
-            console.log("💻 Desktop mode: HLS delaying playback 100ms for EQ");
-            setTimeout(() => {
-              attemptPlayback();
-            }, 100);
-          }
+          // Use smart EQ coordination for HLS tracks too
+          this.waitForEqualizerThenPlay(attemptPlayback);
         });
       } else {
         // Logic for local files with pre-computed waveforms

@@ -54,22 +54,7 @@ export default class extends Controller {
   matchSongUrl = null
 
   connect() {
-    // Check for mobile first
-    if (this.isMobile()) {
-      console.log("EQ: Mobile device detected - disabling Equalizer to preserve background playback")
-      
-      if (this.hasUnavailableMessageTarget) {
-        this.unavailableMessageTarget.textContent = "Equalizer disabled on mobile to optimize battery and background playback."
-        this.unavailableMessageTarget.classList.remove("hidden")
-      }
-      
-      if (this.hasHeaderContentTarget) this.headerContentTarget.classList.add("hidden")
-      if (this.hasMainContentTarget) this.mainContentTarget.classList.add("hidden")
-      if (this.hasPanelTarget) this.panelTarget.classList.add("hidden")
-      
-      // Stop here - do not attach listeners or hook into audio
-      return
-    }
+    console.log("EQ: Controller connected")
 
     // Listen for player events
     window.addEventListener("audio:changed", this.handleSongChange.bind(this))
@@ -267,6 +252,10 @@ export default class extends Controller {
       this.isConnected = true
       console.log("EQ: ✓ Successfully connected audio graph!")
       console.log("EQ: Audio path: MediaElement → 10 Filters → Destination")
+
+      // Signal to player that EQ is ready
+      document.dispatchEvent(new CustomEvent("equalizer:ready"))
+      console.log("EQ: Dispatched equalizer:ready event")
 
     } catch (error) {
       console.error("EQ: Error intercepting audio graph:", error)
