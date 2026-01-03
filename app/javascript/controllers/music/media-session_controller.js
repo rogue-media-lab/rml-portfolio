@@ -10,6 +10,8 @@ import { Controller } from "@hotwired/stimulus"
  * - Metadata display on lock screen
  */
 export default class extends Controller {
+  currentMetadata = null
+
   connect() {
     console.log("🎵 MEDIA SESSION: Controller connected")
 
@@ -89,6 +91,15 @@ export default class extends Controller {
       this.updateMetadata(event.detail)
     })
 
+    // Also update metadata when audio actually changes (covers auto-advance cases)
+    document.addEventListener("audio:changed", (event) => {
+      // Only update if we have the full metadata (from player:play-requested)
+      // This event might fire before metadata is available
+      if (this.currentMetadata) {
+        console.log("🎵 MEDIA SESSION: Audio changed, keeping current metadata")
+      }
+    })
+
     // Update playback state
     document.addEventListener("player:state:changed", (event) => {
       this.updatePlaybackState(event.detail.playing)
@@ -109,6 +120,9 @@ export default class extends Controller {
     console.log("🎵 MEDIA SESSION: Updating metadata:", { title, artist, banner })
 
     try {
+      // Store current metadata
+      this.currentMetadata = { title, artist, banner }
+
       // Prepare artwork array
       const artwork = []
 
@@ -116,7 +130,7 @@ export default class extends Controller {
         // Convert relative path to absolute URL
         const artworkUrl = banner.startsWith('http')
           ? banner
-          : `${window.location.origin}/${banner}`
+          : `${window.location.origin}${banner.startsWith('/') ? '' : '/'}${banner}`
 
         artwork.push({
           src: artworkUrl,

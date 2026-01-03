@@ -53,6 +53,11 @@ export default class extends Controller {
    * Sets up WaveSurfer instance and event listeners
    */
   connect() {
+    // Log environment detection for debugging
+    const isMobile = this.isMobile();
+    const isPWA = this.isPWA();
+    console.log(`🎵 PLAYER: Environment detected - Mobile: ${isMobile}, PWA: ${isPWA}`);
+
     this.initializeWaveSurfer();
     this.setupEventListeners();
     this.setupMobileAudioContext();
@@ -141,6 +146,18 @@ export default class extends Controller {
     // Consider it mobile if: (mobile UA OR touch-only device) AND small screen
     // This prevents laptops from being detected as mobile
     return (mobileUA || isTouchDevice) && isSmallScreen
+  }
+
+  /**
+   * Detect if running as a PWA (installed app)
+   * @returns {boolean}
+   */
+  isPWA() {
+    // Check if running in standalone mode (iOS/Android)
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
+                         window.navigator.standalone === true
+
+    return isStandalone
   }
 
   /**
@@ -911,12 +928,24 @@ export default class extends Controller {
       const setupReadyListener = () => {
         this.wavesurfer.once('ready', () => {
           console.log("✅ Track ready, checking playback preference...");
-          // CRITICAL: Delay playback attempt to allow EQ controller to finish rebuilding
+
+          // CRITICAL: In mobile/PWA mode, skip the delay to preserve user gesture for autoplay
+          // The EQ is already disabled on mobile (see equalizer_controller.js), so we don't
+          // need to wait for it to rebuild its audio graph.
+          // In desktop mode, delay playback to allow EQ controller to finish rebuilding
           // the audio graph (which happens on the same 'ready' event).
-          // Without this, the EQ reconnecting the node cuts the audio.
-          setTimeout(() => {
+          // Without this delay on desktop, the EQ reconnecting the node cuts the audio.
+          const isMobileOrPWA = this.isMobile() || this.isPWA();
+
+          if (isMobileOrPWA) {
+            console.log("📱 Mobile/PWA mode: Attempting playback immediately (no EQ delay)");
             attemptPlayback();
-          }, 100);
+          } else {
+            console.log("💻 Desktop mode: Delaying playback 100ms for EQ initialization");
+            setTimeout(() => {
+              attemptPlayback();
+            }, 100);
+          }
         });
       };
 
@@ -962,7 +991,20 @@ export default class extends Controller {
         // 5. Play when HLS is ready
         hls.on(Hls.Events.MANIFEST_PARSED, () => {
           console.log("✅ HLS manifest parsed, checking playback preference...");
-          attemptPlayback();
+
+          // CRITICAL: For PWA/mobile, play immediately to preserve user gesture
+          // For desktop, delay for EQ initialization
+          const isMobileOrPWA = this.isMobile() || this.isPWA();
+
+          if (isMobileOrPWA) {
+            console.log("📱 Mobile/PWA mode: HLS attempting playback immediately");
+            attemptPlayback();
+          } else {
+            console.log("💻 Desktop mode: HLS delaying playback 100ms for EQ");
+            setTimeout(() => {
+              attemptPlayback();
+            }, 100);
+          }
         });
       } else {
         // Logic for local files with pre-computed waveforms
