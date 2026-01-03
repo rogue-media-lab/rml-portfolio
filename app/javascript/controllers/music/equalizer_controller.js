@@ -54,11 +54,27 @@ export default class extends Controller {
   matchSongUrl = null
 
   connect() {
+    // Check for mobile first
+    if (this.isMobile()) {
+      console.log("EQ: Mobile device detected - disabling Equalizer to preserve background playback")
+      
+      if (this.hasUnavailableMessageTarget) {
+        this.unavailableMessageTarget.textContent = "Equalizer disabled on mobile to optimize battery and background playback."
+        this.unavailableMessageTarget.classList.remove("hidden")
+      }
+      
+      if (this.hasHeaderContentTarget) this.headerContentTarget.classList.add("hidden")
+      if (this.hasMainContentTarget) this.mainContentTarget.classList.add("hidden")
+      if (this.hasPanelTarget) this.panelTarget.classList.add("hidden")
+      
+      // Stop here - do not attach listeners or hook into audio
+      return
+    }
+
     // Listen for player events
     window.addEventListener("audio:changed", this.handleSongChange.bind(this))
     window.addEventListener("player:state:changed", this.handlePlayerState.bind(this))
     window.addEventListener("audio:ready", this.handleAudioReady.bind(this))
-    window.addEventListener("player:user-interaction", this.resumeAudioContext.bind(this))
 
     // Try to hook into WaveSurfer initialization
     this.setupWaveSurferIntegration()
@@ -68,31 +84,15 @@ export default class extends Controller {
   }
 
   /**
-   * Resume (or create) AudioContext on user interaction
-   * Critical for mobile audio to work
+   * Detect mobile device
    */
-  resumeAudioContext() {
-    console.log("EQ: User interaction detected - checking AudioContext")
-    
-    if (!this.audioContext) {
-      try {
-        const AudioContext = window.AudioContext || window.webkitAudioContext
-        if (AudioContext) {
-          this.audioContext = new AudioContext()
-          console.log("EQ: Created AudioContext on user interaction")
-        }
-      } catch (e) {
-        console.warn("EQ: Could not create AudioContext:", e)
-      }
-    }
-
-    if (this.audioContext && this.audioContext.state === 'suspended') {
-      this.audioContext.resume().then(() => {
-        console.log("EQ: AudioContext resumed successfully")
-      }).catch(e => {
-        console.warn("EQ: Failed to resume AudioContext:", e)
-      })
-    }
+  isMobile() {
+    const mobileUA = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+    const isTouchDevice = ('ontouchstart' in window) &&
+                          (navigator.maxTouchPoints > 0) &&
+                          !window.matchMedia("(pointer: fine)").matches
+    const isSmallScreen = window.innerWidth <= 768
+    return (mobileUA || isTouchDevice) && isSmallScreen
   }
 
   /**
@@ -278,7 +278,6 @@ export default class extends Controller {
     window.removeEventListener("audio:changed", this.handleSongChange.bind(this))
     window.removeEventListener("player:state:changed", this.handlePlayerState.bind(this))
     window.removeEventListener("audio:ready", this.handleAudioReady.bind(this))
-    window.removeEventListener("player:user-interaction", this.resumeAudioContext.bind(this))
     this.destroyFilters()
   }
 
@@ -392,12 +391,6 @@ export default class extends Controller {
   handlePlayerState(event) {
     // Update save button state based on whether a song is playing
     this.updateSaveButtonState()
-
-    // Ensure AudioContext is running if playing
-    // This fixes the issue where lock screen 'Play' button wouldn't resume audio
-    if (event.detail.playing) {
-      this.resumeAudioContext()
-    }
   }
 
   /**
