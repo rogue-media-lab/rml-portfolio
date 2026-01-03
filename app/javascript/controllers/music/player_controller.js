@@ -455,7 +455,16 @@ export default class extends Controller {
    * Uses event-based coordination with timeout fallback to preserve user gesture
    */
   waitForEqualizerThenPlay(playCallback) {
-    // Check if EQ is already connected (from previous track)
+    const isMobileOrPWA = this.isMobile() || this.isPWA()
+
+    // On mobile/PWA: EQ is disabled, play immediately to preserve gesture
+    if (isMobileOrPWA) {
+      console.log("📱 Mobile/PWA: EQ disabled, playing immediately")
+      playCallback()
+      return
+    }
+
+    // Desktop: Check if EQ is already connected (from previous track)
     const eqElement = document.querySelector('[data-controller*="music--equalizer"]')
     if (eqElement) {
       const eqController = this.application.getControllerForElementAndIdentifier(
@@ -464,17 +473,16 @@ export default class extends Controller {
       )
 
       if (eqController?.isConnected) {
-        console.log("⚡ EQ already connected, playing immediately")
+        console.log("⚡ Desktop: EQ already connected, playing immediately")
         playCallback()
         return
       }
     }
 
-    // EQ not ready yet, wait for signal with timeout
-    const isMobileOrPWA = this.isMobile() || this.isPWA()
-    const timeout = isMobileOrPWA ? 30 : 100 // Shorter timeout for mobile to preserve gesture
+    // Desktop: EQ not ready yet, wait for signal with timeout
+    const timeout = 100
 
-    console.log(`⏳ Waiting for EQ initialization (${timeout}ms timeout)...`)
+    console.log(`⏳ Desktop: Waiting for EQ initialization (${timeout}ms timeout)...`)
 
     let timeoutId
     let handled = false
@@ -484,7 +492,7 @@ export default class extends Controller {
       handled = true
       clearTimeout(timeoutId)
       document.removeEventListener('equalizer:ready', handleReady)
-      console.log("✅ EQ ready signal received, playing now")
+      console.log("✅ Desktop: EQ ready signal received, playing now")
       playCallback()
     }
 
@@ -496,7 +504,7 @@ export default class extends Controller {
       if (handled) return
       handled = true
       document.removeEventListener('equalizer:ready', handleReady)
-      console.log(`⏰ EQ timeout (${timeout}ms), playing anyway`)
+      console.log(`⏰ Desktop: EQ timeout (${timeout}ms), playing anyway`)
       playCallback()
     }, timeout)
   }

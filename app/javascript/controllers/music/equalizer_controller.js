@@ -54,7 +54,23 @@ export default class extends Controller {
   matchSongUrl = null
 
   connect() {
-    console.log("EQ: Controller connected")
+    // Check for mobile first
+    if (this.isMobile()) {
+      console.log("EQ: Mobile device detected - disabling Equalizer to preserve background playback")
+
+      if (this.hasUnavailableMessageTarget) {
+        this.unavailableMessageTarget.textContent = "Equalizer is disabled on mobile devices. iOS requires native HTML5 audio for background playback and lock screen controls. The Web Audio API (required for EQ) conflicts with these features."
+        this.unavailableMessageTarget.classList.remove("hidden")
+      }
+
+      if (this.hasHeaderContentTarget) this.headerContentTarget.classList.add("hidden")
+      if (this.hasMainContentTarget) this.mainContentTarget.classList.add("hidden")
+
+      // Stop here - do not attach listeners or hook into audio
+      return
+    }
+
+    console.log("EQ: Desktop device - enabling Equalizer")
 
     // Listen for player events
     window.addEventListener("audio:changed", this.handleSongChange.bind(this))
