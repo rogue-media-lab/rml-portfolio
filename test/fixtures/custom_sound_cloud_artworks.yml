@@ -6,6 +6,6 @@ one:
   track_artist: MyString
 
 two:
-  soundcloud_track_id: MyString
+  soundcloud_track_id: MyString2
   track_title: MyString
   track_artist: MyString
