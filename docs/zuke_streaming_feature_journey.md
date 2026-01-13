@@ -243,3 +243,114 @@ With the critical systems functioning, we focused on refining the user experienc
         -   **Optimized Streaming:** The "Streaming Trinity" of S3, CloudFront CDN, and Byte-Range requests.
         -   **Mobile PWA:** The installable nature of the app.
     -   **The Impact:** The About page now accurately reflects the modern, hybrid nature of the Zuke Music Player, serving as both a user guide and a technical showcase.
+
+## Chapter 15: The iOS PWA Dilemma & Custom Artwork System
+
+Following successful deployment of the PWA, a critical issue emerged on iOS: the player worked perfectly in Safari, but failed completely when installed as a PWA on the home screen. This chapter chronicles the investigation of this iOS-specific limitation and the implementation of two major features: a user-controlled EQ toggle and a custom artwork system for SoundCloud tracks.
+
+### The PWA Playback Mystery
+
+-   **The Symptoms:** When using the player through Safari on iPhone, everything worked flawlessly—songs played, background playback continued when the screen locked, and lock screen controls functioned perfectly. However, when the same app was installed as a PWA (launched from the home screen icon), songs would load but refuse to play. The UI would update (banner changed, progress bar showed activity, waveform rendered, pause button appeared), but no audio would play.
+
+-   **The Investigation:** The clues pointed to a fundamental iOS restriction:
+    1.  Safari (browser mode) allowed playback with all features working
+    2.  PWA (standalone mode) blocked playback despite correct UI state
+    3.  The 100ms delay from Chapter 13 (added to coordinate with the EQ) was suspect
+
+-   **The Root Cause - iOS Autoplay Restrictions:**
+    -   **The Discovery:** iOS Safari enforces strict autoplay policies. A `play()` call must occur within the "user gesture chain"—the synchronous execution following a user interaction (tap/click).
+    -   **The Problem:** Our 100ms `setTimeout` delay, added in Chapter 13 to let the Equalizer rebuild its audio graph, *broke* this gesture chain. In browser mode, iOS was lenient. In PWA mode, iOS was strict.
+    -   **The Conflict:** We faced an impossible choice: Remove the delay (audio cuts out from EQ interference) or keep the delay (PWA can't play anything).
+
+### The First Attempt - Immediate Playback on Mobile
+
+-   **The Strategy:** We implemented platform detection (`isMobile()` and `isPWA()` methods) in the player controller and removed the 100ms delay for mobile/PWA devices, allowing immediate playback to preserve the gesture chain.
+
+-   **The Result:** Songs played instantly in the PWA! Success! But...
+
+-   **The New Problem:** Testing revealed that while songs now played in PWA mode, background playback was completely broken. When the screen locked, the music stopped. The lock screen showed no player controls.
+
+-   **The Technical Reality - Web Audio API vs Media Element:**
+    -   **Native HTML5 Audio (MediaElement):**
+        -   ✅ Works with background playback
+        -   ✅ Works with lock screen controls (Media Session API)
+        -   ✅ iOS allows it to continue when screen locks
+        -   ❌ No EQ capability
+    -   **Web Audio API (required for EQ):**
+        -   ✅ Enables EQ and audio processing
+        -   ❌ iOS suspends AudioContext when screen locks
+        -   ❌ Breaks background playback
+        -   ❌ No lock screen controls
+
+-   **The Conclusion:** iOS fundamentally prohibits combining Web Audio API (required for the Equalizer) with background playback. This is a security and battery optimization built into iOS—not a bug we could fix, but a platform limitation we had to respect.
+
+### The Solution - User Choice with localStorage Toggle
+
+Rather than forcing a decision for all users, we implemented a feature that lets mobile users choose their priority:
+
+-   **The Implementation:**
+    1.  **New Controller:** `mobile-eq_controller.js` - Manages the localStorage setting (`mobileEQEnabled`)
+    2.  **Settings UI:** Added a "Mobile EQ" toggle to the player's settings menu (three-dot icon)
+        -   Clear warning text: "⚠️ Disables background playback"
+        -   Defaults to OFF (background playback mode)
+        -   Requires page reload when changed to ensure clean state
+    3.  **Smart Coordination:** Updated `equalizer_controller.js` to check the localStorage setting:
+        -   If disabled (default): Completely skips EQ initialization on mobile, hides the EQ button from UI
+        -   If enabled: Initializes EQ normally, user gets 10-band equalizer but loses background playback
+    4.  **Player Integration:** Modified `waitForEqualizerThenPlay()` to respect the setting:
+        -   **EQ Disabled:** Plays immediately (0ms delay) to preserve gesture, perfect background audio
+        -   **EQ Enabled:** Waits for EQ with reduced timeout (50ms vs 100ms desktop) for faster responsiveness
+
+-   **The User Experience:**
+    -   **Default Mode (EQ OFF):** Songs play instantly, continue playing when screen locks, lock screen controls work, no EQ controls visible
+    -   **EQ Mode (EQ ON):** Full 10-band equalizer available, per-song settings work, but background playback stops when screen locks
+
+-   **Current Status:** Mobile users now have transparent control over the EQ/background-playback trade-off. The setting is persistent, clearly explained, and the UI adapts accordingly.
+
+### The Custom Artwork System for SoundCloud Tracks
+
+With the PWA issue resolved, we turned to a long-requested feature: the ability to override SoundCloud's default artwork with custom images.
+
+-   **The Vision:** The user wanted to associate personal images (uploaded to S3) with specific SoundCloud tracks. When these tracks play, the player should display the custom artwork instead of SoundCloud's generic album art.
+
+-   **The Architecture:**
+    1.  **Database Layer:**
+        -   New model: `CustomSoundCloudArtwork`
+        -   Fields: `soundcloud_track_id` (unique), `track_title`, `track_artist` (cached for browsing)
+        -   Active Storage attachment: `custom_image`
+    2.  **Admin Interface:**
+        -   New admin section: "SoundCloud Artwork" (accessible from dashboard sidebar)
+        -   **Sync Feature:** One-click button to fetch all liked tracks from the SoundCloud API and cache them in the database
+        -   **Customize Page:** For each track, provides two options:
+            -   Upload a new image
+            -   Select from existing song images (carousel view)
+    3.  **Presenter Integration:**
+        -   Updated `SoundCloudSongPresenter#to_song_hash` to check for custom artwork
+        -   If found: Uses the S3 URL from `CustomSoundCloudArtwork`
+        -   If not found: Falls back to SoundCloud's default artwork
+        -   No API calls needed during playback—just a simple database lookup
+
+-   **The Implementation Journey:**
+    1.  **Initial Setup:** Generated the model, migration, and controller using Rails generators
+    2.  **Namespace Conflict:** Encountered "MilkAdmin is not a module" error—the `MilkAdmin` model conflicted with a `module MilkAdmin` wrapper. Fixed by using `class MilkAdmin::ControllerName` syntax (matching other admin controllers).
+    3.  **Service Name Mismatch:** The sync feature initially called `SoundCloudLikesService` (capital C), but the actual class was `SoundcloudLikesService` (lowercase c). Quick fix.
+    4.  **Data Structure Learning:** Discovered the SoundCloud Likes API returns an array of "like" objects, each containing a nested "track" object. Updated sync logic to properly extract `like["track"]` instead of treating the like as the track.
+    5.  **Turbo Frame Integration:** Views initially broke out of the dashboard frame, showing full page without sidebar. Wrapped both `index.html.erb` and `customize.html.erb` in `turbo_frame_tag "dashboard_content"` to keep navigation contained.
+
+-   **The Workflow:**
+    1.  Admin navigates to "SoundCloud Artwork" in dashboard
+    2.  Clicks "Sync Liked Songs" - Fetches tracks from API, displays table with all liked songs
+    3.  Clicks "Customize" on any track
+    4.  Chooses either to:
+        -   Upload a new image from their computer
+        -   Select from a carousel of images already uploaded for other songs
+    5.  Saves the association
+    6.  When that track plays in the player, it automatically uses the custom artwork
+
+-   **Performance Benefits:**
+    -   ✅ No SoundCloud API calls during playback—all track info is cached
+    -   ✅ Single database lookup per track: `find_by(soundcloud_track_id: ...)`
+    -   ✅ Reuses existing S3 images—no duplicate uploads needed
+    -   ✅ Works with Active Storage's standard CDN and proxy features
+
+**Final Status:** The Zuke Music Player now gracefully handles iOS PWA limitations with user choice, and provides a complete custom artwork management system for SoundCloud tracks. Mobile users can pick their priority (EQ vs. background playback), and all users can personalize their streaming experience with custom cover art.

@@ -5,7 +5,7 @@ Rails.application.configure do
 
   # Configure default URL options for route helpers
   config.action_controller.default_url_options = {
-    host: ENV.fetch("HOST", "roguemedialab-137f8a45d7c0.herokuapp.com"),
+    host: ENV.fetch("HOST", "roguemedialab.com"),
     protocol: "https"
   }
   Rails.application.routes.default_url_options = config.action_controller.default_url_options

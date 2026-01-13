@@ -49,6 +49,16 @@ Rails.application.routes.draw do
       end
     end
 
+    # SoundCloud Custom Artwork
+    resources :custom_sound_cloud_artworks, only: [ :index, :update, :destroy ] do
+      collection do
+        post :sync  # Sync liked songs from SoundCloud
+      end
+      member do
+        get :customize  # Customize artwork for a specific track
+      end
+    end
+
     get "hermit_videos/dashboard", to: "hermit_videos#dashboard", as: :hermit_videos_dashboard
     resources :hermit_videos, only: [ :index, :new, :create, :edit, :update, :destroy ]
 

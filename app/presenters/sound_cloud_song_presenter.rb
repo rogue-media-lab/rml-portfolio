@@ -8,15 +8,28 @@ class SoundCloudSongPresenter
   end
 
   def to_song_hash
-    artwork_url = @track["artwork_url"]
+    # Check for custom artwork first
+    custom_artwork = CustomSoundCloudArtwork.find_by(soundcloud_track_id: @track['id'].to_s)
+
+    if custom_artwork&.custom_image&.attached?
+      # Use custom artwork
+      banner = custom_artwork.full_image_url
+      grid_banner = custom_artwork.grid_image_url
+    else
+      # Fall back to SoundCloud artwork
+      artwork_url = @track["artwork_url"]
+      banner = artwork_url&.gsub("large", "t500x500")
+      grid_banner = artwork_url&.gsub("large", "t300x300")
+    end
+
     {
       id: "soundcloud-#{@track['id']}",
       url: stream_url,
       title: @track["title"],
       artist: @track.dig("user", "username"),
-      banner: artwork_url&.gsub("large", "t500x500"),
-      grid_banner: artwork_url&.gsub("large", "t300x300"),
-      bannerMobile: artwork_url&.gsub("large", "t500x500"),
+      banner: banner,
+      grid_banner: grid_banner,
+      bannerMobile: banner, # Use same image for mobile
       bannerVideo: nil,  # No video component for SoundCloud tracks
       imageCredit: nil,
       imageCreditUrl: nil,

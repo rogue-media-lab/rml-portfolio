@@ -1,0 +1,2 @@
+module MilkAdmin::CustomSoundCloudArtworksHelper
+end

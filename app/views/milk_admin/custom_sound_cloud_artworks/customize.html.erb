@@ -1,0 +1,143 @@
+<%= turbo_frame_tag "dashboard_content" do %>
+  <div class="mb-6">
+    <%= link_to "← Back to SoundCloud Tracks",
+                milk_admin_custom_sound_cloud_artworks_path,
+                class: "text-indigo-600 hover:text-indigo-900" %>
+  </div>
+
+  <h1 class="text-3xl font-bold mb-6">Customize Artwork</h1>
+
+  <div class="bg-white shadow-md rounded-lg p-6 mb-6">
+    <h2 class="text-xl font-semibold mb-4">Track Information</h2>
+    <div class="flex items-center gap-4">
+      <% if @artwork.custom_image.attached? %>
+        <%= image_tag @artwork.custom_image.variant(resize_to_limit: [200, 200]),
+                      class: "h-32 w-32 object-cover rounded" %>
+      <% else %>
+        <div class="h-32 w-32 bg-gray-200 rounded flex items-center justify-center">
+          <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+          </svg>
+        </div>
+      <% end %>
+      <div>
+        <p class="text-lg font-medium"><%= @artwork.track_title %></p>
+        <p class="text-gray-600"><%= @artwork.track_artist %></p>
+        <p class="text-sm text-gray-500 mt-2">SoundCloud ID: <%= @artwork.soundcloud_track_id %></p>
+      </div>
+    </div>
+  </div>
+
+  <%= form_with model: @artwork,
+                url: milk_admin_custom_sound_cloud_artwork_path(@artwork),
+                method: :patch,
+                multipart: true,
+                class: "space-y-6" do |f| %>
+
+    <!-- Tab Navigation -->
+    <div class="bg-white shadow-md rounded-lg overflow-hidden">
+      <div class="border-b border-gray-200">
+        <nav class="-mb-px flex">
+          <button type="button"
+                  onclick="showTab('upload')"
+                  id="uploadTab"
+                  class="tab-button w-1/2 py-4 px-1 text-center border-b-2 border-transparent font-medium text-gray-500 hover:text-gray-700 hover:border-gray-300">
+            Upload New Image
+          </button>
+          <button type="button"
+                  onclick="showTab('existing')"
+                  id="existingTab"
+                  class="tab-button w-1/2 py-4 px-1 text-center border-b-2 border-indigo-500 font-medium text-indigo-600">
+            Choose Existing Image
+          </button>
+        </nav>
+      </div>
+
+      <!-- Upload Tab -->
+      <div id="uploadContent" class="hidden p-6">
+        <div class="space-y-4">
+          <label class="block">
+            <span class="text-gray-700 font-medium">Select Image File</span>
+            <%= f.file_field :custom_image,
+                             accept: "image/*",
+                             class: "mt-1 block w-full text-sm text-gray-500
+                                     file:mr-4 file:py-2 file:px-4
+                                     file:rounded-full file:border-0
+                                     file:text-sm file:font-semibold
+                                     file:bg-indigo-50 file:text-indigo-700
+                                     hover:file:bg-indigo-100" %>
+          </label>
+          <p class="text-sm text-gray-500">Supported formats: JPG, PNG, GIF. Recommended size: 500x500px or larger.</p>
+        </div>
+      </div>
+
+      <!-- Existing Images Tab -->
+      <div id="existingContent" class="p-6">
+        <p class="text-gray-700 mb-4">Choose from images already uploaded to your Songs:</p>
+
+        <% if @existing_images.empty? %>
+          <p class="text-gray-500 italic">No existing song images found. Upload one above!</p>
+        <% else %>
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 max-h-96 overflow-y-auto">
+            <% @existing_images.each do |song| %>
+              <label class="cursor-pointer group relative">
+                <input type="radio"
+                       name="use_existing_image_id"
+                       value="<%= song.id %>"
+                       class="sr-only peer">
+                <div class="relative aspect-square rounded-lg overflow-hidden border-2 border-transparent peer-checked:border-indigo-500 peer-checked:ring-2 peer-checked:ring-indigo-500 hover:border-gray-300 transition-all">
+                  <%= image_tag song.image, class: "w-full h-full object-cover" %>
+                  <div class="absolute inset-0 bg-black bg-opacity-0 peer-checked:bg-opacity-20 group-hover:bg-opacity-10 transition-all flex items-center justify-center">
+                    <svg class="hidden peer-checked:block w-12 h-12 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                  </div>
+                </div>
+                <p class="mt-2 text-xs text-gray-600 truncate"><%= song.title %></p>
+              </label>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Submit Button -->
+    <div class="flex justify-end gap-4">
+      <%= link_to "Cancel",
+                  milk_admin_custom_sound_cloud_artworks_path,
+                  class: "px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50" %>
+      <%= f.submit "Save Custom Artwork",
+                   class: "px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-semibold" %>
+    </div>
+  <% end %>
+
+<script>
+  function showTab(tabName) {
+    // Hide all content
+    document.getElementById('uploadContent').classList.add('hidden');
+    document.getElementById('existingContent').classList.add('hidden');
+
+    // Reset all tab buttons
+    document.getElementById('uploadTab').classList.remove('border-indigo-500', 'text-indigo-600');
+    document.getElementById('uploadTab').classList.add('border-transparent', 'text-gray-500');
+    document.getElementById('existingTab').classList.remove('border-indigo-500', 'text-indigo-600');
+    document.getElementById('existingTab').classList.add('border-transparent', 'text-gray-500');
+
+    // Show selected content and activate button
+    if (tabName === 'upload') {
+      document.getElementById('uploadContent').classList.remove('hidden');
+      document.getElementById('uploadTab').classList.add('border-indigo-500', 'text-indigo-600');
+      document.getElementById('uploadTab').classList.remove('border-transparent', 'text-gray-500');
+    } else {
+      document.getElementById('existingContent').classList.remove('hidden');
+      document.getElementById('existingTab').classList.add('border-indigo-500', 'text-indigo-600');
+      document.getElementById('existingTab').classList.remove('border-transparent', 'text-gray-500');
+    }
+  }
+
+  // Default to existing tab on page load
+  document.addEventListener('DOMContentLoaded', function() {
+    showTab('existing');
+  });
+</script>
+<% end %>

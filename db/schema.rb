@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_28_234027) do
+ActiveRecord::Schema[8.0].define(version: 2026_01_03_133251) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -103,6 +103,15 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_28_234027) do
     t.text "description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "custom_sound_cloud_artworks", force: :cascade do |t|
+    t.string "soundcloud_track_id"
+    t.string "track_title"
+    t.string "track_artist"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["soundcloud_track_id"], name: "index_custom_sound_cloud_artworks_on_soundcloud_track_id", unique: true
   end
 
   create_table "genres", force: :cascade do |t|
