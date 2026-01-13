@@ -81,7 +81,14 @@ self.addEventListener('fetch', (event) => {
       })
       .catch(() => {
         // Network failed, try cache
-        return caches.match(event.request);
+        return caches.match(event.request).then((response) => {
+          // Return cache if found, otherwise return a fallback response
+          return response || new Response("Network error and no cache available", {
+            status: 503,
+            statusText: "Service Unavailable",
+            headers: new Headers({ "Content-Type": "text/plain" })
+          });
+        });
       })
   );
 });
