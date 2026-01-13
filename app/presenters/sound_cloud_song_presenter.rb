@@ -9,7 +9,7 @@ class SoundCloudSongPresenter
 
   def to_song_hash
     # Check for custom artwork first
-    custom_artwork = CustomSoundCloudArtwork.find_by(soundcloud_track_id: @track['id'].to_s)
+    custom_artwork = CustomSoundCloudArtwork.find_by(soundcloud_track_id: @track["id"].to_s)
 
     if custom_artwork&.custom_image&.attached?
       # Use custom artwork

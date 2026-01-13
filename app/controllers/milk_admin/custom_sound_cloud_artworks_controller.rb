@@ -3,7 +3,7 @@
 class MilkAdmin::CustomSoundCloudArtworksController < ApplicationController
   include ZukeAuth
   before_action :authenticate_zuke_admin!
-  before_action :set_artwork, only: [:customize, :update, :destroy]
+  before_action :set_artwork, only: [ :customize, :update, :destroy ]
 
   def index
     @artworks = CustomSoundCloudArtwork.order(updated_at: :desc)
@@ -21,12 +21,12 @@ class MilkAdmin::CustomSoundCloudArtworksController < ApplicationController
 
       # Create or update the record with cached track info
       artwork = CustomSoundCloudArtwork.find_or_initialize_by(
-        soundcloud_track_id: track['id'].to_s
+        soundcloud_track_id: track["id"].to_s
       )
 
       artwork.update(
-        track_title: track['title'],
-        track_artist: track.dig('user', 'username')
+        track_title: track["title"],
+        track_artist: track.dig("user", "username")
       )
 
       synced_count += 1 if artwork.persisted?

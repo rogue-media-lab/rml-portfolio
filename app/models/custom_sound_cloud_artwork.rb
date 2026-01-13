@@ -18,7 +18,7 @@ class CustomSoundCloudArtwork < ApplicationRecord
   def grid_image_url
     return nil unless custom_image.attached?
     Rails.application.routes.url_helpers.rails_blob_url(
-      custom_image.variant(resize_to_limit: [400, 400]),
+      custom_image.variant(resize_to_limit: [ 400, 400 ]),
       only_path: true
     )
   end
