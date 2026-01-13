@@ -28,5 +28,4 @@ class StaticPagesControllerTest < ActionDispatch::IntegrationTest
   # assert_equal "This is an amazing project", zuke[:description]
   # assert_equal "/zuke", zuke[:path]
   # end
-
 end
