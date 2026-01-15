@@ -7,7 +7,7 @@ class InfoController < ApplicationController
     # Renders app/views/info/welcome.html.erb
   end
 
-  def about_me
+  def vibe
     # Renders app/views/info/about_me.html.erb
   end
 

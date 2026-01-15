@@ -110,9 +110,11 @@ Rails.application.routes.draw do
 
   get "info", to: "static_pages#info", as: :info
   get "info/welcome", to: "info#welcome"
-  get "info/about_me", to: "info#about_me"
+  get "info/vibe", to: "info#vibe"
   get "info/skills", to: "info#skills"
   get "info/erudition", to: "info#erudition"
+
+  get "gemini_pro", to: "static_pages#gemini_pro", as: :gemini
 
   resources :contacts, only: [ :new, :create ]
   resources :projects, only: [ :index ]

@@ -8,4 +8,6 @@ class StaticPagesController < ApplicationController
       }
     end
   end
+
+  def gemini_pro; end
 end
