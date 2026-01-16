@@ -625,30 +625,47 @@ export default class extends Controller {
    * @returns {Promise<number[]>} A promise resolving to an array of normalized peaks.
    */
   async _fetchJsonPeaks(jsonUrl) {
+    console.log(`📡 [FETCH] Starting waveform fetch for: ${jsonUrl}`);
+    
+    // Create an AbortController for a 3-second timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3000);
+
     try {
-      const response = await fetch(jsonUrl);
+      const response = await fetch(jsonUrl, {
+        signal: controller.signal,
+        mode: 'cors',
+        credentials: 'omit' // S3 doesn't need cookies, omit can prevent some CORS issues
+      });
+
+      clearTimeout(timeoutId);
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
+      
       const waveformData = await response.json();
+      console.log("✅ [FETCH] Waveform data received successfully");
       
       const rawPeaks = waveformData.data || waveformData.samples || [];
-      // Defensively filter for only valid numbers.
       const peaks = rawPeaks.filter(p => typeof p === 'number');
 
       if (peaks.length === 0) return [];
 
       const maxPeak = Math.max(...peaks);
-      // Ensure maxPeak is a valid, finite number before dividing by it.
       if (!isFinite(maxPeak) || maxPeak === 0) {
         return new Array(peaks.length).fill(0);
       }
 
-      const normalizedPeaks = peaks.map(p => p / maxPeak);
-      return normalizedPeaks;
+      return peaks.map(p => p / maxPeak);
 
     } catch (error) {
-      console.error("Failed to fetch or process JSON peaks:", error);
+      clearTimeout(timeoutId);
+      if (error.name === 'AbortError') {
+        console.error("⏱️ [FETCH] Waveform fetch timed out after 3 seconds");
+      } else {
+        console.error("❌ [FETCH] Failed to fetch or process JSON peaks:", error);
+      }
       return [];
     }
   }
