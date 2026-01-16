@@ -1,5 +1,5 @@
 // Zuke Music Player Service Worker
-const CACHE_VERSION = 'zuke-v3'; // Bumped for repeat mode feature
+const CACHE_VERSION = 'zuke-v4'; // Bumped for Range/ActiveStorage fix
 const CACHE_ASSETS = [
   '/zuke/music',
   '/icon.png'
@@ -59,11 +59,14 @@ self.addEventListener('fetch', (event) => {
   // Skip non-GET requests
   if (event.request.method !== 'GET') return;
 
-  // Skip audio files and Range requests (CRITICAL for iOS/Safari streaming)
-  // Safari sends Range headers for media, and Service Workers often mishandle them.
-  // Letting the browser handle these directly ensures proper streaming.
-  if (event.request.url.includes('.mp3') || 
-      event.request.url.includes('.wav') ||
+  // Skip audio files, Range requests, ActiveStorage blobs, and SoundCloud CDN
+  // Letting the browser handle these directly ensures proper streaming and avoids CORS/Range issues.
+  const url = event.request.url;
+  if (url.includes('.mp3') || 
+      url.includes('.wav') ||
+      url.includes('/rails/active_storage/') ||
+      url.includes('sndcdn.com') ||
+      url.includes('soundcloud.com') ||
       event.request.headers.has('range')) {
     return;
   }
@@ -87,7 +90,7 @@ self.addEventListener('fetch', (event) => {
         // Network failed, try cache
         return caches.match(event.request).then((response) => {
           // Return cache if found, otherwise return a fallback response
-          return response || new Response("Network error and no cache available", {
+          return response || new Response("Zuke SW: Network error and no cache available", {
             status: 503,
             statusText: "Service Unavailable",
             headers: new Headers({ "Content-Type": "text/plain" })
