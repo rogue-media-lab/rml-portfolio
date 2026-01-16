@@ -5,7 +5,7 @@
 <%# DO NOT replace with transform: translateY() as it creates unwanted layout gaps %>
 
 <!-- Mobile Video (Hidden on Desktop) -->
-<div class="flex flex-col items-center justify-around h-full w-full py-10 gap-8 md:hidden mt-[-10vh]">
+<div class="flex flex-col items-center justify-around h-full w-full py-10 gap-8 md:hidden mt-[-26vh]">
   <% videos.first(3).each do |video|
     hermit_name = video[:filename].gsub(/S8E1thumb\.webp/, '').gsub(/([a-z])([A-Z])/, '\1 \2').titleize
   %>
@@ -15,7 +15,7 @@
 
 <!-- Desktop Video Grid (Hidden on Mobile) -->
 <div class="hidden md:flex w-full items-center justify-center">
-  <div class="grid grid-cols-5 gap-3 max-w-[1440px] video-grid mt-[-50vh] p-2
+  <div class="grid grid-cols-5 gap-3 max-w-[1440px] video-grid md:mt-[-40vh] xl:mt-[-50vh] p-2
               xl:grid-rows-[repeat(14,minmax(0,1fr))] lg:grid-rows-[repeat(14,minmax(0,1fr))] md:grid-rows-[repeat(14,minmax(0,1fr))]">
     <% videos.each do |video|
       hermit_name = video[:filename].gsub(/S8E1thumb\.webp/, '').gsub(/([a-z])([A-Z])/, '\1 \2').titleize
