@@ -14,8 +14,8 @@ class SongPresenter
   def to_song_hash
     {
       id: @song.id,
-      # Audio uses proxy URL to avoid CORS issues and ensure consistency
-      url: proxy_url_for_blob(@song.audio_file),
+      # Audio needs a direct URL for the player
+      url: @song.audio_file.attached? ? @song.audio_file.url : nil,
       title: @song.title,
       artist: @song.artist&.name,
       # Images can use the redirecting blob URL, which is stable
