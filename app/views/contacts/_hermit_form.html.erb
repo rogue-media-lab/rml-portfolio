@@ -1,0 +1,30 @@
+<%= form_with(model: contact, url: contacts_path, class: "w-full max-w-2xl mx-auto") do |form| %>
+  <% if contact.errors.any? %>
+    <div class="mb-4 p-4 bg-hermit-red/20 text-hermit-red rounded-md">
+      <h2 class="font-bold">Please correct the following errors:</h2>
+      <ul class="list-disc list-inside">
+        <% contact.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="flex flex-col md:flex-row gap-4 mb-4">
+    <div class="w-full">
+      <%= form.text_field :f_name, class: "w-full p-3 border border-hermit-burnt rounded-md bg-transparent text-hermit-burnt placeholder-hermit-burnt/50 font-mPlusCode", placeholder: "First Name" %>
+    </div>
+    <div class="w-full">
+      <%= form.text_field :l_name, class: "w-full p-3 border border-hermit-burnt rounded-md bg-transparent text-hermit-burnt placeholder-hermit-burnt/50 font-mPlusCode", placeholder: "Last Name" %>
+    </div>
+  </div>
+  <div class="mb-4">
+    <%= form.email_field :email, class: "w-full p-3 border border-hermit-burnt rounded-md bg-transparent text-hermit-burnt placeholder-hermit-burnt/50 font-mPlusCode", placeholder: "Email" %>
+  </div>
+  <div class="mb-4">
+    <%= form.text_area :description, rows: 4, class: "w-full p-3 border border-hermit-burnt rounded-md bg-transparent text-hermit-burnt placeholder-hermit-burnt/50 font-mPlusCode", placeholder: "Your message..." %>
+  </div>
+  <div class="text-center">
+    <%= form.submit "Send Message", class: "bg-hermit-red text-white font-bold py-3 px-8 rounded-full uppercase tracking-wider cursor-pointer hover:bg-hermit-red/90 transition-colors" %>
+  </div>
+<% end %>

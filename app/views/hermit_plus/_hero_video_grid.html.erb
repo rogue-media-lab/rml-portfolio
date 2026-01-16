@@ -1,0 +1,31 @@
+<%# Hero Video Grid - Slanted overlapping grid design %>
+<%# Parameters: videos - array of video thumbnail filenames %>
+<%# IMPORTANT: Negative margins (mt-[-50vh] and mt-[-10vh]) are INTENTIONAL %>
+<%# They create the overlapping effect with the hero section - this is the design %>
+<%# DO NOT replace with transform: translateY() as it creates unwanted layout gaps %>
+
+<!-- Mobile Video (Hidden on Desktop) -->
+<div class="flex flex-col items-center justify-around h-full w-full py-10 gap-8 md:hidden mt-[-10vh]">
+  <% videos.first(3).each do |video|
+    hermit_name = video[:filename].gsub(/S8E1thumb\.webp/, '').gsub(/([a-z])([A-Z])/, '\1 \2').titleize
+  %>
+    <%= image_tag(video[:url], alt: "#{hermit_name} Season 8 Episode 1 thumbnail", class: "w-[256px] rounded-md border border-hermit-burnt") %>
+  <% end %>
+</div>
+
+<!-- Desktop Video Grid (Hidden on Mobile) -->
+<div class="hidden md:flex w-full items-center justify-center">
+  <div class="grid grid-cols-6 grid-rows-13 gap-[2px] overflow-hidden max-w-[1440px] video-grid mt-[-50vh]
+              xl:grid-rows-[repeat(13,69px)] lg:grid-rows-[repeat(13,63px)] md:grid-rows-[repeat(13,49px)] p-2">
+    <% videos.each do |video|
+      hermit_name = video[:filename].gsub(/S8E1thumb\.webp/, '').gsub(/([a-z])([A-Z])/, '\1 \2').titleize
+    %>
+      <div class="flex items-center justify-center transition-transform hover:scale-105 duration-200 relative hover:z-30 w-full h-full">
+        <%= image_tag(video[:url], alt: "#{hermit_name} Season 8 Episode 1", class: "w-full h-full object-cover rounded-[5px] border border-hermit-burnt bg-hermit-burnt") %>
+      </div>
+    <% end %>
+     <div class="flex items-center justify-center">
+        <!-- Placeholder or empty -->
+     </div>
+  </div>
+</div>

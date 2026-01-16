@@ -1,0 +1,29 @@
+<%# Bottom Video Grid - 3x3 grid design %>
+<%# Parameters: videos - array of video thumbnail filenames (first 9 used) %>
+<%# IMPORTANT: Mobile uses negative margin (mt-[-10vh]) for intentional overlap %>
+<%# This is part of the designed visual flow - DO NOT remove %>
+
+<!-- Mobile Video (Hidden on Desktop) -->
+<div class="flex flex-col items-center justify-around h-full w-full py-10 gap-8 md:hidden mt-[-10vh]">
+  <% videos.first(3).each do |video|
+    hermit_name = video.gsub(/S8E1thumb\.webp/, '').gsub(/([a-z])([A-Z])/, '\1 \2').titleize
+  %>
+    <%= image_tag("hermit_plus/#{video}", alt: "#{hermit_name} Season 8 Episode 1 thumbnail", class: "w-[256px] rounded-md border border-hermit-burnt") %>
+  <% end %>
+</div>
+
+<!-- Desktop Video Grid (Hidden on Mobile) -->
+<div class="hidden md:flex w-full items-center justify-center">
+  <div class="grid grid-cols-3 grid-rows-3 gap-[16px] overflow-hidden max-w-[1440px] p-2">
+    <% videos.first(9).each do |video|
+      hermit_name = video.gsub(/S8E1thumb\.webp/, '').gsub(/([a-z])([A-Z])/, '\1 \2').titleize
+    %>
+      <div class="flex items-center justify-center transition-transform hover:scale-105 duration-200 relative hover:z-30 w-full h-full">
+        <%= image_tag("hermit_plus/#{video}", alt: "#{hermit_name} Season 8 Episode 1", class: "w-full h-full object-cover rounded-[5px] border border-hermit-burnt bg-hermit-burnt") %>
+      </div>
+    <% end %>
+     <div class="flex items-center justify-center">
+        <!-- Placeholder or empty -->
+     </div>
+  </div>
+</div>

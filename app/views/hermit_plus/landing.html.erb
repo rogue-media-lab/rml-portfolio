@@ -1,50 +1,284 @@
-<!-- //! images to s3 bucket -->
-<section class="w-full bg-slate-50">
-  <div class="flex flex-col justify-center items-center bg-hermit-lt-blue">
-    <div class="bg-[url('https://www.hermitplus.com/static/media/minecraft_full_bg.0e9ff1403ea12532acc2.jpg')] bg-top img-half-size md:bg-cover bg-no-repeat w-full h-[500px] md:h-[700px] relative">
-      <div class="w-full h-full z-10 bg-linear-to-b from-transparent to-hermit-lt-blue"></div>
-      <div class="flex flex-col items-center justify-between top-32 w-full absolute z-20">
-          <%= image_tag("https://www.hermitplus.com/static/media/HermitPlusBend.15a55a5b943048dca8b3.png", alt: "Hermit Logo") %>
+<!-- Hero Section -->
+<%# IMPORTANT: Logo positioning uses mt-[4vh] md:mt-[3vh] lg:mt-[8vh] to sit above character head %>
+<%# These values are carefully tuned for the background image - DO NOT remove %>
+<section class="w-full relative h-[720px] lg:h-[115vh] bg-hermit-lt-blue">
+  <div class="absolute inset-0 w-full h-full bg-top bg-cover bg-no-repeat" style="background-image: url('https://milk-blog.s3.us-east-2.amazonaws.com/hermits/minecraft_full_bg.jpg');">
+    <div class="w-full h-full absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-hermit-lt-blue"></div>
+  </div>
+
+  <div class="relative z-10 flex flex-col items-center justify-start pt-20 h-full">
+    <%= image_tag("https://milk-blog.s3.us-east-2.amazonaws.com/hermits/HermitPlusBend.png", alt: "Hermit Plus Logo - Season 8 Hermitcraft Hub", class: "w-[318px] md:w-[465px] lg:w-[502px] xl:w-full max-w-[702px] mt-[4vh] md:mt-[3vh] lg:mt-[8vh]") %>
+
+    <a href="#waitlist" class="bg-hermit-red hover:bg-hermit-red/90 text-white font-bold py-4 px-12 rounded-lg uppercase tracking-wider font-teko text-2xl md:text-3xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 mt-8">
+      Join the Waitlist
+    </a>
+  </div>
+</section>
+
+<!-- Video Grid Section -->
+<%# IMPORTANT: This grid intentionally overlaps the hero using negative margins (mt-[-50vh]) %>
+<%# DO NOT replace with transform: translateY() - it will create layout gaps %>
+<%# Negative margins are the correct CSS technique for intentional overlapping layouts %>
+<section class="w-full bg-hermit-lt-blue flex flex-col items-center justify-center relative z-20">
+  <%= render 'hero_video_grid', videos: @hero_videos %>
+</section>
+
+<!-- Info Section -->
+<section class="w-full bg-hermit-lt-blue pt-2 flex flex-col items-center relative z-20">
+  <div class="w-full max-w-[900px] px-4 text-center">
+    <h1 class="font-teko text-stroke text-[46px] leading-[46px] md:text-[70px] md:leading-[70px] text-hermit-yellow font-bold my-4 uppercase tracking-wider">Hermitcraft fans Rejoice!</h1>
+    <p class="font-teko text-stroke text-[28px] leading-[28px] md:text-[40px] md:leading-[40px] text-white mb-6 px-2 uppercase tracking-wide">
+      Get info and stats on your favorite hermits
+    </p>
+  </div>
+
+  <div class="w-full max-w-[1440px] px-4 flex flex-col md:flex-row flex-wrap lg:flex-nowrap items-center justify-center gap-8 mb-8">
+      <div class="flex flex-col gap-8 md:hidden">
+         <%= image_tag("https://milk-blog.s3.us-east-2.amazonaws.com/hermits/mumboCard.png", alt: "Mumbo Jumbo character card", class: "w-[275px] max-w-[300px]") %>
+         <%= image_tag("https://milk-blog.s3.us-east-2.amazonaws.com/hermits/GeminiTayCard.png", alt: "GeminiTay character card", class: "w-[275px] max-w-[300px]") %>
+      </div>
+
+      <div class="hidden md:flex flex-wrap lg:flex-nowrap justify-center gap-8">
+         <%= image_tag("https://milk-blog.s3.us-east-2.amazonaws.com/hermits/mumboCard.png", alt: "Mumbo Jumbo character card", class: "max-w-[300px] mt-20 hover:-translate-y-2 transition-transform duration-300 rounded-lg") %>
+         <%= image_tag("https://milk-blog.s3.us-east-2.amazonaws.com/hermits/GeminiTayCard.png", alt: "GeminiTay character card", class: "max-w-[300px] mt-20 lg:mt-0 lg:mb-20 hover:-translate-y-2 transition-transform duration-300 rounded-lg") %>
+         <%= image_tag("https://milk-blog.s3.us-east-2.amazonaws.com/hermits/pearlCard.png", alt: "PearlescentMoon character card", class: "hidden lg:block max-w-[300px] mt-20 hover:-translate-y-2 transition-transform duration-300 rounded-lg") %>
+         <%= image_tag("https://milk-blog.s3.us-east-2.amazonaws.com/hermits/bdubsCard.png", alt: "BdoubleO100 character card", class: "hidden xl:block max-w-[300px] mb-20 hover:-translate-y-2 transition-transform duration-300 rounded-lg") %>
+      </div>
+  </div>
+</section>
+
+<!-- Hermits Character Section -->
+<section class="w-full pt-8 overflow-hidden relative min-h-[1000px] md:min-h-[1200px] bg-gradient-to-b from-hermit-lt-blue to-white">
+  <div class="flex flex-col items-center relative w-full h-full">
+    
+    <div class="relative w-full max-w-[1440px] h-[1200px] mx-auto">
+      
+      <!-- Info Box -->
+      <div class="absolute z-[30] bg-white text-hermit-burnt p-6 rounded-[10px] w-[300px] md:w-[400px] lg:w-[446px] md:top-[8%] lg:top-[15%] left-[50%] -translate-x-1/2 md:left-[24%] lg:left-[30%] xl:left-[38%] md:translate-x-0 shadow-2xl opacity-95">
+        <p class="leading-relaxed tracking-wide text-sm md:text-base text-center md:text-left">No more distracting video's. Meet hermits you may not have known before. Watch the story unfold from various points of view. Easily track your favorites through the season. Hermits now have the option to provide HD or feature length, one of a kind content. Hermit Plus offers a world of new possibilities.</p>
+      </div>
+
+      <!-- Xisuma (Massive Back Left) -->
+      <%= image_tag("https://milk-blog.s3.us-east-2.amazonaws.com/hermits/Xoloti_minecraft_skin.png", alt: "Xisuma Minecraft character skin", class: "hidden lg:block absolute z-[1] w-auto md:w-[500px] lg:w-[600px] top-[-2%] xl:left-[-5%] lg:left-[-10%]") %>
+
+      <!-- Mumbo (Large Back Left-Center) -->
+      <%= image_tag("https://milk-blog.s3.us-east-2.amazonaws.com/hermits/mumbo_skin.png", alt: "Mumbo Jumbo Minecraft character skin", class: "absolute z-[2] w-[200px] md:w-[350px] top-[25%] lg:top-[32%] xl:top-[30%] left-[2%] lg:left-[20%]") %>
+
+      <!-- Etho (Back Right) -->
+      <%= image_tag("https://milk-blog.s3.us-east-2.amazonaws.com/hermits/etho_minecraft_skin.png", alt: "Etho Minecraft character skin", class: "hidden lg:block absolute z-[4] w-[250px] top-[20%] lg:left-[75%] xl:left-[83%]") %>
+
+      <!-- Bdubs (Mid Left - Reduced) -->
+      <%= image_tag("https://milk-blog.s3.us-east-2.amazonaws.com/hermits/bdouble_minecraft_skin.png", alt: "BdoubleO100 Minecraft character skin", class: "hidden lg:block absolute z-[5] w-[150px] md:w-[150px] top-[40%] lg:left-[45%] xl:left-[47%]") %>
+
+      <!-- Keralis (Mid Right - Reduced) -->
+      <%= image_tag("https://milk-blog.s3.us-east-2.amazonaws.com/hermits/keralis_minecraft_skin.png", alt: "Keralis Minecraft character skin", class: "hidden lg:block absolute z-[40] w-[150px] md:w-[180px] top-[30%] lg:left-[65%] xl:left-[75%]") %>
+
+      <!-- Beef (Mid Right Below Keralis) -->
+      <%= image_tag("https://milk-blog.s3.us-east-2.amazonaws.com/hermits/vintage_minecraft_skin.png", alt: "VintageBeef Minecraft character skin", class: "hidden lg:block absolute z-[45] w-[300px] top-[40%] left-[65%]") %>
+
+      <!-- Grian (Front Left) -->
+      <%= image_tag("https://milk-blog.s3.us-east-2.amazonaws.com/hermits/Grian_Minecraft_Skin.png", alt: "Grian Minecraft character skin", class: "hidden lg:block absolute z-[10] w-[125px] md:w-[160px] top-[35%] left-[15%] md:left-[10%]") %>
+
+      <!-- Scar (Front Center) -->
+      <%= image_tag("https://milk-blog.s3.us-east-2.amazonaws.com/hermits/scar_minecraft_skin.png", alt: "GoodTimesWithScar Minecraft character skin", class: "absolute z-[20] w-[250px] md:w-[300px] top-[35%] md:top-[45%] left-[18%] md:left-[22%] lg:left-[18%]") %>
+
+      <!-- Iskall (Front Right) -->
+      <%= image_tag("https://milk-blog.s3.us-east-2.amazonaws.com/hermits/iskal_minecraft_skin.png", alt: "Iskall85 Minecraft character skin", class: "absolute z-[50] w-[200px] md:w-[350px] lg:w-[220px] top-[28%] lg:top-[50%] left-[50%] md:left-[50%] lg:left-[80%]") %>
+      
+    </div>
+  </div>
+</section>
+
+<!-- Info Two Section -->
+<%# IMPORTANT: Negative margins here create intentional overlap with character section %>
+<%# This is part of the designed visual flow - DO NOT remove %>
+<section class="w-full bg-white pb-20 flex flex-col items-center">
+  <div class="mt-[-250px] md:mt-[-200px] text-center relative z-30">
+    <h1 class="font-teko text-stroke text-[60px] leading-[60px] md:text-[80px] md:leading-[80px] font-bold text-white uppercase tracking-wider">
+      Think <span class="text-hermit-red">Netflix</span> for Hermits
+    </h1>
+    <p class="font-teko text-stroke text-[44px] leading-[44px] md:text-[58px] md:leading-[58px] text-white mt-4 mb-8 uppercase">
+      Enjoy the hermits like you never have before!
+    </p>
+  </div>
+</section>
+
+<!-- Features Section -->
+<section class="w-full bg-white py-20">
+  <div class="w-full max-w-[1200px] mx-auto px-4">
+    <h2 class="text-center font-teko text-4xl md:text-5xl font-bold text-hermit-burnt mb-4 uppercase tracking-wide">What Makes Hermit Plus Special</h2>
+    <p class="text-center text-hermit-burnt/70 font-mPlusCode mb-12 max-w-[700px] mx-auto">
+      All the hermits gathered in one place. Watch every episode, every hermit. Follow them easily and create your own collection of favorites.
+    </p>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <!-- Feature Card 1 -->
+      <div class="bg-white border-2 border-hermit-burnt/10 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+        <div class="w-12 h-12 bg-hermit-lt-blue rounded-lg mb-4 flex items-center justify-center">
+          <svg class="w-6 h-6 text-hermit-burnt" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+          </svg>
+        </div>
+        <h3 class="font-teko text-2xl font-bold text-hermit-burnt mb-2 uppercase">Netflix-Style Browsing</h3>
+        <p class="text-hermit-burnt/70 font-mPlusCode text-sm">
+          Browse and discover hermits like never before. Organized seasons, episodes, and hermits all in one beautiful interface.
+        </p>
+      </div>
+
+      <!-- Feature Card 2 -->
+      <div class="bg-white border-2 border-hermit-burnt/10 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+        <div class="w-12 h-12 bg-hermit-lt-blue rounded-lg mb-4 flex items-center justify-center">
+          <svg class="w-6 h-6 text-hermit-burnt" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+          </svg>
+        </div>
+        <h3 class="font-teko text-2xl font-bold text-hermit-burnt mb-2 uppercase">Track Your Favorites</h3>
+        <p class="text-hermit-burnt/70 font-mPlusCode text-sm">
+          Easily follow your favorite hermits through the season. Create custom collections and never miss an episode.
+        </p>
+      </div>
+
+      <!-- Feature Card 3 -->
+      <div class="bg-white border-2 border-hermit-burnt/10 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+        <div class="w-12 h-12 bg-hermit-lt-blue rounded-lg mb-4 flex items-center justify-center">
+          <svg class="w-6 h-6 text-hermit-burnt" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+          </svg>
+        </div>
+        <h3 class="font-teko text-2xl font-bold text-hermit-burnt mb-2 uppercase">Multiple Perspectives</h3>
+        <p class="text-hermit-burnt/70 font-mPlusCode text-sm">
+          Watch the story unfold from various points of view. See how different hermits experience the same events.
+        </p>
+      </div>
+
+      <!-- Feature Card 4 -->
+      <div class="bg-white border-2 border-hermit-burnt/10 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+        <div class="w-12 h-12 bg-hermit-lt-blue rounded-lg mb-4 flex items-center justify-center">
+          <svg class="w-6 h-6 text-hermit-burnt" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <h3 class="font-teko text-2xl font-bold text-hermit-burnt mb-2 uppercase">No Distractions</h3>
+        <p class="text-hermit-burnt/70 font-mPlusCode text-sm">
+          Focus on the hermits you love without YouTube's distracting recommendations pulling you away from Hermitcraft.
+        </p>
+      </div>
+
+      <!-- Feature Card 5 -->
+      <div class="bg-white border-2 border-hermit-burnt/10 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+        <div class="w-12 h-12 bg-hermit-lt-blue rounded-lg mb-4 flex items-center justify-center">
+          <svg class="w-6 h-6 text-hermit-burnt" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
+          </svg>
+        </div>
+        <h3 class="font-teko text-2xl font-bold text-hermit-burnt mb-2 uppercase">HD & Feature Content</h3>
+        <p class="text-hermit-burnt/70 font-mPlusCode text-sm">
+          Hermits have the option to provide HD quality or feature-length, one-of-a-kind content exclusive to Hermit Plus.
+        </p>
+      </div>
+
+      <!-- Feature Card 6 -->
+      <div class="bg-white border-2 border-hermit-burnt/10 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+        <div class="w-12 h-12 bg-hermit-lt-blue rounded-lg mb-4 flex items-center justify-center">
+          <svg class="w-6 h-6 text-hermit-burnt" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+        </div>
+        <h3 class="font-teko text-2xl font-bold text-hermit-burnt mb-2 uppercase">Discover New Hermits</h3>
+        <p class="text-hermit-burnt/70 font-mPlusCode text-sm">
+          Meet hermits you may not have known before. Explore the full roster and find your new favorite content creator.
+        </p>
       </div>
     </div>
   </div>
-  <div class="flex items-center justify-center w-full bg-hermit-lt-blue p-1">
-    <!-- Cards to partial -->
-    <div class="z-20 w-full lg:max-w-5xl h-full grid gap-0.5 grid-cols-6 grid-rows-12 mt-[-50vh] overflow-hidden xl:mt-[-15%] lg:grid-rows-[repeat(12,63px)] md:grid-rows-[repeat(12,49px)] sm:grid-rows-[repeat(12,36px)] max-sm:hidden video-grid">
-      <% 25.times do |i| %>
-        <div>
-          <%= link_to root_path do %>
-            <img class="max-w-[218px] rounded-lg border border-burnt
-                        lg:max-w-[206px]
-                        md:max-w-[148px]
-                        sm:max-w-[106px]" src="https://www.hermitplus.com/static/media/bDouble0S8E1thumb.49a814d250dfe43325da.webp" alt="Video Thumbnail" />
+</section>
+
+<!-- Bottom Video Grid Section
+<section class="flex flex-col items-center justify-center w-full bg-white">
+  <%#= render 'bottom_video_grid', videos: @bottom_videos %>
+</section> -->
+
+<!-- Join the Waitlist Section -->
+<section id="waitlist" class="w-full bg-white pt-20 pb-0 flex flex-col items-center relative scroll-mt-20">
+  <div class="w-full max-w-7xl mx-auto px-4">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-0">
+
+      <!-- Left Column - Join the Waitlist Info -->
+      <div class="bg-hermit-lt-blue/50 flex flex-col">
+        <div class="p-8 lg:p-12 flex-grow">
+          <h2 class="text-4xl lg:text-5xl font-bold text-hermit-burnt mb-8 font-teko tracking-wide">Join the Waitlist</h2>
+
+          <div class="space-y-6 text-hermit-burnt font-mPlusCode">
+            <p class="text-base lg:text-lg leading-relaxed">
+              Here you will find Season 8, which is one of my favorites. In this season the hermits break into groups and the fun is non stop. The builds are amazing. How can you not love this season?! Bdubs builds a moon base and Mumbo gets a theme song.
+            </p>
+
+            <p class="text-base lg:text-lg leading-relaxed">
+              The full version is in development! If you would like early access, join the waitlist!
+            </p>
+
+            <div class="pt-4">
+              <p class="text-base lg:text-lg leading-relaxed">
+                If you prefer, I can be reached at
+              </p>
+              <p class="text-base lg:text-lg font-semibold">
+                rogue.media.lab@gmail.com
+              </p>
+              <p class="text-base lg:text-lg leading-relaxed mt-2">
+                Typical reply within 24 hours.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Minecraft Ground Pattern - Colorful -->
+        <%= image_tag 'https://milk-blog.s3.us-east-2.amazonaws.com/hermits/ground_color.svg', class: "w-full h-auto block mt-auto" %>
+      </div>
+
+      <!-- Right Column - Contact Form -->
+      <div class="bg-white border border-gray-300 flex flex-col">
+        <div class="p-8 lg:p-12 flex-grow" id="hermit_contact_form">
+          <%= form_with(model: Contact.new, url: contacts_path, class: "w-full space-y-6",
+                        data: { controller: "hermit-contact", hermit_contact_target: "form", action: "submit->hermit-contact#submit" }) do |form| %>
+            <div>
+              <%= form.label :f_name, "Name", class: "block text-hermit-burnt font-mPlusCode mb-2 text-sm lg:text-base font-semibold" %>
+              <%= form.text_field :f_name, required: true, class: "w-full p-3 border border-hermit-burnt rounded-md bg-white text-hermit-burnt placeholder-hermit-burnt/50 font-mPlusCode focus:outline-none focus:ring-2 focus:ring-hermit-teal" %>
+            </div>
+
+            <div>
+              <%= form.label :email, "E Mail", class: "block text-hermit-burnt font-mPlusCode mb-2 text-sm lg:text-base font-semibold" %>
+              <%= form.email_field :email, required: true, class: "w-full p-3 border border-hermit-burnt rounded-md bg-white text-hermit-burnt placeholder-hermit-burnt/50 font-mPlusCode focus:outline-none focus:ring-2 focus:ring-hermit-teal" %>
+            </div>
+
+            <div class="space-y-3">
+              <div class="flex items-center">
+                <%= check_box_tag 'subscribe_substack', 'yes', false, class: "w-4 h-4 text-hermit-teal focus:ring-hermit-teal border-hermit-burnt rounded mr-3" %>
+                <%= label_tag 'subscribe_substack', "Subscribe to the Substack", class: "text-hermit-burnt font-mPlusCode text-sm lg:text-base" %>
+              </div>
+
+              <div class="flex items-center">
+                <%= check_box_tag 'early_access', 'yes', false, class: "w-4 h-4 text-hermit-teal focus:ring-hermit-teal border-hermit-burnt rounded mr-3" %>
+                <%= label_tag 'early_access', "I would like early access to Hermit Plus", class: "text-hermit-burnt font-mPlusCode text-sm lg:text-base" %>
+              </div>
+            </div>
+
+            <div>
+              <%= form.label :description, "Message", class: "block text-hermit-burnt font-mPlusCode mb-2 text-sm lg:text-base font-semibold" %>
+              <%= form.text_area :description, rows: 6, class: "w-full p-3 border border-hermit-burnt rounded-md bg-white text-hermit-burnt placeholder-hermit-burnt/50 font-mPlusCode focus:outline-none focus:ring-2 focus:ring-hermit-teal resize-none" %>
+            </div>
+
+            <div class="flex justify-end">
+              <%= form.submit "Submit", data: { hermit_contact_target: "submit" }, class: "bg-hermit-teal text-white font-bold py-3 px-10 rounded-md uppercase tracking-wider font-mPlusCode hover:bg-hermit-teal/90 transition-colors shadow-md cursor-pointer" %>
+            </div>
           <% end %>
         </div>
-      <% end %>
+
+        <!-- Minecraft Ground Pattern - Grey -->
+        <%= image_tag 'https://milk-blog.s3.us-east-2.amazonaws.com/hermits/ground_grey.svg', class: "w-full h-auto block mt-auto" %>
+      </div>
+
     </div>
   </div>
 
-</section>
-<section class="flex flex-col justify-center items-center bg-hermit-lt-blue w-full">
-    <h2 class="text-[32px] md:text-[46px] lg:text-[64px] font-bold font-kanit text-hermit-yellow drop-shadow-dark">Hermitcraft fans REJOICE!</h2>
-    <p class="md:text-2xl font-mPlusCode font-semibold text-hermit-burnt py-4">Get info and stats on your favorite hermits</p>
-  <div class="flex justify-center bg-hermit-lt-blue py-6">
-    <div class="flex flex-wrap justify-evenly lg:max-w-5xl gap-2 w-full">
-    <%= image_tag("https://milk-blog.s3.us-east-2.amazonaws.com/hermits/gemini-card.jpg", alt: "Gemini Card", class: "w-[210px] h-[315px] rounded-sm shadow-md shadow-hermit-smoke") %>
-    <%= image_tag("https://milk-blog.s3.us-east-2.amazonaws.com/hermits/pearl-card.jpg", alt: "Pearl Card", class: "w-[210px] h-[315px] rounded-sm shadow-md shadow-hermit-smoke mt-8") %>
-    <%= image_tag("https://milk-blog.s3.us-east-2.amazonaws.com/hermits/mumbo-card.jpg", alt: "Mumbo Card", class: "hidden md:block md:w-[210px] h-[315px] rounded-sm shadow-md shadow-hermit-smoke mt-8 md:mt-0") %>
-    <%= image_tag("https://milk-blog.s3.us-east-2.amazonaws.com/hermits/bdubs-card.jpg", alt: "B Dubs Card", class: "hidden lg:block lg:w-[210px] h-[315px] rounded-sm shadow-md shadow-hermit-smoke mt-8") %>
-    </div>
-  </div>
-</section>
-<section class="flex justify-center bg-hermit-lt-blue w-screen">
-  <div class="flex justify-center items-center w-full lg:max-w-5xl">
-    <!-- Character Images -->
-    <%= image_tag("hermits/mumbo_skin.png", alt: "Mumbo Skin", class: "hidden md:block md:w-52") %>
-    <!-- Landing Hermit Info -->
-      <p class="w-[446px] p-2 text-sm text-hermit-burnt bg-gray-50 rounded-lg">
-        Introducing Hermit Plus. A web app that shows all the hermits just the way you want to see them. All your Hermits gathered in one place, presented in a tastefully pleasing format, with all the information you want to know about them. This is the experience you didn’t know you wanted.
-      </p>
-      <%= image_tag("hermits/iskal_minecraft_skin.png", alt: "Iskal Skin", class: "hidden md:block md:w-52") %>
-  </div>
 </section>

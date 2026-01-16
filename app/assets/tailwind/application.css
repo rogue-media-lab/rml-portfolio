@@ -33,9 +33,23 @@
   --color-swabbie-st-secondary: #FFB389;
   --color-swabbie-st-drk-secondary: #FF9256;
   --color-st-logo: url('st-logo.svg');
+
+  --font-teko: "Teko", sans-serif;
 }
 
 @variant dark (.dark &);
+
+.text-stroke {
+  text-shadow: 
+    -2px -2px 0 #000,  
+     2px -2px 0 #000,
+    -2px  2px 0 #000,
+     2px  2px 0 #000,
+    -2px  0px 0 #000,
+     2px  0px 0 #000,
+     0px -2px 0 #000,
+     0px  2px 0 #000;
+}
 
 /*
 
@@ -393,7 +407,7 @@ button {
   grid-row: 9/11;
 }
 
-.video-grid > div:nth-of-.video-grid > div:nth-of-type(22) {
+.video-grid > div:nth-of-type(22) {
   grid-column: 4/5;
   grid-row: 10/12;
 }
@@ -411,5 +425,5 @@ button {
 
 .video-grid > div:nth-of-type(25) {
   grid-column: 2/3;
-  grid-row: 10/13;
+  grid-row: 10/12;
 }
