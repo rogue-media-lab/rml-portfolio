@@ -59,8 +59,12 @@ self.addEventListener('fetch', (event) => {
   // Skip non-GET requests
   if (event.request.method !== 'GET') return;
 
-  // Skip audio files (always fetch from network/S3)
-  if (event.request.url.includes('.mp3') || event.request.url.includes('.wav')) {
+  // Skip audio files and Range requests (CRITICAL for iOS/Safari streaming)
+  // Safari sends Range headers for media, and Service Workers often mishandle them.
+  // Letting the browser handle these directly ensures proper streaming.
+  if (event.request.url.includes('.mp3') || 
+      event.request.url.includes('.wav') ||
+      event.request.headers.has('range')) {
     return;
   }
 

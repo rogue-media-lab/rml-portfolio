@@ -605,7 +605,7 @@ export default class extends Controller {
    * @returns {Promise<number[]>} A promise that resolves with an array of normalized peak values.
    */
   async extractPeaks(waveformUrl) {
-    if (!waveformUrl) return [];
+    if (!waveformUrl || typeof waveformUrl !== 'string') return [];
 
     if (waveformUrl.endsWith('.json')) {
       console.log("Waveform URL is JSON, fetching directly.");
