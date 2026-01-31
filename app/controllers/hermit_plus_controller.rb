@@ -1,4 +1,6 @@
 class HermitPlusController < ApplicationController
+
+  before_action :set_meta_data
   # Landing Page
   def landing
     # Video thumbnails for Season 8 Episode 1
@@ -19,5 +21,27 @@ class HermitPlusController < ApplicationController
 
     @hero_videos = video_filenames.map { |filename| { url: "#{s3_base_url}/#{filename}", filename: filename } }
     @bottom_videos = @hero_videos.first(9)
+  end
+
+  private
+
+    # app/controllers/application_controller.rb
+  def set_meta_data
+    set_meta_tags site: "https://www.roguemedialab.com/hermit-plus",
+                  title: "Hermit Plus | Mason Roberts",
+                  reverse: true,
+                  separator: "|",
+                  description: "Hermit Plus is a fan site dedicated to the Hermitcraft Minecraft server and its content creators. Explore episode guides, video thumbnails, and more from Season 8 of Hermitcraft.",
+                  keywords: "Hermits, Hermitcraft, Minecraft, Hermit Plus, Mason Roberts, Minecraft Server, Minecraft Episodes, Hermitcraft Season 8, Minecraft Content Creators",
+                  canonical: request.original_url,
+                  noindex: !Rails.env.production?,
+                  og: {
+                    title: :title,
+                    type: "website",
+                    url: request.original_url,
+                    image: "https://milk-blog.s3.us-east-2.amazonaws.com/hermits/hpscreenshot.png",
+                    image_alt: "Hermit Plus Landing Page",
+                    site_name: "Hermit Plus"
+                  }
   end
 end

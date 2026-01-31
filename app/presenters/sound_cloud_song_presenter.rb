@@ -50,8 +50,42 @@ class SoundCloudSongPresenter
   #
   # @return [String, nil] The final HLS stream URL.
   def stream_url
+    if @track["is_direct_stream"]
+      @track["stream_url"]
+    elsif @track.dig("media", "transcodings")
+      fetch_v2_stream_url
+    elsif @track["stream_url"]
+      fetch_v1_stream_url
+    else
+      nil
+    end
+  end
+
+  def fetch_v1_stream_url
+    token = SoundCloudService.access_token
+    return nil unless token
+
+    uri = URI(@track["stream_url"])
+    request = Net::HTTP::Get.new(uri)
+    request["Authorization"] = "OAuth #{token}"
+
+    response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) do |http|
+      http.request(request)
+    end
+
+    if response.code == "302"
+      response["location"]
+    else
+      Rails.logger.error "SoundCloud V1 Stream Error: #{response.code}"
+      nil
+    end
+  rescue URI::InvalidURIError => e
+    Rails.logger.error "SoundCloud V1 Stream Parse Error: #{e.message}"
+    nil
+  end
+
+  def fetch_v2_stream_url
     # Step 1: Find the initial API endpoint URL from the track data.
-    return nil unless @track.dig("media", "transcodings")
     hls_streams = @track["media"]["transcodings"].select { |t| t.dig("format", "protocol") == "hls" }
     return nil if hls_streams.empty?
     stream_info = hls_streams.find { |s| s.dig("format", "mime_type")&.include?("aac") } || hls_streams.first

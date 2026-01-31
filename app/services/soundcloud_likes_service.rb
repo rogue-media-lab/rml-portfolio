@@ -4,9 +4,9 @@ require "net/http"
 require "uri"
 require "json"
 
-# Fetches a user's liked tracks from SoundCloud.
+# Fetches a user's liked tracks from SoundCloud using V1 API.
 class SoundcloudLikesService
-  BASE_URL = "https://api-v2.soundcloud.com"
+  BASE_URL = "https://api.soundcloud.com"
   PROFILE_URL = "https://soundcloud.com/mason-roberts-939574766"
 
   def self.fetch_likes
@@ -14,22 +14,29 @@ class SoundcloudLikesService
   end
 
   def fetch_likes
-    return [] unless client_id
+    token = SoundCloudService.access_token
+    return [] unless token
 
-    user_id = get_user_id
+    user_id = get_user_id(token)
     return [] unless user_id
 
-    uri = URI("#{BASE_URL}/users/#{user_id}/likes")
+    uri = URI("#{BASE_URL}/users/#{user_id}/favorites")
     params = {
-      client_id:,
-      limit: 50 # Let's get a decent number of likes
+      limit: 50
     }
     uri.query = URI.encode_www_form(params)
 
-    response = Net::HTTP.get_response(uri)
+    request = Net::HTTP::Get.new(uri)
+    request["Authorization"] = "OAuth #{token}"
+
+    response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) do |http|
+      http.request(request)
+    end
 
     if response.is_a?(Net::HTTPSuccess)
-      JSON.parse(response.body)["collection"]
+      tracks = JSON.parse(response.body)
+      # Wrap tracks to match V2 structure expected by controller: { "track" => track_data }
+      tracks.map { |track| { "track" => track } }
     else
       Rails.logger.error "SoundCloud Likes API Error: #{response.code} #{response.message}"
       []
@@ -41,25 +48,38 @@ class SoundcloudLikesService
 
   private
 
-  def client_id
-    @client_id ||= (ENV["SOUNDCLOUD_CLIENT_ID"] || Rails.application.credentials.dig(:soundcloud, :client_id)).tap do |id|
-      Rails.logger.error "SoundCloud client_id is not configured in ENV or credentials." if id.nil?
+  def get_user_id(token)
+    # Try the /me endpoint first since we have a user token
+    uri = URI("#{BASE_URL}/me")
+    request = Net::HTTP::Get.new(uri)
+    request["Authorization"] = "OAuth #{token}"
+
+    response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) do |http|
+      http.request(request)
     end
-  end
 
-  def get_user_id
-    return nil unless client_id
+    if response.is_a?(Net::HTTPSuccess)
+      return JSON.parse(response.body)["id"]
+    end
 
+    # Fallback to resolve if /me fails
     uri = URI("#{BASE_URL}/resolve")
     params = {
-      url: PROFILE_URL,
-      client_id:
+      url: PROFILE_URL
     }
     uri.query = URI.encode_www_form(params)
 
-    response = Net::HTTP.get_response(uri)
+    request = Net::HTTP::Get.new(uri)
+    request["Authorization"] = "OAuth #{token}"
 
-    if response.is_a?(Net::HTTPSuccess)
+    response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) do |http|
+      http.request(request)
+    end
+
+    if response.code == "302"
+      # Location: https://api.soundcloud.com/users/soundcloud:users:579656895
+      response["location"].split(":").last
+    elsif response.is_a?(Net::HTTPSuccess)
       JSON.parse(response.body)["id"]
     else
       Rails.logger.error "SoundCloud Resolve API Error: #{response.code} #{response.message}"
