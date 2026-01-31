@@ -29,24 +29,28 @@ He does not write code line-by-line in a vacuum. He acts as an **AI Architect**.
 
 ### A. RML Portfolio (Rogue Media Lab portfolio includes several sub-projects to showcase larger projects in progress)
 *Status: Active Development*
+**URL:** www.roguemedialab.com
 Showcases the lab potential. It includes the shiny parts (sub-projects) of several concepts currently in development. Each designed to feel like separate projects without ever leaving the portfolio. Each showing off functionality and design specific to the project.
 
 #### A1. Zuke (The visual player behind Soundscape, is part of the portfolio)
 *Status: Active Development*
+**URL:** www.roguemedialab.com/zuke
 A visual-first music player application tailored for PWA (Progressive Web App) usage.
-- **Key Tech:** WaveSurfer.js for audio visualization.
-- **Features:** Custom EQ, integrations with the public SoundCloud API.
+- **Key Tech:** WaveSurfer.js for audio visualization, HLS for streaming audio.
+- **Features:** Custom EQ, integrations with the public SoundCloud API, Custom events calling, AutoPlay, Three stage repeat, Shoe banner videos, Playlists.
 - **Vibe:** 80s aesthetics meets modern streaming.
 
-#### A2. HermitPlus (Season 8 is part of the portfolio)
+#### A2. Hermit Plus (Season 8 is part of the portfolio)
 *Status: Active Development*
-A centralized content aggregation platform for YouTube creators (specifically the "Hermit" community).
+**URL:** www.roguemedialab.com/hermit-plus
+A centralized content aggregation platform for YouTube creators (specifically the "Hermit" community). Built for users to enjoy all of the hermits content in one place.
 - **Goal:** To provide a "Netflix-style" interface for YouTube channels.
 - **Features:** Integration with the YouTube API.
 - **Vibe:** Netflix for Hermits.
 
 #### A3. Salt and Tar (A part pulled from the Voyager project, as part of the portfolio)
 *Status: Active Development*
+**URL:** www.roguemedialab.com/salt-and-tar
 A redesign of the YouTube sailing channel Sat and Tar with added features and functionality. Part of the Voyager project that wraps several of these similar content provider channels that is easier to find content for a user, targeted advertisements, monetization features that providers use in one platform.
 - **Goal:** Redesign presents all current links and monetization sites in a single, easy to access location. Present a creative and unique design concept. Test features to be included in Voyager.
 - **Features:** Content storage in S3 for secure, protected content. Redesign of video to match archived, magic polaroid vibe. Book a day sail or night cruise functionality.
@@ -68,8 +72,8 @@ Rogue Media Lab is currently exploring:
 ---
 
 > **CONTACT / LINKS**
-> - **Rogue GitHub:** [https://github.com/rogue-media-lab]
-> - **Rogue Portfolio Wiki:** [https://github.com/rogue-media-lab/rml-portfolio/wiki]
-> - **Dev3027 GitHub:** [https://github.com/Developer3027]
-> - **Substack:** [https://masonroberts.substack.com/]
-> - **Portfolio:** [https://www.roguemedialab.com/]
+> - **Rogue GitHub:** https://github.com/rogue-media-lab
+> - **Rogue Portfolio Wiki:** https://github.com/rogue-media-lab/rml-portfolio/wiki
+> - **Dev3027 GitHub:** https://github.com/Developer3027
+> - **Substack:** https://masonroberts.substack.com/
+> - **Portfolio:** https://www.roguemedialab.com/

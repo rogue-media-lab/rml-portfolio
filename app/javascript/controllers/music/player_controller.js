@@ -1023,8 +1023,13 @@ export default class extends Controller {
         });
       };
 
-      // Conditional HLS loading for SoundCloud
-      if (song.audioSource === 'SoundCloud' && Hls.isSupported()) {
+      // Conditional HLS loading
+      // SoundCloud V2 uses HLS (.m3u8), but V1 (fallback) uses progressive MP3.
+      // We check for .m3u8 or if the audio source is explicitly SoundCloud AND the URL doesn't look like a standard file.
+      // However, the most reliable check for the V1 redirect is likely just checking if it's NOT an m3u8.
+      const isHls = Hls.isSupported() && (song.url.includes('.m3u8') || song.url.includes('hls'));
+
+      if (song.audioSource === 'SoundCloud' && isHls) {
         // The loading process for HLS tracks with pre-computed peaks is sensitive
         // to the order of operations to avoid race conditions between Wavesurfer and HLS.js.
         // The correct sequence is:
@@ -1070,12 +1075,12 @@ export default class extends Controller {
           this.waitForEqualizerThenPlay(attemptPlayback);
         });
       } else {
-        // Logic for local files with pre-computed waveforms
+        // Logic for local files AND non-HLS SoundCloud tracks
         if (song.waveformUrl) {
-          console.log("Local file with waveformUrl detected.");
+          console.log("File with waveformUrl detected (Local or SC MP3).");
           
-          // 1. Get raw peaks from our own JSON file
-          const rawPeaks = await this._fetchJsonPeaks(song.waveformUrl);
+          // 1. Get raw peaks - use extractPeaks to support both JSON (local) and PNG (SoundCloud)
+          const rawPeaks = await this.extractPeaks(song.waveformUrl);
 
           // 2. Resample peaks to match the density defined by minPxPerSec
           let peaks = rawPeaks;
@@ -1086,7 +1091,7 @@ export default class extends Controller {
             const totalWidth = song.duration * minPxPerSec;
             const numBars = Math.floor(totalWidth / (barWidth + barGap));
             
-            console.log(`Resampling peaks for local file: original ${rawPeaks.length}, target bars ${numBars} for duration ${song.duration}s`);
+            console.log(`Resampling peaks: original ${rawPeaks.length}, target bars ${numBars} for duration ${song.duration}s`);
             peaks = this._resamplePeaks(rawPeaks, numBars);
           } else {
             console.warn("Song duration is 0 or missing, using raw peaks without resampling.");
@@ -1099,8 +1104,8 @@ export default class extends Controller {
           this.wavesurfer.load(song.url, peaks, song.duration || undefined);
 
         } else {
-          // Fallback for local files without a waveform (e.g., old files)
-          console.log("Local file without waveformUrl, loading directly.");
+          // Fallback for files without a waveform
+          console.log("File without waveformUrl, loading directly.");
           setupReadyListener();
           this.wavesurfer.load(song.url);
         }

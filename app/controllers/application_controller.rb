@@ -21,12 +21,12 @@ class ApplicationController < ActionController::Base
 
   # app/controllers/application_controller.rb
   def set_meta_data
-    set_meta_tags site: "https://roguemedialab-137f8a45d7c0.herokuapp.com/",
+    set_meta_tags site: "https://www.roguemedialab.com",
                   title: "Rogue Media Lab | Mason Roberts",
                   reverse: true,
                   separator: "|",
-                  description: "Developing the web with Ruby on Rails. Mason Roberts has built a corner of the internet to showcase what he can do as a designer and developer as well as be both a client hub and learning center.",
-                  keywords: "Ruby, Rails, RoR, Ruby on Rails, Node, React, Vue, JavaScript, HTML, CSS, Express, PG, PostgreSQL, MongoDB, Mongoose, MERN, MEAN, MERN Stack, Full Stack, Web Development, Web Design, Web Designer, Web Developer, Mason Roberts, Developer 3027",
+                  description: "Developing the web with Ruby on Rails. Mason Roberts has built a corner of the internet to showcase what he can do as a designer and developer. This site serves as both a client hub and learning center.",
+                  keywords: "Ruby, Rails, RoR, Ruby on Rails, Node, React, Vue, JavaScript, HTML, CSS, Express, PG, PostgreSQL, MongoDB, Mongoose, MERN, MEAN, MERN Stack, Full Stack, Web Development, Web Design, Web Designer, Web Developer, Mason Roberts",
                   canonical: request.original_url,
                   noindex: !Rails.env.production?,
                   og: {
@@ -34,8 +34,8 @@ class ApplicationController < ActionController::Base
                     type: "website",
                     url: request.original_url,
                     image: "https://milk-blog.s3.us-east-2.amazonaws.com/og-image.png",
-                    image_alt: "Mason Roberts platform",
-                    site_name: "https://roguemedialab-137f8a45d7c0.herokuapp.com/"
+                    image_alt: "The Rogue Media Lab",
+                    site_name: "https://www.roguemedialab.com"
                   }
   end
 end
