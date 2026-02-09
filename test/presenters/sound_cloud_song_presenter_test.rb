@@ -28,20 +28,22 @@ class SoundCloudSongPresenterTest < ActiveSupport::TestCase
     # Since stream_url is private and called by to_song_hash, we can stub Net::HTTP
 
     mock_response = Minitest::Mock.new
-    mock_response.expect :is_a?, true, [ Net::HTTPSuccess ]
+    mock_response.expect :is_a?, true, [Net::HTTPSuccess]
     mock_response.expect :body, '{"url": "https://final.stream.url/playlist.m3u8"}'
 
-    Net::HTTP.stub :get_response, mock_response do
-      presenter = SoundCloudSongPresenter.new(@track_data)
-      hash = presenter.to_song_hash
+    SoundCloudService.stub :access_token, "fake_token" do
+      Net::HTTP.stub :get_response, mock_response do
+        presenter = SoundCloudSongPresenter.new(@track_data)
+        hash = presenter.to_song_hash
 
-      assert_equal "soundcloud-12345", hash[:id]
-      assert_equal "SoundCloud Track", hash[:title]
-      assert_equal "ArtistUser", hash[:artist]
-      assert_equal "https://final.stream.url/playlist.m3u8", hash[:url]
-      assert_equal "https://i1.sndcdn.com/artworks-t500x500.jpg", hash[:banner]
-      assert_equal 60.0, hash[:duration]
-      assert_equal "SoundCloud", hash[:audioSource]
+        assert_equal "soundcloud-12345", hash[:id]
+        assert_equal "SoundCloud Track", hash[:title]
+        assert_equal "ArtistUser", hash[:artist]
+        assert_equal "https://final.stream.url/playlist.m3u8", hash[:url]
+        assert_equal "https://i1.sndcdn.com/artworks-t500x500.jpg", hash[:banner]
+        assert_equal 60.0, hash[:duration]
+        assert_equal "SoundCloud", hash[:audioSource]
+      end
     end
 
     mock_response.verify
@@ -51,9 +53,11 @@ class SoundCloudSongPresenterTest < ActiveSupport::TestCase
     # Remove transcodings to simulate no stream available
     @track_data["media"] = nil
 
-    presenter = SoundCloudSongPresenter.new(@track_data)
-    hash = presenter.to_song_hash
+    SoundCloudService.stub :access_token, "fake_token" do
+      presenter = SoundCloudSongPresenter.new(@track_data)
+      hash = presenter.to_song_hash
 
-    assert_nil hash[:url]
+      assert_nil hash[:url]
+    end
   end
 end

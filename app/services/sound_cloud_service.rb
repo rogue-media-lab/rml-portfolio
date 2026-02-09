@@ -26,13 +26,11 @@ class SoundCloudService
     }
     uri.query = URI.encode_www_form(params)
 
-    request = Net::HTTP::Get.new(uri)
     token = self.class.access_token
-    request["Authorization"] = "OAuth #{token}" if token
+    headers = {}
+    headers["Authorization"] = "OAuth #{token}" if token
 
-    response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) do |http|
-      http.request(request)
-    end
+    response = Net::HTTP.get_response(uri, headers)
 
     if response.is_a?(Net::HTTPSuccess)
       JSON.parse(response.body)["collection"]
@@ -56,12 +54,9 @@ class SoundCloudService
     # Note: V1 tracks endpoint format is /tracks/:id
     uri = URI("https://api.soundcloud.com/tracks/#{track_id}")
 
-    request = Net::HTTP::Get.new(uri)
-    request["Authorization"] = "OAuth #{token}"
+    headers = { "Authorization" => "OAuth #{token}" }
 
-    response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) do |http|
-      http.request(request)
-    end
+    response = Net::HTTP.get_response(uri, headers)
 
     if response.is_a?(Net::HTTPSuccess)
       track = JSON.parse(response.body)
