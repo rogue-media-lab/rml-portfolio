@@ -159,7 +159,7 @@ class SoundCloudService
         begin
           fixed_json = seed_json.sub(', xpires_at"', ',"expires_at"')
           seed_data = JSON.parse(fixed_json)
-          
+
           token_record = SoundcloudToken.create!(
             access_token: seed_data["access_token"],
             refresh_token: seed_data["refresh_token"],
@@ -201,7 +201,7 @@ class SoundCloudService
   def self.refresh_token(token_record)
     Rails.logger.info "Refreshing SoundCloud Access Token from DB..."
     uri = URI("https://api.soundcloud.com/oauth2/token")
-    
+
     # Try with the client_id stored in the record
     primary_client_id = token_record.client_id || CLIENT_ID
     params = {
