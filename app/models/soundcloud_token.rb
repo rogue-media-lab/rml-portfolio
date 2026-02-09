@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Stores SoundCloud OAuth2 tokens. 
+# Stores SoundCloud OAuth2 tokens.
 # Using a database table ensures that token rotation persists across Heroku dyno restarts.
 class SoundcloudToken < ApplicationRecord
   validates :access_token, presence: true
