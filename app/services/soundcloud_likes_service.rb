@@ -58,8 +58,26 @@ class SoundcloudLikesService
   private
 
   def get_user_id(token)
-    # Try the V1 /me endpoint first since we have a user token
-    # (V1 is still fine for basic user info)
+    # 1. Try V2 resolve WITHOUT token (most reliable for public profiles)
+    uri = URI("#{BASE_URL}/resolve")
+    params = {
+      url: PROFILE_URL,
+      client_id: SoundCloudService::PUBLIC_V2_CLIENT_ID
+    }
+    uri.query = URI.encode_www_form(params)
+
+    request = Net::HTTP::Get.new(uri)
+    request["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+
+    response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) do |http|
+      http.request(request)
+    end
+
+    if response.is_a?(Net::HTTPSuccess)
+      return JSON.parse(response.body)["id"]
+    end
+
+    # 2. Fallback to /me (requires valid user token)
     uri = URI("https://api.soundcloud.com/me")
     request = Net::HTTP::Get.new(uri)
     request["Authorization"] = "OAuth #{token}"
@@ -72,48 +90,8 @@ class SoundcloudLikesService
       return JSON.parse(response.body)["id"]
     end
 
-    # Try V2 /me (fallback for V2-only tokens)
-    uri = URI("https://api-v2.soundcloud.com/me")
-    params = { client_id: SoundCloudService::PUBLIC_V2_CLIENT_ID }
-    uri.query = URI.encode_www_form(params)
-
-    request = Net::HTTP::Get.new(uri)
-    request["Authorization"] = "OAuth #{token}"
-    request["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
-
-    response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) do |http|
-      http.request(request)
-    end
-
-    if response.is_a?(Net::HTTPSuccess)
-      return JSON.parse(response.body)["id"]
-    end
-
-    # Fallback to resolve if /me fails
-    uri = URI("https://api.soundcloud.com/resolve")
-    params = {
-      url: PROFILE_URL,
-      client_id: SoundCloudService::PUBLIC_V2_CLIENT_ID # Use the same Client ID as the token
-    }
-    uri.query = URI.encode_www_form(params)
-
-    request = Net::HTTP::Get.new(uri)
-    request["Authorization"] = "OAuth #{token}"
-    request["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
-
-    response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) do |http|
-      http.request(request)
-    end
-
-    if response.code == "302"
-      # Location: https://api.soundcloud.com/users/soundcloud:users:579656895
-      response["location"].split(":").last
-    elsif response.is_a?(Net::HTTPSuccess)
-      JSON.parse(response.body)["id"]
-    else
-      Rails.logger.error "SoundCloud Resolve API Error: #{response.code} #{response.message}"
-      nil
-    end
+    Rails.logger.error "SoundCloud User ID Resolution Failed"
+    nil
   rescue JSON::ParserError => e
     Rails.logger.error "SoundCloud Resolve JSON Parse Error: #{e.message}"
     nil

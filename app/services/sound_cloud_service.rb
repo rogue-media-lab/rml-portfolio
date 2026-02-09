@@ -44,7 +44,7 @@ class SoundCloudService
   end
 
   # Public V2 Client ID (Borrowed from Web Player to bypass preview restrictions)
-  PUBLIC_V2_CLIENT_ID = "KKzJxmw11tYpCs6T24P4uUYhqmjalG6M"
+  PUBLIC_V2_CLIENT_ID = Rails.application.credentials.dig(:soundcloud, :public_v2_client_id) || "KKzJxmw11tYpCs6T24P4uUYhqmjalG6M"
 
   # Fetches a single track from the SoundCloud API.
   def get_track(track_id)
@@ -95,15 +95,20 @@ class SoundCloudService
 
     headers = { "User-Agent" => "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36" }
     token = self.class.access_token
-    headers["Authorization"] = "OAuth #{token}" if token
+    auth_headers = headers.merge("Authorization" => "OAuth #{token}") if token
 
-    response = Net::HTTP.get_response(uri, headers)
+    response = Net::HTTP.get_response(uri, auth_headers || headers)
+
+    # Fallback to no-auth for metadata
+    if response.code == "403"
+      response = Net::HTTP.get_response(uri, headers)
+    end
+
     return nil unless response.is_a?(Net::HTTPSuccess)
 
     track = JSON.parse(response.body)
 
     # 2. Get Stream URL
-    # We can reuse the existing logic, or duplicate for clarity. Reusing logic:
     if track["media"] && track["media"]["transcodings"]
        stream = track["media"]["transcodings"].find { |t| t["format"]["protocol"] == "hls" } ||
                 track["media"]["transcodings"].find { |t| t["format"]["protocol"] == "progressive" }
@@ -116,7 +121,7 @@ class SoundCloudService
          params = { client_id: PUBLIC_V2_CLIENT_ID, track_authorization: auth_token }
          uri.query = URI.encode_www_form(params)
 
-         res = Net::HTTP.get_response(uri, headers)
+         res = Net::HTTP.get_response(uri, auth_headers || headers)
          if res.is_a?(Net::HTTPSuccess)
            track["stream_url"] = JSON.parse(res.body)["url"]
            track["is_direct_stream"] = true
@@ -139,9 +144,15 @@ class SoundCloudService
 
     # Add Authorization if available (Required for Go+ content)
     token = self.class.access_token
-    headers["Authorization"] = "OAuth #{token}" if token
+    auth_headers = headers.merge("Authorization" => "OAuth #{token}") if token
 
-    response = Net::HTTP.get_response(uri, headers)
+    # Try with auth first
+    response = Net::HTTP.get_response(uri, auth_headers || headers)
+
+    # FALLBACK: Try without auth if 403 (Sometimes works for restricted metadata)
+    if response.code == "403"
+      response = Net::HTTP.get_response(uri, headers)
+    end
 
     if response.is_a?(Net::HTTPSuccess)
       data = JSON.parse(response.body)
@@ -162,8 +173,8 @@ class SoundCloudService
       params = { client_id: PUBLIC_V2_CLIENT_ID, track_authorization: auth_token }
       uri.query = URI.encode_www_form(params)
 
-      # IMPORTANT: Must include Auth header here too
-      res = Net::HTTP.get_response(uri, headers)
+      # IMPORTANT: Must include Auth header here too for Go+ content
+      res = Net::HTTP.get_response(uri, auth_headers || headers)
       if res.is_a?(Net::HTTPSuccess)
         JSON.parse(res.body)["url"]
       else
@@ -182,56 +193,100 @@ class SoundCloudService
   # Checks current token validity and refreshes if needed.
   # Returns the access string.
   def self.ensure_valid_token
-    # Bootstrap: If file missing, try to seed from environment variables or credentials
+    # 1. Bootstrap from token_seed if file missing
     unless File.exist?(TOKEN_FILE)
-      access = ENV["SOUNDCLOUD_ACCESS_TOKEN"] || Rails.application.credentials.dig(:soundcloud, :access_token)
-      refresh = ENV["SOUNDCLOUD_REFRESH_TOKEN"] || Rails.application.credentials.dig(:soundcloud, :refresh_token)
+      seed_json = Rails.application.credentials.dig(:soundcloud, :token_seed)
+      if seed_json.present?
+        begin
+          # Fix known typo in credentials
+          fixed_json = seed_json.sub(', xpires_at"', ',"expires_at"')
+          seed_data = JSON.parse(fixed_json)
 
-      if access.present? && refresh.present?
-        # Create a dummy data structure that will trigger an immediate refresh or work as-is
-        initial_data = {
-          "access_token" => access,
-          "refresh_token" => refresh,
-          "expires_at" => Time.now.to_i + 3600 # Assume valid for 1 hour initially
-        }
-        File.write(TOKEN_FILE, JSON.pretty_generate(initial_data))
-        Rails.logger.info "SoundCloud: Bootstrapped token file from environment/credentials."
-      else
-        Rails.logger.error "SoundCloud Token File missing and no environment variables found."
-        return nil
+          # Ensure correct Client ID is saved with the token
+          # We know this specific seed uses the default public ID
+          seed_data["client_id"] = "KKzJxmw11tYpCs6T24P4uUYhqmjalG6M"
+
+          File.write(TOKEN_FILE, JSON.pretty_generate(seed_data))
+          Rails.logger.info "SoundCloud: Bootstrapped token file from credentials token_seed."
+        rescue JSON::ParserError => e
+          Rails.logger.error "SoundCloud: Failed to parse token_seed: #{e.message}"
+        end
       end
     end
 
-    data = JSON.parse(File.read(TOKEN_FILE))
-
-    # Check if expired (buffer of 60 seconds)
-    if Time.now.to_i >= (data["expires_at"] || 0) - 60
-      refresh_token(data["refresh_token"])
-    else
-      data["access_token"]
+    # 2. Try to read and use/refresh existing token
+    if File.exist?(TOKEN_FILE)
+      begin
+        data = JSON.parse(File.read(TOKEN_FILE))
+        # Check if expired (buffer of 60 seconds)
+        exp_at = data["expires_at"] || 0
+        if Time.now.to_i >= exp_at - 60
+          return refresh_token(data["refresh_token"], data["client_id"])
+        else
+          return data["access_token"]
+        end
+      rescue JSON::ParserError, StandardError => e
+        Rails.logger.error "SoundCloud Token File Error: #{e.message}. Attempting fallback."
+      end
     end
-  rescue JSON::ParserError => e
-    Rails.logger.error "SoundCloud Token File Corrupt: #{e.message}"
-    nil
+
+    # 3. Last resort: Client Credentials Flow
+    client_credentials_token
+  end
+
+  # Obtains a token via Client Credentials flow (no user-specific access)
+  def self.client_credentials_token
+    Rails.logger.info "Requesting SoundCloud Client Credentials Token..."
+    uri = URI("https://api.soundcloud.com/oauth2/token")
+    params = {
+      client_id: CLIENT_ID,
+      client_secret: CLIENT_SECRET,
+      grant_type: "client_credentials"
+    }
+
+    response = Net::HTTP.post_form(uri, params)
+
+    if response.is_a?(Net::HTTPSuccess)
+      data = JSON.parse(response.body)
+      # Note: Client credentials tokens usually don't have refresh tokens
+      data["access_token"]
+    else
+      Rails.logger.error "SoundCloud Client Credentials Failed: #{response.code} #{response.body}"
+      nil
+    end
   end
 
   # Performs the refresh token exchange and saves the new tokens.
-  def self.refresh_token(current_refresh_token)
+  def self.refresh_token(current_refresh_token, token_client_id = nil)
+    return client_credentials_token if current_refresh_token.blank?
+
     Rails.logger.info "Refreshing SoundCloud Access Token..."
+    Rails.logger.info "Using Client ID for Refresh: #{token_client_id || CLIENT_ID}"
 
     uri = URI("https://api.soundcloud.com/oauth2/token")
+
+    # Use the specific client_id associated with the token if known, otherwise try official
+    primary_client_id = token_client_id || CLIENT_ID
+
     params = {
-      client_id: PUBLIC_V2_CLIENT_ID, # MUST use the Public ID (Web Client) for this token
-      client_secret: CLIENT_SECRET, # Note: Public client might not need a secret, or this might fail
+      client_id: primary_client_id,
       grant_type: "refresh_token",
       refresh_token: current_refresh_token
     }
 
-    # If the public client doesn't use a secret, we should probably omit it.
-    # Standard OAuth for public clients (SPA) usually omits client_secret.
-    # Let's try sending it first; if it fails, we might need to remove it.
+    # Only add secret if using the official app client
+    params[:client_secret] = CLIENT_SECRET if primary_client_id == CLIENT_ID
 
     response = Net::HTTP.post_form(uri, params)
+
+    # Fallback logic: If primary failed and it wasn't the default public one, try the default public one
+    if !response.is_a?(Net::HTTPSuccess) && primary_client_id != "KKzJxmw11tYpCs6T24P4uUYhqmjalG6M"
+      Rails.logger.warn "SoundCloud Refresh with #{primary_client_id} Failed. Retrying with Default Public Client..."
+      params[:client_id] = "KKzJxmw11tYpCs6T24P4uUYhqmjalG6M"
+      params.delete(:client_secret)
+      response = Net::HTTP.post_form(uri, params)
+      token_client_id = "KKzJxmw11tYpCs6T24P4uUYhqmjalG6M" if response.is_a?(Net::HTTPSuccess)
+    end
 
     if response.is_a?(Net::HTTPSuccess)
       new_data = JSON.parse(response.body)
@@ -239,14 +294,17 @@ class SoundCloudService
       # Calculate new absolute expiration
       new_data["expires_at"] = Time.now.to_i + new_data["expires_in"].to_i
 
+      # Persist the working client_id for future refreshes
+      new_data["client_id"] = token_client_id || params[:client_id]
+
       # Save to file
       File.write(TOKEN_FILE, JSON.pretty_generate(new_data))
       Rails.logger.info "SoundCloud Token Refreshed Successfully."
 
       new_data["access_token"]
     else
-      Rails.logger.error "SoundCloud Refresh Failed: #{response.code} #{response.body}"
-      nil
+      Rails.logger.error "SoundCloud Refresh Failed: #{response.code} #{response.body}. Falling back to Client Credentials."
+      client_credentials_token
     end
   end
 end
