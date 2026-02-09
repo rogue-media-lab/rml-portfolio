@@ -47,3 +47,4 @@
 
 /app/assets/builds/*
 !/app/assets/builds/.keep
+config/soundcloud_token.json
