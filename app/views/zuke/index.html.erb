@@ -1,23 +1,544 @@
-<section class="flex justify-center items-center bg-zinc-900 text-zinc-50 h-svh w-full">
-  <div class="relative flex bg-[url(/AI-ROBOT-PANIC-mask1.webp)] bg-no-repeat bg-cover lg:bg-[url(/AI-ROBOT-PANIC-left.webp)] bg-center-top w-full h-full">
-    <div class="absolute flex flex-col z-20 bottom-2 left-4 items-end">
-      <%= link_to 'Zuke', root_path, class: "font-kanit text-3xl font-extrabold text-zinc-400 mb-4" %>
-      <!-- QR Code Section -->
-      <div class="flex flex-col items-center bg-white/90 backdrop-blur-sm p-4 rounded-lg shadow-lg max-w-xs">
-        <%= image_tag "zuke-qr-code.png", alt: "Scan to open Zuke Music Player", class: "w-32 h-32 sm:w-40 sm:h-40" %>
-        <p class="text-zinc-900 text-xs sm:text-sm font-bold mt-2">Scan to open Zuke</p>
+<div class="min-h-screen bg-black text-white">
+  <section class="relative min-h-[90vh] flex flex-col justify-end md:justify-center px-6 md:px-12 lg:px-24 overflow-hidden pb-12 md:pb-0">
+    <div class="absolute inset-0 z-0">
+      <%= image_tag "AI-ROBOT-PANIC-leftA.webp", class: "w-full h-full object-cover opacity-40 md:opacity-50", alt: "Audio Impression Hero" %>
+      <div class="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent md:bg-gradient-to-r md:from-black md:via-black/40 md:to-transparent"></div>
+    </div>
 
-        <!-- Installation Instructions -->
-        <div class="mt-3 pt-3 border-t border-zinc-300 w-full">
-          <p class="text-zinc-800 text-xs font-semibold mb-2">📱 Install as App:</p>
-          <div class="text-zinc-700 text-xs space-y-1">
-            <p><strong>iPhone:</strong> Tap <svg class="inline w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z"/></svg> → "Add to Home Screen"</p>
-            <p><strong>Android:</strong> Tap menu → "Install app"</p>
+    <div class="relative z-10 max-w-2xl">
+      <div class="flex items-center gap-2 mb-4">
+        <div class="w-8 h-[2px] bg-red-600"></div>
+        <span class="text-[10px] md:text-xs uppercase tracking-widest text-gray-400">Rogue Media Lab</span>
+      </div>
+      
+      <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-8xl mb-6 font-oswald uppercase leading-none tracking-tighter">
+        Zuke <span class="text-red-600"><span class="text-2xl">Media</span> Player</span>
+      </h1>
+      
+      <p class="text-gray-300 md:text-gray-400 text-sm md:text-lg mb-8 leading-relaxed max-w-lg">
+        A visual music player to build your <em>soundscapes</em>. Associate your tracks with <em>"live images"</em> to create the mood you've always wanted. Welcome to the only mood centric social network.
+      </p>
+      
+      <div class="flex flex-col sm:flex-row items-start sm:items-center gap-6">
+        <%= link_to "Demo Player", music_list_zuke_index_path, class: "w-full sm:w-auto px-8 py-4 bg-white text-red-600 hover:bg-red-700 hover:text-white transition-colors uppercase text-sm font-bold tracking-widest rounded-lg shadow-lg" %>
+        <button class="w-full sm:w-auto px-8 py-4 bg-red-600 text-white hover:bg-red-700 transition-colors uppercase text-sm font-bold tracking-widest rounded-lg shadow-lg">
+          Get Started
+        </button>
+        <div class="flex items-center gap-3">
+          <%= image_tag "audioeye3.svg", class: "w-10 h-10 drop-shadow-[0_0_8px_rgba(239,68,68,0.4)]" %>
+          <span class="text-[10px] md:text-[12px] uppercase tracking-tighter text-gray-500 font-medium">Music with attitude</span>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- Player -->
+  <section class="py-16 md:py-24 px-6 md:px-12 lg:px-24 bg-zinc-900 text-white relative overflow-hidden">
+    <div class="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
+      
+      <div class="w-full lg:w-1/2 order-2 lg:order-1">
+        <div class="flex items-center gap-2 mb-4">
+          <div class="w-8 h-[2px] bg-red-600"></div>
+          <span class="text-xs uppercase tracking-widest text-gray-400">The Core Engine</span>
+        </div>
+        <h2 class="text-4xl md:text-6xl lg:text-7xl mb-8 font-oswald uppercase leading-tight">
+          The <span class="text-red-600">Player</span>
+        </h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-8">
+          <div class="group">
+            <h4 class="text-lg md:text-xl font-bold text-red-600 mb-2 uppercase tracking-tighter">Live Visual Sync</h4>
+            <p class="text-gray-400 text-sm md:text-base leading-relaxed">Your tracks aren't just heard, they're seen, they're felt. Pair your high fidelity audio with interactive <em>"Live Images"</em> that represent the mood of your music.</p>
+          </div>
+
+          <div class="group">
+            <h4 class="text-lg md:text-xl font-bold text-red-600 mb-2 uppercase tracking-tighter">Waveform Interaction</h4>
+            <p class="text-gray-400 text-sm md:text-base leading-relaxed">Powered by Wavesurfer.js, our player provides a tactile, visual representation of your audio impression, allowing for precise navigation and immersive listening.</p>
+          </div>
+
+          <div class="group">
+            <h4 class="text-lg md:text-xl font-bold text-red-600 mb-2 uppercase tracking-tighter">HLS Streaming</h4>
+            <p class="text-gray-400 text-sm md:text-base leading-relaxed">Built with Rails 8 and optimized for performance, ensuring your audio impressions load instantly and stream flawlessly across any device.</p>
+          </div>
+
+          <div class="group">
+            <h4 class="text-lg md:text-xl font-bold text-red-600 mb-2 uppercase tracking-tighter">10 Band Equalizer</h4>
+            <p class="text-gray-400 text-sm md:text-base leading-relaxed">Tune your audio with ease. 10 bands of functional range or choose common presets. Save the setting to the track, not the player. Set the frequency to your life's soundtrack.</p>
           </div>
         </div>
       </div>
 
-      <%= link_to "Music that moves me", music_list_zuke_index_path, class: "font-medium text-zinc-900 bg-lime-400 hover:bg-lime-300 mb-6 px-12 py-2 max-w-xs rounded-md mt-4" %>
+      <div class="w-full lg:w-1/2 order-1 lg:order-2 flex justify-center">
+        <div class="relative w-full max-w-[280px] sm:max-w-[320px] aspect-[9/19] bg-black rounded-[2.5rem] border-[8px] border-zinc-800 shadow-2xl overflow-hidden ring-1 ring-white/5">
+          <div class="relative h-full">
+            <%= image_tag "player.webp", class: "absolute inset-0 h-full w-full object-cover opacity-90", alt: "Player Interface" %>
+            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20"></div>
+          </div>
+        </div>
+      </div>
+
     </div>
-</section>
+  </section>
+  <!-- Soundscape Collection-->
+  <section class="py-24 px-6 md:px-12 lg:px-24 bg-black text-white border-t border-white/5">
+    <div class="max-w-7xl mx-auto">
+      <div class="grid lg:grid-cols-2 gap-16 items-center">
+        
+        <div class="relative order-2 lg:order-1">
+          <div class="aspect-video bg-zinc-900 rounded-2xl overflow-hidden border border-white/10 relative group">
+            <%= image_tag "player.webp", class: "w-full h-full object-cover opacity-60 grayscale group-hover:grayscale-0 transition-all duration-700", alt: "Collaboration Preview" %>
+            <div class="absolute inset-0 flex items-center justify-center">
+              <div class="flex items-center gap-4">
+                <div class="w-16 h-16 rounded-full bg-white flex items-center justify-center text-black font-bold shadow-xl">♫</div>
+                <div class="text-red-600 text-3xl font-bold">+</div>
+                <div class="w-16 h-16 rounded-full bg-red-600 flex items-center justify-center text-white font-bold shadow-xl">👁</div>
+              </div>
+            </div>
+            <div class="absolute bottom-6 left-1/2 -translate-x-1/2 bg-black/80 backdrop-blur-md px-6 py-2 rounded-full border border-red-600/50">
+              <span class="text-[10px] uppercase tracking-[0.2em] font-bold">Limited Edition: 01 / 100</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="order-1 lg:order-2">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-8 h-[2px] bg-red-600"></div>
+            <span class="text-xs uppercase tracking-widest text-gray-400">Collaborative Economy</span>
+          </div>
+          <h2 class="text-4xl md:text-5xl font-oswald uppercase leading-none mb-8">
+            The <span class="text-red-600">Soundscape</span> Collection
+          </h2>
+          <p class="text-gray-400 text-sm md:text-lg mb-8 leading-relaxed">
+            We've reinvented how digital creators get paid. Musicians and Visual Artists team up to release limited-run <em>Soundscapes</em>. Every purchase directly compensates both artists for their base work, while the scarcity premium supports the platform and rewards the collaboration.
+          </p>
+          
+          <div class="space-y-6">
+            <div class="flex items-start gap-4">
+              <span class="bg-red-600/10 text-red-600 p-2 rounded-lg">✔</span>
+              <div>
+                <h4 class="text-sm font-bold uppercase">Fair Split Guarantee</h4>
+                <p class="text-xs text-gray-500">Musicians and Artists set their own base rates. No opaque algorithms.</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-4">
+              <span class="bg-red-600/10 text-red-600 p-2 rounded-lg">✔</span>
+              <div>
+                <h4 class="text-sm font-bold uppercase">Verified Ownership</h4>
+                <p class="text-xs text-gray-500">Only Y copies ever exist. Your library becomes a gallery of rare impressions.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- QR Code -->
+  <section class="py-16 md:py-24 px-6 md:px-12 lg:px-24 bg-zinc-900 text-white border-y border-white/5">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-12">
+      
+      <div class="max-w-xl text-center md:text-left">
+        <div class="flex items-center justify-center md:justify-start gap-2 mb-4">
+          <div class="w-8 h-[2px] bg-red-600"></div>
+          <span class="text-xs uppercase tracking-widest text-gray-400 font-medium">Native Experience</span>
+        </div>
+        <h2 class="text-4xl md:text-5xl font-oswald uppercase mb-6 leading-tight">
+          Your Music, <span class="text-red-600">Untethered</span>
+        </h2>
+        <p class="text-gray-400 text-sm md:text-lg mb-8 leading-relaxed">
+          The Zuke engine is optimized as a Progressive Web App. Scan the code to launch the player on your device and install it directly to your home screen for a full-screen, immersive experience without the app store friction.
+        </p>
+        
+        <div class="hidden md:flex items-center gap-4 text-gray-500">
+          <div class="flex flex-col">
+            <span class="text-[10px] uppercase font-bold text-white tracking-widest">No Downloads</span>
+            <span class="text-[9px] uppercase tracking-tighter">Pure Web Power</span>
+          </div>
+          <div class="w-[1px] h-8 bg-white/10"></div>
+          <div class="flex flex-col">
+            <span class="text-[10px] uppercase font-bold text-white tracking-widest">HLS Optimized</span>
+            <span class="text-[9px] uppercase tracking-tighter">Fast Streaming</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="relative group">
+        <div class="absolute -inset-1 bg-gradient-to-r from-red-600 to-red-900 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+        
+        <div class="relative flex flex-col items-center bg-white p-6 rounded-2xl shadow-2xl max-w-xs transition-transform hover:scale-[1.02] duration-300">
+          <%= image_tag "zuke-qr-code.png", alt: "Scan to open Zuke Music Player", class: "w-40 h-40 md:w-48 md:h-48" %>
+          <p class="text-zinc-900 text-sm font-bold mt-4 uppercase tracking-tighter">Scan to open Zuke</p>
+
+          <div class="mt-4 pt-4 border-t border-zinc-200 w-full">
+            <p class="text-zinc-800 text-[10px] uppercase font-bold mb-3 tracking-widest">📱 Install as App:</p>
+            <div class="text-zinc-600 text-xs space-y-2">
+              <div class="flex items-center gap-2">
+                <strong class="text-zinc-900 w-12">iPhone:</strong> 
+                <span class="flex items-center">Tap <svg class="inline w-3 h-3 mx-1 text-blue-500" fill="currentColor" viewBox="0 0 20 20"><path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z"/></svg> → "Add to Home Screen"</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <strong class="text-zinc-900 w-12">Android:</strong> 
+                <span>Tap menu → "Install app"</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Radio -->
+  <section class="py-24 px-8 lg:px-24 bg-black text-white border-t border-gray-900">
+    <div class="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-16">
+      <div class="lg:w-1/2">
+        <div class="flex items-center gap-2 mb-4">
+          <div class="w-8 h-[2px] bg-red-600"></div>
+          <span class="text-xs uppercase tracking-widest text-gray-400">On Air Now</span>
+        </div>
+        <h2 class="text-4xl lg:text-5xl mb-6 font-oswald uppercase">
+          Zuke <span class="text-red-600">Radio</span>
+        </h2>
+        <p class="text-gray-400 text-lg leading-relaxed mb-8">
+          Magic happens when artists and musicians connect. There are only so many of these unique soundscapes created and the radio will play them until they're all gone. Tune in to discover the latest and greatest from our community of creators, or submit your own Soundscape for a chance to be featured on the airwaves.
+        </p>
+        <div class="flex gap-4">
+          <button class="px-8 py-3 bg-red-600 text-white font-bold uppercase text-sm tracking-widest hover:bg-red-700 transition rounded-lg shadow-lg">
+            Start Listening
+          </button>
+        </div>
+      </div>
+
+      <div class="lg:w-1/2 relative">
+        <div class="aspect-square w-full max-w-md mx-auto rounded-full border border-gray-800 flex items-center justify-center relative overflow-hidden">
+            <div class="absolute inset-0 border border-red-600/20 rounded-full animate-ping"></div>
+            <div class="absolute inset-4 border border-red-600/40 rounded-full animate-[ping_3s_linear_infinite]"></div>
+            
+            <img src="https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?auto=format&fit=crop&q=80&w=600" class="w-3/4 h-3/4 object-cover rounded-full grayscale hover:grayscale-0 transition-all duration-700" alt="Current Track">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Soundcloud integration -->
+  <section class="py-24 px-8 lg:px-24 bg-zinc-900 text-white relative overflow-hidden">
+    <div class="absolute top-0 right-0 w-96 h-96 bg-red-600/5 rounded-full blur-3xl"></div>
+
+    <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
+      <div class="order-2 lg:order-1">
+        <div class="bg-black p-6 rounded-xl border border-gray-800 shadow-2xl">
+          <div class="flex items-center gap-3 mb-6 border-b border-gray-800 pb-4">
+            <div class="w-10 h-10 rounded-full bg-red-600 flex items-center justify-center text-xs font-bold">RML</div>
+            <div>
+              <p class="text-sm font-bold">Rogue Media Lab</p>
+              <p class="text-[10px] text-gray-500">2 minutes ago</p>
+            </div>
+          </div>
+          <p class="text-sm text-gray-300 italic mb-4">"Soundcloud in a way I never knew I needed! I added my own images to my Soundcloud favorites! The same song can have so many different flavors!"</p>
+          <div class="flex items-center gap-4 text-xs text-gray-500">
+            <span>❤️ 24 Likes</span>
+            <span>💬 8 Comments</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="order-1 lg:order-2">
+        <h2 class="text-4xl lg:text-5xl font-oswald uppercase mb-6">Sound<span class="text-red-600">cloud</span></h2>
+        <p class="text-gray-400 mb-6">
+          Connect your SoundCloud account to pull your favorite tracks and pair your sonic signature with your visual mood or your own short-form <em>"Live Images."</em>
+        </p>
+        <ul class="space-y-4 text-sm tracking-wide">
+          <li class="flex items-center gap-3"><span class="text-red-600">✔</span> Real-time SoundCloud streaming integration.</li>
+          <li class="flex items-center gap-3"><span class="text-red-600">✔</span> Add your own cover to the tracks you love.</li>
+          <li class="flex items-center gap-3"><span class="text-red-600">✔</span> Full-screen immersive player with interactive visuals.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="py-24 px-6 md:px-12 lg:px-24 bg-black text-white border-t border-gray-900">
+    <div class="max-w-4xl mx-auto">
+      <div class="flex items-center gap-2 mb-4">
+        <div class="w-8 h-[2px] bg-red-600"></div>
+        <span class="text-xs uppercase tracking-widest text-gray-400">Common Questions</span>
+      </div>
+      <h2 class="text-4xl md:text-5xl font-oswald uppercase mb-12">
+        Frequently Asked <span class="text-red-600">Questions</span>
+      </h2>
+
+      <div class="space-y-4">
+        <div class="border-b border-gray-800 pb-4" data-controller="faq">
+          <button 
+            class="flex justify-between items-center w-full text-left group py-4" 
+            data-action="click->faq#toggle"
+          >
+            <h3 class="text-xl font-bold text-white uppercase tracking-tighter group-hover:text-red-600 transition-colors">
+              Who is this for?
+            </h3>
+            <span class="text-red-600 transition-transform duration-300 font-light text-2xl" data-faq-target="icon">+</span>
+          </button>
+          <div class="hidden transition-all duration-300 ease-in-out pb-4" data-faq-target="answer">
+            <p class="text-gray-400 text-sm md:text-base leading-relaxed">
+              You! If you make digital art or music, this is for you. If you love music and want to experience it in a new way, this is for you. If you want to connect with artists and musicians in a unique social network, this is for you. If you want to be part of the future of music and digital expression, this is for you.
+            </p>
+          </div>
+        </div>
+
+        <div class="border-b border-gray-800 pb-4" data-controller="faq">
+          <button 
+            class="flex justify-between items-center w-full text-left group py-4" 
+            data-action="click->faq#toggle"
+          >
+            <h3 class="text-xl font-bold text-white uppercase tracking-tighter group-hover:text-red-600 transition-colors">
+              What exactly is an "Audio Impression"?
+            </h3>
+            <span class="text-red-600 transition-transform duration-300 font-light text-2xl" data-faq-target="icon">+</span>
+          </button>
+          <div class="hidden transition-all duration-300 ease-in-out pb-4" data-faq-target="answer">
+            <p class="text-gray-400 text-sm md:text-base leading-relaxed">
+              An Audio Impression is a unique digital asset where high-fidelity audio meets interactive visual mood. By pairing a track with a static or "Live Image," you create a self-contained aesthetic experience that can be shared, streamed, or collected within our social network and played in the player.
+            </p>
+          </div>
+        </div>
+
+        <div class="border-b border-gray-800 pb-4" data-controller="faq">
+          <button 
+            class="flex justify-between items-center w-full text-left group py-4" 
+            data-action="click->faq#toggle"
+          >
+            <h3 class="text-xl font-bold text-white uppercase tracking-tighter group-hover:text-red-600 transition-colors">
+              Can I use my own music and/or images?
+            </h3>
+            <span class="text-red-600 transition-transform duration-300 font-light text-2xl" data-faq-target="icon">+</span>
+          </button>
+          <div class="hidden transition-all duration-300 ease-in-out pb-4" data-faq-target="answer">
+            <p class="text-gray-400 text-sm md:text-base leading-relaxed">
+              Yes! The player was designed for exactly this purpose. The whole idea is to allow one to modify the mood of the music they own by adding a visual layer. You can upload your own music and images to create custom audio impressions that reflect your unique style and vibe. <em>This is a family friendly platform, so please ensure that all public content adheres to our community guidelines.</em>
+            </p>
+          </div>
+        </div>
+
+        <div class="border-b border-gray-800 pb-4" data-controller="faq">
+          <button 
+            class="flex justify-between items-center w-full text-left group py-4" 
+            data-action="click->faq#toggle"
+          >
+            <h3 class="text-xl font-bold text-white uppercase tracking-tighter group-hover:text-red-600 transition-colors">
+              Do I have to use my own music?
+            </h3>
+            <span class="text-red-600 transition-transform duration-300 font-light text-2xl" data-faq-target="icon">+</span>
+          </button>
+          <div class="hidden transition-all duration-300 ease-in-out pb-4" data-faq-target="answer">
+            <p class="text-gray-400 text-sm md:text-base leading-relaxed">
+              No. The player integrates with Soundcloud! Customize and play your favorite playlists.</em>
+            </p>
+          </div>
+        </div>
+
+        <div class="border-b border-gray-800 pb-4" data-controller="faq">
+          <button 
+            class="flex justify-between items-center w-full text-left group py-4" 
+            data-action="click->faq#toggle"
+          >
+            <h3 class="text-xl font-bold text-white uppercase tracking-tighter group-hover:text-red-600 transition-colors">
+              What do you do with my music?
+            </h3>
+            <span class="text-red-600 transition-transform duration-300 font-light text-2xl" data-faq-target="icon">+</span>
+          </button>
+          <div class="hidden transition-all duration-300 ease-in-out pb-4" data-faq-target="answer">
+            <p class="text-gray-400 text-sm md:text-base leading-relaxed">
+              absolutely nothing. For Soundcloud we do not store your music on our servers. We simply pull the track and wrap it in a custom visual layer. For your uploaded art and music, it is stored in a secure AWS S3 or Google storage bucket. Your music stays yours, and we have no access to it beyond what is necessary to play it in the player.
+            </p>
+          </div>
+        </div>
+
+        <div class="border-b border-gray-800 pb-4" data-controller="faq">
+          <button 
+            class="flex justify-between items-center w-full text-left group py-4" 
+            data-action="click->faq#toggle"
+          >
+            <h3 class="text-xl font-bold text-white uppercase tracking-tighter group-hover:text-red-600 transition-colors">
+              Is AI generated music allowed?
+            </h3>
+            <span class="text-red-600 transition-transform duration-300 font-light text-2xl" data-faq-target="icon">+</span>
+          </button>
+          <div class="hidden transition-all duration-300 ease-in-out pb-4" data-faq-target="answer">
+            <p class="text-gray-400 text-sm md:text-base leading-relaxed">
+              Yes! All music is welcome. We believe in the power of creativity and innovation, and AI-generated music is an exciting frontier in the world of sound. Feel free to upload your AI-generated tracks and pair them with visuals to create unique audio impressions.
+            </p>
+          </div>
+        </div>
+
+        <div class="border-b border-gray-800 pb-4" data-controller="faq">
+          <button 
+            class="flex justify-between items-center w-full text-left group py-4" 
+            data-action="click->faq#toggle"
+          >
+            <h3 class="text-xl font-bold text-white uppercase tracking-tighter group-hover:text-red-600 transition-colors">
+              Can I share my library?
+            </h3>
+            <span class="text-red-600 transition-transform duration-300 font-light text-2xl" data-faq-target="icon">+</span>
+          </button>
+          <div class="hidden transition-all duration-300 ease-in-out pb-4" data-faq-target="answer">
+            <p class="text-gray-400 text-sm md:text-base leading-relaxed">
+              Yes! With some restrictions. Any tracks or art you decide to share must be owned by you or you must have explicit permission from the rights holder to distribute the content. We take copyright seriously and expect our users to respect intellectual property rights.
+            </p>
+          </div>
+        </div>
+
+        <div class="border-b border-gray-800 pb-4" data-controller="faq">
+          <button 
+            class="flex justify-between items-center w-full text-left group py-4" 
+            data-action="click->faq#toggle"
+          >
+            <h3 class="text-xl font-bold text-white uppercase tracking-tighter group-hover:text-red-600 transition-colors">
+              Can I sync my existing SoundCloud library?
+            </h3>
+            <span class="text-red-600 transition-transform duration-300 font-light text-2xl" data-faq-target="icon">+</span>
+          </button>
+          <div class="hidden transition-all duration-300 ease-in-out pb-4" data-faq-target="answer">
+            <p class="text-gray-400 text-sm md:text-base leading-relaxed">
+              Yes. Our platform features deep SoundCloud integration, allowing you to pull your favorite tracks and wrap them in a custom visual layer.
+            </p>
+          </div>
+        </div>
+
+        <div class="border-b border-gray-800 pb-4" data-controller="faq">
+          <button 
+            class="flex justify-between items-center w-full text-left group py-4" 
+            data-action="click->faq#toggle"
+          >
+            <h3 class="text-xl font-bold text-white uppercase tracking-tighter group-hover:text-red-600 transition-colors">
+              Are other music streaming service available?
+            </h3>
+            <span class="text-red-600 transition-transform duration-300 font-light text-2xl" data-faq-target="icon">+</span>
+          </button>
+          <div class="hidden transition-all duration-300 ease-in-out pb-4" data-faq-target="answer">
+            <p class="text-gray-400 text-sm md:text-base leading-relaxed">
+              No. I am currently looking at other service providers like Bandcamp and Spotify.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-12 bg-red-800 text-white">
+    <div class="max-w-7xl mx-auto px-8 lg:px-24 flex flex-col md:flex-row items-center justify-between gap-8">
+      <div class="max-w-md">
+        <h3 class="text-2xl font-oswald uppercase tracking-tighter leading-none mb-2">Join the Rogue Beta</h3>
+        <p class="text-white/80 text-xs uppercase tracking-widest">Reserve your artist handle before the public launch.</p>
+      </div>
+
+      <form class="w-full md:w-auto flex flex-col sm:flex-row gap-2">
+        <input type="email" placeholder="ENTER EMAIL ADDRESS" class="bg-white/10 border border-white/20 px-6 py-4 outline-none focus:bg-white focus:text-black transition-all text-sm rounded-lg min-w-[300px] placeholder:text-white/50">
+        <button class="bg-black text-white px-8 py-4 text-xs font-bold uppercase tracking-widest hover:bg-zinc-800 transition rounded-lg shadow-xl">
+          Claim Handle
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <!-- progress -->
+  <section class="py-24 px-6 md:px-12 lg:px-24 bg-zinc-900 text-white border-t border-white/5">
+    <div class="max-w-7xl mx-auto">
+      
+      <div class="flex flex-col md:flex-row justify-between items-end gap-8 mb-16">
+        <div class="max-w-xl">
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-8 h-[2px] bg-red-600"></div>
+            <span class="text-xs uppercase tracking-widest text-gray-400">System Status</span>
+          </div>
+          <h2 class="text-4xl md:text-6xl font-oswald uppercase leading-none">
+            Zuke's Lab <span class="text-red-600">Progress</span>
+          </h2>
+        </div>
+        <div class="text-right">
+          <p class="text-[10px] uppercase tracking-[0.2em] text-gray-500 mb-2">Overall Completion</p>
+          <div class="w-64 h-2 bg-gray-800 rounded-full overflow-hidden">
+            <div class="bg-red-600 h-full w-[65%] shadow-[0_0_10px_rgba(220,38,38,0.5)]"></div>
+          </div>
+          <p class="text-xs mt-2 text-red-600 font-bold uppercase tracking-widest">65% Deployed</p>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-8">
+        
+        <div class="bg-black/40 border border-white/5 p-8 rounded-2xl relative overflow-hidden group">
+          <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-30 transition-opacity">
+            <span class="text-4xl italic font-oswald text-white">01</span>
+          </div>
+          <h3 class="text-xs uppercase tracking-widest text-red-600 font-bold mb-6 flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-red-600 animate-pulse"></span> Active / Live
+          </h3>
+          <ul class="space-y-4 text-sm text-gray-400">
+            <li class="flex items-center gap-3"><span class="text-red-600">✔</span> Rails 8 Core Architecture</li>
+            <li class="flex items-center gap-3"><span class="text-red-600">✔</span> Wavesurfer.js Zuke Player</li>
+            <li class="flex items-center gap-3"><span class="text-red-600">✔</span> HLS Optimized Streaming</li>
+            <li class="flex items-center gap-3"><span class="text-red-600">✔</span> PWA / Home Screen Support</li>
+            <li class="flex items-center gap-3"><span class="text-red-600">✔</span> Soundcloud Integration</li>
+            <li class="flex items-center gap-3"><span class="text-red-600">✔</span> 10 Band Equalizer + presets</li>
+            <li class="flex items-center gap-3"><span class="text-red-600">✔</span> 4 Distinct Features</li>
+            <li class="flex items-center gap-3"><span class="text-red-600">✔</span> Playlists includes Soundcloud</li>
+            <li class="flex items-center gap-3"><span class="text-red-600">✔</span> Demo Player is LIVE</li>
+          </ul>
+        </div>
+
+        <div class="bg-black/40 border border-red-600/30 p-8 rounded-2xl relative overflow-hidden group">
+          <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-30 transition-opacity">
+            <span class="text-4xl italic font-oswald text-white">02</span>
+          </div>
+          <h3 class="text-xs uppercase tracking-widest text-amber-500 font-bold mb-6 flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-amber-500 animate-bounce"></span> In Development
+          </h3>
+          <ul class="space-y-4 text-sm text-gray-400">
+            <li class="flex items-center gap-3 font-medium text-white">● Collaborator Split Logic</li>
+            <li class="flex items-center gap-3 font-medium text-white">● Limited Run Minting (100 qty)</li>
+            <li class="flex items-center gap-3">○ User Multi-tier Storage Logic</li>
+            <li class="flex items-center gap-3">○ Creator Wallet System</li>
+            <li class="flex items-center gap-3 font-medium text-white">● RAG-based AI Knowledge Base</li>
+          </ul>
+        </div>
+
+        <div class="bg-black/40 border border-white/5 p-8 rounded-2xl relative overflow-hidden group">
+          <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-30 transition-opacity">
+            <span class="text-4xl italic font-oswald text-white">03</span>
+          </div>
+          <h3 class="text-xs uppercase tracking-widest text-gray-600 font-bold mb-6">Planned / Staged</h3>
+          <ul class="space-y-4 text-sm text-gray-500 italic">
+            <li>- Spotify / Bandcamp Connectors</li>
+            <li>- Encrypted "Gallery" Mode</li>
+            <li>- Advanced 10-Band EQ Sharing</li>
+            <li>- Collaborative Live Image Sets</li>
+            <li>- Global Soundscape Radio Charts</li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="mt-12 pt-8 border-t border-white/5 flex flex-wrap gap-x-12 gap-y-4 justify-center md:justify-start">
+          <div class="flex items-center gap-2">
+              <span class="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Stack:</span>
+              <span class="text-[10px] text-white font-mono bg-white/5 px-2 py-1 rounded">Ruby on Rails 8</span>
+              <span class="text-[10px] text-white font-mono bg-white/5 px-2 py-1 rounded">PostgreSQL + pgvector</span>
+              <span class="text-[10px] text-white font-mono bg-white/5 px-2 py-1 rounded">Heroku Deploy</span>
+              <span class="text-[10px] text-white font-mono bg-white/5 px-2 py-1 rounded">Production through Lab</span>
+          </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="py-8 border-t border-gray-900 text-center">
+    <div class="mb-4 flex justify-center items-center gap-2">
+      <%= image_tag "audioeye3.svg", class: "w-10 h-10 drop-shadow-[0_0_8px_rgba(239,68,68,0.4)]" %>
+      <span class="font-bold tracking-tighter">Rogue Media Lab</span>
+    </div>
+    <p class="text-[10px] text-gray-500 uppercase tracking-widest">
+      ©2026 Rogue Media Lab. | PRIVACY POLICY | TERMS & CONDITIONS |
+    </p>
+  </footer>
+</div>
+
+
 

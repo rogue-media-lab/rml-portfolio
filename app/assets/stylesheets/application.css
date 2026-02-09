@@ -9,6 +9,10 @@
  * Consider organizing styles into separate files for maintainability.
  */
 
+ @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Inter:wght@300;400&family=Kodchasan:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,200;1,300;1,400;1,500;1,600;1,700&display=swap');
+
+  h1, h2 { font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 0.1em; }
+
 /* EQ Slider Styles */
 .eq-slider {
   -webkit-appearance: slider-vertical;

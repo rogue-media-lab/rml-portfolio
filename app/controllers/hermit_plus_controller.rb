@@ -1,5 +1,4 @@
 class HermitPlusController < ApplicationController
-
   before_action :set_meta_data
   # Landing Page
   def landing
@@ -25,7 +24,7 @@ class HermitPlusController < ApplicationController
 
   private
 
-    # app/controllers/application_controller.rb
+  # app/controllers/application_controller.rb
   def set_meta_data
     set_meta_tags site: "https://www.roguemedialab.com/hermit-plus",
                   title: "Hermit Plus | Mason Roberts",
