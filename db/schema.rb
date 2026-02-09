@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_01_03_133251) do
+ActiveRecord::Schema[8.0].define(version: 2026_02_09_141344) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -422,6 +422,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_03_133251) do
     t.bigint "user_id", null: false
     t.index ["song_id", "user_id"], name: "index_songs_users_on_song_id_and_user_id"
     t.index ["user_id", "song_id"], name: "index_songs_users_on_user_id_and_song_id"
+  end
+
+  create_table "soundcloud_tokens", force: :cascade do |t|
+    t.text "access_token"
+    t.text "refresh_token"
+    t.integer "expires_at"
+    t.string "client_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "tasks", force: :cascade do |t|
