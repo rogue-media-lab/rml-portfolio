@@ -28,7 +28,7 @@ class SoundCloudSongPresenterTest < ActiveSupport::TestCase
     # Since stream_url is private and called by to_song_hash, we can stub Net::HTTP
 
     mock_response = Minitest::Mock.new
-    mock_response.expect :is_a?, true, [Net::HTTPSuccess]
+    mock_response.expect :is_a?, true, [ Net::HTTPSuccess ]
     mock_response.expect :body, '{"url": "https://final.stream.url/playlist.m3u8"}'
 
     SoundCloudService.stub :access_token, "fake_token" do
