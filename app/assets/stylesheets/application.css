@@ -47,3 +47,13 @@
   border: none;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
+
+body {
+  -webkit-tap-highlight-color: transparent;
+  scrollbar-width: none;
+  min-height: max(884px, 100dvh);
+}
+
+body::-webkit-scrollbar {
+  display: none;
+}
