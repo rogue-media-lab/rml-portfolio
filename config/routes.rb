@@ -115,6 +115,7 @@ Rails.application.routes.draw do
   get "info/erudition", to: "info#erudition"
 
   get "gemini_pro", to: "static_pages#gemini_pro", as: :gemini
+  get "rocky_audio", to: "static_pages#rocky_audio", as: :rocky_audio
 
   resources :contacts, only: [ :new, :create ]
   resources :projects, only: [ :index ]

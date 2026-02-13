@@ -10,4 +10,6 @@ class StaticPagesController < ApplicationController
   end
 
   def gemini_pro; end
+
+  def rocky_audio; end
 end

@@ -34,10 +34,28 @@
   --color-swabbie-st-drk-secondary: #FF9256;
   --color-st-logo: url('st-logo.svg');
 
+  --color-primary: #136dec;
+  --color-background-light: #f6f7f8;
+  --color-background-dark: #101822;
+  --color-card-dark: #1a2432;
+
   --font-teko: "Teko", sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
 }
 
 @variant dark (.dark &);
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.ios-blur {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
 
 .text-stroke {
   text-shadow: 
