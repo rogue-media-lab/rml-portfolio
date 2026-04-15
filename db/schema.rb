@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_02_09_141344) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_14_215322) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -94,6 +94,28 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_09_141344) do
     t.index ["featured"], name: "index_blogs_on_featured", unique: true, where: "(featured IS TRUE)"
     t.index ["milk_admin_id"], name: "index_blogs_on_milk_admin_id"
     t.index ["slug"], name: "index_blogs_on_slug", unique: true
+  end
+
+  create_table "chat_messages", force: :cascade do |t|
+    t.bigint "chat_session_id", null: false
+    t.string "role", null: false
+    t.text "content", null: false
+    t.integer "input_tokens", default: 0
+    t.integer "output_tokens", default: 0
+    t.decimal "cost_usd", default: "0.0"
+    t.string "media_type"
+    t.string "media_url"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["chat_session_id"], name: "index_chat_messages_on_chat_session_id"
+  end
+
+  create_table "chat_sessions", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "title"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_chat_sessions_on_user_id"
   end
 
   create_table "contacts", force: :cascade do |t|
@@ -445,6 +467,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_09_141344) do
     t.index ["project_id"], name: "index_tasks_on_project_id"
   end
 
+  create_table "tones", force: :cascade do |t|
+    t.string "name", null: false
+    t.text "description"
+    t.string "tags", default: [], array: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
@@ -463,6 +493,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_09_141344) do
   add_foreign_key "albums", "genres"
   add_foreign_key "blogs", "blog_categories"
   add_foreign_key "blogs", "milk_admins"
+  add_foreign_key "chat_messages", "chat_sessions"
+  add_foreign_key "chat_sessions", "users"
   add_foreign_key "hermit_videos", "hermits"
   add_foreign_key "milk_admin_profiles", "milk_admins"
   add_foreign_key "pills", "resumes"

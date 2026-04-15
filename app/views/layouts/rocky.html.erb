@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html class="h-full">
+  <head>
+    <title><%= content_for(:title) || "Rocky — Eridian AI" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <link rel="icon" href="/icon.png" type="image/png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inconsolata:wght@200..900&display=swap" rel="stylesheet">
+
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+
+    <style>
+      /* ── Rocky deep-space base ── */
+      :root {
+        --rocky-bg:        #040d1a;
+        --rocky-surface:   #071428;
+        --rocky-surface-2: #0a1c38;
+        --rocky-border:    #0f2d55;
+        --rocky-amber:     #f59e0b;
+        --rocky-amber-dim: #92650a;
+        --rocky-text:      #e2e8f0;
+        --rocky-muted:     #64748b;
+        --rocky-user-bg:   #0f2040;
+        --rocky-rocky-bg:  #071428;
+        --font-mono:       'Inconsolata', monospace;
+        --font-sans:       'Space Grotesk', sans-serif;
+      }
+
+      html, body { height: 100%; overflow: hidden; }
+
+      body {
+        background-color: var(--rocky-bg);
+        color: var(--rocky-text);
+        font-family: var(--font-sans);
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      /* ── Animated star field ── */
+      body::before,
+      body::after {
+        content: '';
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      body::before {
+        background-image:
+          radial-gradient(1px 1px at 10%  15%, rgba(255,255,255,0.55) 0%, transparent 100%),
+          radial-gradient(1px 1px at 23%  72%, rgba(255,255,255,0.40) 0%, transparent 100%),
+          radial-gradient(1px 1px at 38%  9%,  rgba(255,255,255,0.50) 0%, transparent 100%),
+          radial-gradient(1px 1px at 55%  88%, rgba(255,255,255,0.45) 0%, transparent 100%),
+          radial-gradient(1px 1px at 67%  31%, rgba(255,255,255,0.60) 0%, transparent 100%),
+          radial-gradient(1px 1px at 80%  58%, rgba(255,255,255,0.35) 0%, transparent 100%),
+          radial-gradient(1px 1px at 91%  4%,  rgba(255,255,255,0.50) 0%, transparent 100%),
+          radial-gradient(1px 1px at 4%   47%, rgba(255,255,255,0.45) 0%, transparent 100%),
+          radial-gradient(1px 1px at 44%  62%, rgba(255,255,255,0.30) 0%, transparent 100%),
+          radial-gradient(1px 1px at 75%  82%, rgba(255,255,255,0.55) 0%, transparent 100%),
+          radial-gradient(1.5px 1.5px at 18% 40%, rgba(255,255,255,0.70) 0%, transparent 100%),
+          radial-gradient(1.5px 1.5px at 60% 20%, rgba(255,255,255,0.65) 0%, transparent 100%),
+          radial-gradient(1.5px 1.5px at 85% 75%, rgba(255,255,255,0.60) 0%, transparent 100%),
+          radial-gradient(2px   2px   at 30% 55%, rgba(245,158,11,0.40) 0%, transparent 100%),
+          radial-gradient(2px   2px   at 70% 10%, rgba(245,158,11,0.30) 0%, transparent 100%);
+      }
+
+      body::after {
+        background-image:
+          radial-gradient(1px 1px at 7%   90%, rgba(255,255,255,0.35) 0%, transparent 100%),
+          radial-gradient(1px 1px at 33%  25%, rgba(255,255,255,0.45) 0%, transparent 100%),
+          radial-gradient(1px 1px at 50%  50%, rgba(255,255,255,0.25) 0%, transparent 100%),
+          radial-gradient(1px 1px at 88%  40%, rgba(255,255,255,0.50) 0%, transparent 100%),
+          radial-gradient(1px 1px at 14%  65%, rgba(255,255,255,0.40) 0%, transparent 100%),
+          radial-gradient(1px 1px at 96%  22%, rgba(255,255,255,0.55) 0%, transparent 100%),
+          radial-gradient(1.5px 1.5px at 42% 80%, rgba(255,255,255,0.65) 0%, transparent 100%),
+          radial-gradient(1.5px 1.5px at 77% 95%, rgba(255,255,255,0.50) 0%, transparent 100%);
+        animation: twinkle 8s ease-in-out infinite alternate;
+      }
+
+      @keyframes twinkle {
+        0%   { opacity: 0.6; }
+        50%  { opacity: 1.0; }
+        100% { opacity: 0.7; }
+      }
+
+      /* ── Flash messages ── */
+      .rocky-flash {
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        z-index: 9999;
+        padding: 0.75rem 1.25rem;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        font-family: var(--font-mono);
+        border: 1px solid var(--rocky-border);
+        background: var(--rocky-surface-2);
+        color: var(--rocky-amber);
+        opacity: 1;
+        transition: opacity 1s ease-out;
+      }
+
+      /* ── Message bubbles ── */
+      .message {
+        display: flex;
+        gap: 0.75rem;
+        padding: 0.25rem 0;
+      }
+
+      .message--user {
+        flex-direction: row-reverse;
+      }
+
+      .message--user .message__content {
+        background: var(--rocky-user-bg);
+        color: #f1f5f9;
+        border: 1px solid #1e3a5f;
+        border-radius: 1rem 1rem 0.25rem 1rem;
+        max-width: 72%;
+        padding: 0.75rem 1rem;
+        font-size: 0.9375rem;
+        line-height: 1.6;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+
+      .message--assistant {
+        align-items: flex-start;
+      }
+
+      .message__avatar {
+        flex-shrink: 0;
+        width: 2rem;
+        height: 2rem;
+        border-radius: 50%;
+        background: var(--rocky-amber-dim);
+        border: 2px solid var(--rocky-amber);
+        color: var(--rocky-bg);
+        font-family: var(--font-mono);
+        font-weight: 700;
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        letter-spacing: 0;
+        flex-shrink: 0;
+      }
+
+      .message__body {
+        display: flex;
+        flex-direction: column;
+        gap: 0.375rem;
+        max-width: 72%;
+      }
+
+      .message--assistant .message__content {
+        background: var(--rocky-rocky-bg);
+        color: var(--rocky-text);
+        border: 1px solid var(--rocky-border);
+        border-radius: 0.25rem 1rem 1rem 1rem;
+        padding: 0.75rem 1rem;
+        font-size: 0.9375rem;
+        line-height: 1.7;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+
+      .message__speak-btn {
+        align-self: flex-start;
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        color: var(--rocky-muted);
+        background: transparent;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+        letter-spacing: 0.05em;
+        transition: color 0.2s;
+      }
+
+      .message__speak-btn:hover {
+        color: var(--rocky-amber);
+      }
+
+      /* Tone marker — amber italic caption */
+      .tone-marker {
+        display: block;
+        font-size: 0.8rem;
+        font-style: italic;
+        color: var(--rocky-amber);
+        opacity: 0.8;
+        margin-bottom: 0.35rem;
+        font-family: var(--font-mono);
+        letter-spacing: 0.03em;
+      }
+
+      /* Media results */
+      .message--media {
+        padding: 0.5rem 0;
+      }
+
+      .media-result--image {
+        max-width: 480px;
+        width: 100%;
+        border-radius: 0.75rem;
+        border: 1px solid var(--rocky-border);
+        display: block;
+      }
+
+      .media-result--video {
+        max-width: 480px;
+        width: 100%;
+        border-radius: 0.75rem;
+        border: 1px solid var(--rocky-border);
+        display: block;
+      }
+
+      .media-result--audio {
+        width: 100%;
+        max-width: 480px;
+        filter: invert(1) hue-rotate(180deg);
+        display: block;
+      }
+
+      /* ── Scrollbar ── */
+      #rocky-messages::-webkit-scrollbar {
+        width: 4px;
+      }
+      #rocky-messages::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      #rocky-messages::-webkit-scrollbar-thumb {
+        background: var(--rocky-border);
+        border-radius: 2px;
+      }
+
+      /* ── Auto-resize textarea ── */
+      #rocky-input {
+        field-sizing: content;
+        min-height: 2.5rem;
+        max-height: 10rem;
+        resize: none;
+        overflow-y: auto;
+      }
+
+      /* Fallback for browsers without field-sizing */
+      @supports not (field-sizing: content) {
+        #rocky-input {
+          height: 2.5rem;
+          overflow-y: hidden;
+        }
+      }
+
+      /* Sidebar scrollbar */
+      #rocky-sidebar::-webkit-scrollbar {
+        width: 3px;
+      }
+      #rocky-sidebar::-webkit-scrollbar-thumb {
+        background: var(--rocky-border);
+      }
+    </style>
+  </head>
+
+  <body class="h-full">
+    <% if flash[:notice].present? %>
+      <div class="rocky-flash" data-controller="flash">
+        <%= flash[:notice] %>
+      </div>
+    <% end %>
+    <% if flash[:alert].present? %>
+      <div class="rocky-flash" style="color: #f87171; border-color: #7f1d1d;" data-controller="flash">
+        <%= flash[:alert] %>
+      </div>
+    <% end %>
+
+    <div class="h-full w-full relative z-10">
+      <%= yield %>
+    </div>
+  </body>
+</html>

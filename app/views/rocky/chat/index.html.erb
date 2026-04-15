@@ -1,0 +1,198 @@
+<div class="flex h-full w-full overflow-hidden"
+     data-controller="rocky-chat"
+     data-rocky-chat-session-id-value="<%= @session.id %>"
+     data-rocky-chat-messages-url-value="<%= rocky_session_messages_path(@session) %>"
+     data-rocky-chat-tts-url-value="<%= rocky_tts_path %>"
+     data-rocky-chat-generate-image-url-value="<%= rocky_generate_image_path %>"
+     data-rocky-chat-generate-video-url-value="<%= rocky_generate_video_path %>"
+     data-rocky-chat-generate-music-url-value="<%= rocky_generate_music_path %>"
+     data-rocky-chat-tone-match-url-value="<%= rocky_tones_match_path %>">
+
+  <%# ── Sidebar ── %>
+  <aside id="rocky-sidebar"
+         class="flex-shrink-0 w-60 flex flex-col overflow-y-auto border-r"
+         style="background: var(--rocky-surface); border-color: var(--rocky-border);">
+
+    <%# Identity block %>
+    <div class="p-5 border-b" style="border-color: var(--rocky-border);">
+      <div class="flex items-center gap-3 mb-3">
+        <div class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0"
+             style="background: var(--rocky-amber-dim); border: 2px solid var(--rocky-amber); color: var(--rocky-bg); font-family: var(--font-mono);">
+          R
+        </div>
+        <div>
+          <div class="font-semibold text-sm tracking-wide" style="color: var(--rocky-amber);">Rocky</div>
+          <div class="text-xs" style="color: var(--rocky-muted); font-family: var(--font-mono);">Eridian engineer</div>
+        </div>
+      </div>
+      <p class="text-xs leading-relaxed" style="color: var(--rocky-muted); font-family: var(--font-mono);">
+        Project Hail Mary.<br>
+        Rocky here. Is good.
+      </p>
+    </div>
+
+    <%# Session info %>
+    <div class="p-4 border-b" style="border-color: var(--rocky-border);">
+      <div class="text-xs mb-2 uppercase tracking-widest" style="color: var(--rocky-muted); font-family: var(--font-mono);">
+        Session
+      </div>
+      <div class="text-xs font-mono" style="color: var(--rocky-amber); font-family: var(--font-mono);">
+        #<%= @session.id.to_s.rjust(6, '0') %>
+      </div>
+      <div class="text-xs mt-1" style="color: var(--rocky-muted); font-family: var(--font-mono);">
+        <%= @messages.count %> message<%= @messages.count == 1 ? '' : 's' %>
+      </div>
+    </div>
+
+    <%# Commands reference %>
+    <div class="p-4 flex-1">
+      <div class="text-xs uppercase tracking-widest mb-3" style="color: var(--rocky-muted); font-family: var(--font-mono);">
+        Commands
+      </div>
+      <div class="space-y-2">
+        <div class="text-xs" style="font-family: var(--font-mono);">
+          <span style="color: var(--rocky-amber);">/image</span>
+          <span style="color: var(--rocky-muted);"> [prompt]</span>
+        </div>
+        <div class="text-xs" style="font-family: var(--font-mono);">
+          <span style="color: var(--rocky-amber);">/video</span>
+          <span style="color: var(--rocky-muted);"> [prompt]</span>
+        </div>
+        <div class="text-xs" style="font-family: var(--font-mono);">
+          <span style="color: var(--rocky-amber);">/music</span>
+          <span style="color: var(--rocky-muted);"> [prompt]</span>
+        </div>
+      </div>
+    </div>
+
+    <%# New session button %>
+    <div class="p-4 border-t" style="border-color: var(--rocky-border);">
+      <%= link_to rocky_sessions_path, method: :post,
+            data: { turbo_method: :post },
+            class: "block w-full text-center text-xs py-2 px-3 rounded border transition-colors duration-200",
+            style: "color: var(--rocky-muted); border-color: var(--rocky-border); font-family: var(--font-mono); text-decoration: none;" do %>
+        + New Session
+      <% end %>
+    </div>
+  </aside>
+
+  <%# ── Main chat area ── %>
+  <main class="flex-1 flex flex-col min-w-0 overflow-hidden" style="background: var(--rocky-bg);">
+
+    <%# Header bar %>
+    <div class="flex-shrink-0 flex items-center justify-between px-6 py-3 border-b"
+         style="background: rgba(4,13,26,0.8); border-color: var(--rocky-border); backdrop-filter: blur(8px);">
+      <div class="flex items-center gap-2">
+        <span class="text-sm font-medium" style="color: var(--rocky-amber); font-family: var(--font-mono);">Rocky</span>
+        <span class="text-xs" style="color: var(--rocky-muted);">·</span>
+        <span class="text-xs" style="color: var(--rocky-muted); font-family: var(--font-mono);">Eridian AI — Project Hail Mary</span>
+      </div>
+      <div class="flex items-center gap-1.5">
+        <span class="w-2 h-2 rounded-full" style="background: #22c55e;"></span>
+        <span class="text-xs" style="color: var(--rocky-muted); font-family: var(--font-mono);">online</span>
+      </div>
+    </div>
+
+    <%# Messages scroll area %>
+    <div id="rocky-messages"
+         data-rocky-chat-target="messages"
+         class="flex-1 overflow-y-auto px-6 py-6 space-y-4">
+
+      <%# Welcome message when no messages yet %>
+      <% if @messages.empty? %>
+        <div class="message message--assistant" id="rocky-welcome">
+          <div class="message__avatar">R</div>
+          <div class="message__body">
+            <div class="message__content" data-content>
+              <span class="tone-marker">♪ warm resonant hum</span>Hello! Rocky here.<br><br>
+              Am Eridian. You are human. This is good — Rocky like humans.<br><br>
+              We meet on <em>Hail Mary</em>, yes? You can ask Rocky science things. Or other things. Rocky try to help.<br><br>
+              Also: type <span style="color: var(--rocky-amber); font-family: var(--font-mono);">/image</span>, <span style="color: var(--rocky-amber); font-family: var(--font-mono);">/video</span>, or <span style="color: var(--rocky-amber); font-family: var(--font-mono);">/music</span> to generate. Amaze!
+            </div>
+            <button class="message__speak-btn"
+                    data-action="click->rocky-chat#speakMessage">
+              ♪ Speak
+            </button>
+          </div>
+        </div>
+      <% end %>
+
+      <%# Render persisted messages %>
+      <% @messages.each do |message| %>
+        <% if message.role == "user" %>
+          <div class="message message--user">
+            <div class="message__content" data-content><%= message.content %></div>
+          </div>
+
+        <% elsif message.role == "assistant" %>
+          <div class="message message--assistant">
+            <div class="message__avatar">R</div>
+            <div class="message__body">
+              <div class="message__content"
+                   data-content
+                   data-rocky-chat-target="persistedAssistant"
+                   data-raw-content="<%= h(message.content) %>">
+              </div>
+              <% if message.media_type.present? && message.media_url.present? %>
+                <div class="mt-2">
+                  <% if message.media_type == "image" %>
+                    <img src="<%= message.media_url %>" class="media-result--image" alt="Generated image">
+                  <% elsif message.media_type == "video" %>
+                    <video src="<%= message.media_url %>" controls class="media-result--video"></video>
+                  <% elsif message.media_type == "music" %>
+                    <audio src="<%= message.media_url %>" controls class="media-result--audio"></audio>
+                  <% end %>
+                </div>
+              <% end %>
+              <button class="message__speak-btn"
+                      data-action="click->rocky-chat#speakMessage">
+                ♪ Speak
+              </button>
+            </div>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+
+    <%# Input area %>
+    <div class="flex-shrink-0 border-t px-4 py-4"
+         style="background: rgba(7,20,40,0.95); border-color: var(--rocky-border); backdrop-filter: blur(8px);">
+
+      <%# Hint bar %>
+      <div class="flex items-center gap-3 mb-3 px-1">
+        <span class="text-xs" style="color: var(--rocky-muted); font-family: var(--font-mono);">
+          Enter to send · Shift+Enter for newline
+        </span>
+      </div>
+
+      <form data-action="submit->rocky-chat#submit"
+            class="flex items-end gap-3">
+        <div class="flex-1 relative">
+          <textarea
+            id="rocky-input"
+            data-rocky-chat-target="input"
+            data-action="keydown->rocky-chat#handleKeydown input->rocky-chat#autoResize"
+            placeholder="Talk to Rocky..."
+            rows="1"
+            class="w-full rounded-xl px-4 py-3 text-sm outline-none transition-all duration-200"
+            style="background: var(--rocky-surface-2);
+                   border: 1px solid var(--rocky-border);
+                   color: var(--rocky-text);
+                   font-family: var(--font-sans);
+                   line-height: 1.5;
+                   scrollbar-width: none;"
+          ></textarea>
+        </div>
+
+        <button type="submit"
+                data-rocky-chat-target="sendButton"
+                class="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-xl transition-all duration-200 disabled:opacity-40"
+                style="background: var(--rocky-amber); color: var(--rocky-bg);">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">
+            <path d="M3.105 2.288a.75.75 0 0 0-.826.95l1.903 6.89H10.5a.75.75 0 0 1 0 1.5H4.182l-1.903 6.89a.75.75 0 0 0 .826.95 28.897 28.897 0 0 0 15.208-7.078.75.75 0 0 0 0-1.14A28.897 28.897 0 0 0 3.105 2.288Z"/>
+          </svg>
+        </button>
+      </form>
+    </div>
+  </main>
+</div>

@@ -131,6 +131,21 @@ Rails.application.routes.draw do
   get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
   get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
+  namespace :rocky do
+    root to: "chat#index"
+    resources :sessions, only: [:create, :show, :destroy] do
+      resources :messages, only: [:create]
+    end
+    get  "tones/match", to: "tones#match"
+    post "tts", to: "tts#synthesize"
+    post "generate/image", to: "generate#image"
+    post "generate/video", to: "generate#video"
+    post "generate/music", to: "generate#music"
+  end
+
+  # ActionCable WebSocket endpoint
+  mount ActionCable.server => "/cable"
+
   # Defines the root path route ("/")
   root "static_pages#index"
 end
