@@ -12,7 +12,18 @@ module Rocky
       content = params[:content].to_s.strip
       return head(:unprocessable_entity) if content.blank?
 
+      # Track if this is a new conversation for pet XP
+      is_new_conversation = @chat_session.chat_messages.count == 0
+
       @chat_session.chat_messages.create!(role: "user", content: content)
+
+      # Update RockPet virtual companion
+      begin
+        word_count = content.split.size
+        current_user.rock_pet!.interact!(word_count: word_count, is_new_conversation: is_new_conversation)
+      rescue => e
+        Rails.logger.error("RockPet interaction failed: #{e.message}")
+      end
 
       messages = @chat_session.chat_messages.ordered.map do |m|
         { role: m.role, content: m.content }

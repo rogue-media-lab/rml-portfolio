@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_04_14_215322) do
+ActiveRecord::Schema[8.0].define(version: 2026_04_22_150545) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -259,6 +259,27 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_14_215322) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "rock_pets", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.integer "level", default: 1
+    t.integer "xp", default: 0
+    t.integer "xp_to_next_level", default: 100
+    t.string "stage", default: "egg"
+    t.jsonb "personality_attributes", default: {}
+    t.jsonb "skills_learned", default: []
+    t.jsonb "achievements", default: []
+    t.integer "total_messages", default: 0
+    t.integer "total_conversations", default: 0
+    t.integer "total_words", default: 0
+    t.datetime "last_interaction_at"
+    t.string "nickname"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["level"], name: "index_rock_pets_on_level"
+    t.index ["stage"], name: "index_rock_pets_on_stage"
+    t.index ["user_id"], name: "index_rock_pets_on_user_id"
+  end
+
   create_table "salt_and_tar_videos", force: :cascade do |t|
     t.string "title"
     t.text "description"
@@ -501,6 +522,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_04_14_215322) do
   add_foreign_key "playlist_songs", "playlists"
   add_foreign_key "playlist_songs", "songs"
   add_foreign_key "projects", "resumes"
+  add_foreign_key "rock_pets", "users"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_claimed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_failed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade

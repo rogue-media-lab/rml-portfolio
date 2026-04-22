@@ -136,6 +136,7 @@ Rails.application.routes.draw do
     resources :sessions, only: [:create, :show, :destroy] do
       resources :messages, only: [:create]
     end
+    post "pet/hatch", to: "pet#hatch"
     get  "tones/match", to: "tones#match"
     post "tts", to: "tts#synthesize"
     post "generate/image", to: "generate#image"

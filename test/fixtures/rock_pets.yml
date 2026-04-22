@@ -1,0 +1,21 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user: one
+  level: 1
+  xp: 1
+  xp_to_next_level: 1
+  stage: MyString
+  personality_attributes: 
+  skills_learned: 
+  achievements: 
+
+two:
+  user: two
+  level: 1
+  xp: 1
+  xp_to_next_level: 1
+  stage: MyString
+  personality_attributes: 
+  skills_learned: 
+  achievements: 
