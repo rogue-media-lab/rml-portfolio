@@ -117,6 +117,9 @@ Rails.application.routes.draw do
   get "gemini_pro", to: "static_pages#gemini_pro", as: :gemini
   get "rocky_audio", to: "static_pages#rocky_audio", as: :rocky_audio
 
+  # Rocky chat interface (turbo frame)
+  get "rocky/chat", to: "rocky#chat", as: :rocky_chat
+
   resources :contacts, only: [ :new, :create ]
   resources :projects, only: [ :index ]
   resources :skills, only: [ :index ]
