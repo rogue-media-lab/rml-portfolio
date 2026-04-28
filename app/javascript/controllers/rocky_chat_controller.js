@@ -1,7 +1,11 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["messages", "input", "sendButton", "tonebars", "statusDot", "statusText", "counter"]
+  static targets = [
+    "messages", "input", "sendButton", "counter",
+    "toneGlow", "toneCircleOuter", "toneCircleInner", "toneDiamond",
+    "speechbars"
+  ]
   static values = {
     messagesUrl: String,
     ttsUrl:      String,
@@ -12,18 +16,21 @@ export default class extends Controller {
   }
 
   connect() {
-    this._streaming    = false
-    this._toneQueue    = []
-    this._tonePlaying  = false
-    this._ttsReady     = false
-    this._tonePending  = false
-    this._audioCtx     = null
-    this._analyser     = null
-    this._reverbNode   = null
+    this._streaming     = false
+    this._toneQueue     = []
+    this._tonePlaying   = false
+    this._ttsReady      = false
+    this._tonePending   = false
+    this._audioCtx      = null
+    this._toneAnalyser  = null   // drives circles (tones)
+    this._speechAnalyser = null  // drives bars (TTS)
+    this._reverbNode    = null
     this._currentTtsSrc = null
-    this._playedTones  = new Set()
-    this._animFrameId  = null
-    this._activeSources = 0
+    this._playedTones   = new Set()
+    this._toneAnimId    = null
+    this._speechAnimId  = null
+    this._activeTones   = 0
+    this._activeSpeech  = 0
 
     this.scrollToBottom()
     if (this.hasInputTarget) this.inputTarget.focus()
@@ -31,10 +38,11 @@ export default class extends Controller {
   }
 
   disconnect() {
-    if (this._animFrameId) cancelAnimationFrame(this._animFrameId)
+    if (this._toneAnimId) cancelAnimationFrame(this._toneAnimId)
+    if (this._speechAnimId) cancelAnimationFrame(this._speechAnimId)
   }
 
-  // ── Input handling ──────────────────────────────────────────────────────
+  // ── Input ───────────────────────────────────────────────────────────────
 
   handleKeydown(event) {
     if (event.key === "Enter" && !event.shiftKey) {
@@ -56,7 +64,6 @@ export default class extends Controller {
 
     this.inputTarget.value = ""
     this._setStreaming(true)
-    this._setStatus("active", "PROCESSING_INPUT")
 
     this.appendUserMessage(content)
     const assistantBubble = this.appendAssistantBubble()
@@ -64,10 +71,7 @@ export default class extends Controller {
     try {
       const response = await fetch(this.messagesUrlValue, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRF-Token": this.csrfToken
-        },
+        headers: { "Content-Type": "application/json", "X-CSRF-Token": this.csrfToken },
         body: JSON.stringify({ content })
       })
 
@@ -89,7 +93,6 @@ export default class extends Controller {
       this._updateBubble(assistantBubble, "Problem! Connection lost. Try again.")
     } finally {
       this._setStreaming(false)
-      this._setStatus("online", "LISTENING_FOR_INPUT")
       this.inputTarget.focus()
     }
   }
@@ -118,7 +121,6 @@ export default class extends Controller {
 
       for (const line of lines) {
         if (!line.startsWith("data: ")) continue
-
         let data
         try { data = JSON.parse(line.slice(6)) } catch { continue }
 
@@ -127,12 +129,9 @@ export default class extends Controller {
           this._updateBubble(bubble, fullContent)
           this.scrollToBottom()
           this._playNewTones(fullContent)
-
         } else if (data.type === "done") {
           const speakText = this.stripToneMarkers(fullContent)
           if (speakText.trim()) this.speakText(speakText)
-          this._setStatus("online", "RESPONSE_COMPLETE")
-
         } else if (data.type === "error") {
           this._updateBubble(bubble, data.message || "Problem! Rocky not responding.")
         }
@@ -140,7 +139,7 @@ export default class extends Controller {
     }
   }
 
-  // ── Audio context & analyser ────────────────────────────────────────────
+  // ── Audio context ───────────────────────────────────────────────────────
 
   _getAudioCtx() {
     if (!this._audioCtx) {
@@ -149,54 +148,50 @@ export default class extends Controller {
     return this._audioCtx
   }
 
-  _getAnalyser() {
-    if (this._analyser) return this._analyser
+  // Tone analyser → drives circles
+  _getToneAnalyser() {
+    if (this._toneAnalyser) return this._toneAnalyser
+    const ctx = this._getAudioCtx()
+    const analyser = ctx.createAnalyser()
+    analyser.fftSize = 64
+    analyser.smoothingTimeConstant = 0.75
+    analyser.connect(ctx.destination)
+    this._toneAnalyser = analyser
+    return analyser
+  }
 
-    const ctx     = this._getAudioCtx()
+  // Speech analyser → drives bars
+  _getSpeechAnalyser() {
+    if (this._speechAnalyser) return this._speechAnalyser
+    const ctx = this._getAudioCtx()
     const analyser = ctx.createAnalyser()
     analyser.fftSize = 64
     analyser.smoothingTimeConstant = 0.7
     analyser.connect(ctx.destination)
-    this._analyser = analyser
+    this._speechAnalyser = analyser
     return analyser
   }
 
   _getReverb() {
     if (this._reverbNode) return this._reverbNode
-
     const ctx      = this._getAudioCtx()
     const reverb   = ctx.createConvolver()
     const duration = 0.25
     const decay    = 3.5
     const length   = Math.floor(ctx.sampleRate * duration)
     const impulse  = ctx.createBuffer(2, length, ctx.sampleRate)
-
     for (let c = 0; c < 2; c++) {
       const data = impulse.getChannelData(c)
       for (let i = 0; i < length; i++) {
         data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, decay)
       }
     }
-
-    reverb.buffer   = impulse
+    reverb.buffer = impulse
     this._reverbNode = reverb
     return reverb
   }
 
-  // Track active sources for waveform start/stop
-  _sourceStarted() {
-    this._activeSources++
-    this._startWaveformLoop()
-  }
-
-  _sourceEnded() {
-    this._activeSources = Math.max(0, this._activeSources - 1)
-    if (this._activeSources === 0) {
-      this._stopWaveformLoop()
-    }
-  }
-
-  // ── Tone playback (through Web Audio analyser) ──────────────────────────
+  // ── Tone playback (→ tone analyser → circles) ───────────────────────────
 
   _playNewTones(fullContent) {
     const TONE_RE = /\*(?:🎵\s*)?(.+?)(?:\s*🎵)?\*/g
@@ -215,16 +210,12 @@ export default class extends Controller {
       const url = `${this.toneUrlValue}?description=${encodeURIComponent(description)}`
       const response = await fetch(url)
       if (!response.ok) return
-
       const blob = await response.blob()
       if (!blob.size) return
-
       const arrayBuffer = await blob.arrayBuffer()
       this._toneQueue.push(arrayBuffer)
       if (!this._tonePlaying) this._drainToneQueue()
-    } catch (e) {
-      // Non-critical
-    }
+    } catch (e) { /* non-critical */ }
   }
 
   _drainToneQueue() {
@@ -232,7 +223,6 @@ export default class extends Controller {
       this._tonePlaying = false
       return
     }
-
     if (!this._ttsReady) {
       this._tonePending = true
       this._tonePlaying = false
@@ -242,9 +232,17 @@ export default class extends Controller {
     this._tonePlaying = true
     const arrayBuffer = this._toneQueue.shift()
 
-    this._playAudioThroughAnalyser(arrayBuffer, 0.3, () => {
+    // Play through tone analyser (circles layer)
+    this._playThroughAnalyser(arrayBuffer, this._getToneAnalyser(), 0.3, () => {
+      this._activeTones--
+      if (this._activeTones <= 0) {
+        this._activeTones = 0
+        this._stopToneLoop()
+      }
       this._drainToneQueue()
     })
+    this._activeTones++
+    this._startToneLoop()
   }
 
   _releaseToneQueue() {
@@ -255,64 +253,20 @@ export default class extends Controller {
     }
   }
 
-  // ── Shared audio routing through analyser ───────────────────────────────
-
-  async _playAudioThroughAnalyser(arrayBuffer, volume = 1.0, onEnded = null) {
-    try {
-      const ctx = this._getAudioCtx()
-      if (ctx.state === "suspended") await ctx.resume()
-
-      const analyser = this._getAnalyser()
-      const audioBuffer = await ctx.decodeAudioData(arrayBuffer.slice(0))
-
-      const source = ctx.createBufferSource()
-      source.buffer = audioBuffer
-
-      const gainNode = ctx.createGain()
-      gainNode.gain.value = volume
-
-      source.connect(gainNode)
-      gainNode.connect(analyser)
-
-      this._sourceStarted()
-      source.start()
-
-      source.addEventListener("ended", () => {
-        this._sourceEnded()
-        if (onEnded) onEnded()
-      })
-
-      return source
-    } catch (e) {
-      console.warn("Audio playback failed:", e)
-      if (onEnded) onEnded()
-      return null
-    }
-  }
-
-  // ── TTS (through analyser + reverb) ─────────────────────────────────────
+  // ── TTS playback (→ speech analyser → bars) ─────────────────────────────
 
   async speakText(text) {
     if (!text.trim() || !this.hasTtsUrlValue) {
       this._releaseToneQueue()
       return
     }
-
     try {
       const response = await fetch(this.ttsUrlValue, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRF-Token": this.csrfToken
-        },
+        headers: { "Content-Type": "application/json", "X-CSRF-Token": this.csrfToken },
         body: JSON.stringify({ text: text.slice(0, 2000) })
       })
-
-      if (!response.ok) {
-        this._releaseToneQueue()
-        return
-      }
-
+      if (!response.ok) { this._releaseToneQueue(); return }
       const arrayBuffer = await response.arrayBuffer()
       this._playTtsWithReverb(arrayBuffer)
     } catch (e) {
@@ -326,7 +280,7 @@ export default class extends Controller {
       const ctx = this._getAudioCtx()
       if (ctx.state === "suspended") await ctx.resume()
 
-      const analyser = this._getAnalyser()
+      const speechAnalyser = this._getSpeechAnalyser()
       const audioBuffer = await ctx.decodeAudioData(arrayBuffer)
 
       if (this._currentTtsSrc) {
@@ -334,90 +288,190 @@ export default class extends Controller {
         this._currentTtsSrc = null
       }
 
-      const source  = ctx.createBufferSource()
+      const source = ctx.createBufferSource()
       source.buffer = audioBuffer
 
-      // Dry path → analyser (82%)
-      const dryGain       = ctx.createGain()
-      dryGain.gain.value  = 0.82
+      // Dry path → speech analyser (82%)
+      const dryGain = ctx.createGain()
+      dryGain.gain.value = 0.82
       source.connect(dryGain)
-      dryGain.connect(analyser)
+      dryGain.connect(speechAnalyser)
 
-      // Wet path → reverb → analyser (18%)
-      const reverb        = this._getReverb()
-      const wetGain       = ctx.createGain()
-      wetGain.gain.value  = 0.18
+      // Wet path → reverb → speech analyser (18%)
+      const reverb = this._getReverb()
+      const wetGain = ctx.createGain()
+      wetGain.gain.value = 0.18
       source.connect(reverb)
       reverb.connect(wetGain)
-      wetGain.connect(analyser)
+      wetGain.connect(speechAnalyser)
 
       this._currentTtsSrc = source
-      this._sourceStarted()
+      this._activeSpeech++
+      this._startSpeechLoop()
       source.start()
       this._releaseToneQueue()
 
       source.addEventListener("ended", () => {
         this._currentTtsSrc = null
-        this._sourceEnded()
+        this._activeSpeech--
+        if (this._activeSpeech <= 0) {
+          this._activeSpeech = 0
+          this._stopSpeechLoop()
+        }
       })
     } catch (e) {
-      console.warn("Rocky TTS reverb failed:", e)
+      console.warn("Rocky TTS failed:", e)
       this._releaseToneQueue()
     }
   }
 
-  // ── Real waveform visualization ─────────────────────────────────────────
+  // ── Shared audio player ─────────────────────────────────────────────────
 
-  _startWaveformLoop() {
-    if (this._animFrameId) return // already running
-    if (!this.hasTonebarsTarget) return
+  async _playThroughAnalyser(arrayBuffer, analyser, volume, onEnded) {
+    try {
+      const ctx = this._getAudioCtx()
+      if (ctx.state === "suspended") await ctx.resume()
+      const audioBuffer = await ctx.decodeAudioData(arrayBuffer.slice(0))
+      const source = ctx.createBufferSource()
+      source.buffer = audioBuffer
+      const gain = ctx.createGain()
+      gain.gain.value = volume
+      source.connect(gain)
+      gain.connect(analyser)
+      source.start()
+      source.addEventListener("ended", () => { if (onEnded) onEnded() })
+    } catch (e) {
+      console.warn("Audio failed:", e)
+      if (onEnded) onEnded()
+    }
+  }
 
-    const bars = this.tonebarsTarget.querySelectorAll(".tonebar")
-    if (!bars.length) return
+  // ── LAYER 1: Tone visualization (circles + diamond) ─────────────────────
 
-    const analyser = this._getAnalyser()
+  _startToneLoop() {
+    if (this._toneAnimId) return
+    const analyser = this._getToneAnalyser()
     const dataArray = new Uint8Array(analyser.frequencyBinCount)
 
     const update = () => {
       analyser.getByteFrequencyData(dataArray)
 
-      // Map frequency bins to bars (use first 9 bins for 9 bars)
-      const binStep = Math.max(1, Math.floor(dataArray.length / bars.length))
+      // Average energy across all bins
+      let sum = 0
+      for (let i = 0; i < dataArray.length; i++) sum += dataArray[i]
+      const avg = sum / dataArray.length
+      const norm = avg / 255  // 0..1
+
+      // Outer circle: border opacity pulses 0.08 → 0.6
+      if (this.hasToneCircleOuterTarget) {
+        const outerAlpha = 0.08 + norm * 0.52
+        this.toneCircleOuterTarget.style.borderColor = `rgba(251,191,36,${outerAlpha})`
+        // Subtle scale pulse
+        const scale = 1 + norm * 0.03
+        this.toneCircleOuterTarget.style.transform = `scale(${scale})`
+      }
+
+      // Inner circle: border opacity pulses 0.15 → 0.8
+      if (this.hasToneCircleInnerTarget) {
+        const innerAlpha = 0.15 + norm * 0.65
+        this.toneCircleInnerTarget.style.borderColor = `rgba(251,191,36,${innerAlpha})`
+        const scale = 1 + norm * 0.05
+        this.toneCircleInnerTarget.style.transform = `scale(${scale})`
+      }
+
+      // Diamond glow intensifies
+      if (this.hasToneDiamondTarget) {
+        const glowInner = 30 + norm * 40
+        const glowOuter = 50 + norm * 60
+        const alpha = 0.3 + norm * 0.5
+        this.toneDiamondTarget.style.boxShadow =
+          `inset 0 0 ${glowInner}px rgba(251,191,36,${alpha}), 0 0 ${glowOuter}px rgba(251,191,36,${alpha})`
+        this.toneDiamondTarget.style.borderColor = `rgba(251,191,36,${0.7 + norm * 0.3})`
+      }
+
+      // Radial glow expands and brightens
+      if (this.hasToneGlowTarget) {
+        const glowAlpha = 0.10 + norm * 0.25
+        this.toneGlowTarget.style.backgroundImage =
+          `radial-gradient(circle farthest-corner at 50% 50% in oklab, oklab(83.7% 0.016 0.164 / ${glowAlpha}) 0%, oklab(0% 0 .0001 / 0%) 70%)`
+      }
+
+      this._toneAnimId = requestAnimationFrame(update)
+    }
+
+    this._toneAnimId = requestAnimationFrame(update)
+  }
+
+  _stopToneLoop() {
+    if (this._toneAnimId) {
+      cancelAnimationFrame(this._toneAnimId)
+      this._toneAnimId = null
+    }
+
+    // Reset to idle
+    if (this.hasToneCircleOuterTarget) {
+      this.toneCircleOuterTarget.style.borderColor = "rgba(251,191,36,0.08)"
+      this.toneCircleOuterTarget.style.transform = "scale(1)"
+    }
+    if (this.hasToneCircleInnerTarget) {
+      this.toneCircleInnerTarget.style.borderColor = "rgba(251,191,36,0.15)"
+      this.toneCircleInnerTarget.style.transform = "scale(1)"
+    }
+    if (this.hasToneDiamondTarget) {
+      this.toneDiamondTarget.style.boxShadow = "inset 0 0 30px rgba(251,191,36,0.3), 0 0 50px rgba(251,191,36,0.5)"
+      this.toneDiamondTarget.style.borderColor = "rgba(251,191,36,1)"
+    }
+    if (this.hasToneGlowTarget) {
+      this.toneGlowTarget.style.backgroundImage =
+        "radial-gradient(circle farthest-corner at 50% 50% in oklab, oklab(83.7% 0.016 0.164 / 0.10) 0%, oklab(0% 0 .0001 / 0%) 70%)"
+    }
+  }
+
+  // ── LAYER 2: Speech visualization (bars) ────────────────────────────────
+
+  _startSpeechLoop() {
+    if (this._speechAnimId) return
+    if (!this.hasSpeechbarsTarget) return
+
+    const bars = this.speechbarsTarget.querySelectorAll(".speechbar")
+    if (!bars.length) return
+
+    const analyser = this._getSpeechAnalyser()
+    const dataArray = new Uint8Array(analyser.frequencyBinCount)
+    const binStep = Math.max(1, Math.floor(dataArray.length / bars.length))
+
+    const update = () => {
+      analyser.getByteFrequencyData(dataArray)
 
       bars.forEach((bar, i) => {
-        const binIndex = i * binStep
-        const value = dataArray[binIndex] || 0
-
-        // Scale: min 10% height, max 100%
-        const minH = 10  // minimum percentage
-        const maxH = 100
-        const pct = minH + (value / 255) * (maxH - minH)
-
+        const value = dataArray[i * binStep] || 0
+        const pct = 10 + (value / 255) * 90
         bar.style.height = `${pct}%`
-        bar.style.opacity = 0.5 + (value / 255) * 0.5
+        bar.style.opacity = 0.3 + (value / 255) * 0.7
         bar.style.boxShadow = value > 30
-          ? `0 0 ${8 + value / 10}px rgba(45,212,191,${0.4 + value / 500})`
+          ? `0 0 ${8 + value / 8}px rgba(45,212,191,${0.4 + value / 400})`
           : "0 0 8px rgba(45,212,191,0.3)"
       })
 
-      this._animFrameId = requestAnimationFrame(update)
+      this._speechAnimId = requestAnimationFrame(update)
     }
 
-    this._animFrameId = requestAnimationFrame(update)
+    this._speechAnimId = requestAnimationFrame(update)
   }
 
-  _stopWaveformLoop() {
-    if (this._animFrameId) {
-      cancelAnimationFrame(this._animFrameId)
-      this._animFrameId = null
+  _stopSpeechLoop() {
+    if (this._speechAnimId) {
+      cancelAnimationFrame(this._speechAnimId)
+      this._speechAnimId = null
     }
 
-    // Reset bars to idle state
-    if (this.hasTonebarsTarget) {
-      const bars = this.tonebarsTarget.querySelectorAll(".tonebar")
-      bars.forEach((bar, i) => {
-        bar.style.height = bar.dataset.idleHeight || `${30 + (i % 3) * 20}%`
-        bar.style.opacity = "0.4"
+    // Reset bars to idle
+    if (this.hasSpeechbarsTarget) {
+      const bars = this.speechbarsTarget.querySelectorAll(".speechbar")
+      bars.forEach(bar => {
+        const idle = bar.dataset.idleHeight || "30%"
+        bar.style.height = idle
+        bar.style.opacity = "0.3"
         bar.style.boxShadow = "0 0 8px rgba(45,212,191,0.3)"
       })
     }
@@ -496,18 +550,6 @@ export default class extends Controller {
   _setStreaming(val) {
     this._streaming = val
     if (this.hasSendButtonTarget) this.sendButtonTarget.disabled = val
-  }
-
-  _setStatus(state, text) {
-    if (this.hasStatusDotTarget) {
-      this.statusDotTarget.className = this.statusDotTarget.className.replace(
-        /bg-(green|yellow|red)-\d+/,
-        state === "active" ? "bg-yellow-400" : state === "error" ? "bg-red-400" : "bg-green-400"
-      )
-    }
-    if (this.hasStatusTextTarget) {
-      this.statusTextTarget.textContent = `STATUS: ${state.toUpperCase()} // ${text}`
-    }
   }
 
   _updateCounter() {
