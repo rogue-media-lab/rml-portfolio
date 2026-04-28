@@ -59,7 +59,8 @@
     </div>
   </div>
 
-  <%# ─── HERO SECTION ─── %>
+  <%# ─── HERO SECTION (turbo frame for Rocky swap) ─── %>
+  <turbo-frame id="workbench-hero">
   <div class="relative flex justify-center w-full pt-30 pb-20 px-16">
     <div class="flex flex-col items-center max-w-200 gap-10">
       <%# Badge %>
@@ -129,7 +130,7 @@
               <span class="text-zinc-500 font-mono text-[11px]">STATUS: ONLINE // LISTENING_FOR_INPUT</span>
             </div>
           </div>
-          <%= link_to "#", class: "rounded-md py-2 px-4 bg-zinc-50 hover:bg-zinc-200 transition-colors cursor-pointer" do %>
+          <%= link_to rocky_chat_path, class: "rounded-md py-2 px-4 bg-zinc-50 hover:bg-zinc-200 transition-colors cursor-pointer", data: { turbo_frame: "workbench-hero" } do %>
             <span class="uppercase text-zinc-950 font-['Inter',system-ui,sans-serif] font-bold text-[13px]">Initiate</span>
           <% end %>
         </div>
@@ -137,6 +138,7 @@
       </div>
     </div>
   </div>
+  </turbo-frame>
 
   <%# ─── THE PILLARS ─── %>
   <div class="flex justify-center w-full pt-15 pb-30 gap-8 px-16">
