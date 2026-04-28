@@ -4,7 +4,7 @@ module Rocky
   class TtsService
     class Error < StandardError; end
 
-    ELEVENLABS_VOICE_ID = "21m00Tcm4TlvDZuoxGvT" # Rachel — update to your preferred voice
+    ELEVENLABS_VOICE_ID = "vBKc2FfBKJfcZNyEt1n6" # Finn
     ELEVENLABS_URL      = "https://api.elevenlabs.io/v1/text-to-speech"
 
     def initialize(text:)
