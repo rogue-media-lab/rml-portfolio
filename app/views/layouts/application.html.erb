@@ -28,7 +28,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English+SC&family=Inconsolata:wght@200..900&family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=M+PLUS+Code+Latin:wght@100..700&family=Teko:wght@300..700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=IM+Fell+English+SC&family=Inconsolata:wght@200..900&family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=M+PLUS+Code+Latin:wght@100..700&family=Teko:wght@300..700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 
@@ -55,8 +55,8 @@
     </script>
   </head>
 
-  <body class="bg-base-light text-base-dark dark:bg-base-dark dark:text-white">
-    <main class="flex flex-col justify-center items-center min-h-screen">
+  <body class="<%= content_for?(:body_class) ? yield(:body_class) : 'bg-base-light text-base-dark dark:bg-base-dark dark:text-white' %>">
+    <main class="<%= content_for?(:main_class) ? yield(:main_class) : 'flex flex-col justify-center items-center min-h-screen' %>">
       <%= render "shared/flash_notice" %>
       <% if controller_name == "blogs" %>
         <%= render "shared/blog_nav" %>

@@ -1,12 +1,6 @@
 class StaticPagesController < ApplicationController
   def index
-    @featured_projects = Project.where(featured: true).order(updated_at: :desc).pluck(:short_title, :short_description).map do |title, description|
-      {
-        title: title,
-        description: description,
-        path: "/#{title.parameterize}"
-      }
-    end
+    @latest_articles = Blog.published.sorted.includes(:blog_category).limit(2)
   end
 
   def gemini_pro; end

@@ -1,37 +1,289 @@
-<div class="max-w-5xl mx-auto w-full px-3">
-  <%= render "shared/main_nav" %>
-  <section>
-    <!-- Welcome Hero with navigation -->
-    <div class="flex flex-col-reverse md:flex-row justify-center items-start md:items-stretch gap-2 mt-4 mb-2">
-      <%# 1. Right side info frame %>
-      <turbo-frame id="info" class="flex flex-col justify-start items-start w-full md:w-3/4">
-        <%= image_tag "RogueMediaLab-intro.png", 
-                  alt: "Welcome to the lab", 
-                  class: "border-2 border-gray-800 rounded-lg w-full lg:max-w-[700px] max-h-[525px] overflow-hidden" %>
-      </turbo-frame>
-      <%# 2. Left side info sidebar %>
-      <div id="info-nav" class="hidden md:flex flex-col w-full md:w-1/4">
-        <h2 class="text-3xl font-bold dark:text-milk-light text-base-dark">Info</h2>
-        <hr class="my-4 w-full dark:border-white border-base-dark">
-        <%= info_nav_link "Welcome", info_welcome_path, data: { turbo_frame: "info" } %>
-        <%= info_nav_link "Vibe Coding", info_vibe_path, data: { turbo_frame: "info" } %>
-        <%= info_nav_link "Skills", skills_path, data: { turbo_frame: "info" } %>
-        <%= info_nav_link "Blog", blogs_path %>
-        <%= info_nav_link "Projects", projects_path, data: { turbo_frame: "info" } %>
+<%# RML Workbench Home — Digital Workbench Design %>
+<% content_for(:title) { "Rogue Media Lab — Digital Workbench" } %>
+<% content_for(:body_class) { "bg-zinc-950 text-zinc-50" } %>
+<% content_for(:main_class) { "flex flex-col min-h-screen w-full" } %>
 
-        <%# 2. Use proper path helpers for robust links %>
-        <%= info_nav_link "Contact", new_contact_path, data: { turbo_frame: "info" } %>
-        <%= info_nav_link "Erudition", info_erudition_path, data: { turbo_frame: "info" } %>
-        <%= info_nav_link "Code - GitHub", "https://github.com/Developer3027", target: "_blank" %>
+<div class="w-full min-h-screen bg-zinc-950 antialiased">
+
+  <%# ─── SYSTEM STATUS BAR ─── %>
+  <div class="flex justify-between items-center w-full py-3 px-6 bg-[#050505] border-b border-zinc-800">
+    <div class="flex items-center gap-4">
+      <span class="text-green-400 font-mono text-[13px]">[ SYS.ROCKY_ONLINE ]</span>
+      <span class="text-zinc-400 font-mono text-[13px]">// ROGUE MEDIA LAB // WORKBENCH V2.0</span>
+    </div>
+    <div class="flex gap-6">
+      <div class="flex items-center gap-2">
+        <div class="w-2 h-2 rounded-sm bg-green-400"></div>
+        <span class="text-zinc-400 font-mono text-[13px]">RAILS SYSTEM: NOMINAL</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="w-2 h-2 rounded-sm bg-yellow-500"></div>
+        <span class="text-zinc-400 font-mono text-[13px]">AI EXPERIMENTS: ACTIVE</span>
       </div>
     </div>
-    <!-- Featured projects -->
-    <div class="my-6">
-      <h2 class="text-3xl font-bold dark:text-milk-light text-base-dark">Featured</h2>
-      <hr class="my-4 w-full dark:border-white border-base-dark">
-        <div class="flex justify-between items-center flex-wrap w-full my-2">
-          <%= render partial: "shared/project_card", collection: @featured_projects, as: :project_card %>
+  </div>
+
+  <%# ─── MAIN NAVIGATION ─── %>
+  <div class="flex justify-between items-center w-full py-8 px-16 bg-zinc-950 border-b border-zinc-800">
+    <%# Logo %>
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-sm bg-orange-600"></div>
+      <span class="tracking-[0.05em] uppercase text-zinc-50 font-['Barlow_Condensed',system-ui,sans-serif] font-bold text-[28px]">Rogue Media Lab</span>
+    </div>
+    <%# Nav Links %>
+    <div class="flex gap-12">
+      <div class="flex items-center pb-1 border-b-2 border-orange-600">
+        <span class="tracking-[0.02em] text-zinc-50 font-['Inter',system-ui,sans-serif] font-medium text-[15px]">Workbench</span>
+      </div>
+      <div class="flex items-center gap-1.5">
+        <span class="tracking-[0.02em] text-zinc-400 font-['Inter',system-ui,sans-serif] font-medium text-[15px]">The Studio</span>
+        <span class="text-[11px] text-zinc-500 font-['Inter',system-ui,sans-serif] font-medium py-0.5 px-1.5 border border-zinc-800 rounded-sm">APPS</span>
+      </div>
+      <div class="flex items-center gap-1.5">
+        <span class="tracking-[0.02em] text-zinc-400 font-['Inter',system-ui,sans-serif] font-medium text-[15px]">The Lab</span>
+        <span class="text-[11px] text-zinc-500 font-['Inter',system-ui,sans-serif] font-medium py-0.5 px-1.5 border border-zinc-800 rounded-sm">TOOLS</span>
+      </div>
+      <div class="flex items-center gap-1.5">
+        <span class="tracking-[0.02em] text-zinc-400 font-['Inter',system-ui,sans-serif] font-medium text-[15px]">Erudition</span>
+        <span class="text-[11px] text-zinc-500 font-['Inter',system-ui,sans-serif] font-medium py-0.5 px-1.5 border border-zinc-800 rounded-sm">ACADEMY</span>
       </div>
     </div>
-  </section>
+    <%# CTA Buttons %>
+    <div class="flex gap-4">
+      <div class="flex items-center justify-center rounded-md py-2.5 px-5 bg-zinc-900 border border-zinc-800 cursor-pointer hover:bg-zinc-800 transition-colors">
+        <span class="text-zinc-200 font-['Inter',system-ui,sans-serif] font-semibold text-sm">Patreon</span>
+      </div>
+      <div class="flex items-center justify-center rounded-md py-2.5 px-5 bg-zinc-50 cursor-pointer hover:bg-zinc-200 transition-colors">
+        <span class="text-zinc-950 font-['Inter',system-ui,sans-serif] font-semibold text-sm">Substack</span>
+      </div>
+    </div>
+  </div>
+
+  <%# ─── HERO SECTION ─── %>
+  <div class="relative flex justify-center w-full pt-30 pb-20 px-16">
+    <div class="flex flex-col items-center max-w-200 gap-10">
+      <%# Badge %>
+      <div class="flex items-center rounded-full py-1.5 px-3 gap-2 border border-zinc-800">
+        <div class="w-1.5 h-1.5 rounded-[3px] bg-orange-600"></div>
+        <span class="text-center text-orange-600 font-mono text-xs">Bridging the gap between legacy stability and future tech.</span>
+      </div>
+      <%# Headline %>
+      <h1 class="text-[72px] leading-[1.1] tracking-[0.02em] uppercase text-center text-zinc-50 font-['Barlow_Condensed',system-ui,sans-serif] font-bold m-0">The Rails Ecosystem<br>Is a Powerhouse for AI.</h1>
+      <%# Subtitle %>
+      <p class="text-[18px] leading-[1.6] max-w-150 text-center text-zinc-400 font-['Inter',system-ui,sans-serif] m-0">Welcome to the Digital Workbench. I am a developer in the Rails ecosystem, using AI to build tools and applications. Demonstrating that you don't need React to build the future.</p>
+    </div>
+
+    <%# ─── LAB FEED (absolute) ─── %>
+    <div class="absolute top-45 right-16 w-70 flex flex-col gap-5">
+      <div class="pb-2 border-b border-zinc-800">
+        <span class="text-zinc-500 font-mono text-[11px]">LIVE_LAB_FEED</span>
+      </div>
+      <div class="flex flex-col gap-4">
+        <div class="flex gap-3">
+          <div class="w-0.5 h-8 bg-orange-600 shrink-0"></div>
+          <div class="flex flex-col gap-0.5">
+            <span class="text-zinc-400 font-mono text-[11px]">ROCKY // SYNC_SUCCESS</span>
+            <span class="text-zinc-600 font-['Inter',system-ui,sans-serif] text-xs">New tone library indexed: 'Eridian_Acoustics_V2'</span>
+          </div>
+        </div>
+        <div class="flex gap-3">
+          <div class="w-0.5 h-8 bg-blue-500 shrink-0"></div>
+          <div class="flex flex-col gap-0.5">
+            <span class="text-zinc-400 font-mono text-[11px]">ZUKE // PROC_COMPLETE</span>
+            <span class="text-zinc-600 font-['Inter',system-ui,sans-serif] text-xs">Waveform generated for track: 'Neon_Pulse_Final'</span>
+          </div>
+        </div>
+        <div class="flex gap-3">
+          <div class="w-0.5 h-8 bg-purple-500 shrink-0"></div>
+          <div class="flex flex-col gap-0.5">
+            <span class="text-zinc-400 font-mono text-[11px]">ERUDITION // NEW_ENTRY</span>
+            <span class="text-zinc-600 font-['Inter',system-ui,sans-serif] text-xs">"The Rails Way: AI as a First-Class Citizen" published.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%# ─── ROCKY MINI CORE INTERFACE ─── %>
+  <div class="flex justify-center w-full pb-20 px-16">
+    <div class="w-full max-w-[700px] h-40 rounded-2xl overflow-hidden bg-[#050505] border border-zinc-800 shadow-[0_10px_40px_rgba(0,0,0,0.5)] flex">
+      <%# Left — Rocky Visualizer %>
+      <div class="w-40 h-full relative flex items-center justify-center shrink-0 overflow-hidden bg-zinc-950 border-r border-zinc-800">
+        <div class="absolute w-50 h-50 rounded-full" style="background-image: radial-gradient(circle farthest-corner at 50% 50% in oklab, oklab(83.7% 0.016 0.164 / 10%) 0%, oklab(0% 0 .0001 / 0%) 70%)"></div>
+        <div class="w-10 h-10 rounded-lg relative bg-[#050505] border-2 border-yellow-400 shadow-[0_0_20px_rgba(251,191,36,0.3)] shrink-0" style="transform: rotate(45deg)"></div>
+        <div class="absolute flex items-center justify-center gap-[3px] w-full h-full">
+          <div class="w-[3px] h-5 rounded-[1px] bg-teal-400 shadow-[0_0_8px_rgba(45,212,191,0.8)] shrink-0"></div>
+          <div class="w-[3px] h-10 rounded-[1px] bg-teal-400 shadow-[0_0_8px_rgba(45,212,191,0.8)] shrink-0"></div>
+          <div class="w-[3px] h-[15px] rounded-[1px] bg-teal-400 shadow-[0_0_8px_rgba(45,212,191,0.8)] shrink-0"></div>
+          <div class="w-[3px] h-[35px] rounded-[1px] bg-teal-400 shadow-[0_0_8px_rgba(45,212,191,0.8)] shrink-0"></div>
+        </div>
+      </div>
+      <%# Right — Rocky Interface %>
+      <div class="flex-1 flex flex-col justify-between relative p-6">
+        <div class="absolute top-0 left-0 w-full h-full" style="background-image: radial-gradient(circle farthest-corner at 50% 50% in oklab, oklab(83.7% 0.016 0.164 / 3%) 0%, oklab(0% 0 .0001 / 0%) 50%)"></div>
+        <div class="flex justify-between items-start relative">
+          <div class="flex flex-col gap-1">
+            <span class="text-zinc-50 font-['Inter',system-ui,sans-serif] font-semibold text-base">Rocky // Lab Assistant</span>
+            <div class="flex items-center gap-1.5">
+              <div class="w-1.5 h-1.5 rounded-[3px] bg-green-400"></div>
+              <span class="text-zinc-500 font-mono text-[11px]">STATUS: ONLINE // LISTENING_FOR_INPUT</span>
+            </div>
+          </div>
+          <%= link_to "#", class: "rounded-md py-2 px-4 bg-zinc-50 hover:bg-zinc-200 transition-colors cursor-pointer" do %>
+            <span class="uppercase text-zinc-950 font-['Inter',system-ui,sans-serif] font-bold text-[13px]">Initiate</span>
+          <% end %>
+        </div>
+        <p class="relative text-zinc-400 font-['Inter',system-ui,sans-serif] italic text-sm">"*harmonic hum* Good morning, friend. How can the Lab help today?"</p>
+      </div>
+    </div>
+  </div>
+
+  <%# ─── THE PILLARS ─── %>
+  <div class="flex justify-center w-full pt-15 pb-30 gap-8 px-16">
+
+    <%# The Studio Card %>
+    <div class="flex-1 max-w-100 flex flex-col relative rounded-xl overflow-hidden gap-6 bg-zinc-900 border border-zinc-800 p-10">
+      <div class="absolute top-0 left-0 w-full h-1 bg-blue-500"></div>
+      <div class="flex justify-between items-center relative">
+        <span class="tracking-[0.05em] uppercase text-blue-500 font-['Barlow_Condensed',system-ui,sans-serif] font-bold text-xl">The Studio</span>
+        <span class="text-zinc-600 font-mono text-[11px]">/APPS</span>
+      </div>
+      <h3 class="text-[28px] leading-[1.2] relative text-zinc-50 font-['Inter',system-ui,sans-serif] font-semibold m-0">Consumer Applications &amp; Prototypes</h3>
+      <p class="text-[16px] leading-[1.5] relative text-zinc-400 font-['Inter',system-ui,sans-serif] m-0">Zuke Music Player, Notary Assistant, Hermit Plus. Showcasing polished, functional tools built with a blend of classic Rails and modern AI APIs.</p>
+      <div class="mt-auto flex items-center pt-8 gap-2 relative">
+        <span class="text-zinc-50 font-['Inter',system-ui,sans-serif] font-semibold text-sm">Explore The Studio</span>
+        <span class="text-blue-500 font-['Inter',system-ui,sans-serif] font-semibold text-sm">&rarr;</span>
+      </div>
+      <div class="w-full h-25 mt-4 flex items-center justify-center relative rounded-lg overflow-hidden bg-zinc-950 border border-zinc-800 shrink-0">
+        <div class="flex items-end h-10 gap-[3px]">
+          <div class="w-1 h-3 rounded-xs bg-blue-500 shrink-0"></div>
+          <div class="w-1 h-6 rounded-xs bg-blue-500 shrink-0"></div>
+          <div class="w-1 h-[18px] rounded-xs bg-blue-500 shrink-0"></div>
+          <div class="w-1 h-8 rounded-xs bg-blue-500 shrink-0"></div>
+          <div class="w-1 h-5 rounded-xs bg-blue-500 shrink-0"></div>
+          <div class="w-1 h-[14px] rounded-xs bg-blue-500 shrink-0"></div>
+          <div class="w-1 h-7 rounded-xs bg-blue-500 shrink-0"></div>
+        </div>
+      </div>
+    </div>
+
+    <%# The Lab Card %>
+    <div class="flex-1 max-w-100 flex flex-col relative rounded-xl overflow-hidden gap-6 bg-zinc-900 border border-zinc-800 p-10">
+      <div class="absolute top-0 left-0 w-full h-1 bg-orange-600"></div>
+      <div class="flex justify-between items-center relative">
+        <span class="tracking-[0.05em] uppercase text-orange-600 font-['Barlow_Condensed',system-ui,sans-serif] font-bold text-xl">The Lab</span>
+        <span class="text-zinc-600 font-mono text-[11px]">/TOOLS</span>
+      </div>
+      <h3 class="text-[28px] leading-[1.2] relative text-zinc-50 font-['Inter',system-ui,sans-serif] font-semibold m-0">Behind the Scenes Experiments</h3>
+      <p class="text-[16px] leading-[1.5] relative text-zinc-400 font-['Inter',system-ui,sans-serif] m-0">Where Rocky lives. Deep technical dives into LLM tool-calling, background jobs with audiowaveform, and robust system architecture.</p>
+      <div class="mt-auto flex items-center pt-8 gap-2 relative">
+        <span class="text-zinc-50 font-['Inter',system-ui,sans-serif] font-semibold text-sm">Enter The Lab</span>
+        <span class="text-orange-600 font-['Inter',system-ui,sans-serif] font-semibold text-sm">&rarr;</span>
+      </div>
+      <div class="w-full h-25 mt-4 flex items-center justify-center relative rounded-lg overflow-hidden bg-zinc-950 border border-zinc-800 shrink-0">
+        <div class="absolute w-[150px] h-[150px] rounded-full" style="background-image: radial-gradient(circle farthest-corner at 50% 50% in oklab, oklab(83.7% 0.016 0.164 / 8%) 0%, oklab(0% 0 .0001 / 0%) 70%)"></div>
+        <div class="absolute w-full flex items-center justify-center opacity-50 gap-[2px]">
+          <div class="w-0.5 h-2.5 rounded-[1px] bg-teal-400 shrink-0"></div>
+          <div class="w-0.5 h-5 rounded-[1px] bg-teal-400 shrink-0"></div>
+          <div class="w-0.5 h-[15px] rounded-[1px] bg-teal-400 shrink-0"></div>
+          <div class="w-0.5 h-[25px] rounded-[1px] bg-teal-400 shrink-0"></div>
+          <div class="w-0.5 h-3 rounded-[1px] bg-teal-400 shrink-0"></div>
+        </div>
+        <div class="flex items-center justify-center rounded-sm relative border-2 border-yellow-400 shrink-0 w-6 h-6" style="transform: rotate(45deg)">
+          <div class="border border-yellow-400/40 shrink-0 w-2.5 h-2.5"></div>
+        </div>
+      </div>
+    </div>
+
+    <%# Erudition Card %>
+    <div class="flex-1 max-w-100 flex flex-col relative rounded-xl overflow-hidden gap-6 bg-zinc-900 border border-zinc-800 p-10">
+      <div class="absolute top-0 left-0 w-full h-1 bg-purple-500"></div>
+      <div class="flex justify-between items-center relative">
+        <span class="tracking-[0.05em] uppercase text-purple-500 font-['Barlow_Condensed',system-ui,sans-serif] font-bold text-xl">Erudition</span>
+        <span class="text-zinc-600 font-mono text-[11px]">/ACADEMY</span>
+      </div>
+      <h3 class="text-[28px] leading-[1.2] relative text-zinc-50 font-['Inter',system-ui,sans-serif] font-semibold m-0">Knowledge &amp; Education</h3>
+      <p class="text-[16px] leading-[1.5] relative text-zinc-400 font-['Inter',system-ui,sans-serif] m-0">A modern publication focused on "Rails + AI" as a distinct discipline. Learn how to architect, prompt, and deploy AI natively in Ruby environments.</p>
+      <div class="mt-auto flex items-center pt-8 gap-2 relative">
+        <span class="text-zinc-50 font-['Inter',system-ui,sans-serif] font-semibold text-sm">Read Erudition</span>
+        <span class="text-purple-500 font-['Inter',system-ui,sans-serif] font-semibold text-sm">&rarr;</span>
+      </div>
+      <div class="w-full h-25 mt-4 flex flex-col justify-center rounded-lg overflow-hidden gap-2 relative bg-zinc-950 border border-zinc-800 shrink-0 p-4">
+        <div class="w-10 h-1 rounded-xs bg-purple-500 shrink-0"></div>
+        <div class="w-full h-1.5 rounded-[3px] bg-zinc-800 shrink-0"></div>
+        <div class="w-4/5 h-1.5 rounded-[3px] bg-zinc-800 shrink-0"></div>
+        <div class="w-[90%] h-1.5 rounded-[3px] bg-zinc-800 shrink-0"></div>
+      </div>
+    </div>
+  </div>
+
+  <%# ─── ERUDITION PREVIEW SECTION ─── %>
+  <div class="flex flex-col w-full pt-10 pb-20 gap-10 bg-[#050505] border-t border-zinc-800 px-16">
+    <div class="flex justify-between items-end w-full">
+      <div class="flex flex-col gap-2">
+        <span class="text-purple-500 font-mono text-xs">LATEST INTEL</span>
+        <h2 class="tracking-[0.02em] uppercase text-zinc-50 font-['Barlow_Condensed',system-ui,sans-serif] font-bold text-4xl m-0">From Erudition</h2>
+      </div>
+      <div class="pb-0.5 border-b border-zinc-400">
+        <span class="text-zinc-400 font-['Inter',system-ui,sans-serif] font-semibold text-sm hover:text-zinc-200 transition-colors cursor-pointer">View all articles</span>
+      </div>
+    </div>
+
+    <div class="flex flex-col rounded-lg overflow-hidden gap-px bg-zinc-800 border border-zinc-800">
+      <% if @latest_articles.present? %>
+        <% @latest_articles.each do |article| %>
+          <div class="flex items-center gap-6 bg-zinc-900 p-6">
+            <span class="w-25 shrink-0 text-zinc-500 font-mono text-[13px]"><%= article.published_at.strftime("%Y.%m.%d") %></span>
+            <div class="flex-1 flex flex-col gap-1">
+              <span class="text-zinc-50 font-['Inter',system-ui,sans-serif] font-semibold text-lg"><%= article.title %></span>
+              <span class="text-zinc-400 font-['Inter',system-ui,sans-serif] text-[15px]"><%= article.subtitle %></span>
+            </div>
+            <span class="shrink-0 rounded-full py-1.5 px-3 border border-zinc-800">
+              <span class="text-purple-500 font-mono text-[11px]"><%= article.blog_category&.title&.upcase || "ARTICLE" %></span>
+            </span>
+          </div>
+        <% end %>
+      <% else %>
+        <%# Fallback static articles when no blogs exist yet %>
+        <div class="flex items-center gap-6 bg-zinc-900 p-6">
+          <span class="w-25 shrink-0 text-zinc-500 font-mono text-[13px]">2026.04.12</span>
+          <div class="flex-1 flex flex-col gap-1">
+            <span class="text-zinc-50 font-['Inter',system-ui,sans-serif] font-semibold text-lg">The Architecture of Rocky: Tool Calling in Rails</span>
+            <span class="text-zinc-400 font-['Inter',system-ui,sans-serif] text-[15px]">Deep dive into how we built the Lab's resident AI assistant without touching React.</span>
+          </div>
+          <span class="shrink-0 rounded-full py-1.5 px-3 border border-zinc-800">
+            <span class="text-purple-500 font-mono text-[11px]">AI ENGINEERING</span>
+          </span>
+        </div>
+        <div class="flex items-center gap-6 bg-zinc-900 p-6">
+          <span class="w-25 shrink-0 text-zinc-500 font-mono text-[13px]">2026.03.28</span>
+          <div class="flex-1 flex flex-col gap-1">
+            <span class="text-zinc-50 font-['Inter',system-ui,sans-serif] font-semibold text-lg">Waveforms at Scale: Zuke's Audio Architecture</span>
+            <span class="text-zinc-400 font-['Inter',system-ui,sans-serif] text-[15px]">Using audiowaveform and background jobs for robust media processing.</span>
+          </div>
+          <span class="shrink-0 rounded-full py-1.5 px-3 border border-zinc-800">
+            <span class="text-blue-500 font-mono text-[11px]">SYSTEMS</span>
+          </span>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <%# ─── FOOTER ─── %>
+  <div class="flex flex-col items-center w-full gap-8 bg-zinc-950 border-t border-zinc-800 p-16">
+    <span class="tracking-[0.05em] uppercase text-zinc-600 font-['Barlow_Condensed',system-ui,sans-serif] font-bold text-xl">Rogue Media Lab</span>
+    <div class="flex gap-8">
+      <span class="text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm hover:text-zinc-200 transition-colors cursor-pointer">Workbench</span>
+      <span class="text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm hover:text-zinc-200 transition-colors cursor-pointer">The Studio</span>
+      <span class="text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm hover:text-zinc-200 transition-colors cursor-pointer">The Lab</span>
+      <span class="text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm hover:text-zinc-200 transition-colors cursor-pointer">Erudition</span>
+      <span class="text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm hover:text-zinc-200 transition-colors cursor-pointer">Patreon</span>
+      <span class="text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm hover:text-zinc-200 transition-colors cursor-pointer">Substack</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <div class="w-1 h-1 rounded-xs bg-green-400"></div>
+      <span class="text-zinc-600 font-mono text-[11px]">SYSTEMS SECURE // END OF FILE</span>
+    </div>
+  </div>
+
 </div>
