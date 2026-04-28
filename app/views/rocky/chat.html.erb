@@ -31,27 +31,36 @@
 
       <%# ─── LEFT: ACOUSTIC CORE ─── %>
       <div class="w-[420px] h-full relative flex flex-col items-center justify-center shrink-0 overflow-hidden bg-zinc-950 border-r border-zinc-800">
-        <%# Radial gradient background %>
-        <div class="absolute w-[600px] h-[600px] rounded-full" style="background-image: radial-gradient(circle farthest-corner at 50% 50% in oklab, oklab(83.7% 0.016 0.164 / 15%) 0%, oklab(0% 0 .0001 / 0%) 70%)"></div>
-        <%# Concentric circles %>
-        <div class="absolute w-[400px] h-[400px] rounded-full border border-yellow-400/10"></div>
-        <div class="absolute w-[250px] h-[250px] rounded-full border border-yellow-400/20"></div>
-        <%# Center diamond %>
-        <div class="w-25 h-25 flex items-center justify-center rounded-[20px] relative bg-zinc-950 border-4 border-yellow-400 shadow-[inset_0_0_30px_rgba(251,191,36,0.3),0_0_50px_rgba(251,191,36,0.5)] shrink-0" style="transform: rotate(45deg)">
-          <div class="w-10 h-10 border-2 border-dashed border-yellow-400/40"></div>
+
+        <%# ─── LAYER 1: TONES (circles + diamond) ─── %>
+        <%# This layer reacts to tone MP3 audio — Rocky's raw biology %>
+        <div class="absolute inset-0 flex items-center justify-center">
+          <%# Radial gradient glow (reacts to tone amplitude) %>
+          <div class="absolute w-[600px] h-[600px] rounded-full transition-all duration-100" data-rocky-chat-target="toneGlow" style="background-image: radial-gradient(circle farthest-corner at 50% 50% in oklab, oklab(83.7% 0.016 0.164 / 10%) 0%, oklab(0% 0 .0001 / 0%) 70%)"></div>
+          <%# Outer circle %>
+          <div class="absolute w-[400px] h-[400px] rounded-full border-2 transition-all duration-75" data-rocky-chat-target="toneCircleOuter" style="border-color: rgba(251,191,36,0.08)"></div>
+          <%# Inner circle %>
+          <div class="absolute w-[250px] h-[250px] rounded-full border-2 transition-all duration-75" data-rocky-chat-target="toneCircleInner" style="border-color: rgba(251,191,36,0.15)"></div>
+          <%# Center diamond (glows with tone energy) %>
+          <div class="w-25 h-25 flex items-center justify-center rounded-[20px] relative bg-zinc-950 border-4 border-yellow-400 shrink-0 transition-all duration-75" data-rocky-chat-target="toneDiamond" style="transform: rotate(45deg); box-shadow: inset 0 0 30px rgba(251,191,36,0.3), 0 0 50px rgba(251,191,36,0.5)">
+            <div class="w-10 h-10 border-2 border-dashed border-yellow-400/40"></div>
+          </div>
         </div>
-        <%# Tone waveform bars (animated) %>
-        <div class="absolute flex items-end justify-center px-10 gap-1.5 w-full h-full" data-rocky-chat-target="tonebars">
-          <div class="tonebar w-1.5 rounded-[3px] bg-teal-400 shadow-[0_0_15px_rgba(45,212,191,0.8)] shrink-0 transition-[height] duration-75" style="height: 15%; opacity: 0.4" data-idle-height="15%"></div>
-          <div class="tonebar w-1.5 rounded-[3px] bg-teal-400 shadow-[0_0_15px_rgba(45,212,191,0.8)] shrink-0 transition-[height] duration-75" style="height: 34%; opacity: 0.4" data-idle-height="34%"></div>
-          <div class="tonebar w-1.5 rounded-[3px] bg-teal-400 shadow-[0_0_15px_rgba(45,212,191,0.8)] shrink-0 transition-[height] duration-75" style="height: 56%; opacity: 0.4" data-idle-height="56%"></div>
-          <div class="tonebar w-1.5 rounded-[3px] bg-teal-400 shadow-[0_0_15px_rgba(45,212,191,0.8)] shrink-0 transition-[height] duration-75" style="height: 87%; opacity: 0.4" data-idle-height="87%"></div>
-          <div class="tonebar w-1.5 rounded-[3px] bg-teal-400 shadow-[0_0_15px_rgba(45,212,191,0.8)] shrink-0 transition-[height] duration-75" style="height: 43%; opacity: 0.4" data-idle-height="43%"></div>
-          <div class="tonebar w-1.5 rounded-[3px] bg-teal-400 shadow-[0_0_15px_rgba(45,212,191,0.8)] shrink-0 transition-[height] duration-75" style="height: 100%; opacity: 0.4" data-idle-height="100%"></div>
-          <div class="tonebar w-1.5 rounded-[3px] bg-teal-400 shadow-[0_0_15px_rgba(45,212,191,0.8)] shrink-0 transition-[height] duration-75" style="height: 25%; opacity: 0.4" data-idle-height="25%"></div>
-          <div class="tonebar w-1.5 rounded-[3px] bg-teal-400 shadow-[0_0_15px_rgba(45,212,191,0.8)] shrink-0 transition-[height] duration-75" style="height: 68%; opacity: 0.4" data-idle-height="68%"></div>
-          <div class="tonebar w-1.5 rounded-[3px] bg-teal-400 shadow-[0_0_15px_rgba(45,212,191,0.8)] shrink-0 transition-[height] duration-75" style="height: 37%; opacity: 0.4" data-idle-height="37%"></div>
+
+        <%# ─── LAYER 2: SPEECH (translation waveform bars) ─── %>
+        <%# This layer reacts to TTS audio — Rocky's translated voice %>
+        <div class="absolute flex items-end justify-center px-10 gap-1.5 w-full h-full" data-rocky-chat-target="speechbars">
+          <div class="speechbar w-1.5 rounded-[3px] bg-teal-400 shrink-0 transition-[height] duration-75" style="height: 15%; opacity: 0.3; box-shadow: 0 0 8px rgba(45,212,191,0.3)" data-idle-height="15%"></div>
+          <div class="speechbar w-1.5 rounded-[3px] bg-teal-400 shrink-0 transition-[height] duration-75" style="height: 34%; opacity: 0.3; box-shadow: 0 0 8px rgba(45,212,191,0.3)" data-idle-height="34%"></div>
+          <div class="speechbar w-1.5 rounded-[3px] bg-teal-400 shrink-0 transition-[height] duration-75" style="height: 56%; opacity: 0.3; box-shadow: 0 0 8px rgba(45,212,191,0.3)" data-idle-height="56%"></div>
+          <div class="speechbar w-1.5 rounded-[3px] bg-teal-400 shrink-0 transition-[height] duration-75" style="height: 87%; opacity: 0.3; box-shadow: 0 0 8px rgba(45,212,191,0.3)" data-idle-height="87%"></div>
+          <div class="speechbar w-1.5 rounded-[3px] bg-teal-400 shrink-0 transition-[height] duration-75" style="height: 43%; opacity: 0.3; box-shadow: 0 0 8px rgba(45,212,191,0.3)" data-idle-height="43%"></div>
+          <div class="speechbar w-1.5 rounded-[3px] bg-teal-400 shrink-0 transition-[height] duration-75" style="height: 100%; opacity: 0.3; box-shadow: 0 0 8px rgba(45,212,191,0.3)" data-idle-height="100%"></div>
+          <div class="speechbar w-1.5 rounded-[3px] bg-teal-400 shrink-0 transition-[height] duration-75" style="height: 25%; opacity: 0.3; box-shadow: 0 0 8px rgba(45,212,191,0.3)" data-idle-height="25%"></div>
+          <div class="speechbar w-1.5 rounded-[3px] bg-teal-400 shrink-0 transition-[height] duration-75" style="height: 68%; opacity: 0.3; box-shadow: 0 0 8px rgba(45,212,191,0.3)" data-idle-height="68%"></div>
+          <div class="speechbar w-1.5 rounded-[3px] bg-teal-400 shrink-0 transition-[height] duration-75" style="height: 37%; opacity: 0.3; box-shadow: 0 0 8px rgba(45,212,191,0.3)" data-idle-height="37%"></div>
         </div>
+
         <%# Bottom label %>
         <div class="absolute bottom-8 flex items-center gap-2">
           <div class="w-1.5 h-1.5 rounded-[3px] bg-teal-400 shadow-[0_0_8px_rgba(45,212,191,0.8)]"></div>
@@ -114,7 +123,7 @@
 
     <%# ─── WAVEFORM STYLES ─── %>
     <style>
-      .tonebar {
+      .speechbar {
         transform-origin: bottom;
         min-height: 6px;
       }
