@@ -18,15 +18,20 @@ export default class extends Controller {
     this._ttsReady     = false
     this._tonePending  = false
     this._audioCtx     = null
+    this._analyser     = null
     this._reverbNode   = null
     this._currentTtsSrc = null
     this._playedTones  = new Set()
+    this._animFrameId  = null
+    this._activeSources = 0
 
     this.scrollToBottom()
     if (this.hasInputTarget) this.inputTarget.focus()
-
-    // Update counter display
     this._updateCounter()
+  }
+
+  disconnect() {
+    if (this._animFrameId) cancelAnimationFrame(this._animFrameId)
   }
 
   // ── Input handling ──────────────────────────────────────────────────────
@@ -44,7 +49,6 @@ export default class extends Controller {
     const content = this.inputTarget.value.trim()
     if (!content || this._streaming) return
 
-    // Check rate limit for anonymous users
     if (!this.loggedInValue && this.promptCountValue >= this.anonLimitValue) {
       this._showLimitMessage()
       return
@@ -53,7 +57,6 @@ export default class extends Controller {
     this.inputTarget.value = ""
     this._setStreaming(true)
     this._setStatus("active", "PROCESSING_INPUT")
-    this._animateTonebars("active")
 
     this.appendUserMessage(content)
     const assistantBubble = this.appendAssistantBubble()
@@ -87,7 +90,6 @@ export default class extends Controller {
     } finally {
       this._setStreaming(false)
       this._setStatus("online", "LISTENING_FOR_INPUT")
-      this._animateTonebars("idle")
       this.inputTarget.focus()
     }
   }
@@ -127,7 +129,6 @@ export default class extends Controller {
           this._playNewTones(fullContent)
 
         } else if (data.type === "done") {
-          // Strip tone markers for TTS
           const speakText = this.stripToneMarkers(fullContent)
           if (speakText.trim()) this.speakText(speakText)
           this._setStatus("online", "RESPONSE_COMPLETE")
@@ -139,7 +140,63 @@ export default class extends Controller {
     }
   }
 
-  // ── Tone playback ───────────────────────────────────────────────────────
+  // ── Audio context & analyser ────────────────────────────────────────────
+
+  _getAudioCtx() {
+    if (!this._audioCtx) {
+      this._audioCtx = new (window.AudioContext || window.webkitAudioContext)()
+    }
+    return this._audioCtx
+  }
+
+  _getAnalyser() {
+    if (this._analyser) return this._analyser
+
+    const ctx     = this._getAudioCtx()
+    const analyser = ctx.createAnalyser()
+    analyser.fftSize = 64
+    analyser.smoothingTimeConstant = 0.7
+    analyser.connect(ctx.destination)
+    this._analyser = analyser
+    return analyser
+  }
+
+  _getReverb() {
+    if (this._reverbNode) return this._reverbNode
+
+    const ctx      = this._getAudioCtx()
+    const reverb   = ctx.createConvolver()
+    const duration = 0.25
+    const decay    = 3.5
+    const length   = Math.floor(ctx.sampleRate * duration)
+    const impulse  = ctx.createBuffer(2, length, ctx.sampleRate)
+
+    for (let c = 0; c < 2; c++) {
+      const data = impulse.getChannelData(c)
+      for (let i = 0; i < length; i++) {
+        data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, decay)
+      }
+    }
+
+    reverb.buffer   = impulse
+    this._reverbNode = reverb
+    return reverb
+  }
+
+  // Track active sources for waveform start/stop
+  _sourceStarted() {
+    this._activeSources++
+    this._startWaveformLoop()
+  }
+
+  _sourceEnded() {
+    this._activeSources = Math.max(0, this._activeSources - 1)
+    if (this._activeSources === 0) {
+      this._stopWaveformLoop()
+    }
+  }
+
+  // ── Tone playback (through Web Audio analyser) ──────────────────────────
 
   _playNewTones(fullContent) {
     const TONE_RE = /\*(?:🎵\s*)?(.+?)(?:\s*🎵)?\*/g
@@ -162,8 +219,8 @@ export default class extends Controller {
       const blob = await response.blob()
       if (!blob.size) return
 
-      const audioUrl = URL.createObjectURL(blob)
-      this._toneQueue.push(audioUrl)
+      const arrayBuffer = await blob.arrayBuffer()
+      this._toneQueue.push(arrayBuffer)
       if (!this._tonePlaying) this._drainToneQueue()
     } catch (e) {
       // Non-critical
@@ -183,13 +240,9 @@ export default class extends Controller {
     }
 
     this._tonePlaying = true
-    this._animateTonebars("tone")
-    const audioUrl = this._toneQueue.shift()
-    const audio = new Audio(audioUrl)
-    audio.volume = 0.3
-    audio.play()
-    audio.addEventListener("ended", () => {
-      URL.revokeObjectURL(audioUrl)
+    const arrayBuffer = this._toneQueue.shift()
+
+    this._playAudioThroughAnalyser(arrayBuffer, 0.3, () => {
       this._drainToneQueue()
     })
   }
@@ -202,7 +255,42 @@ export default class extends Controller {
     }
   }
 
-  // ── TTS ─────────────────────────────────────────────────────────────────
+  // ── Shared audio routing through analyser ───────────────────────────────
+
+  async _playAudioThroughAnalyser(arrayBuffer, volume = 1.0, onEnded = null) {
+    try {
+      const ctx = this._getAudioCtx()
+      if (ctx.state === "suspended") await ctx.resume()
+
+      const analyser = this._getAnalyser()
+      const audioBuffer = await ctx.decodeAudioData(arrayBuffer.slice(0))
+
+      const source = ctx.createBufferSource()
+      source.buffer = audioBuffer
+
+      const gainNode = ctx.createGain()
+      gainNode.gain.value = volume
+
+      source.connect(gainNode)
+      gainNode.connect(analyser)
+
+      this._sourceStarted()
+      source.start()
+
+      source.addEventListener("ended", () => {
+        this._sourceEnded()
+        if (onEnded) onEnded()
+      })
+
+      return source
+    } catch (e) {
+      console.warn("Audio playback failed:", e)
+      if (onEnded) onEnded()
+      return null
+    }
+  }
+
+  // ── TTS (through analyser + reverb) ─────────────────────────────────────
 
   async speakText(text) {
     if (!text.trim() || !this.hasTtsUrlValue) {
@@ -238,6 +326,7 @@ export default class extends Controller {
       const ctx = this._getAudioCtx()
       if (ctx.state === "suspended") await ctx.resume()
 
+      const analyser = this._getAnalyser()
       const audioBuffer = await ctx.decodeAudioData(arrayBuffer)
 
       if (this._currentTtsSrc) {
@@ -248,28 +337,28 @@ export default class extends Controller {
       const source  = ctx.createBufferSource()
       source.buffer = audioBuffer
 
-      // Dry path — 82% direct
+      // Dry path → analyser (82%)
       const dryGain       = ctx.createGain()
       dryGain.gain.value  = 0.82
       source.connect(dryGain)
-      dryGain.connect(ctx.destination)
+      dryGain.connect(analyser)
 
-      // Wet path — 18% through reverb
+      // Wet path → reverb → analyser (18%)
       const reverb        = this._getReverb()
       const wetGain       = ctx.createGain()
       wetGain.gain.value  = 0.18
       source.connect(reverb)
       reverb.connect(wetGain)
-      wetGain.connect(ctx.destination)
+      wetGain.connect(analyser)
 
       this._currentTtsSrc = source
-      this._animateTonebars("tts")
+      this._sourceStarted()
       source.start()
       this._releaseToneQueue()
 
       source.addEventListener("ended", () => {
         this._currentTtsSrc = null
-        this._animateTonebars("idle")
+        this._sourceEnded()
       })
     } catch (e) {
       console.warn("Rocky TTS reverb failed:", e)
@@ -277,52 +366,61 @@ export default class extends Controller {
     }
   }
 
-  _getAudioCtx() {
-    if (!this._audioCtx) {
-      this._audioCtx = new (window.AudioContext || window.webkitAudioContext)()
-    }
-    return this._audioCtx
-  }
+  // ── Real waveform visualization ─────────────────────────────────────────
 
-  _getReverb() {
-    if (this._reverbNode) return this._reverbNode
-
-    const ctx      = this._getAudioCtx()
-    const reverb   = ctx.createConvolver()
-    const duration = 0.25
-    const decay    = 3.5
-    const length   = Math.floor(ctx.sampleRate * duration)
-    const impulse  = ctx.createBuffer(2, length, ctx.sampleRate)
-
-    for (let c = 0; c < 2; c++) {
-      const data = impulse.getChannelData(c)
-      for (let i = 0; i < length; i++) {
-        data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, decay)
-      }
-    }
-
-    reverb.buffer   = impulse
-    this._reverbNode = reverb
-    return reverb
-  }
-
-  // ── Waveform animation ──────────────────────────────────────────────────
-
-  _animateTonebars(state) {
+  _startWaveformLoop() {
+    if (this._animFrameId) return // already running
     if (!this.hasTonebarsTarget) return
+
     const bars = this.tonebarsTarget.querySelectorAll(".tonebar")
-    bars.forEach(bar => {
-      if (state === "active") {
-        bar.style.animationDuration = "0.4s"
-        bar.style.opacity = "1"
-      } else if (state === "tone" || state === "tts") {
-        bar.style.animationDuration = "0.6s"
-        bar.style.opacity = "1"
-      } else {
-        bar.style.animationDuration = "2s"
-        bar.style.opacity = "0.5"
-      }
-    })
+    if (!bars.length) return
+
+    const analyser = this._getAnalyser()
+    const dataArray = new Uint8Array(analyser.frequencyBinCount)
+
+    const update = () => {
+      analyser.getByteFrequencyData(dataArray)
+
+      // Map frequency bins to bars (use first 9 bins for 9 bars)
+      const binStep = Math.max(1, Math.floor(dataArray.length / bars.length))
+
+      bars.forEach((bar, i) => {
+        const binIndex = i * binStep
+        const value = dataArray[binIndex] || 0
+
+        // Scale: min 10% height, max 100%
+        const minH = 10  // minimum percentage
+        const maxH = 100
+        const pct = minH + (value / 255) * (maxH - minH)
+
+        bar.style.height = `${pct}%`
+        bar.style.opacity = 0.5 + (value / 255) * 0.5
+        bar.style.boxShadow = value > 30
+          ? `0 0 ${8 + value / 10}px rgba(45,212,191,${0.4 + value / 500})`
+          : "0 0 8px rgba(45,212,191,0.3)"
+      })
+
+      this._animFrameId = requestAnimationFrame(update)
+    }
+
+    this._animFrameId = requestAnimationFrame(update)
+  }
+
+  _stopWaveformLoop() {
+    if (this._animFrameId) {
+      cancelAnimationFrame(this._animFrameId)
+      this._animFrameId = null
+    }
+
+    // Reset bars to idle state
+    if (this.hasTonebarsTarget) {
+      const bars = this.tonebarsTarget.querySelectorAll(".tonebar")
+      bars.forEach((bar, i) => {
+        bar.style.height = bar.dataset.idleHeight || `${30 + (i % 3) * 20}%`
+        bar.style.opacity = "0.4"
+        bar.style.boxShadow = "0 0 8px rgba(45,212,191,0.3)"
+      })
+    }
   }
 
   // ── Content formatting ──────────────────────────────────────────────────

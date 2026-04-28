@@ -5,4 +5,5 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable
 
   has_and_belongs_to_many :songs
+  has_many :chat_sessions, dependent: :destroy
 end
