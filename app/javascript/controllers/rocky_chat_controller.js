@@ -154,7 +154,7 @@ export default class extends Controller {
     const ctx = this._getAudioCtx()
     const analyser = ctx.createAnalyser()
     analyser.fftSize = 64
-    analyser.smoothingTimeConstant = 0.75
+    analyser.smoothingTimeConstant = 0.4
     analyser.connect(ctx.destination)
     this._toneAnalyser = analyser
     return analyser
@@ -233,7 +233,7 @@ export default class extends Controller {
     const arrayBuffer = this._toneQueue.shift()
 
     // Play through tone analyser (circles layer)
-    this._playThroughAnalyser(arrayBuffer, this._getToneAnalyser(), 0.3, () => {
+    this._playThroughAnalyser(arrayBuffer, this._getToneAnalyser(), 0.6, () => {
       this._activeTones--
       if (this._activeTones <= 0) {
         this._activeTones = 0
@@ -361,39 +361,55 @@ export default class extends Controller {
       for (let i = 0; i < dataArray.length; i++) sum += dataArray[i]
       const avg = sum / dataArray.length
       const norm = avg / 255  // 0..1
+      // Boost the curve — make it more reactive
+      const boosted = Math.pow(norm, 0.6)
 
-      // Outer circle: border opacity pulses 0.08 → 0.6
+      // Outer circle: border opacity pulses 0.08 → 1.0, scale pulses
       if (this.hasToneCircleOuterTarget) {
-        const outerAlpha = 0.08 + norm * 0.52
+        const outerAlpha = 0.08 + boosted * 0.92
         this.toneCircleOuterTarget.style.borderColor = `rgba(251,191,36,${outerAlpha})`
-        // Subtle scale pulse
-        const scale = 1 + norm * 0.03
+        const scale = 1 + boosted * 0.08
         this.toneCircleOuterTarget.style.transform = `scale(${scale})`
+        // Add glow shadow when active
+        const shadowBlur = boosted * 40
+        this.toneCircleOuterTarget.style.boxShadow = boosted > 0.1
+          ? `0 0 ${shadowBlur}px rgba(251,191,36,${boosted * 0.5})`
+          : "none"
       }
 
-      // Inner circle: border opacity pulses 0.15 → 0.8
+      // Inner circle: border opacity pulses 0.15 → 1.0, bigger scale
       if (this.hasToneCircleInnerTarget) {
-        const innerAlpha = 0.15 + norm * 0.65
+        const innerAlpha = 0.15 + boosted * 0.85
         this.toneCircleInnerTarget.style.borderColor = `rgba(251,191,36,${innerAlpha})`
-        const scale = 1 + norm * 0.05
+        const scale = 1 + boosted * 0.12
         this.toneCircleInnerTarget.style.transform = `scale(${scale})`
+        const shadowBlur = boosted * 30
+        this.toneCircleInnerTarget.style.boxShadow = boosted > 0.1
+          ? `0 0 ${shadowBlur}px rgba(251,191,36,${boosted * 0.4})`
+          : "none"
       }
 
-      // Diamond glow intensifies
+      // Diamond glow intensifies significantly
       if (this.hasToneDiamondTarget) {
-        const glowInner = 30 + norm * 40
-        const glowOuter = 50 + norm * 60
-        const alpha = 0.3 + norm * 0.5
+        const glowInner = 30 + boosted * 60
+        const glowOuter = 50 + boosted * 100
+        const alpha = 0.3 + boosted * 0.7
         this.toneDiamondTarget.style.boxShadow =
           `inset 0 0 ${glowInner}px rgba(251,191,36,${alpha}), 0 0 ${glowOuter}px rgba(251,191,36,${alpha})`
-        this.toneDiamondTarget.style.borderColor = `rgba(251,191,36,${0.7 + norm * 0.3})`
+        this.toneDiamondTarget.style.borderColor = `rgba(251,191,36,${0.7 + boosted * 0.3})`
+        // Scale the diamond slightly
+        const dScale = 1 + boosted * 0.06
+        this.toneDiamondTarget.style.transform = `rotate(45deg) scale(${dScale})`
       }
 
-      // Radial glow expands and brightens
+      // Radial glow expands and brightens significantly
       if (this.hasToneGlowTarget) {
-        const glowAlpha = 0.10 + norm * 0.25
+        const glowAlpha = 0.10 + boosted * 0.45
         this.toneGlowTarget.style.backgroundImage =
           `radial-gradient(circle farthest-corner at 50% 50% in oklab, oklab(83.7% 0.016 0.164 / ${glowAlpha}) 0%, oklab(0% 0 .0001 / 0%) 70%)`
+        // Scale the glow
+        const gScale = 1 + boosted * 0.15
+        this.toneGlowTarget.style.transform = `scale(${gScale})`
       }
 
       this._toneAnimId = requestAnimationFrame(update)

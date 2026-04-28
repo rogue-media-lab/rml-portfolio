@@ -49,7 +49,8 @@
 
         <%# ─── LAYER 2: SPEECH (translation waveform bars) ─── %>
         <%# This layer reacts to TTS audio — Rocky's translated voice %>
-        <div class="absolute flex items-end justify-center px-10 gap-1.5 w-full h-full" data-rocky-chat-target="speechbars">
+        <%# Constrained to circle layer height (400px), centered %>
+        <div class="absolute flex items-end justify-center px-10 gap-1.5 w-full h-[400px] top-1/2 -translate-y-1/2" data-rocky-chat-target="speechbars">
           <div class="speechbar w-1.5 rounded-[3px] bg-teal-400 shrink-0 transition-[height] duration-75" style="height: 15%; opacity: 0.3; box-shadow: 0 0 8px rgba(45,212,191,0.3)" data-idle-height="15%"></div>
           <div class="speechbar w-1.5 rounded-[3px] bg-teal-400 shrink-0 transition-[height] duration-75" style="height: 34%; opacity: 0.3; box-shadow: 0 0 8px rgba(45,212,191,0.3)" data-idle-height="34%"></div>
           <div class="speechbar w-1.5 rounded-[3px] bg-teal-400 shrink-0 transition-[height] duration-75" style="height: 56%; opacity: 0.3; box-shadow: 0 0 8px rgba(45,212,191,0.3)" data-idle-height="56%"></div>
