@@ -93,3 +93,4 @@ gem "friendly_id"
 
 gem "google-api-client", "~> 0.53.0"
 gem "ruby-openai", "~> 8.0"
+gem "octokit", "~> 9.0"

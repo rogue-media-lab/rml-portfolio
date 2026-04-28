@@ -80,27 +80,49 @@
         <span class="text-zinc-500 font-mono text-[11px]">LIVE_LAB_FEED</span>
       </div>
       <div class="flex flex-col gap-4">
-        <div class="flex gap-3">
-          <div class="w-0.5 h-8 bg-orange-600 shrink-0"></div>
-          <div class="flex flex-col gap-0.5">
-            <span class="text-zinc-400 font-mono text-[11px]">ROCKY // SYNC_SUCCESS</span>
-            <span class="text-zinc-600 font-['Inter',system-ui,sans-serif] text-xs">New tone library indexed: 'Eridian_Acoustics_V2'</span>
+        <% if @lab_feed.present? %>
+          <% @lab_feed.each do |event| %>
+            <div class="flex gap-3">
+              <div class="w-0.5 h-8 shrink-0
+                <% case event[:color] %>
+                <% when 'orange' %> bg-orange-600
+                <% when 'blue' %> bg-blue-500
+                <% when 'purple' %> bg-purple-500
+                <% when 'green' %> bg-green-400
+                <% when 'yellow' %> bg-yellow-400
+                <% else %> bg-zinc-600
+                <% end %>
+              "></div>
+              <div class="flex flex-col gap-0.5 min-w-0">
+                <span class="text-zinc-400 font-mono text-[11px]"><%= event[:source] %> // <%= event[:action] %></span>
+                <span class="text-zinc-600 font-['Inter',system-ui,sans-serif] text-xs truncate"><%= event[:description] %></span>
+              </div>
+            </div>
+          <% end %>
+        <% else %>
+          <%# Fallback static content when API unavailable %>
+          <div class="flex gap-3">
+            <div class="w-0.5 h-8 bg-orange-600 shrink-0"></div>
+            <div class="flex flex-col gap-0.5">
+              <span class="text-zinc-400 font-mono text-[11px]">ROCKY // SYNC_SUCCESS</span>
+              <span class="text-zinc-600 font-['Inter',system-ui,sans-serif] text-xs">New tone library indexed: 'Eridian_Acoustics_V2'</span>
+            </div>
           </div>
-        </div>
-        <div class="flex gap-3">
-          <div class="w-0.5 h-8 bg-blue-500 shrink-0"></div>
-          <div class="flex flex-col gap-0.5">
-            <span class="text-zinc-400 font-mono text-[11px]">ZUKE // PROC_COMPLETE</span>
-            <span class="text-zinc-600 font-['Inter',system-ui,sans-serif] text-xs">Waveform generated for track: 'Neon_Pulse_Final'</span>
+          <div class="flex gap-3">
+            <div class="w-0.5 h-8 bg-blue-500 shrink-0"></div>
+            <div class="flex flex-col gap-0.5">
+              <span class="text-zinc-400 font-mono text-[11px]">ZUKE // PROC_COMPLETE</span>
+              <span class="text-zinc-600 font-['Inter',system-ui,sans-serif] text-xs">Waveform generated for track: 'Neon_Pulse_Final'</span>
+            </div>
           </div>
-        </div>
-        <div class="flex gap-3">
-          <div class="w-0.5 h-8 bg-purple-500 shrink-0"></div>
-          <div class="flex flex-col gap-0.5">
-            <span class="text-zinc-400 font-mono text-[11px]">ERUDITION // NEW_ENTRY</span>
-            <span class="text-zinc-600 font-['Inter',system-ui,sans-serif] text-xs">"The Rails Way: AI as a First-Class Citizen" published.</span>
+          <div class="flex gap-3">
+            <div class="w-0.5 h-8 bg-purple-500 shrink-0"></div>
+            <div class="flex flex-col gap-0.5">
+              <span class="text-zinc-400 font-mono text-[11px]">ERUDITION // NEW_ENTRY</span>
+              <span class="text-zinc-600 font-['Inter',system-ui,sans-serif] text-xs">"The Rails Way: AI as a First-Class Citizen" published.</span>
+            </div>
           </div>
-        </div>
+        <% end %>
       </div>
     </div>
   </div>

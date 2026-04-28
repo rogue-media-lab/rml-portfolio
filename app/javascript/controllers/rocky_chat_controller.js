@@ -233,7 +233,7 @@ export default class extends Controller {
     const arrayBuffer = this._toneQueue.shift()
 
     // Play through tone analyser (circles layer)
-    this._playThroughAnalyser(arrayBuffer, this._getToneAnalyser(), 0.6, () => {
+    this._playThroughAnalyser(arrayBuffer, this._getToneAnalyser(), 0.15, () => {
       this._activeTones--
       if (this._activeTones <= 0) {
         this._activeTones = 0
