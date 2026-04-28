@@ -92,3 +92,4 @@ gem "sitemap_generator"
 gem "friendly_id"
 
 gem "google-api-client", "~> 0.53.0"
+gem "ruby-openai", "~> 8.0"
