@@ -1,0 +1,21 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  chat_session: one
+  role: MyString
+  content: MyText
+  input_tokens: 1
+  output_tokens: 1
+  cost_usd: 9.99
+  media_type: MyString
+  media_url: MyString
+
+two:
+  chat_session: two
+  role: MyString
+  content: MyText
+  input_tokens: 1
+  output_tokens: 1
+  cost_usd: 9.99
+  media_type: MyString
+  media_url: MyString
