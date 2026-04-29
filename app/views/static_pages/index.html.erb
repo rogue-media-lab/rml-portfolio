@@ -81,18 +81,10 @@
       </div>
       <div class="flex flex-col gap-4">
         <% if @lab_feed.present? %>
+          <% color_map = { "orange" => "bg-orange-600", "blue" => "bg-blue-500", "purple" => "bg-purple-500", "green" => "bg-green-400", "yellow" => "bg-yellow-400" } %>
           <% @lab_feed.each do |event| %>
             <div class="flex gap-3">
-              <div class="w-0.5 h-8 shrink-0
-                <% case event[:color] %>
-                <% when 'orange' %> bg-orange-600
-                <% when 'blue' %> bg-blue-500
-                <% when 'purple' %> bg-purple-500
-                <% when 'green' %> bg-green-400
-                <% when 'yellow' %> bg-yellow-400
-                <% else %> bg-zinc-600
-                <% end %>
-              "></div>
+              <div class="w-0.5 h-8 shrink-0 <%= color_map[event[:color]] || 'bg-zinc-600' %>"></div>
               <div class="flex flex-col gap-0.5 min-w-0">
                 <span class="text-zinc-400 font-mono text-[11px]"><%= event[:source] %> // <%= event[:action] %></span>
                 <span class="text-zinc-600 font-['Inter',system-ui,sans-serif] text-xs truncate"><%= event[:description] %></span>
