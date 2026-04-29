@@ -99,8 +99,11 @@ class RockyController < ApplicationController
     tone_path = Rocky::ToneService.match(description)
 
     if tone_path
+      # Sanitize: ensure path stays within public/tones/
+      base_dir = Rails.root.join("public", "tones")
       full_path = Rails.root.join("public", tone_path.delete_prefix("/"))
-      if File.exist?(full_path)
+
+      if full_path.to_s.start_with?(base_dir.to_s) && File.exist?(full_path)
         send_file full_path, type: "audio/mpeg", disposition: "inline"
       else
         head :not_found
