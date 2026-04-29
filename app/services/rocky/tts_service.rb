@@ -9,7 +9,7 @@ module Rocky
 
     def initialize(text:)
       @text = text
-      @api_key = Rails.application.credentials.dig(:eleven_labs, :api_key)
+      @api_key = ENV["ELEVENLABS_API_KEY"] || Rails.application.credentials.dig(:eleven_labs, :api_key)
     end
 
     # Returns { audio_data: String (binary), content_type: String }
