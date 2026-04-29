@@ -21,6 +21,8 @@ module Github
       "GollumEvent"          => { label: "WIKI",      color: "purple" }
     }.freeze
 
+    REPO_COLORS = %w[orange blue purple green yellow].freeze
+
     def self.fetch(limit: 4)
       Rails.cache.fetch(CACHE_KEY, expires_in: CACHE_TTL) do
         new.fetch_events(limit: limit)
@@ -34,15 +36,20 @@ module Github
       @client = Octokit::Client.new(access_token: github_token)
       @client.auto_paginate = false
 
-      # Try user public events
-      events = @client.user_public_events(GITHUB_USER, per_page: limit * 2)
+      events = @client.user_public_events(GITHUB_USER, per_page: limit * 3)
 
-      events.first(limit).map { |e| format_event(e) }.compact
+      # Dedupe by repo to show variety, keep latest per repo
+      seen = {}
+      events.each do |e|
+        repo = e.repo&.name&.split("/")&.last || "unknown"
+        seen[repo] ||= e
+      end
+
+      seen.values.first(limit).map { |e| format_event(e) }.compact
     rescue Octokit::TooManyRequests
       Rails.logger.warn("GitHub API rate limited")
       []
     rescue Octokit::NotFound
-      # Fallback to repo activity
       fetch_from_repos(limit)
     end
 
@@ -60,12 +67,16 @@ module Github
       repo_name = event.repo&.name&.split("/")&.last || "unknown"
       description = build_description(event, type, repo_name)
 
+      # Consistent color per repo name
+      repo_color = REPO_COLORS[repo_name.hash.abs % REPO_COLORS.length]
+
       {
         source: repo_name.upcase.gsub("-", "_"),
         action: info[:label],
-        color: info[:color],
+        color: repo_color,
         description: description,
-        time_ago: time_ago(Time.parse(event.created_at.to_s))
+        time_ago: time_ago(Time.parse(event.created_at.to_s)),
+        date: Time.parse(event.created_at.to_s).strftime("%m/%d")
       }
     end
 
