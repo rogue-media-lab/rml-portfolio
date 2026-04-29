@@ -2,15 +2,19 @@
 <%# Usage: render 'shared/workbench_footer', section_name: 'Workbench' %>
 <% section = local_assigns[:section_name] || 'Workbench' %>
 
-<div class="flex flex-col items-center w-full gap-8 bg-zinc-950 border-t border-zinc-800 p-16">
+<div class="flex flex-col items-center w-full gap-8 bg-zinc-950 border-t border-zinc-800 p-8 md:p-16">
   <span class="tracking-[0.05em] uppercase text-zinc-600 font-['Barlow_Condensed',system-ui,sans-serif] font-bold text-xl">Rogue Media Lab // <%= section %></span>
-  <div class="flex gap-8">
-    <a href="<%= root_path %>" class="text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm hover:text-zinc-200 transition-colors">Workbench</a>
-    <a href="<%= studio_path %>" class="text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm hover:text-zinc-200 transition-colors">The Studio</a>
-    <span class="text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm hover:text-zinc-200 transition-colors cursor-pointer">The Lab</span>
-    <span class="text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm hover:text-zinc-200 transition-colors cursor-pointer">Erudition</span>
-    <span class="text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm hover:text-zinc-200 transition-colors cursor-pointer">Patreon</span>
-    <span class="text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm hover:text-zinc-200 transition-colors cursor-pointer">Substack</span>
+  <div class="grid grid-cols-2 md:flex md:flex-row gap-4 md:gap-8 text-center md:text-left">
+    <div class="flex flex-col md:flex-row gap-4 md:gap-8">
+      <a href="<%= root_path %>" class="text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm hover:text-zinc-200 transition-colors">Workbench</a>
+      <a href="<%= studio_path %>" class="text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm hover:text-zinc-200 transition-colors">The Studio</a>
+      <span class="text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm hover:text-zinc-200 transition-colors cursor-pointer">The Lab</span>
+    </div>
+    <div class="flex flex-col md:flex-row gap-4 md:gap-8">
+      <span class="text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm hover:text-zinc-200 transition-colors cursor-pointer">Erudition</span>
+      <span class="text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm hover:text-zinc-200 transition-colors cursor-pointer">Patreon</span>
+      <span class="text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm hover:text-zinc-200 transition-colors cursor-pointer">Substack</span>
+    </div>
   </div>
   <div class="flex items-center gap-2">
     <div class="w-1 h-1 rounded-xs bg-green-400"></div>
