@@ -62,6 +62,11 @@ export default class extends Controller {
       return
     }
 
+    // Warm up AudioContext inside the user gesture (Enter keypress).
+    // Mobile browsers require ctx creation + resume within a direct gesture;
+    // by the time TTS audio arrives async, the gesture window has expired.
+    this._warmUpAudio()
+
     this.inputTarget.value = ""
     this._setStreaming(true)
 
@@ -146,6 +151,19 @@ export default class extends Controller {
       this._audioCtx = new (window.AudioContext || window.webkitAudioContext)()
     }
     return this._audioCtx
+  }
+
+  // Mobile browsers suspend AudioContext until a user gesture resumes it.
+  // Call this inside a gesture handler (e.g. submit/keydown) so the context
+  // is ready by the time async audio data arrives.
+  async _warmUpAudio() {
+    try {
+      const ctx = this._getAudioCtx()
+      if (ctx.state === "suspended") await ctx.resume()
+      console.log("[Rocky] AudioContext warmed up, state:", ctx.state)
+    } catch (e) {
+      console.warn("[Rocky] AudioContext warmup failed:", e)
+    }
   }
 
   // Tone analyser → drives circles
@@ -270,7 +288,7 @@ export default class extends Controller {
       const arrayBuffer = await response.arrayBuffer()
       this._playTtsWithReverb(arrayBuffer)
     } catch (e) {
-      console.warn("Rocky TTS failed:", e)
+      console.warn("[Rocky] TTS fetch failed:", e)
       this._releaseToneQueue()
     }
   }
@@ -278,10 +296,15 @@ export default class extends Controller {
   async _playTtsWithReverb(arrayBuffer) {
     try {
       const ctx = this._getAudioCtx()
-      if (ctx.state === "suspended") await ctx.resume()
+      if (ctx.state === "suspended") {
+        console.warn("[Rocky] AudioContext still suspended at TTS play time, attempting resume")
+        await ctx.resume()
+      }
+      console.log("[Rocky] TTS decoding", arrayBuffer.byteLength, "bytes, ctx state:", ctx.state)
 
       const speechAnalyser = this._getSpeechAnalyser()
       const audioBuffer = await ctx.decodeAudioData(arrayBuffer)
+      console.log("[Rocky] TTS decoded OK, duration:", audioBuffer.duration, "s")
 
       if (this._currentTtsSrc) {
         try { this._currentTtsSrc.stop() } catch {}
@@ -320,7 +343,7 @@ export default class extends Controller {
         }
       })
     } catch (e) {
-      console.warn("Rocky TTS failed:", e)
+      console.warn("[Rocky] TTS playback failed:", e)
       this._releaseToneQueue()
     }
   }
@@ -330,7 +353,10 @@ export default class extends Controller {
   async _playThroughAnalyser(arrayBuffer, analyser, volume, onEnded) {
     try {
       const ctx = this._getAudioCtx()
-      if (ctx.state === "suspended") await ctx.resume()
+      if (ctx.state === "suspended") {
+        console.warn("[Rocky] AudioContext still suspended at tone play time, attempting resume")
+        await ctx.resume()
+      }
       const audioBuffer = await ctx.decodeAudioData(arrayBuffer.slice(0))
       const source = ctx.createBufferSource()
       source.buffer = audioBuffer
@@ -341,7 +367,7 @@ export default class extends Controller {
       source.start()
       source.addEventListener("ended", () => { if (onEnded) onEnded() })
     } catch (e) {
-      console.warn("Audio failed:", e)
+      console.warn("[Rocky] Tone playback failed:", e)
       if (onEnded) onEnded()
     }
   }
