@@ -17,7 +17,7 @@ module Rocky
       full_text = ""
 
       # Prepend system prompt as first message
-      all_messages = [{ role: "system", content: system_prompt_with_tones }] + @messages
+      all_messages = [ { role: "system", content: system_prompt_with_tones } ] + @messages
 
       @client.chat(
         parameters: {
