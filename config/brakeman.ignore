@@ -60,6 +60,10 @@
       "noteB": "Potentially unsafe model attribute in `link_to` href",
       "file": "app/views/static_pages/info.html.erb",
       "line": "106"
+    },
+    {
+      "fingerprint": "12b18fb5b377e828c0a7c01917f60273020a4762223a2cb627cab00a6af536b8",
+      "noteA": "False positive: filename comes from tone_index.json, not user input. Path traversal check in place."
     }
   ]
 }

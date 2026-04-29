@@ -3,9 +3,9 @@
 module Rocky
   class ToneService
     class << self
-      # Match a tone description to an audio file path.
-      # Returns the relative path to the tone file, or nil.
-      def match(description)
+      # Match a tone description to an audio filename.
+      # Returns just the filename (e.g. "abc123.mp3"), or nil.
+      def match_filename(description)
         return nil if description.blank?
 
         index = load_index
@@ -13,7 +13,7 @@ module Rocky
 
         # Exact match first
         exact = index[description.downcase.strip]
-        return "/tones/#{exact}" if exact
+        return exact if exact
 
         # Fuzzy: find the closest match by word overlap
         words = description.downcase.split(/[\s,]+/).reject { |w| w.length < 3 }
@@ -31,7 +31,7 @@ module Rocky
           end
         end
 
-        best_score > 0 ? "/tones/#{best_match}" : nil
+        best_score > 0 ? best_match : nil
       end
 
       # Return all tone descriptions for the system prompt
