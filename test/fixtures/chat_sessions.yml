@@ -1,9 +1,1 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
-
-one:
-  user: one
-  title: MyString
-
-two:
-  user: two
-  title: MyString
+# chat_sessions fixtures - empty to avoid FK violations
