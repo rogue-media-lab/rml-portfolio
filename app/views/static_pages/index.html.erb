@@ -118,8 +118,10 @@
       <h3 class="text-[28px] leading-[1.2] relative text-zinc-50 font-['Inter',system-ui,sans-serif] font-semibold m-0">Consumer Applications &amp; Prototypes</h3>
       <p class="text-[16px] leading-[1.5] relative text-zinc-400 font-['Inter',system-ui,sans-serif] m-0">Zuke Music Player, Notary Assistant, Hermit Plus. Showcasing polished, functional tools built with a blend of classic Rails and modern AI APIs.</p>
       <div class="mt-auto flex items-center pt-8 gap-2 relative">
-        <span class="text-zinc-50 font-['Inter',system-ui,sans-serif] font-semibold text-sm">Explore The Studio</span>
-        <span class="text-blue-500 font-['Inter',system-ui,sans-serif] font-semibold text-sm">&rarr;</span>
+        <%= link_to studio_path, class: "flex items-center gap-2" do %>
+          <span class="text-zinc-50 font-['Inter',system-ui,sans-serif] font-semibold text-sm">Explore The Studio</span>
+          <span class="text-blue-500 font-['Inter',system-ui,sans-serif] font-semibold text-sm">&rarr;</span>
+        <% end %>
       </div>
       <div class="w-full h-25 mt-4 flex items-center justify-center relative rounded-lg overflow-hidden bg-zinc-950 border border-zinc-800 shrink-0">
         <div class="flex items-end h-10 gap-[3px]">
