@@ -1,0 +1,19 @@
+<%# Workbench Footer %>
+<%# Usage: render 'shared/workbench_footer', section_name: 'Workbench' %>
+<% section = local_assigns[:section_name] || 'Workbench' %>
+
+<div class="flex flex-col items-center w-full gap-8 bg-zinc-950 border-t border-zinc-800 p-16">
+  <span class="tracking-[0.05em] uppercase text-zinc-600 font-['Barlow_Condensed',system-ui,sans-serif] font-bold text-xl">Rogue Media Lab // <%= section %></span>
+  <div class="flex gap-8">
+    <span class="text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm hover:text-zinc-200 transition-colors cursor-pointer">Workbench</span>
+    <span class="text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm hover:text-zinc-200 transition-colors cursor-pointer">The Studio</span>
+    <span class="text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm hover:text-zinc-200 transition-colors cursor-pointer">The Lab</span>
+    <span class="text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm hover:text-zinc-200 transition-colors cursor-pointer">Erudition</span>
+    <span class="text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm hover:text-zinc-200 transition-colors cursor-pointer">Patreon</span>
+    <span class="text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm hover:text-zinc-200 transition-colors cursor-pointer">Substack</span>
+  </div>
+  <div class="flex items-center gap-2">
+    <div class="w-1 h-1 rounded-xs bg-green-400"></div>
+    <span class="text-zinc-600 font-mono text-[11px]">SYSTEMS SECURE // END OF FILE</span>
+  </div>
+</div>

@@ -1,0 +1,107 @@
+<%# The Studio — Product Showcase %>
+<% content_for(:title) { "The Studio — Rogue Media Lab" } %>
+<% content_for(:body_class) { "bg-[#050505] text-zinc-50" } %>
+<% content_for(:main_class) { "flex flex-col min-h-screen w-full" } %>
+
+<div class="w-full min-h-screen bg-[#050505] antialiased">
+
+  <%= render 'shared/workbench_nav', active_page: 'studio' %>
+
+  <%# ─── STUDIO HERO ─── %>
+  <div class="flex flex-col items-center justify-center w-full pt-25 pb-20 gap-8 px-16">
+    <div class="flex flex-col items-center max-w-200 gap-6">
+      <%# Badge %>
+      <div class="flex items-center rounded-full py-1.5 px-3 gap-2 bg-blue-500/5 border border-blue-500/30">
+        <div class="w-1.5 h-1.5 rounded-[3px] bg-blue-500"></div>
+        <span class="text-center text-blue-500 font-mono text-xs">Hand-Crafted Apps &amp; Prototypes</span>
+      </div>
+      <%# Headline %>
+      <h1 class="text-[72px] leading-[1.1] tracking-[0.02em] uppercase text-center text-zinc-50 font-['Barlow_Condensed',system-ui,sans-serif] font-bold m-0">Refined Tools for<br>Modern Consumers.</h1>
+      <%# Subtitle %>
+      <p class="text-[20px] leading-[1.6] max-w-162 text-center text-zinc-400 font-['Inter',system-ui,sans-serif] m-0">Polished, production-ready applications born from the Lab. From audio-centric social players to AI-assisted legal tools—built with a focus on craft and performance.</p>
+    </div>
+  </div>
+
+  <%# ─── STUDIO SHOWCASE ─── %>
+  <div class="flex flex-col w-full pt-10 pb-30 gap-20 px-16">
+
+    <%# ─── ZUKE MUSIC (left showcase) ─── %>
+    <div class="flex items-center w-full gap-16">
+      <%# Preview card with waveform %>
+      <div class="flex-[1.2] shrink-0 basis-0 h-125 relative flex flex-col rounded-3xl overflow-hidden bg-zinc-900 border border-zinc-800">
+        <div class="flex justify-between items-center border-b border-zinc-800 p-6">
+          <span class="tracking-[0.05em] text-zinc-50 font-['Barlow_Condensed',system-ui,sans-serif] font-bold text-xl">ZUKE // PLAYER</span>
+          <div class="flex gap-3">
+            <div class="w-3 h-3 rounded-md bg-red-500"></div>
+            <div class="w-3 h-3 rounded-md bg-yellow-500"></div>
+            <div class="w-3 h-3 rounded-md bg-green-500"></div>
+          </div>
+        </div>
+        <div class="flex-1 flex items-center justify-center px-10 gap-1">
+          <div class="w-2 h-10 opacity-30 rounded-sm bg-blue-500 shrink-0"></div>
+          <div class="w-2 h-20 opacity-60 rounded-sm bg-blue-500 shrink-0"></div>
+          <div class="w-2 h-37 rounded-sm bg-blue-500 shrink-0"></div>
+          <div class="w-2 h-25 rounded-sm bg-blue-500 shrink-0"></div>
+          <div class="w-2 h-50 rounded-sm bg-blue-500 shrink-0"></div>
+          <div class="w-2 h-32 rounded-sm bg-blue-500 shrink-0"></div>
+          <div class="w-2 h-45 rounded-sm bg-blue-500 shrink-0"></div>
+          <div class="w-2 h-15 opacity-60 rounded-sm bg-blue-500 shrink-0"></div>
+        </div>
+      </div>
+      <%# Product info %>
+      <div class="flex-1 flex flex-col gap-8">
+        <div class="flex flex-col gap-3">
+          <span class="text-blue-500 font-mono text-[13px]">01 // SOCIAL MEDIA PLAYER</span>
+          <h2 class="uppercase text-zinc-50 font-['Barlow_Condensed',system-ui,sans-serif] font-bold text-5xl m-0">Zuke Music</h2>
+          <p class="text-[18px] leading-[1.6] text-zinc-400 font-['Inter',system-ui,sans-serif] m-0">A visual music player that builds soundscapes with live imagery and mood-centric social features. Powered by server-side waveform generation and HLS streaming.</p>
+        </div>
+        <div class="flex gap-4">
+          <div class="rounded-lg py-3 px-6 bg-blue-500 cursor-pointer hover:bg-blue-400 transition-colors">
+            <span class="uppercase text-zinc-950 font-['Inter',system-ui,sans-serif] font-bold text-sm">Launch Demo</span>
+          </div>
+          <div class="rounded-lg py-3 px-6 border border-zinc-800 cursor-pointer hover:bg-zinc-800 transition-colors">
+            <span class="text-zinc-50 font-['Inter',system-ui,sans-serif] font-semibold text-sm">Case Study</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <%# ─── NOTARY ASSISTANT (right showcase) ─── %>
+    <div class="flex flex-row-reverse items-center w-full gap-16">
+      <%# Preview card with document mockup %>
+      <div class="flex-[1.2] shrink-0 basis-0 h-125 relative rounded-3xl overflow-hidden bg-zinc-900 border border-zinc-800 p-10">
+        <div class="flex flex-col rounded-xl gap-4 bg-zinc-950 border border-zinc-800 w-full h-full p-6">
+          <div class="w-full h-10 flex items-center rounded-sm px-4 bg-zinc-900 shrink-0">
+            <span class="text-zinc-500 font-mono text-xs">DOCUMENT_SCAN_ACTIVE...</span>
+          </div>
+          <div class="w-full h-50 flex items-center justify-center rounded-lg border-2 border-dashed border-zinc-800 shrink-0">
+            <span class="text-zinc-700 font-['Inter',system-ui,sans-serif] text-base">AI Analysis Overlay</span>
+          </div>
+          <div class="w-full h-15 flex items-center rounded-lg px-4 bg-green-500/5 border border-green-500/30 shrink-0">
+            <span class="text-green-400 font-['Inter',system-ui,sans-serif] text-[13px]">Verification complete. Seal ready for application.</span>
+          </div>
+        </div>
+      </div>
+      <%# Product info %>
+      <div class="flex-1 flex flex-col gap-8">
+        <div class="flex flex-col gap-3">
+          <span class="text-blue-500 font-mono text-[13px]">02 // AI ASSISTED LEGAL</span>
+          <h2 class="uppercase text-zinc-50 font-['Barlow_Condensed',system-ui,sans-serif] font-bold text-5xl m-0">Notary Assistant</h2>
+          <p class="text-[18px] leading-[1.6] text-zinc-400 font-['Inter',system-ui,sans-serif] m-0">Streamlining legal document verification with AI. Real-time document analysis, verification logging, and secure digital signing workflows.</p>
+        </div>
+        <div class="flex gap-4">
+          <div class="rounded-lg py-3 px-6 bg-blue-500 cursor-pointer hover:bg-blue-400 transition-colors">
+            <span class="uppercase text-zinc-950 font-['Inter',system-ui,sans-serif] font-bold text-sm">Request Access</span>
+          </div>
+          <div class="rounded-lg py-3 px-6 border border-zinc-800 cursor-pointer hover:bg-zinc-800 transition-colors">
+            <span class="text-zinc-50 font-['Inter',system-ui,sans-serif] font-semibold text-sm">Technical Build</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <%= render 'shared/workbench_footer', section_name: 'The Studio' %>
+
+</div>
