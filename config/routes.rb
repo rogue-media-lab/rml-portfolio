@@ -123,6 +123,9 @@ Rails.application.routes.draw do
   post "rocky/tts",    to: "rocky#tts",    as: :rocky_tts
   get  "rocky/tone",   to: "rocky#tone",   as: :rocky_tone
 
+  # The Studio
+  get "studio", to: "studio#index", as: :studio
+
   resources :contacts, only: [ :new, :create ]
   resources :projects, only: [ :index ]
   resources :skills, only: [ :index ]
