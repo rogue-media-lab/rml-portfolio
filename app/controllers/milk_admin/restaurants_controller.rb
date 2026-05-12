@@ -47,7 +47,7 @@ class MilkAdmin::RestaurantsController < ApplicationController
   private
 
   def set_restaurant
-    @restaurant = Restaurant.find(params[:id])
+    @restaurant = Restaurant.find_by!(slug: params[:id])
   end
 
   def restaurant_params
