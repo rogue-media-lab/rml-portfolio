@@ -137,22 +137,22 @@ Rails.application.routes.draw do
   # These routes MUST come after all specific portfolio routes
   # to avoid slug conflicts with /studio, /lab, /blog, etc.
   scope "/:restaurant_slug" do
-    get "/", to: "restaurant/pages#home", as: :restaurant_home
-    get "/menu", to: "restaurant/menu#index", as: :restaurant_menu
-    get "/about", to: "restaurant/pages#about", as: :restaurant_about
-    get "/contact", to: "restaurant/contact#index", as: :restaurant_contact
+    get "/", to: "restaurants/pages#home", as: :restaurant_home
+    get "/menu", to: "restaurants/menu#index", as: :restaurant_menu
+    get "/about", to: "restaurants/pages#about", as: :restaurant_about
+    get "/contact", to: "restaurants/contact#index", as: :restaurant_contact
 
     # Cart
-    get "/cart", to: "restaurant/cart#show", as: :restaurant_cart
-    post "/cart/add", to: "restaurant/cart#add", as: :restaurant_cart_add
-    patch "/cart/update", to: "restaurant/cart#update", as: :restaurant_cart_update
-    delete "/cart/remove/:menu_item_id", to: "restaurant/cart#remove", as: :restaurant_cart_remove
-    delete "/cart/clear", to: "restaurant/cart#clear", as: :restaurant_cart_clear
+    get "/cart", to: "restaurants/cart#show", as: :restaurant_cart
+    post "/cart/add", to: "restaurants/cart#add", as: :restaurant_cart_add
+    patch "/cart/update", to: "restaurants/cart#update", as: :restaurant_cart_update
+    delete "/cart/remove/:menu_item_id", to: "restaurants/cart#remove", as: :restaurant_cart_remove
+    delete "/cart/clear", to: "restaurants/cart#clear", as: :restaurant_cart_clear
 
     # Orders
-    get "/orders/new", to: "restaurant/orders#new", as: :new_restaurant_order
-    post "/orders", to: "restaurant/orders#create", as: :restaurant_orders
-    get "/orders/:id/confirmation", to: "restaurant/orders#confirmation", as: :restaurant_order_confirmation
+    get "/orders/new", to: "restaurants/orders#new", as: :new_restaurant_order
+    post "/orders", to: "restaurants/orders#create", as: :restaurant_orders
+    get "/orders/:id/confirmation", to: "restaurants/orders#confirmation", as: :restaurant_order_confirmation
   end
 
   # Restaurant admin (under MilkAdmin)
