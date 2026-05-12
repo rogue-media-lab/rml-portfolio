@@ -1,0 +1,38 @@
+<%= turbo_frame_tag "dashboard_content" do %>
+  <%= render "shared/admin_breadcrumbs", breadcrumbs: [{ name: "Restaurants", path: milk_admin_restaurants_path }, { name: @restaurant.name, path: milk_admin_restaurant_path(@restaurant) }, { name: "Testimonials", path: milk_admin_restaurant_testimonials_path(@restaurant) }, { name: @testimonial.persisted? ? @testimonial.customer_name : "New" }] %>
+
+  <div class="mb-6">
+    <h2 class="text-3xl font-bold text-gray-900"><%= @testimonial.persisted? ? "Edit Testimonial" : "New Testimonial" %></h2>
+  </div>
+
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+    <%= form_with model: [:milk_admin, @restaurant, @testimonial], class: "space-y-6" do |form| %>
+      <div>
+        <%= form.label :customer_name, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :customer_name, class: "w-full rounded-lg border border-gray-300 px-4 py-2" %>
+      </div>
+      <div>
+        <%= form.label :quote, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_area :quote, rows: 3, class: "w-full rounded-lg border border-gray-300 px-4 py-2" %>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div>
+          <%= form.label :stars, class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= form.select :stars, [5, 4, 3, 2, 1], {}, class: "w-full rounded-lg border border-gray-300 px-4 py-2" %>
+        </div>
+        <div class="flex items-center gap-2 pt-6">
+          <%= form.check_box :active, class: "rounded" %>
+          <%= form.label :active, "Active", class: "text-sm font-medium text-gray-700" %>
+        </div>
+        <div class="flex items-center gap-2 pt-6">
+          <%= form.check_box :featured, class: "rounded" %>
+          <%= form.label :featured, "Featured", class: "text-sm font-medium text-gray-700" %>
+        </div>
+      </div>
+      <div class="flex items-center gap-4">
+        <%= form.submit class: "px-6 py-3 bg-orange-600 hover:bg-orange-500 text-white rounded-lg font-medium transition-colors cursor-pointer" %>
+        <%= link_to "Cancel", milk_admin_restaurant_testimonials_path(@restaurant), data: { turbo_frame: "dashboard_content" }, class: "text-gray-600 hover:text-gray-900" %>
+      </div>
+    <% end %>
+  </div>
+<% end %>
