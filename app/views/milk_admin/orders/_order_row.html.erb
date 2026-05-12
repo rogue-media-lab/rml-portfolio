@@ -1,0 +1,30 @@
+<%# Order row partial — used by Turbo Streams for real-time updates %>
+<tr id="order_<%= order.id %>" class="hover:bg-gray-50">
+  <td class="px-4 py-3 text-sm font-medium text-gray-900">#<%= order.id %></td>
+  <td class="px-4 py-3 text-sm text-gray-900"><%= order.customer_name %></td>
+  <td class="px-4 py-3 text-sm text-gray-500"><%= order.phone %></td>
+  <td class="px-4 py-3 text-sm font-medium text-gray-900">$<%= '%.2f' % order.total %></td>
+  <td class="px-4 py-3 text-sm text-gray-500"><%= order.pickup_time&.strftime("%l:%M %p") %></td>
+  <td class="px-4 py-3">
+    <% case order.status %>
+    <% when "pending" %>
+      <span class="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">Pending</span>
+    <% when "confirmed" %>
+      <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">Confirmed</span>
+    <% when "ready" %>
+      <span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">Ready</span>
+    <% when "completed" %>
+      <span class="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">Completed</span>
+    <% when "cancelled" %>
+      <span class="px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">Cancelled</span>
+    <% else %>
+      <span class="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800"><%= order.status %></span>
+    <% end %>
+  </td>
+  <td class="px-4 py-3 text-sm text-gray-500"><%= order.created_at.strftime("%b %d, %l:%M %p") %></td>
+  <td class="px-4 py-3 text-right">
+    <div class="flex items-center justify-end gap-2">
+      <%= link_to "View", milk_admin_restaurant_order_path(restaurant, order), data: { turbo_frame: "dashboard_content" }, class: "text-sky-600 hover:text-sky-900 text-sm" %>
+    </div>
+  </td>
+</tr>
