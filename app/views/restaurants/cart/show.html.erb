@@ -1,0 +1,48 @@
+<%# Restaurant Cart Page %>
+<% content_for(:title) { "Cart — #{@restaurant.name}" } %>
+
+<section class="py-16 px-6 md:px-16">
+  <div class="max-w-2xl mx-auto">
+    <h1 style="font-family: var(--font-display); color: var(--dark);" class="text-4xl font-bold text-center mb-12">Your Cart</h1>
+
+    <% if @cart_items.any? %>
+      <div class="space-y-4 mb-8">
+        <% @cart_items.each do |cart_item| %>
+          <div class="bg-white rounded-xl shadow-md p-4 flex justify-between items-center">
+            <div>
+              <h3 style="color: var(--dark);" class="font-semibold"><%= cart_item[:item].name %></h3>
+              <p class="text-gray-500 text-sm">$<%= '%.2f' % cart_item[:item].price %> each</p>
+            </div>
+            <div class="flex items-center gap-4">
+              <%= form_with url: restaurant_cart_update_path(@restaurant.slug), method: :patch, class: "flex items-center gap-2" do |f| %>
+                <%= hidden_field_tag :menu_item_id, cart_item[:item].id %>
+                <%= number_field_tag :quantity, cart_item[:quantity], min: 0, class: "w-16 text-center rounded border border-gray-300 py-1" %>
+                <%= f.submit "Update", class: "text-sm text-gray-600 hover:text-gray-900 cursor-pointer" %>
+              <% end %>
+              <span style="color: var(--accent);" class="font-bold">$<%= '%.2f' % cart_item[:subtotal] %></span>
+              <%= button_to "✕", restaurant_cart_remove_path(@restaurant.slug, menu_item_id: cart_item[:item].id), method: :delete, class: "text-red-500 hover:text-red-700" %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+        <div class="flex justify-between items-center text-xl font-bold" style="color: var(--dark);">
+          <span>Total</span>
+          <span style="color: var(--accent);">$<%= '%.2f' % @cart_items.sum { |ci| ci[:subtotal] } %></span>
+        </div>
+      </div>
+
+      <div class="flex gap-4">
+        <%= link_to "Proceed to Order", new_restaurant_order_path(@restaurant.slug), class: "flex-1 text-center py-3 rounded-lg text-white font-bold transition-colors", style: "background-color: var(--accent);" %>
+        <%= button_to "Clear Cart", restaurant_cart_clear_path(@restaurant.slug), method: :delete, class: "px-6 py-3 rounded-lg border border-gray-300 text-gray-600 font-medium hover:bg-gray-50 transition-colors" %>
+      </div>
+    <% else %>
+      <div class="text-center py-12">
+        <span class="material-icons text-gray-400 text-6xl mb-4">shopping_cart</span>
+        <p class="text-gray-500 mb-6">Your cart is empty</p>
+        <%= link_to "Browse Menu", restaurant_menu_path(@restaurant.slug), class: "inline-block px-8 py-3 rounded-lg text-white font-bold transition-colors", style: "background-color: var(--accent);" %>
+      </div>
+    <% end %>
+  </div>
+</section>

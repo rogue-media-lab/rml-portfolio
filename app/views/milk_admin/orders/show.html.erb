@@ -1,0 +1,96 @@
+<%= turbo_frame_tag "dashboard_content" do %>
+  <%= render "shared/admin_breadcrumbs", breadcrumbs: [{ name: "Restaurants", path: milk_admin_restaurants_path }, { name: @restaurant.name, path: milk_admin_restaurant_path(@restaurant) }, { name: "Orders", path: milk_admin_restaurant_orders_path(@restaurant) }, { name: "Order ##{@order.id}" }] %>
+
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h2 class="text-3xl font-bold text-gray-900">Order #<%= @order.id %></h2>
+      <p class="text-gray-500">Placed <%= @order.created_at.strftime("%B %d, %Y at %l:%M %p") %></p>
+    </div>
+    <div class="flex items-center gap-3">
+      <% case @order.status %>
+      <% when "pending" %>
+        <%= button_to "Confirm", milk_admin_restaurant_order_path(@restaurant, @order, order: { status: "confirmed" }), method: :patch, class: "px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium transition-colors cursor-pointer" %>
+      <% when "confirmed" %>
+        <%= button_to "Mark Ready", milk_admin_restaurant_order_path(@restaurant, @order, order: { status: "ready" }), method: :patch, class: "px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg text-sm font-medium transition-colors cursor-pointer" %>
+      <% when "ready" %>
+        <%= button_to "Complete", milk_admin_restaurant_order_path(@restaurant, @order, order: { status: "completed" }), method: :patch, class: "px-4 py-2 bg-gray-600 hover:bg-gray-500 text-white rounded-lg text-sm font-medium transition-colors cursor-pointer" %>
+      <% end %>
+      <% unless @order.status == "cancelled" || @order.status == "completed" %>
+        <%= button_to "Cancel", milk_admin_restaurant_order_path(@restaurant, @order, order: { status: "cancelled" }), method: :patch, data: { turbo_confirm: "Cancel this order?" }, class: "px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg text-sm font-medium transition-colors cursor-pointer" %>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+    <%# Customer Info %>
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Customer</h3>
+      <p class="text-lg font-medium text-gray-900"><%= @order.customer_name %></p>
+      <a href="tel:<%= @order.phone %>" class="text-sky-600 hover:text-sky-900"><%= @order.phone %></a>
+    </div>
+
+    <%# Pickup Time %>
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Pickup Time</h3>
+      <p class="text-lg font-medium text-gray-900">
+        <% if @order.pickup_time.present? %>
+          <%= @order.pickup_time.strftime("%l:%M %p") %>
+        <% else %>
+          <span class="text-gray-400">Not specified</span>
+        <% end %>
+      </p>
+    </div>
+
+    <%# Status %>
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">Status</h3>
+      <% case @order.status %>
+      <% when "pending" %>
+        <span class="px-3 py-1 text-sm font-medium rounded-full bg-yellow-100 text-yellow-800">Pending</span>
+      <% when "confirmed" %>
+        <span class="px-3 py-1 text-sm font-medium rounded-full bg-blue-100 text-blue-800">Confirmed</span>
+      <% when "ready" %>
+        <span class="px-3 py-1 text-sm font-medium rounded-full bg-green-100 text-green-800">Ready</span>
+      <% when "completed" %>
+        <span class="px-3 py-1 text-sm font-medium rounded-full bg-gray-100 text-gray-800">Completed</span>
+      <% when "cancelled" %>
+        <span class="px-3 py-1 text-sm font-medium rounded-full bg-red-100 text-red-800">Cancelled</span>
+      <% end %>
+    </div>
+  </div>
+
+  <%# Order Items %>
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+    <div class="p-4 border-b border-gray-200">
+      <h3 class="text-lg font-semibold text-gray-900">Order Items</h3>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead class="bg-gray-50 border-b border-gray-200">
+          <tr>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Item</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Qty</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Price</th>
+            <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Subtotal</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">
+          <% @order_items.each do |item| %>
+            <tr class="hover:bg-gray-50">
+              <td class="px-4 py-3 text-sm font-medium text-gray-900"><%= item.menu_item.name %></td>
+              <td class="px-4 py-3 text-sm text-gray-500"><%= item.quantity %></td>
+              <td class="px-4 py-3 text-sm text-gray-500">$<%= '%.2f' % item.price %></td>
+              <td class="px-4 py-3 text-sm font-medium text-gray-900 text-right">$<%= '%.2f' % (item.price * item.quantity) %></td>
+            </tr>
+          <% end %>
+        </tbody>
+        <tfoot class="bg-gray-50 border-t border-gray-200">
+          <tr>
+            <td colspan="3" class="px-4 py-3 text-sm font-semibold text-gray-900 text-right">Total</td>
+            <td class="px-4 py-3 text-lg font-bold text-gray-900 text-right">$<%= '%.2f' % @order.total %></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+<% end %>

@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" fill="none">
+  <!-- Tortilla Chips / Nachos - colorful flat style -->
+  <defs>
+    <linearGradient id="chip1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#F5CB5C"/>
+      <stop offset="100%" style="stop-color:#E8B93A"/>
+    </linearGradient>
+    <linearGradient id="chip2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#F0C040"/>
+      <stop offset="100%" style="stop-color:#D4A43A"/>
+    </linearGradient>
+    <linearGradient id="chip3" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#E8B93A"/>
+      <stop offset="100%" style="stop-color:#C4922E"/>
+    </linearGradient>
+    <linearGradient id="salsa" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#E53935"/>
+      <stop offset="100%" style="stop-color:#C62828"/>
+    </linearGradient>
+    <filter id="shadow3" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+  
+  <!-- Shadow pool -->
+  <ellipse cx="200" cy="275" rx="160" ry="18" fill="#D4781E" opacity="0.12"/>
+  
+  <!-- Background scattered chip (far back) -->
+  <polygon points="50,120 90,95 110,130 70,145" fill="#D4A43A" filter="url(#shadow3)" opacity="0.7"/>
+  <line x1="65" y1="122" x2="95" y2="118" stroke="#C4922E" stroke-width="1.5" opacity="0.4"/>
+  
+  <polygon points="310,100 350,85 365,120 330,140" fill="#C4922E" filter="url(#shadow3)" opacity="0.7"/>
+  <line x1="325" y1="105" x2="350" y2="108" stroke="#B8862A" stroke-width="1.5" opacity="0.4"/>
+  
+  <!-- Middle layer chips -->
+  <polygon points="100,180 155,145 185,185 130,210" fill="url(#chip2)" filter="url(#shadow3)"/>
+  <line x1="115" y1="180" x2="165" y2="170" stroke="#D4A43A" stroke-width="1.5" opacity="0.5"/>
+  <line x1="140" y1="158" x2="155" y2="195" stroke="#D4A43A" stroke-width="1" opacity="0.3"/>
+  
+  <polygon points="230,160 285,135 310,175 265,200" fill="url(#chip1)" filter="url(#shadow3)"/>
+  <line x1="248" y1="165" x2="290" y2="158" stroke="#C4922E" stroke-width="1.5" opacity="0.5"/>
+  <line x1="270" y1="145" x2="280" y2="188" stroke="#C4922E" stroke-width="1" opacity="0.3"/>
+  
+  <polygon points="320,170 370,150 380,195 340,210" fill="url(#chip3)" filter="url(#shadow3)"/>
+  <line x1="335" y1="175" x2="365" y2="170" stroke="#B8862A" stroke-width="1.5" opacity="0.5"/>
+  
+  <!-- Front layer chips -->
+  <polygon points="60,230 120,195 155,235 100,260" fill="url(#chip1)" filter="url(#shadow3)"/>
+  <line x1="78" y1="230" x2="135" y2="218" stroke="#C4922E" stroke-width="2" opacity="0.5"/>
+  <line x1="105" y1="205" x2="120" y2="248" stroke="#C4922E" stroke-width="1.5" opacity="0.3"/>
+  
+  <polygon points="170,220 230,185 265,225 210,255" fill="url(#chip2)" filter="url(#shadow3)"/>
+  <line x1="190" y1="222" x2="245" y2="210" stroke="#D4A43A" stroke-width="2" opacity="0.5"/>
+  <line x1="215" y1="198" x2="232" y2="240" stroke="#D4A43A" stroke-width="1.5" opacity="0.3"/>
+  
+  <polygon points="280,210 340,185 365,225 310,250" fill="url(#chip3)" filter="url(#shadow3)"/>
+  <line x1="298" y1="215" x2="345" y2="208" stroke="#B8862A" stroke-width="2" opacity="0.5"/>
+  <line x1="325" y1="195" x2="335" y2="238" stroke="#B8862A" stroke-width="1.5" opacity="0.3"/>
+  
+  <!-- Small scattered chips -->
+  <polygon points="145,140 170,125 180,150 155,160" fill="#F5CB5C" filter="url(#shadow3)"/>
+  <polygon points="200,130 230,118 240,148 215,155" fill="#E8B93A" filter="url(#shadow3)"/>
+  
+  <!-- Cheese sauce dollop -->
+  <ellipse cx="200" cy="165" rx="30" ry="20" fill="#FFD54F" filter="url(#shadow3)"/>
+  <ellipse cx="195" cy="160" rx="20" ry="12" fill="#FFE082" opacity="0.7"/>
+  <ellipse cx="192" cy="158" rx="10" ry="6" fill="#FFF176" opacity="0.5"/>
+  
+  <!-- Cheese drip -->
+  <path d="M215 175 Q218 190 212 200" fill="none" stroke="#FFD54F" stroke-width="4" stroke-linecap="round"/>
+  
+  <!-- Jalapeño slices -->
+  <ellipse cx="170" cy="145" rx="12" ry="7" fill="#4CAF50" transform="rotate(-20 170 145)"/>
+  <ellipse cx="170" cy="145" rx="8" ry="4" fill="#66BB6A" transform="rotate(-20 170 145)"/>
+  <ellipse cx="170" cy="145" rx="3" ry="2" fill="#81C784" transform="rotate(-20 170 145)"/>
+  
+  <ellipse cx="245" cy="155" rx="10" ry="6" fill="#4CAF50" transform="rotate(15 245 155)"/>
+  <ellipse cx="245" cy="155" rx="7" ry="3.5" fill="#66BB6A" transform="rotate(15 245 155)"/>
+  <ellipse cx="245" cy="155" rx="2.5" ry="1.5" fill="#81C784" transform="rotate(15 245 155)"/>
+  
+  <!-- Salsa splashes -->
+  <circle cx="180" cy="180" r="6" fill="#E53935" opacity="0.8"/>
+  <circle cx="220" cy="190" r="5" fill="#EF5350" opacity="0.8"/>
+  <circle cx="195" cy="200" r="4" fill="#F44336" opacity="0.7"/>
+  
+  <!-- Tomato bits -->
+  <circle cx="160" cy="170" r="4" fill="#F44336"/>
+  <circle cx="235" cy="175" r="3.5" fill="#EF5350"/>
+  <circle cx="205" cy="185" r="3" fill="#F44336"/>
+  
+  <!-- Scattered salt/seasoning dots -->
+  <circle cx="130" cy="205" r="1.5" fill="white" opacity="0.6"/>
+  <circle cx="145" cy="195" r="1" fill="white" opacity="0.5"/>
+  <circle cx="250" cy="195" r="1.5" fill="white" opacity="0.6"/>
+  <circle cx="270" cy="210" r="1" fill="white" opacity="0.5"/>
+  <circle cx="90" cy="240" r="1.5" fill="white" opacity="0.6"/>
+  <circle cx="310" cy="230" r="1" fill="white" opacity="0.5"/>
+  <circle cx="200" cy="245" r="1.5" fill="white" opacity="0.6"/>
+</svg>
