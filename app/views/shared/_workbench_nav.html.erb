@@ -57,12 +57,12 @@
     <% if active == 'lab' %>
       <div class="flex items-center pb-1 border-b-2 border-orange-600">
         <span class="tracking-[0.02em] text-zinc-50 font-['Inter',system-ui,sans-serif] font-medium text-[15px]">The Lab</span>
-        <span class="ml-1.5 text-[11px] text-orange-400 font-['Inter',system-ui,sans-serif] font-medium py-0.5 px-1.5 bg-orange-500/10 border border-orange-500/30 rounded-sm">TOOLS</span>
+        <span class="ml-1.5 text-[11px] text-orange-400 font-['Inter',system-ui,sans-serif] font-medium py-0.5 px-1.5 bg-orange-500/10 border border-orange-500/30 rounded-sm">HIRE</span>
       </div>
     <% else %>
       <div class="flex items-center gap-1.5">
-        <span class="tracking-[0.02em] text-zinc-400 font-['Inter',system-ui,sans-serif] font-medium text-[15px]">The Lab</span>
-        <span class="text-[11px] text-zinc-500 font-['Inter',system-ui,sans-serif] font-medium py-0.5 px-1.5 border border-zinc-800 rounded-sm">TOOLS</span>
+        <a href="<%= lab_path %>" class="tracking-[0.02em] text-zinc-400 font-['Inter',system-ui,sans-serif] font-medium text-[15px] hover:text-zinc-200 transition-colors">The Lab</a>
+        <span class="text-[11px] text-zinc-500 font-['Inter',system-ui,sans-serif] font-medium py-0.5 px-1.5 border border-zinc-800 rounded-sm">HIRE</span>
       </div>
     <% end %>
 
