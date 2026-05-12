@@ -146,8 +146,10 @@
       <h3 class="text-[28px] leading-[1.2] relative text-zinc-50 font-['Inter',system-ui,sans-serif] font-semibold m-0">Behind the Scenes Experiments</h3>
       <p class="text-[16px] leading-[1.5] relative text-zinc-400 font-['Inter',system-ui,sans-serif] m-0">Where Rocky lives. Deep technical dives into LLM tool-calling, background jobs with audiowaveform, and robust system architecture.</p>
       <div class="mt-auto flex items-center pt-8 gap-2 relative">
-        <span class="text-zinc-50 font-['Inter',system-ui,sans-serif] font-semibold text-sm">Enter The Lab</span>
-        <span class="text-orange-600 font-['Inter',system-ui,sans-serif] font-semibold text-sm">&rarr;</span>
+        <%= link_to lab_path, class: "flex items-center gap-2" do %>
+          <span class="text-zinc-50 font-['Inter',system-ui,sans-serif] font-semibold text-sm">Enter The Lab</span>
+          <span class="text-orange-600 font-['Inter',system-ui,sans-serif] font-semibold text-sm">&rarr;</span>
+        <% end %>
       </div>
       <div class="w-full h-25 mt-4 flex items-center justify-center relative rounded-lg overflow-hidden bg-zinc-950 border border-zinc-800 shrink-0">
         <div class="absolute w-[150px] h-[150px] rounded-full" style="background-image: radial-gradient(circle farthest-corner at 50% 50% in oklab, oklab(83.7% 0.016 0.164 / 8%) 0%, oklab(0% 0 .0001 / 0%) 70%)"></div>
