@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_12_163454) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_12_171607) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -245,6 +245,30 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_12_163454) do
     t.text "short_description"
     t.boolean "featured", default: false, null: false
     t.index ["resume_id"], name: "index_projects_on_resume_id"
+  end
+
+  create_table "restaurants", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "slug", null: false
+    t.string "tagline"
+    t.string "address"
+    t.string "phone"
+    t.string "email"
+    t.string "place_id"
+    t.decimal "rating", precision: 2, scale: 1
+    t.integer "review_count", default: 0
+    t.string "price_level"
+    t.string "service_type"
+    t.string "primary_color", default: "#FDD835"
+    t.string "accent_color", default: "#A10035"
+    t.string "dark_color", default: "#1A237E"
+    t.string "font_display", default: "Lilita One"
+    t.string "font_body", default: "Nunito"
+    t.string "hero_image"
+    t.string "logo_image"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["slug"], name: "index_restaurants_on_slug", unique: true
   end
 
   create_table "resumes", force: :cascade do |t|

@@ -133,6 +133,40 @@ Rails.application.routes.draw do
   resources :projects, only: [ :index ]
   resources :skills, only: [ :index ]
 
+  # Restaurant platform — multi-tenant restaurant sites
+  # These routes MUST come after all specific portfolio routes
+  # to avoid slug conflicts with /studio, /lab, /blog, etc.
+  scope "/:restaurant_slug" do
+    get "/", to: "restaurant/pages#home", as: :restaurant_home
+    get "/menu", to: "restaurant/menu#index", as: :restaurant_menu
+    get "/about", to: "restaurant/pages#about", as: :restaurant_about
+    get "/contact", to: "restaurant/contact#index", as: :restaurant_contact
+
+    # Cart
+    get "/cart", to: "restaurant/cart#show", as: :restaurant_cart
+    post "/cart/add", to: "restaurant/cart#add", as: :restaurant_cart_add
+    patch "/cart/update", to: "restaurant/cart#update", as: :restaurant_cart_update
+    delete "/cart/remove/:menu_item_id", to: "restaurant/cart#remove", as: :restaurant_cart_remove
+    delete "/cart/clear", to: "restaurant/cart#clear", as: :restaurant_cart_clear
+
+    # Orders
+    get "/orders/new", to: "restaurant/orders#new", as: :new_restaurant_order
+    post "/orders", to: "restaurant/orders#create", as: :restaurant_orders
+    get "/orders/:id/confirmation", to: "restaurant/orders#confirmation", as: :restaurant_order_confirmation
+  end
+
+  # Restaurant admin (under MilkAdmin)
+  namespace :milk_admin do
+    resources :restaurants do
+      resources :menu_categories, except: [:show]
+      resources :menu_items, except: [:show]
+      resources :testimonials, except: [:show]
+      resources :hours, only: [:index, :edit, :update]
+      resources :reservations, only: [:index, :update, :destroy]
+      resources :orders, only: [:index, :update, :destroy]
+    end
+  end
+
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
