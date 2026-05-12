@@ -1,6 +1,7 @@
 module Restaurant
   class ContactController < ApplicationController
     include RestaurantScoped
+    layout "restaurant"
 
     def index
       @contact = Contact.new

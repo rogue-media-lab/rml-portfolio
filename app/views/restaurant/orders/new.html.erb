@@ -1,0 +1,40 @@
+<%# Restaurant Order Form %>
+<% content_for(:title) { "Order — #{@restaurant.name}" } %>
+
+<section class="py-16 px-6 md:px-16">
+  <div class="max-w-lg mx-auto">
+    <h1 style="font-family: var(--font-display); color: var(--dark);" class="text-4xl font-bold text-center mb-12">Place Your Order</h1>
+
+    <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+      <h2 style="color: var(--dark);" class="text-lg font-bold mb-4">Order Summary</h2>
+      <div class="space-y-2 mb-4">
+        <% @cart_items.each do |cart_item| %>
+          <div class="flex justify-between text-sm text-gray-600">
+            <span><%= cart_item[:item].name %> x<%= cart_item[:quantity] %></span>
+            <span>$<%= '%.2f' % cart_item[:subtotal] %></span>
+          </div>
+        <% end %>
+      </div>
+      <div class="border-t pt-4 flex justify-between font-bold" style="color: var(--dark);">
+        <span>Total</span>
+        <span style="color: var(--accent);">$<%= '%.2f' % @cart_items.sum { |ci| ci[:subtotal] } %></span>
+      </div>
+    </div>
+
+    <%= form_with model: @order, url: restaurant_orders_path(@restaurant.slug), class: "bg-white rounded-xl shadow-md p-6 space-y-4" do |form| %>
+      <div>
+        <%= form.label :customer_name, "Your Name", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :customer_name, required: true, class: "w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-yellow-400 focus:border-transparent" %>
+      </div>
+      <div>
+        <%= form.label :phone, "Phone Number", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.telephone_field :phone, required: true, class: "w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-yellow-400 focus:border-transparent" %>
+      </div>
+      <div>
+        <%= form.label :pickup_time, "Preferred Pickup Time", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.time_field :pickup_time, class: "w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-yellow-400 focus:border-transparent" %>
+      </div>
+      <%= form.submit "Place Order", class: "w-full py-3 rounded-lg text-white font-bold transition-colors cursor-pointer", style: "background-color: var(--accent);" %>
+    <% end %>
+  </div>
+</section>

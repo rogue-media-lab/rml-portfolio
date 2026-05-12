@@ -1,6 +1,7 @@
 module Restaurant
   class CartController < ApplicationController
     include RestaurantScoped
+    layout "restaurant"
 
     def show
       @cart = session[:cart] || {}

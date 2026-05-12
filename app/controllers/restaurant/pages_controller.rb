@@ -1,6 +1,7 @@
 module Restaurant
   class PagesController < ApplicationController
     include RestaurantScoped
+    layout "restaurant"
 
     def home
       @featured_items = @restaurant.menu_items.featured.active.includes(:menu_category).limit(6)
