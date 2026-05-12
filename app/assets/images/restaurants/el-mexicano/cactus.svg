@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" fill="none">
+  <!-- Cactus illustration - colorful flat style, suitable for logo placeholder -->
+  <defs>
+    <linearGradient id="cactusBody" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#2E7D32"/>
+      <stop offset="50%" style="stop-color:#4CAF50"/>
+      <stop offset="100%" style="stop-color:#388E3C"/>
+    </linearGradient>
+    <linearGradient id="cactusArm" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#388E3C"/>
+      <stop offset="100%" style="stop-color:#43A047"/>
+    </linearGradient>
+    <linearGradient id="pot" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#E65100"/>
+      <stop offset="100%" style="stop-color:#BF360C"/>
+    </linearGradient>
+    <linearGradient id="potRim" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#F57C00"/>
+      <stop offset="100%" style="stop-color:#E65100"/>
+    </linearGradient>
+    <filter id="shadow4" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+  
+  <!-- Shadow under pot -->
+  <ellipse cx="200" cy="370" rx="100" ry="12" fill="#BF360C" opacity="0.2"/>
+  
+  <!-- Terracotta pot -->
+  <path d="M125 320 L135 365 Q140 370 200 370 Q260 370 265 365 L275 320 Z" fill="url(#pot)" filter="url(#shadow4)"/>
+  
+  <!-- Pot rim -->
+  <rect x="118" y="310" width="164" height="20" rx="5" fill="url(#potRim)"/>
+  <rect x="118" y="310" width="164" height="6" rx="3" fill="#FF8F00" opacity="0.5"/>
+  
+  <!-- Pot decoration band -->
+  <rect x="140" y="345" width="120" height="8" rx="4" fill="#D84315" opacity="0.4"/>
+  
+  <!-- Dirt/soil -->
+  <ellipse cx="200" cy="318" rx="70" ry="10" fill="#5D4037"/>
+  <ellipse cx="200" cy="316" rx="60" ry="6" fill="#6D4C41" opacity="0.5"/>
+  
+  <!-- Main cactus body -->
+  <rect x="175" y="100" width="50" height="220" rx="25" fill="url(#cactusBody)" filter="url(#shadow4)"/>
+  
+  <!-- Body highlight -->
+  <rect x="183" y="105" width="14" height="210" rx="7" fill="#66BB6A" opacity="0.4"/>
+  <rect x="187" y="110" width="6" height="200" rx="3" fill="#81C784" opacity="0.3"/>
+  
+  <!-- Body shadow edge -->
+  <rect x="210" y="105" width="10" height="215" rx="5" fill="#2E7D32" opacity="0.3"/>
+  
+  <!-- Left arm -->
+  <path d="M175 200 L130 200 Q105 200 105 175 L105 155 Q105 130 130 130 L135 130 Q155 130 155 155 L155 175 Q155 190 145 190 L175 190" fill="url(#cactusArm)" filter="url(#shadow4)"/>
+  
+  <!-- Left arm highlight -->
+  <rect x="110" y="138" width="10" height="50" rx="5" fill="#66BB6A" opacity="0.4"/>
+  
+  <!-- Left arm top cap -->
+  <ellipse cx="130" cy="130" rx="25" ry="8" fill="#43A047"/>
+  
+  <!-- Right arm -->
+  <path d="M225 170 L265 170 Q290 170 290 145 L290 125 Q290 100 265 100 L260 100 Q240 100 240 125 L240 145 Q240 160 250 160 L225 160" fill="url(#cactusArm)" filter="url(#shadow4)"/>
+  
+  <!-- Right arm highlight -->
+  <rect x="248" y="108" width="10" height="55" rx="5" fill="#66BB6A" opacity="0.4"/>
+  
+  <!-- Right arm top cap -->
+  <ellipse cx="265" cy="100" rx="25" ry="8" fill="#43A047"/>
+  
+  <!-- Cactus spines - main body -->
+  <line x1="175" y1="130" x2="168" y2="125" stroke="#81C784" stroke-width="2" stroke-linecap="round"/>
+  <line x1="175" y1="160" x2="168" y2="155" stroke="#81C784" stroke-width="2" stroke-linecap="round"/>
+  <line x1="175" y1="190" x2="168" y2="185" stroke="#81C784" stroke-width="2" stroke-linecap="round"/>
+  <line x1="175" y1="220" x2="168" y2="215" stroke="#81C784" stroke-width="2" stroke-linecap="round"/>
+  <line x1="175" y1="250" x2="168" y2="245" stroke="#81C784" stroke-width="2" stroke-linecap="round"/>
+  <line x1="175" y1="280" x2="168" y2="275" stroke="#81C784" stroke-width="2" stroke-linecap="round"/>
+  
+  <line x1="225" y1="140" x2="232" y2="135" stroke="#81C784" stroke-width="2" stroke-linecap="round"/>
+  <line x1="225" y1="170" x2="232" y2="165" stroke="#81C784" stroke-width="2" stroke-linecap="round"/>
+  <line x1="225" y1="200" x2="232" y2="195" stroke="#81C784" stroke-width="2" stroke-linecap="round"/>
+  <line x1="225" y1="230" x2="232" y2="225" stroke="#81C784" stroke-width="2" stroke-linecap="round"/>
+  <line x1="225" y1="260" x2="232" y2="255" stroke="#81C784" stroke-width="2" stroke-linecap="round"/>
+  
+  <!-- Cactus top spines -->
+  <line x1="190" y1="102" x2="185" y2="94" stroke="#81C784" stroke-width="2" stroke-linecap="round"/>
+  <line x1="200" y1="100" x2="200" y2="90" stroke="#81C784" stroke-width="2" stroke-linecap="round"/>
+  <line x1="210" y1="102" x2="215" y2="94" stroke="#81C784" stroke-width="2" stroke-linecap="round"/>
+  
+  <!-- Small flower on top -->
+  <circle cx="200" cy="88" r="8" fill="#FF4081"/>
+  <circle cx="200" cy="88" r="5" fill="#FF80AB"/>
+  <circle cx="200" cy="88" r="2.5" fill="#FCE4EC"/>
+  <circle cx="192" cy="84" r="5" fill="#E91E63" opacity="0.7"/>
+  <circle cx="208" cy="84" r="5" fill="#E91E63" opacity="0.7"/>
+  <circle cx="196" cy="94" r="4" fill="#E91E63" opacity="0.7"/>
+  <circle cx="204" cy="94" r="4" fill="#E91E63" opacity="0.7"/>
+  
+  <!-- Small decorative dots on pot -->
+  <circle cx="170" cy="340" r="3" fill="#FF8F00" opacity="0.6"/>
+  <circle cx="200" cy="340" r="3" fill="#FF8F00" opacity="0.6"/>
+  <circle cx="230" cy="340" r="3" fill="#FF8F00" opacity="0.6"/>
+</svg>
