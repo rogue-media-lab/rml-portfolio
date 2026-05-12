@@ -1,0 +1,93 @@
+<%= turbo_frame_tag "dashboard_content" do %>
+  <%= render "shared/admin_breadcrumbs", breadcrumbs: [{ name: "Restaurants", path: milk_admin_restaurants_path }, { name: @restaurant.name }] %>
+
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h2 class="text-3xl font-bold text-gray-900"><%= @restaurant.name %></h2>
+      <p class="text-gray-500">/<%= @restaurant.slug %></p>
+    </div>
+    <div class="flex items-center gap-3">
+      <%= link_to "Visit Live Site", restaurant_home_path(@restaurant.slug), target: "_blank", class: "inline-flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg text-sm font-medium transition-colors" %>
+      <%= link_to "Edit", edit_milk_admin_restaurant_path(@restaurant), data: { turbo_frame: "dashboard_content" }, class: "inline-flex items-center gap-2 px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white rounded-lg text-sm font-medium transition-colors" %>
+    </div>
+  </div>
+
+  <!-- Quick Stats -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+      <p class="text-sm text-gray-500">Menu Items</p>
+      <p class="text-2xl font-bold text-gray-900"><%= @menu_items.count %></p>
+    </div>
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+      <p class="text-sm text-gray-500">Categories</p>
+      <p class="text-2xl font-bold text-gray-900"><%= @menu_categories.count %></p>
+    </div>
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+      <p class="text-sm text-gray-500">Testimonials</p>
+      <p class="text-2xl font-bold text-gray-900"><%= @testimonials.count %></p>
+    </div>
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+      <p class="text-sm text-gray-500">Orders</p>
+      <p class="text-2xl font-bold text-gray-900"><%= @restaurant.orders.count %></p>
+    </div>
+  </div>
+
+  <!-- Menu Items -->
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-8">
+    <div class="p-4 border-b border-gray-200 flex items-center justify-between">
+      <h3 class="text-lg font-semibold text-gray-900">Menu Items</h3>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead class="bg-gray-50 border-b border-gray-200">
+          <tr>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Price</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">
+          <% @menu_items.each do |item| %>
+            <tr class="hover:bg-gray-50">
+              <td class="px-4 py-3 text-sm font-medium text-gray-900"><%= item.name %></td>
+              <td class="px-4 py-3 text-sm text-gray-500"><%= item.menu_category.name %></td>
+              <td class="px-4 py-3 text-sm text-gray-900">$<%= '%.2f' % item.price %></td>
+              <td class="px-4 py-3">
+                <% if item.active? %>
+                  <span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">Active</span>
+                <% else %>
+                  <span class="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">Inactive</span>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Theme Preview -->
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+    <div class="p-4 border-b border-gray-200">
+      <h3 class="text-lg font-semibold text-gray-900">Theme</h3>
+    </div>
+    <div class="p-4 flex items-center gap-6">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded" style="background-color: <%= @restaurant.primary_color %>;"></div>
+        <span class="text-sm text-gray-600">Primary</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded" style="background-color: <%= @restaurant.accent_color %>;"></div>
+        <span class="text-sm text-gray-600">Accent</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded" style="background-color: <%= @restaurant.dark_color %>;"></div>
+        <span class="text-sm text-gray-600">Dark</span>
+      </div>
+      <div class="text-sm text-gray-600">
+        <span class="font-medium">Fonts:</span> <%= @restaurant.font_display %>, <%= @restaurant.font_body %>
+      </div>
+    </div>
+  </div>
+<% end %>
