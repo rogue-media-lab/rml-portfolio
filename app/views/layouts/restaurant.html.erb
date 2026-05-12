@@ -24,11 +24,11 @@
   </style>
 </head>
 <body style="font-family: var(--font-body); color: #795548; background-color: #FFF8E1; min-height: 100vh;">
-  <%= render "restaurant/shared/navbar" %>
-  <%= render "shared/flash_messages" %>
+  <%= render "restaurants/shared/navbar" %>
+  <%= render "shared/flash_notice" %>
   <main>
     <%= yield %>
   </main>
-  <%= render "restaurant/shared/footer" %>
+  <%= render "restaurants/shared/footer" %>
 </body>
 </html>

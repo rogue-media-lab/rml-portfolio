@@ -1,4 +1,4 @@
-module Restaurant
+module Restaurants
   class PagesController < ApplicationController
     include RestaurantScoped
     layout "restaurant"
