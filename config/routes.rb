@@ -133,9 +133,21 @@ Rails.application.routes.draw do
   resources :projects, only: [ :index ]
   resources :skills, only: [ :index ]
 
+  # Restaurant admin (under MilkAdmin) — MUST be before the catch-all scope
+  namespace :milk_admin do
+    resources :restaurants do
+      resources :menu_categories, except: [:show]
+      resources :menu_items, except: [:show]
+      resources :testimonials, except: [:show]
+      resources :hours, only: [:index, :edit, :update]
+      resources :reservations, only: [:index, :update, :destroy]
+      resources :orders, only: [:index, :update, :destroy]
+    end
+  end
+
   # Restaurant platform — multi-tenant restaurant sites
   # These routes MUST come after all specific portfolio routes
-  # to avoid slug conflicts with /studio, /lab, /blog, etc.
+  # to avoid slug conflicts with /studio, /lab, /blog, /milk_admin, etc.
   scope "/:restaurant_slug" do
     get "/", to: "restaurants/pages#home", as: :restaurant_home
     get "/menu", to: "restaurants/menu#index", as: :restaurant_menu
@@ -153,18 +165,6 @@ Rails.application.routes.draw do
     get "/orders/new", to: "restaurants/orders#new", as: :new_restaurant_order
     post "/orders", to: "restaurants/orders#create", as: :restaurant_orders
     get "/orders/:id/confirmation", to: "restaurants/orders#confirmation", as: :restaurant_order_confirmation
-  end
-
-  # Restaurant admin (under MilkAdmin)
-  namespace :milk_admin do
-    resources :restaurants do
-      resources :menu_categories, except: [:show]
-      resources :menu_items, except: [:show]
-      resources :testimonials, except: [:show]
-      resources :hours, only: [:index, :edit, :update]
-      resources :reservations, only: [:index, :update, :destroy]
-      resources :orders, only: [:index, :update, :destroy]
-    end
   end
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
