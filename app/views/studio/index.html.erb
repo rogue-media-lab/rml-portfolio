@@ -27,7 +27,7 @@
 
     <%# ─── ZUKE MUSIC (left showcase) ─── %>
     <div class="flex flex-col lg:flex-row items-center w-full gap-8 lg:gap-16">
-      <%# Preview card with waveform %>
+      <%# Preview card with hero image %>
       <div class="w-full lg:flex-[1.2] lg:shrink-0 lg:basis-0 h-72 lg:h-125 relative flex flex-col rounded-2xl lg:rounded-3xl overflow-hidden bg-zinc-900 border border-zinc-800">
         <div class="flex justify-between items-center border-b border-zinc-800 p-4 lg:p-6">
           <span class="tracking-[0.05em] text-zinc-50 font-['Barlow_Condensed',system-ui,sans-serif] font-bold text-lg lg:text-xl">ZUKE // PLAYER</span>
@@ -37,15 +37,8 @@
             <div class="w-3 h-3 rounded-md bg-green-500"></div>
           </div>
         </div>
-        <div class="flex-1 flex items-center justify-center px-10 gap-1">
-          <div class="w-2 h-10 opacity-30 rounded-sm bg-blue-500 shrink-0"></div>
-          <div class="w-2 h-20 opacity-60 rounded-sm bg-blue-500 shrink-0"></div>
-          <div class="w-2 h-37 rounded-sm bg-blue-500 shrink-0"></div>
-          <div class="w-2 h-25 rounded-sm bg-blue-500 shrink-0"></div>
-          <div class="w-2 h-50 rounded-sm bg-blue-500 shrink-0"></div>
-          <div class="w-2 h-32 rounded-sm bg-blue-500 shrink-0"></div>
-          <div class="w-2 h-45 rounded-sm bg-blue-500 shrink-0"></div>
-          <div class="w-2 h-15 opacity-60 rounded-sm bg-blue-500 shrink-0"></div>
+        <div class="flex-1 flex items-center justify-center overflow-hidden">
+          <%= image_tag "zuke-hero.jpg", alt: "Zuke Media Player — Music with Attitude", class: "w-full h-full object-cover" %>
         </div>
       </div>
       <%# Product info %>
