@@ -1,0 +1,75 @@
+<%# Restaurant Contact Page %>
+<% content_for(:title) { "Contact — #{@restaurant.name}" } %>
+
+<section class="py-16 px-6 md:px-16">
+  <div class="max-w-4xl mx-auto">
+    <h1 style="font-family: var(--font-display); color: var(--dark);" class="text-4xl font-bold text-center mb-12">Contact Us</h1>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div>
+        <h2 style="color: var(--dark);" class="text-xl font-bold mb-4">Get in Touch</h2>
+        <% if @restaurant.phone.present? %>
+          <a href="tel:<%= @restaurant.phone %>" class="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-3">
+            <span class="material-icons">phone</span>
+            <span><%= @restaurant.phone %></span>
+          </a>
+        <% end %>
+        <% if @restaurant.email.present? %>
+          <a href="mailto:<%= @restaurant.email %>" class="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-3">
+            <span class="material-icons">email</span>
+            <span><%= @restaurant.email %></span>
+          </a>
+        <% end %>
+        <% if @restaurant.address.present? %>
+          <div class="flex items-center gap-2 text-gray-600 mb-3">
+            <span class="material-icons">location_on</span>
+            <span><%= @restaurant.address %></span>
+          </div>
+        <% end %>
+
+        <% if @hours.any? %>
+          <h3 style="color: var(--dark);" class="text-lg font-bold mt-8 mb-4">Hours</h3>
+          <div class="space-y-1">
+            <% @hours.each do |hour| %>
+              <div class="flex justify-between text-sm text-gray-600">
+                <span><%= hour.day_name %></span>
+                <span>
+                  <% if hour.closed? %>
+                    Closed
+                  <% else %>
+                    <%= hour.open_time&.strftime("%l:%M %p") %> - <%= hour.close_time&.strftime("%l:%M %p") %>
+                  <% end %>
+                </span>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+
+      <div>
+        <h2 style="color: var(--dark);" class="text-xl font-bold mb-4">Send a Message</h2>
+        <div id="contact_form">
+          <%= form_with model: @contact, url: contacts_path, class: "space-y-4" do |form| %>
+            <div>
+              <%= form.label :f_name, "Name", class: "block text-sm font-medium text-gray-700 mb-1" %>
+              <%= form.text_field :f_name, class: "w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-yellow-400 focus:border-transparent" %>
+            </div>
+            <div>
+              <%= form.label :email, "Email", class: "block text-sm font-medium text-gray-700 mb-1" %>
+              <%= form.email_field :email, class: "w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-yellow-400 focus:border-transparent" %>
+            </div>
+            <div>
+              <%= form.label :phone, "Phone", class: "block text-sm font-medium text-gray-700 mb-1" %>
+              <%= form.telephone_field :phone, class: "w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-yellow-400 focus:border-transparent" %>
+            </div>
+            <div>
+              <%= form.label :description, "Message", class: "block text-sm font-medium text-gray-700 mb-1" %>
+              <%= form.text_area :description, rows: 4, class: "w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-yellow-400 focus:border-transparent" %>
+            </div>
+            <%= form.submit "Send Message", class: "w-full py-3 rounded-lg text-white font-bold transition-colors cursor-pointer", style: "background-color: var(--accent);" %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
