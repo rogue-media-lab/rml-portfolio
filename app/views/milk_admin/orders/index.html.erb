@@ -1,6 +1,7 @@
-<%= turbo_frame_tag "dashboard_content" do %>
-  <%= turbo_stream_from "restaurant_#{@restaurant.id}_orders" %>
+<%# Turbo Stream subscription — must be OUTSIDE the turbo_frame %>
+<%= turbo_stream_from "restaurant_#{@restaurant.id}_orders" %>
 
+<%= turbo_frame_tag "dashboard_content" do %>
   <%= render "shared/admin_breadcrumbs", breadcrumbs: [{ name: "Restaurants", path: milk_admin_restaurants_path }, { name: @restaurant.name, path: milk_admin_restaurant_path(@restaurant) }, { name: "Orders" }] %>
 
   <div class="flex items-center justify-between mb-6">

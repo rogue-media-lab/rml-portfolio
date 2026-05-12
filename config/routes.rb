@@ -143,7 +143,7 @@ Rails.application.routes.draw do
       resources :testimonials, except: [:show]
       resources :hours, only: [:index, :edit, :update]
       resources :reservations, only: [:index, :update, :destroy]
-      resources :orders, only: [:index, :update, :destroy]
+      resources :orders, only: [:index, :show, :update, :destroy]
     end
   end
 
