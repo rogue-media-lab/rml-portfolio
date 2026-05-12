@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" fill="none">
+  <!-- Burrito illustration - colorful flat style -->
+  <defs>
+    <linearGradient id="tortilla" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#F5CB5C"/>
+      <stop offset="100%" style="stop-color:#E8B93A"/>
+    </linearGradient>
+    <linearGradient id="foil" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#E0E0E0"/>
+      <stop offset="50%" style="stop-color:#BDBDBD"/>
+      <stop offset="100%" style="stop-color:#9E9E9E"/>
+    </linearGradient>
+    <filter id="shadow2" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+  
+  <!-- Shadow -->
+  <ellipse cx="200" cy="270" rx="150" ry="15" fill="#D4781E" opacity="0.15"/>
+  
+  <!-- Aluminum foil bottom -->
+  <rect x="45" y="155" width="310" height="110" rx="12" fill="url(#foil)" filter="url(#shadow2)"/>
+  
+  <!-- Foil wrinkles -->
+  <line x1="60" y1="170" x2="60" y2="255" stroke="#BDBDBD" stroke-width="1.5" opacity="0.5"/>
+  <line x1="340" y1="170" x2="340" y2="255" stroke="#BDBDBD" stroke-width="1.5" opacity="0.5"/>
+  <line x1="100" y1="165" x2="100" y2="260" stroke="#BDBDBD" stroke-width="1" opacity="0.3"/>
+  <line x1="300" y1="165" x2="300" y2="260" stroke="#BDBDBD" stroke-width="1" opacity="0.3"/>
+  
+  <!-- Foil highlight -->
+  <rect x="50" y="158" width="300" height="8" rx="4" fill="white" opacity="0.3"/>
+  
+  <!-- Burrito body - tortilla wrap -->
+  <rect x="55" y="100" width="290" height="130" rx="65" fill="url(#tortilla)" filter="url(#shadow2)"/>
+  
+  <!-- Tortilla texture lines -->
+  <path d="M80 130 Q120 125 200 122 Q280 125 320 130" fill="none" stroke="#D4A43A" stroke-width="1.5" opacity="0.5"/>
+  <path d="M80 200 Q120 205 200 208 Q280 205 320 200" fill="none" stroke="#D4A43A" stroke-width="1.5" opacity="0.5"/>
+  
+  <!-- Grill marks -->
+  <line x1="120" y1="115" x2="135" y2="220" stroke="#C4922E" stroke-width="3" opacity="0.3" stroke-linecap="round"/>
+  <line x1="180" y1="110" x2="195" y2="225" stroke="#C4922E" stroke-width="3" opacity="0.3" stroke-linecap="round"/>
+  <line x1="240" y1="110" x2="255" y2="225" stroke="#C4922E" stroke-width="3" opacity="0.3" stroke-linecap="round"/>
+  <line x1="300" y1="115" x2="315" y2="220" stroke="#C4922E" stroke-width="3" opacity="0.3" stroke-linecap="round"/>
+  
+  <!-- Cross-section cut on right side showing fillings -->
+  <circle cx="320" cy="165" r="55" fill="#F5CB5C"/>
+  
+  <!-- Inner tortilla layer -->
+  <circle cx="320" cy="165" r="48" fill="#E8B93A"/>
+  
+  <!-- Rice layer in cross-section -->
+  <path d="M300 135 Q320 128 340 135 Q335 145 320 148 Q305 145 300 135Z" fill="white" opacity="0.9"/>
+  <!-- Rice grains -->
+  <circle cx="310" cy="138" r="2.5" fill="#E8E8E8"/>
+  <circle cx="318" cy="135" r="2" fill="#F0F0F0"/>
+  <circle cx="325" cy="140" r="2.5" fill="#E8E8E8"/>
+  <circle cx="332" cy="136" r="2" fill="#F0F0F0"/>
+  <circle cx="315" cy="142" r="2" fill="#E8E8E8"/>
+  
+  <!-- Beans in cross-section -->
+  <ellipse cx="320" cy="162" rx="20" ry="10" fill="#5D4037"/>
+  <circle cx="312" cy="160" r="5" fill="#4E342E"/>
+  <circle cx="325" cy="163" r="5" fill="#4E342E"/>
+  <circle cx="318" cy="166" r="4" fill="#4E342E"/>
+  
+  <!-- Meat in cross-section -->
+  <ellipse cx="320" cy="178" rx="18" ry="8" fill="#8D6E63"/>
+  <rect x="308" y="175" width="8" height="6" rx="2" fill="#795548"/>
+  <rect x="320" y="177" width="8" height="5" rx="2" fill="#795548"/>
+  
+  <!-- Cheese in cross-section -->
+  <path d="M305 148 L312 155 L320 148 L328 155 L335 148" fill="none" stroke="#FFD54F" stroke-width="3" stroke-linecap="round"/>
+  
+  <!-- Lettuce bits in cross-section -->
+  <circle cx="308" cy="150" r="4" fill="#4CAF50"/>
+  <circle cx="332" cy="150" r="4" fill="#66BB6A"/>
+  <circle cx="320" cy="152" r="3" fill="#4CAF50"/>
+  
+  <!-- Left end wrap -->
+  <ellipse cx="55" cy="165" rx="20" ry="65" fill="#E8B93A"/>
+  <ellipse cx="55" cy="165" rx="15" ry="55" fill="#D4A43A" opacity="0.4"/>
+  
+  <!-- Cross-section outline -->
+  <circle cx="320" cy="165" r="55" fill="none" stroke="#C4922E" stroke-width="2"/>
+  
+  <!-- Steam lines -->
+  <path d="M140 85 Q135 65 140 45" fill="none" stroke="#BDBDBD" stroke-width="2.5" stroke-linecap="round" opacity="0.5"/>
+  <path d="M200 80 Q195 58 200 38" fill="none" stroke="#BDBDBD" stroke-width="2.5" stroke-linecap="round" opacity="0.5"/>
+  <path d="M260 85 Q255 65 260 45" fill="none" stroke="#BDBDBD" stroke-width="2.5" stroke-linecap="round" opacity="0.5"/>
+  
+  <!-- Sauce drizzle on top -->
+  <path d="M100 120 Q130 110 160 118 Q190 110 220 118 Q250 110 280 120" fill="none" stroke="#F44336" stroke-width="4" stroke-linecap="round" opacity="0.8"/>
+</svg>

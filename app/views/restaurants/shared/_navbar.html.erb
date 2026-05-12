@@ -1,0 +1,26 @@
+<%# Restaurant Navbar — adapts to each restaurant's theme %>
+<nav style="background-color: var(--dark);" class="py-4 px-6 md:px-16">
+  <div class="flex justify-between items-center max-w-6xl mx-auto">
+    <div class="flex items-center gap-3">
+      <% if @restaurant.logo_image.present? %>
+        <%= image_tag @restaurant.logo_image, alt: @restaurant.name, class: "h-10" %>
+      <% else %>
+        <span style="font-family: var(--font-display); color: var(--primary);" class="text-2xl font-bold"><%= @restaurant.name %></span>
+      <% end %>
+    </div>
+    <div class="hidden md:flex items-center gap-8">
+      <%= link_to "Home", restaurant_home_path(@restaurant.slug), class: "text-white hover:text-yellow-300 transition-colors font-medium" %>
+      <%= link_to "Menu", restaurant_menu_path(@restaurant.slug), class: "text-white hover:text-yellow-300 transition-colors font-medium" %>
+      <%= link_to "About", restaurant_about_path(@restaurant.slug), class: "text-white hover:text-yellow-300 transition-colors font-medium" %>
+      <%= link_to "Contact", restaurant_contact_path(@restaurant.slug), class: "text-white hover:text-yellow-300 transition-colors font-medium" %>
+    </div>
+    <div class="flex items-center gap-4">
+      <%= link_to restaurant_cart_path(@restaurant.slug), class: "relative text-white hover:text-yellow-300 transition-colors" do %>
+        <span class="material-icons">shopping_cart</span>
+        <% if cart_item_count > 0 %>
+          <span class="absolute -top-2 -right-2 text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center" style="background-color: var(--primary); color: var(--dark);"><%= cart_item_count %></span>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+</nav>

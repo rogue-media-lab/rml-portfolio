@@ -320,30 +320,34 @@
 
       <%# Italian Garden %>
       <div class="flex flex-col lg:flex-row-reverse items-center gap-8 lg:gap-12 rounded-xl bg-zinc-900/50 border border-zinc-800 p-6 md:p-8">
-        <div class="w-full lg:w-1/2 h-48 lg:h-64 rounded-lg overflow-hidden bg-zinc-800 flex items-center justify-center">
-          <span class="text-zinc-600 font-['Barlow_Condensed',system-ui,sans-serif] text-xl uppercase">Italian Garden</span>
+        <div class="w-full lg:w-1/2 h-48 lg:h-64 rounded-lg overflow-hidden bg-zinc-800">
+          <%= image_tag "italian-garden.png", alt: "Italian Garden Restaurant", class: "w-full h-full object-cover" %>
         </div>
         <div class="w-full lg:w-1/2 flex flex-col gap-4">
           <span class="text-orange-500 font-mono text-[13px]">RESTAURANT</span>
           <h3 class="text-zinc-50 font-['Barlow_Condensed',system-ui,sans-serif] font-bold text-2xl uppercase m-0">Italian Garden Restaurant</h3>
           <p class="text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm leading-[1.6] m-0">A warm, inviting restaurant site with online menu, photo gallery, reviews, and Google Maps integration. Built to bring in diners who are searching for a great meal.</p>
           <div class="flex gap-3">
-            <span class="rounded-lg py-2 px-4 border border-zinc-800 text-zinc-500 font-['Inter',system-ui,sans-serif] text-xs">Coming Soon</span>
+            <a href="/italian-garden" class="rounded-lg py-2 px-4 bg-orange-600 cursor-pointer hover:bg-orange-500 transition-colors">
+              <span class="uppercase text-zinc-950 font-['Inter',system-ui,sans-serif] font-bold text-xs">View Live</span>
+            </a>
           </div>
         </div>
       </div>
 
       <%# El Mexicano %>
       <div class="flex flex-col lg:flex-row items-center gap-8 lg:gap-12 rounded-xl bg-zinc-900/50 border border-zinc-800 p-6 md:p-8">
-        <div class="w-full lg:w-1/2 h-48 lg:h-64 rounded-lg overflow-hidden bg-zinc-800 flex items-center justify-center">
-          <span class="text-zinc-600 font-['Barlow_Condensed',system-ui,sans-serif] text-xl uppercase">El Mexicano</span>
+        <div class="w-full lg:w-1/2 h-48 lg:h-64 rounded-lg overflow-hidden bg-zinc-800">
+          <%= image_tag "el-mexicano.png", alt: "El Mexicano", class: "w-full h-full object-cover" %>
         </div>
         <div class="w-full lg:w-1/2 flex flex-col gap-4">
           <span class="text-orange-500 font-mono text-[13px]">RESTAURANT</span>
           <h3 class="text-zinc-50 font-['Barlow_Condensed',system-ui,sans-serif] font-bold text-2xl uppercase m-0">El Mexicano</h3>
           <p class="text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm leading-[1.6] m-0">Authentic Mexican restaurant site with admin dashboard, menu management, and a bold visual identity. Custom-built with Rails 8 and Tailwind CSS.</p>
           <div class="flex gap-3">
-            <span class="rounded-lg py-2 px-4 border border-zinc-800 text-zinc-500 font-['Inter',system-ui,sans-serif] text-xs">Coming Soon</span>
+            <a href="/el-mexicano" class="rounded-lg py-2 px-4 bg-orange-600 cursor-pointer hover:bg-orange-500 transition-colors">
+              <span class="uppercase text-zinc-950 font-['Inter',system-ui,sans-serif] font-bold text-xs">View Live</span>
+            </a>
           </div>
         </div>
       </div>

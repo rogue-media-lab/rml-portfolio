@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  mount ActionCable.server => "/cable"
+
   # User model planned for clients feature
   devise_for :users
   devise_for :milk_admins, skip: [ :registrations ]
@@ -132,6 +134,40 @@ Rails.application.routes.draw do
   resources :contacts, only: [ :new, :create ]
   resources :projects, only: [ :index ]
   resources :skills, only: [ :index ]
+
+  # Restaurant admin (under MilkAdmin) — MUST be before the catch-all scope
+  namespace :milk_admin do
+    resources :restaurants do
+      resources :menu_categories, except: [ :show ]
+      resources :menu_items, except: [ :show ]
+      resources :testimonials, except: [ :show ]
+      resources :hours, only: [ :index, :edit, :update ]
+      resources :reservations, only: [ :index, :update, :destroy ]
+      resources :orders, only: [ :index, :show, :update, :destroy ]
+    end
+  end
+
+  # Restaurant platform — multi-tenant restaurant sites
+  # These routes MUST come after all specific portfolio routes
+  # to avoid slug conflicts with /studio, /lab, /blog, /milk_admin, etc.
+  scope "/:restaurant_slug" do
+    get "/", to: "restaurants/pages#home", as: :restaurant_home
+    get "/menu", to: "restaurants/menu#index", as: :restaurant_menu
+    get "/about", to: "restaurants/pages#about", as: :restaurant_about
+    get "/contact", to: "restaurants/contact#index", as: :restaurant_contact
+
+    # Cart
+    get "/cart", to: "restaurants/cart#show", as: :restaurant_cart
+    post "/cart/add", to: "restaurants/cart#add", as: :restaurant_cart_add
+    patch "/cart/update", to: "restaurants/cart#update", as: :restaurant_cart_update
+    delete "/cart/remove/:menu_item_id", to: "restaurants/cart#remove", as: :restaurant_cart_remove
+    delete "/cart/clear", to: "restaurants/cart#clear", as: :restaurant_cart_clear
+
+    # Orders
+    get "/orders/new", to: "restaurants/orders#new", as: :new_restaurant_order
+    post "/orders", to: "restaurants/orders#create", as: :restaurant_orders
+    get "/orders/:id/confirmation", to: "restaurants/orders#confirmation", as: :restaurant_order_confirmation
+  end
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

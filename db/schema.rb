@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_12_163454) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_12_171833) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -178,6 +178,41 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_12_163454) do
     t.string "alias_image_url"
   end
 
+  create_table "hours", force: :cascade do |t|
+    t.bigint "restaurant_id", null: false
+    t.integer "day_of_week", null: false
+    t.time "open_time"
+    t.time "close_time"
+    t.boolean "closed", default: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["restaurant_id"], name: "index_hours_on_restaurant_id"
+  end
+
+  create_table "menu_categories", force: :cascade do |t|
+    t.bigint "restaurant_id", null: false
+    t.string "name", null: false
+    t.boolean "active", default: true
+    t.integer "sort_order", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["restaurant_id"], name: "index_menu_categories_on_restaurant_id"
+  end
+
+  create_table "menu_items", force: :cascade do |t|
+    t.bigint "menu_category_id", null: false
+    t.bigint "restaurant_id", null: false
+    t.string "name", null: false
+    t.text "description"
+    t.decimal "price", precision: 8, scale: 2, null: false
+    t.boolean "active", default: true
+    t.boolean "featured", default: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["menu_category_id"], name: "index_menu_items_on_menu_category_id"
+    t.index ["restaurant_id"], name: "index_menu_items_on_restaurant_id"
+  end
+
   create_table "milk_admin_profiles", force: :cascade do |t|
     t.bigint "milk_admin_id", null: false
     t.string "first_name"
@@ -199,6 +234,29 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_12_163454) do
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_milk_admins_on_email", unique: true
     t.index ["reset_password_token"], name: "index_milk_admins_on_reset_password_token", unique: true
+  end
+
+  create_table "order_items", force: :cascade do |t|
+    t.bigint "order_id", null: false
+    t.bigint "menu_item_id", null: false
+    t.integer "quantity", default: 1, null: false
+    t.decimal "price", precision: 8, scale: 2, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["menu_item_id"], name: "index_order_items_on_menu_item_id"
+    t.index ["order_id"], name: "index_order_items_on_order_id"
+  end
+
+  create_table "orders", force: :cascade do |t|
+    t.bigint "restaurant_id", null: false
+    t.string "customer_name", null: false
+    t.string "phone", null: false
+    t.time "pickup_time"
+    t.decimal "total", precision: 8, scale: 2, null: false
+    t.string "status", default: "pending"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["restaurant_id"], name: "index_orders_on_restaurant_id"
   end
 
   create_table "pills", force: :cascade do |t|
@@ -245,6 +303,44 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_12_163454) do
     t.text "short_description"
     t.boolean "featured", default: false, null: false
     t.index ["resume_id"], name: "index_projects_on_resume_id"
+  end
+
+  create_table "reservations", force: :cascade do |t|
+    t.bigint "restaurant_id", null: false
+    t.string "customer_name", null: false
+    t.string "phone", null: false
+    t.integer "party_size", null: false
+    t.date "reservation_date", null: false
+    t.time "reservation_time", null: false
+    t.text "special_requests"
+    t.string "status", default: "pending"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["restaurant_id"], name: "index_reservations_on_restaurant_id"
+  end
+
+  create_table "restaurants", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "slug", null: false
+    t.string "tagline"
+    t.string "address"
+    t.string "phone"
+    t.string "email"
+    t.string "place_id"
+    t.decimal "rating", precision: 2, scale: 1
+    t.integer "review_count", default: 0
+    t.string "price_level"
+    t.string "service_type"
+    t.string "primary_color", default: "#FDD835"
+    t.string "accent_color", default: "#A10035"
+    t.string "dark_color", default: "#1A237E"
+    t.string "font_display", default: "Lilita One"
+    t.string "font_body", default: "Nunito"
+    t.string "hero_image"
+    t.string "logo_image"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["slug"], name: "index_restaurants_on_slug", unique: true
   end
 
   create_table "resumes", force: :cascade do |t|
@@ -489,6 +585,18 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_12_163454) do
     t.index ["project_id"], name: "index_tasks_on_project_id"
   end
 
+  create_table "testimonials", force: :cascade do |t|
+    t.bigint "restaurant_id", null: false
+    t.string "customer_name", null: false
+    t.text "quote", null: false
+    t.integer "stars", default: 5
+    t.boolean "active", default: true
+    t.boolean "featured", default: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["restaurant_id"], name: "index_testimonials_on_restaurant_id"
+  end
+
   create_table "tones", force: :cascade do |t|
     t.string "name", null: false
     t.text "description"
@@ -518,11 +626,19 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_12_163454) do
   add_foreign_key "chat_messages", "chat_sessions"
   add_foreign_key "chat_sessions", "users"
   add_foreign_key "hermit_videos", "hermits"
+  add_foreign_key "hours", "restaurants"
+  add_foreign_key "menu_categories", "restaurants"
+  add_foreign_key "menu_items", "menu_categories"
+  add_foreign_key "menu_items", "restaurants"
   add_foreign_key "milk_admin_profiles", "milk_admins"
+  add_foreign_key "order_items", "menu_items"
+  add_foreign_key "order_items", "orders"
+  add_foreign_key "orders", "restaurants"
   add_foreign_key "pills", "resumes"
   add_foreign_key "playlist_songs", "playlists"
   add_foreign_key "playlist_songs", "songs"
   add_foreign_key "projects", "resumes"
+  add_foreign_key "reservations", "restaurants"
   add_foreign_key "rock_pets", "users"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_claimed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
@@ -535,4 +651,5 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_12_163454) do
   add_foreign_key "songs", "albums"
   add_foreign_key "songs", "artists"
   add_foreign_key "tasks", "projects"
+  add_foreign_key "testimonials", "restaurants"
 end

@@ -1,0 +1,41 @@
+<%= turbo_frame_tag "dashboard_content" do %>
+  <%= render "shared/admin_breadcrumbs", breadcrumbs: [{ name: "Restaurants" }] %>
+
+  <div class="flex items-center justify-between mb-6">
+    <h2 class="text-3xl font-bold text-gray-900">Restaurants</h2>
+    <%= link_to new_milk_admin_restaurant_path, data: { turbo_frame: "dashboard_content" }, class: "inline-flex items-center gap-2 px-5 py-3 bg-orange-600 hover:bg-orange-500 text-white rounded-lg font-medium transition-colors" do %>
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+      </svg>
+      New Restaurant
+    <% end %>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <% @restaurants.each do |restaurant| %>
+      <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+        <div class="h-32 flex items-center justify-center" style="background-color: <%= restaurant.primary_color || '#FDD835' %>;">
+          <span class="text-2xl font-bold" style="font-family: '<%= restaurant.font_display || 'Lilita One' %>', cursive; color: <%= restaurant.dark_color || '#1A237E' %>;"><%= restaurant.name %></span>
+        </div>
+        <div class="p-4">
+          <p class="text-sm text-gray-500 mb-2">/<%= restaurant.slug %></p>
+          <% if restaurant.tagline.present? %>
+            <p class="text-sm text-gray-600 mb-3"><%= restaurant.tagline %></p>
+          <% end %>
+          <div class="flex items-center gap-2 text-sm text-gray-500 mb-4">
+            <% if restaurant.address.present? %>
+              <span><%= restaurant.address %></span>
+            <% end %>
+          </div>
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <%= link_to "View", milk_admin_restaurant_path(restaurant), data: { turbo_frame: "dashboard_content" }, class: "text-orange-600 hover:text-orange-900 text-sm font-medium" %>
+              <%= link_to "Edit", edit_milk_admin_restaurant_path(restaurant), data: { turbo_frame: "dashboard_content" }, class: "text-sky-600 hover:text-sky-900 text-sm font-medium" %>
+            </div>
+            <span class="text-sm text-gray-400"><%= restaurant.menu_items.count %> items</span>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% end %>

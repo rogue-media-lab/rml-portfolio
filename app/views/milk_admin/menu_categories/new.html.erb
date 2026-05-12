@@ -1,0 +1,30 @@
+<%= turbo_frame_tag "dashboard_content" do %>
+  <%= render "shared/admin_breadcrumbs", breadcrumbs: [{ name: "Restaurants", path: milk_admin_restaurants_path }, { name: @restaurant.name, path: milk_admin_restaurant_path(@restaurant) }, { name: "Menu Categories", path: milk_admin_restaurant_menu_categories_path(@restaurant) }, { name: @menu_category.persisted? ? @menu_category.name : "New" }] %>
+
+  <div class="mb-6">
+    <h2 class="text-3xl font-bold text-gray-900"><%= @menu_category.persisted? ? "Edit Category" : "New Category" %></h2>
+  </div>
+
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+    <%= form_with model: [:milk_admin, @restaurant, @menu_category], class: "space-y-6" do |form| %>
+      <div>
+        <%= form.label :name, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :name, class: "w-full rounded-lg border border-gray-300 px-4 py-2" %>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <%= form.label :sort_order, class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= form.number_field :sort_order, class: "w-full rounded-lg border border-gray-300 px-4 py-2" %>
+        </div>
+        <div class="flex items-center gap-2 pt-6">
+          <%= form.check_box :active, class: "rounded" %>
+          <%= form.label :active, "Active", class: "text-sm font-medium text-gray-700" %>
+        </div>
+      </div>
+      <div class="flex items-center gap-4">
+        <%= form.submit class: "px-6 py-3 bg-orange-600 hover:bg-orange-500 text-white rounded-lg font-medium transition-colors cursor-pointer" %>
+        <%= link_to "Cancel", milk_admin_restaurant_menu_categories_path(@restaurant), data: { turbo_frame: "dashboard_content" }, class: "text-gray-600 hover:text-gray-900" %>
+      </div>
+    <% end %>
+  </div>
+<% end %>
