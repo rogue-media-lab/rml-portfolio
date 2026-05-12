@@ -1,0 +1,220 @@
+<%# El Mexicano Homepage — adapted from standalone app %>
+<% content_for(:title) { @restaurant.name } %>
+
+<%# ─── HERO ─── %>
+<section class="px-6 md:px-12 pt-16 md:pt-24 pb-32 md:pb-40 relative overflow-hidden wavy-texture min-h-[620px]" style="background-color: var(--primary);">
+  <%# Decorative bunting flags in top-right corner %>
+  <div class="bunting-container">
+    <div class="bunting-string"></div>
+    <div class="bunting-flag left-[10px] bg-green -rotate-5"></div>
+    <div class="bunting-flag left-[24px] bg-[#64B5F6] rotate-2"></div>
+    <div class="bunting-flag left-[38px] bg-orange -rotate-3"></div>
+    <div class="bunting-flag left-[52px] bg-[#F48FB1] rotate-4"></div>
+    <div class="bunting-flag left-[66px] bg-green -rotate-2"></div>
+    <div class="bunting-flag left-[80px] bg-[#64B5F6] rotate-3"></div>
+  </div>
+
+  <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-10 md:gap-16">
+    <%# Left: text content %>
+    <div class="flex-1 max-w-lg z-10 text-center md:text-left">
+      <div class="w-16 h-1 rounded mb-6 mx-auto md:mx-0" style="background-color: var(--accent);"></div>
+      <p class="text-sm font-medium uppercase tracking-[0.15em] mb-4" style="color: var(--accent);">Clover, South Carolina — Family Owned</p>
+      <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight tracking-tight font-display" style="color: var(--dark);"><%= @restaurant.name %></h1>
+      <p class="text-base md:text-lg mt-5 leading-relaxed" style="color: #795548;"><%= @restaurant.tagline %></p>
+      <div class="flex flex-col sm:flex-row gap-4 mt-8 justify-center md:justify-start">
+        <%= link_to "ORDER NOW →", restaurant_menu_path(@restaurant.slug), class: "text-sm font-semibold text-white px-9 py-3.5 rounded-full hover:opacity-90", style: "background-color: var(--accent);" %>
+        <% if @restaurant.phone.present? %>
+          <a href="tel:<%= @restaurant.phone&.gsub(/[^0-9]/, '') %>" class="text-sm font-semibold px-9 py-3.5 rounded-full border-2 hover:opacity-80" style="color: var(--dark); border-color: var(--dark);">Call to Order</a>
+        <% end %>
+      </div>
+    </div>
+
+    <%# Right: hero image %>
+    <div class="flex-1 max-w-md md:max-w-lg z-10">
+      <%= image_tag "restaurants/el-mexicano/mexican-dinner.png", alt: "Mexican dinner spread", class: "w-full h-auto rounded-2xl drop-shadow-xl" %>
+    </div>
+  </div>
+</section>
+
+<%# ─── TEETH BORDER ─── %>
+<div class="teeth-border"></div>
+
+<%# ─── SIGNATURE FAVORITES ─── %>
+<% if @featured_items.any? %>
+<section class="px-6 md:px-12 py-16 md:py-24" style="background-color: var(--dark);">
+  <div class="max-w-6xl mx-auto">
+    <p class="text-xs font-medium uppercase tracking-[0.15em] text-center mb-2" style="color: var(--primary);">From Our Kitchen</p>
+    <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 tracking-tight text-white font-display">Signature Favorites</h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-7">
+      <% @featured_items.each do |item| %>
+        <div class="bg-white overflow-hidden rounded-2xl shadow-lg hover:-translate-y-1 hover:shadow-xl transition-all duration-200">
+          <div class="h-56 flex items-center justify-center bg-gradient-to-br from-orange-400 to-red-700">
+            <span class="text-5xl opacity-30">🌮</span>
+          </div>
+          <div class="p-6">
+            <h3 class="text-lg font-bold" style="color: var(--dark);"><%= item.name %></h3>
+            <p class="text-sm mt-2 leading-relaxed" style="color: #795548;"><%= item.description %></p>
+            <div class="flex items-center justify-between mt-4">
+              <span class="text-lg font-bold" style="color: var(--accent);">$<%= '%.2f' % item.price %></span>
+              <%= button_to "Add to Cart", restaurant_cart_add_path(@restaurant.slug, menu_item_id: item.id), method: :post, class: "text-sm font-semibold text-white px-4 py-2.5 rounded-full cursor-pointer hover:opacity-90", style: "background-color: var(--accent);" %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="text-center mt-10">
+      <%= link_to "View Full Menu →", restaurant_menu_path(@restaurant.slug), class: "text-sm font-medium uppercase tracking-wider pb-0.5 border-b hover:opacity-80", style: "color: var(--primary); border-color: var(--primary);" %>
+    </div>
+  </div>
+</section>
+<% end %>
+
+<%# ─── OUR STORY ─── %>
+<% if @restaurant.tagline.present? %>
+<section class="px-6 md:px-12 py-16 md:py-20 papel-picado-multi bg-cream">
+  <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-12 md:gap-16">
+    <div class="flex-1 max-w-lg">
+      <p class="text-xs font-medium uppercase tracking-[0.1em] mb-3" style="color: var(--accent);">Our Story</p>
+      <h2 class="text-3xl md:text-4xl font-bold leading-tight tracking-tight mb-5 font-display" style="color: var(--dark);">Welcome to <%= @restaurant.name %></h2>
+      <p class="text-base leading-relaxed" style="color: #795548;"><%= @restaurant.tagline %></p>
+      <% if @restaurant.address.present? %>
+        <p class="text-base leading-relaxed mt-4" style="color: #795548;">Visit us at <%= @restaurant.address %>. We look forward to serving you!</p>
+      <% end %>
+    </div>
+    <div class="flex-1 max-w-sm h-72 rounded-2xl overflow-hidden flex items-center justify-center" style="background: linear-gradient(135deg, var(--primary), var(--accent));">
+      <div class="text-center">
+        <%= image_tag "restaurants/el-mexicano/cactus.svg", class: "mx-auto mb-3 opacity-50 w-[60px]" %>
+        <p class="text-2xl font-bold text-white font-display"><%= @restaurant.name %></p>
+        <p class="text-xs text-white opacity-60 mt-1 uppercase tracking-wider"><%= @restaurant.address %></p>
+      </div>
+    </div>
+  </div>
+</section>
+<% end %>
+
+<%# ─── MENU PREVIEW ─── %>
+<% if @categories.any? %>
+<section class="px-6 md:px-12 py-16 md:py-20" style="background-color: var(--dark);">
+  <p class="text-xs font-medium uppercase tracking-[0.15em] text-center mb-2" style="color: var(--primary);">What We Serve</p>
+  <h2 class="text-3xl md:text-4xl font-bold text-center mb-4 tracking-tight text-white font-display">Our Menu</h2>
+  <p class="text-base text-center max-w-lg mx-auto mb-12 text-white/60">Authentic Mexican favorites — fresh ingredients, bold flavors, and generous portions at honest prices.</p>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-6xl mx-auto">
+    <% @categories.limit(3).each do |cat| %>
+      <div>
+        <h3 class="text-lg font-bold pb-3 mb-5 font-display" style="color: var(--primary); border-bottom: 1px solid rgba(253,216,53,0.3);"><%= cat.name %></h3>
+        <div class="space-y-3.5">
+          <% cat.menu_items.active.limit(7).each do |item| %>
+            <div class="flex justify-between items-baseline">
+              <span class="text-sm font-medium text-white"><%= item.name %></span>
+              <span class="text-sm text-white/50">$<%= '%.2f' % item.price %></span>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="text-center mt-10">
+    <%= link_to "View Full Menu →", restaurant_menu_path(@restaurant.slug), class: "text-sm font-medium uppercase tracking-wider pb-0.5 border-b hover:opacity-80", style: "color: var(--primary); border-color: var(--primary);" %>
+  </div>
+</section>
+<% end %>
+
+<%# ─── REVIEWS ─── %>
+<section class="px-6 md:px-12 py-16 md:py-20 bg-cream">
+  <p class="text-xs font-medium uppercase tracking-[0.15em] text-center mb-2" style="color: var(--accent);">What People Say</p>
+  <h2 class="text-3xl md:text-4xl font-bold text-center mb-4 tracking-tight font-display" style="color: var(--dark);">Our Guests Love Us</h2>
+
+  <% if @restaurant.rating.present? %>
+    <div class="flex items-center justify-center gap-3 mb-10">
+      <span class="text-3xl font-bold" style="color: var(--dark);"><%= @restaurant.rating %></span>
+      <div>
+        <div class="flex gap-0.5">
+          <% @restaurant.rating.to_i.times do %><span style="color: var(--primary);">★</span><% end %>
+          <% (5 - @restaurant.rating.to_i).times do %><span class="opacity-30" style="color: var(--primary);">★</span><% end %>
+        </div>
+        <p class="text-xs" style="color: #795548;">Google Reviews · <%= @restaurant.review_count %> reviews</p>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-7 max-w-6xl mx-auto">
+    <% @testimonials.each do |t| %>
+      <div class="bg-white rounded-2xl p-8 border-l-4" style="border-left-color: #66BB6A;">
+        <div class="flex gap-1 mb-4">
+          <% t.stars.times do %><span style="color: var(--primary);">★</span><% end %>
+        </div>
+        <p class="text-sm leading-relaxed italic mb-5" style="color: var(--dark);">"<%= t.quote %>"</p>
+        <p class="text-sm font-semibold" style="color: var(--accent);">— <%= t.customer_name %></p>
+      </div>
+    <% end %>
+  </div>
+
+  <% if @restaurant.place_id.present? %>
+    <div class="text-center mt-10">
+      <p class="text-xs font-medium uppercase tracking-[0.15em] mb-4" style="color: var(--accent);">Leave a Review</p>
+      <div class="flex items-center justify-center gap-6">
+        <a href="https://www.google.com/maps/place/?q=place_id:<%= @restaurant.place_id %>" target="_blank" class="flex flex-col items-center gap-2 group">
+          <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
+            <span class="text-xl text-[#4285F4]">G</span>
+          </div>
+          <span class="text-xs opacity-60 group-hover:opacity-100" style="color: var(--dark);">Google</span>
+        </a>
+      </div>
+    </div>
+  <% end %>
+</section>
+
+<%# ─── CONTACT & MAP ─── %>
+<section class="px-6 md:px-12 py-16 md:py-20 papel-picado" style="background-color: var(--accent);">
+  <p class="text-xs font-medium uppercase tracking-[0.15em] text-center mb-2" style="color: var(--primary);">Come See Us</p>
+  <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 tracking-tight text-white font-display">Visit <%= @restaurant.name %></h2>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-5xl mx-auto">
+    <%# Hours %>
+    <div>
+      <h3 class="text-xs font-semibold uppercase tracking-[0.1em] mb-5" style="color: var(--primary);">Hours</h3>
+      <div class="space-y-3">
+        <% @hours.each do |h| %>
+          <div class="flex justify-between">
+            <span class="text-sm text-white/80"><%= h.day_name %></span>
+            <span class="text-sm font-medium text-white">
+              <% if h.closed? %>
+                Closed
+              <% else %>
+                <%= h.open_time&.strftime("%l:%M %p") %> - <%= h.close_time&.strftime("%l:%M %p") %>
+              <% end %>
+            </span>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <%# Contact %>
+    <div>
+      <h3 class="text-xs font-semibold uppercase tracking-[0.1em] mb-5" style="color: var(--primary);">Contact</h3>
+      <% if @restaurant.address.present? %>
+        <p class="text-sm mb-1 text-white/80"><%= @restaurant.address %></p>
+      <% end %>
+      <% if @restaurant.phone.present? %>
+        <a href="tel:<%= @restaurant.phone&.gsub(/[^0-9]/, '') %>" class="text-lg font-semibold block mt-3" style="color: var(--primary);"><%= @restaurant.phone %></a>
+      <% end %>
+      <% if @restaurant.email.present? %>
+        <p class="text-sm mt-1 text-white/60"><%= @restaurant.email %></p>
+      <% end %>
+    </div>
+
+    <%# Map %>
+    <div>
+      <h3 class="text-xs font-semibold uppercase tracking-[0.1em] mb-5" style="color: var(--primary);">Find Us</h3>
+      <% if @restaurant.address.present? %>
+        <div class="aspect-square rounded-2xl overflow-hidden mb-5">
+          <iframe src="https://maps.google.com/maps?q=<%= CGI.escape(@restaurant.address) %>&t=&z=16&ie=UTF8&iwloc=&output=embed" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</section>
