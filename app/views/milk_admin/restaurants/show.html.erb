@@ -13,7 +13,7 @@
   </div>
 
   <!-- Quick Stats -->
-  <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+  <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
     <a href="<%= milk_admin_restaurant_menu_items_path(@restaurant) %>" data-turbo-frame="dashboard_content" class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:border-orange-300 transition-colors">
       <p class="text-sm text-gray-500">Menu Items</p>
       <p class="text-2xl font-bold text-gray-900"><%= @menu_items.count %></p>
@@ -29,6 +29,10 @@
     <a href="<%= milk_admin_restaurant_hours_path(@restaurant) %>" data-turbo-frame="dashboard_content" class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:border-orange-300 transition-colors">
       <p class="text-sm text-gray-500">Hours</p>
       <p class="text-2xl font-bold text-gray-900"><%= @hours.count %></p>
+    </a>
+    <a href="<%= milk_admin_restaurant_orders_path(@restaurant) %>" data-turbo-frame="dashboard_content" class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:border-orange-300 transition-colors">
+      <p class="text-sm text-gray-500">Orders</p>
+      <p class="text-2xl font-bold text-gray-900"><%= @restaurant.orders.count %></p>
     </a>
   </div>
 
