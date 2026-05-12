@@ -1,3 +1,6 @@
+# Load restaurant seeds
+require_relative "seeds/restaurants"
+
 puts "Deleting all videos..."
 SaltAndTarVideo.destroy_all
 
