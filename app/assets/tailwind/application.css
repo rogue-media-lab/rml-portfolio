@@ -445,3 +445,68 @@ button {
   grid-column: 5/6;
   grid-row: 13/15;
 }
+
+/* ─── El Mexicano Restaurant Styles ─── */
+.navy-frame {
+  background: #A10035;
+  border-radius: 20px;
+  margin: 15px;
+  padding: 25px;
+  overflow: hidden;
+}
+@media (max-width: 768px) {
+  .navy-frame { margin: 8px; padding: 12px; border-radius: 14px; }
+}
+
+.papel-picado-banner {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  overflow: hidden;
+  height: 22px;
+  background: #A10035;
+  padding-top: 0;
+}
+.papel-picado-banner .pennant {
+  width: 0; height: 0;
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-top: 18px solid #A10035;
+  flex-shrink: 0;
+}
+@media (max-width: 768px) {
+  .papel-picado-banner .pennant { border-left-width: 9px; border-right-width: 9px; border-top-width: 14px; }
+  .papel-picado-banner { height: 16px; }
+}
+
+.teeth-border {
+  width: 100%; height: 14px;
+  background: linear-gradient(135deg, #FDD835 33.33%, transparent 33.33%) 0 0 / 14px 14px, linear-gradient(225deg, #FDD835 33.33%, transparent 33.33%) 7px 0 / 14px 14px;
+  background-repeat: repeat-x;
+}
+@media (max-width: 768px) { .teeth-border { height: 10px; } }
+
+.papel-picado { position: relative; }
+.papel-picado::after {
+  content: ''; display: block; width: 100%; height: 20px;
+  background: linear-gradient(135deg, #FDD835 33.33%, transparent 33.33%) 0 0 / 20px 20px, linear-gradient(225deg, #FDD835 33.33%, transparent 33.33%) 0 0 / 20px 20px;
+  background-position: top left; background-repeat: repeat-x;
+}
+.papel-picado-multi::after {
+  background: linear-gradient(135deg, #FDD835 33.33%, transparent 33.33%) 0 0 / 16px 16px, linear-gradient(225deg, #FFFFFF 33.33%, transparent 33.33%) 8px 0 / 16px 16px, linear-gradient(135deg, #66BB6A 33.33%, transparent 33.33%) 0 0 / 16px 16px, linear-gradient(225deg, #FBC02D 33.33%, transparent 33.33%) 8px 0 / 16px 16px;
+  background-repeat: repeat-x; height: 16px;
+}
+
+.wavy-texture {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='20'%3E%3Cpath d='M0 10 Q25 0 50 10 Q75 20 100 10' stroke='%23E8B800' stroke-width='1.5' fill='none' opacity='0.08'/%3E%3C/svg%3E");
+  background-repeat: repeat; background-size: 100px 20px;
+}
+
+.bunting-container { position: absolute; top: 15px; right: 20px; width: 100px; height: 80px; z-index: 5; }
+.bunting-string { position: absolute; top: 0; left: 0; width: 100%; height: 30px; border-bottom: 2px dashed rgba(255,255,255,0.3); border-radius: 0 0 50% 50%; }
+.bunting-flag { position: absolute; width: 10px; height: 16px; top: 22px; border-radius: 0 0 2px 2px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+@media (max-width: 768px) {
+  .bunting-container { width: 70px; height: 55px; top: 10px; right: 10px; }
+  .bunting-flag { width: 7px; height: 11px; top: 15px; }
+  .bunting-string { height: 20px; }
+}
