@@ -2,7 +2,7 @@
 class MilkAdmin::OrdersController < ApplicationController
   before_action :authenticate_milk_admin!
   before_action :set_restaurant
-  before_action :set_order, only: [:show, :update, :destroy]
+  before_action :set_order, only: [ :show, :update, :destroy ]
 
   def index
     @orders = @restaurant.orders.order(created_at: :desc)

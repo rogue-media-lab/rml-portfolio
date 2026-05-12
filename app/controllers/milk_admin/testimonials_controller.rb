@@ -2,7 +2,7 @@
 class MilkAdmin::TestimonialsController < ApplicationController
   before_action :authenticate_milk_admin!
   before_action :set_restaurant
-  before_action :set_testimonial, only: [:edit, :update, :destroy]
+  before_action :set_testimonial, only: [ :edit, :update, :destroy ]
 
   def index
     @testimonials = @restaurant.testimonials.order(created_at: :desc)

@@ -2,7 +2,7 @@
 class MilkAdmin::MenuCategoriesController < ApplicationController
   before_action :authenticate_milk_admin!
   before_action :set_restaurant
-  before_action :set_menu_category, only: [:edit, :update, :destroy]
+  before_action :set_menu_category, only: [ :edit, :update, :destroy ]
 
   def index
     @menu_categories = @restaurant.menu_categories.sorted

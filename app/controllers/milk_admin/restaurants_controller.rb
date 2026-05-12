@@ -1,7 +1,7 @@
 # Restaurants Controller for Milk Admin
 class MilkAdmin::RestaurantsController < ApplicationController
   before_action :authenticate_milk_admin!
-  before_action :set_restaurant, only: [:show, :edit, :update, :destroy]
+  before_action :set_restaurant, only: [ :show, :edit, :update, :destroy ]
 
   def index
     @restaurants = Restaurant.order(:name)

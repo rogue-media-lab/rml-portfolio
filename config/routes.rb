@@ -138,12 +138,12 @@ Rails.application.routes.draw do
   # Restaurant admin (under MilkAdmin) — MUST be before the catch-all scope
   namespace :milk_admin do
     resources :restaurants do
-      resources :menu_categories, except: [:show]
-      resources :menu_items, except: [:show]
-      resources :testimonials, except: [:show]
-      resources :hours, only: [:index, :edit, :update]
-      resources :reservations, only: [:index, :update, :destroy]
-      resources :orders, only: [:index, :show, :update, :destroy]
+      resources :menu_categories, except: [ :show ]
+      resources :menu_items, except: [ :show ]
+      resources :testimonials, except: [ :show ]
+      resources :hours, only: [ :index, :edit, :update ]
+      resources :reservations, only: [ :index, :update, :destroy ]
+      resources :orders, only: [ :index, :show, :update, :destroy ]
     end
   end
 
