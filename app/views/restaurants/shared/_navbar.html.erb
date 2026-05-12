@@ -15,8 +15,11 @@
       <%= link_to "Contact", restaurant_contact_path(@restaurant.slug), class: "text-white hover:text-yellow-300 transition-colors font-medium" %>
     </div>
     <div class="flex items-center gap-4">
-      <%= link_to restaurant_cart_path(@restaurant.slug), class: "text-white hover:text-yellow-300 transition-colors" do %>
+      <%= link_to restaurant_cart_path(@restaurant.slug), class: "relative text-white hover:text-yellow-300 transition-colors" do %>
         <span class="material-icons">shopping_cart</span>
+        <% if cart_item_count > 0 %>
+          <span class="absolute -top-2 -right-2 text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center" style="background-color: var(--primary); color: var(--dark);"><%= cart_item_count %></span>
+        <% end %>
       <% end %>
     </div>
   </div>

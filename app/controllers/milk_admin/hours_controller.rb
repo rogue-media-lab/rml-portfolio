@@ -2,7 +2,7 @@
 class MilkAdmin::HoursController < ApplicationController
   before_action :authenticate_milk_admin!
   before_action :set_restaurant
-  before_action :set_hour, only: [:edit, :update]
+  before_action :set_hour, only: [ :edit, :update ]
 
   def index
     @hours = @restaurant.hours.ordered

@@ -3,7 +3,7 @@ module RestaurantScoped
 
   included do
     before_action :set_restaurant
-    helper_method :current_restaurant
+    helper_method :current_restaurant, :cart_item_count
   end
 
   private
@@ -16,5 +16,9 @@ module RestaurantScoped
 
   def current_restaurant
     @restaurant
+  end
+
+  def cart_item_count
+    (session[:cart] || {}).values.sum
   end
 end
