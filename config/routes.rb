@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  mount ActionCable.server => "/cable"
+
   # User model planned for clients feature
   devise_for :users
   devise_for :milk_admins, skip: [ :registrations ]
