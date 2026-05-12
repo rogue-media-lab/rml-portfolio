@@ -1,0 +1,414 @@
+<%# The Lab — Client-Facing Hire/Contact Page %>
+<% content_for(:title) { "The Lab — Rogue Media Lab" } %>
+<% content_for(:body_class) { "bg-[#050505] text-zinc-50" } %>
+<% content_for(:main_class) { "flex flex-col min-h-screen w-full" } %>
+
+<div class="w-full min-h-screen bg-[#050505] antialiased">
+
+  <%= render "shared/workbench_nav", active_page: "lab" %>
+
+  <%# ─── HERO ─── %>
+  <section class="flex flex-col items-center justify-center w-full pt-16 md:pt-25 pb-16 md:pb-20 gap-6 md:gap-8 px-6 md:px-16">
+    <div class="flex flex-col items-center max-w-200 gap-4 md:gap-6">
+      <%# Badge %>
+      <div class="flex items-center rounded-full py-1.5 px-3 gap-2 bg-orange-500/5 border border-orange-500/30">
+        <div class="w-1.5 h-1.5 rounded-[3px] bg-orange-500"></div>
+        <span class="text-center text-orange-500 font-mono text-xs">Web Services for Local Business</span>
+      </div>
+      <%# Headline %>
+      <h1 class="text-4xl md:text-[72px] leading-[1.1] tracking-[0.02em] uppercase text-center text-zinc-50 font-['Barlow_Condensed',system-ui,sans-serif] font-bold m-0">Bring Your Project<br>to the Lab.</h1>
+      <%# Subtitle %>
+      <p class="text-base md:text-[20px] leading-[1.6] max-w-162 text-center text-zinc-400 font-['Inter',system-ui,sans-serif] m-0">Custom websites built for local businesses in Rock Hill, York, Clover, and the surrounding SC communities. No templates. No shortcuts. Real code, built right.</p>
+      <%# CTA %>
+      <div class="flex flex-col sm:flex-row gap-4 mt-2">
+        <a href="#contact" class="rounded-lg py-3 px-8 bg-orange-600 cursor-pointer hover:bg-orange-500 transition-colors">
+          <span class="uppercase text-zinc-950 font-['Inter',system-ui,sans-serif] font-bold text-sm">Start a Project</span>
+        </a>
+        <a href="#portfolio" class="rounded-lg py-3 px-8 border border-zinc-800 cursor-pointer hover:bg-zinc-800 transition-colors">
+          <span class="text-zinc-50 font-['Inter',system-ui,sans-serif] font-semibold text-sm">See Our Work</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <%# ─── HOW IT WORKS ─── %>
+  <section class="flex flex-col items-center w-full py-16 md:py-24 gap-12 md:gap-16 px-6 md:px-16 border-t border-zinc-800">
+    <div class="flex flex-col items-center gap-3 max-w-200">
+      <span class="text-orange-500 font-mono text-[13px]">THE PROCESS</span>
+      <h2 class="text-3xl md:text-5xl tracking-[0.02em] uppercase text-center text-zinc-50 font-['Barlow_Condensed',system-ui,sans-serif] font-bold m-0">How It Works</h2>
+      <p class="text-base md:text-[18px] leading-[1.6] text-center text-zinc-400 font-['Inter',system-ui,sans-serif] max-w-162 m-0">From first conversation to live site — a simple, transparent process designed for busy business owners.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full max-w-200">
+      <%# Step 1 %>
+      <div class="flex flex-col gap-4 rounded-xl bg-zinc-900/50 border border-zinc-800 p-6">
+        <div class="flex items-center gap-3">
+          <span class="text-orange-500 font-mono text-2xl font-bold">01</span>
+          <span class="material-symbols-outlined text-orange-500 text-2xl">search</span>
+        </div>
+        <h3 class="text-zinc-50 font-['Barlow_Condensed',system-ui,sans-serif] font-bold text-xl uppercase m-0">Discover</h3>
+        <p class="text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm leading-[1.6] m-0">We learn about your business, your customers, and your goals. What makes you different? What do your customers need?</p>
+      </div>
+      <%# Step 2 %>
+      <div class="flex flex-col gap-4 rounded-xl bg-zinc-900/50 border border-zinc-800 p-6">
+        <div class="flex items-center gap-3">
+          <span class="text-orange-500 font-mono text-2xl font-bold">02</span>
+          <span class="material-symbols-outlined text-orange-500 text-2xl">palette</span>
+        </div>
+        <h3 class="text-zinc-50 font-['Barlow_Condensed',system-ui,sans-serif] font-bold text-xl uppercase m-0">Design</h3>
+        <p class="text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm leading-[1.6] m-0">A custom design tailored to your brand. You see and approve the look before any code is written. No surprises.</p>
+      </div>
+      <%# Step 3 %>
+      <div class="flex flex-col gap-4 rounded-xl bg-zinc-900/50 border border-zinc-800 p-6">
+        <div class="flex items-center gap-3">
+          <span class="text-orange-500 font-mono text-2xl font-bold">03</span>
+          <span class="material-symbols-outlined text-orange-500 text-2xl">code</span>
+        </div>
+        <h3 class="text-zinc-50 font-['Barlow_Condensed',system-ui,sans-serif] font-bold text-xl uppercase m-0">Build</h3>
+        <p class="text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm leading-[1.6] m-0">Your site is built with modern technology — fast, mobile-friendly, and secure. You get a working preview during the build.</p>
+      </div>
+      <%# Step 4 %>
+      <div class="flex flex-col gap-4 rounded-xl bg-zinc-900/50 border border-zinc-800 p-6">
+        <div class="flex items-center gap-3">
+          <span class="text-orange-500 font-mono text-2xl font-bold">04</span>
+          <span class="material-symbols-outlined text-orange-500 text-2xl">rocket_launch</span>
+        </div>
+        <h3 class="text-zinc-50 font-['Barlow_Condensed',system-ui,sans-serif] font-bold text-xl uppercase m-0">Launch</h3>
+        <p class="text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm leading-[1.6] m-0">We go live. Your site is hosted, secured, and maintained. You focus on your business — we handle the rest.</p>
+      </div>
+    </div>
+  </section>
+
+  <%# ─── SERVICES & PRICING ─── %>
+  <section class="flex flex-col items-center w-full py-16 md:py-24 gap-12 md:gap-16 px-6 md:px-16 border-t border-zinc-800">
+    <div class="flex flex-col items-center gap-3 max-w-200">
+      <span class="text-orange-500 font-mono text-[13px]">SERVICES</span>
+      <h2 class="text-3xl md:text-5xl tracking-[0.02em] uppercase text-center text-zinc-50 font-['Barlow_Condensed',system-ui,sans-serif] font-bold m-0">What We Build</h2>
+      <p class="text-base md:text-[18px] leading-[1.6] text-center text-zinc-400 font-['Inter',system-ui,sans-serif] max-w-162 m-0">Simple, honest pricing. Every site is custom-built. No templates, no monthly lock-in contracts.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-200">
+      <%# Tier 1: Starter %>
+      <div class="flex flex-col gap-6 rounded-xl bg-zinc-900/50 border border-zinc-800 p-6 md:p-8">
+        <div class="flex flex-col gap-2">
+          <span class="text-zinc-500 font-mono text-xs">STARTER</span>
+          <h3 class="text-zinc-50 font-['Barlow_Condensed',system-ui,sans-serif] font-bold text-2xl uppercase m-0">Online Presence</h3>
+          <p class="text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm leading-[1.6] m-0">A clean, professional site that shows customers who you are and how to reach you.</p>
+        </div>
+        <div class="flex flex-col gap-1">
+          <span class="text-zinc-50 font-['Barlow_Condensed',system-ui,sans-serif] font-bold text-3xl m-0">$800</span>
+          <span class="text-zinc-500 font-['Inter',system-ui,sans-serif] text-xs">One-time build fee</span>
+          <span class="text-zinc-50 font-['Barlow_Condensed',system-ui,sans-serif] font-bold text-xl m-0 mt-2">$40<span class="text-zinc-500 text-sm font-normal">/month</span></span>
+          <span class="text-zinc-500 font-['Inter',system-ui,sans-serif] text-xs">Hosting + maintenance</span>
+        </div>
+        <ul class="flex flex-col gap-3 m-0 p-0 list-none">
+          <li class="flex items-start gap-2 text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm">
+            <span class="material-symbols-outlined text-green-400 text-lg mt-0.5">check_circle</span>
+            <span>3-5 page custom site</span>
+          </li>
+          <li class="flex items-start gap-2 text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm">
+            <span class="material-symbols-outlined text-green-400 text-lg mt-0.5">check_circle</span>
+            <span>Mobile responsive design</span>
+          </li>
+          <li class="flex items-start gap-2 text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm">
+            <span class="material-symbols-outlined text-green-400 text-lg mt-0.5">check_circle</span>
+            <span>Contact form</span>
+          </li>
+          <li class="flex items-start gap-2 text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm">
+            <span class="material-symbols-outlined text-green-400 text-lg mt-0.5">check_circle</span>
+            <span>Google Maps integration</span>
+          </li>
+          <li class="flex items-start gap-2 text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm">
+            <span class="material-symbols-outlined text-green-400 text-lg mt-0.5">check_circle</span>
+            <span>Hosting & maintenance</span>
+          </li>
+          <li class="flex items-start gap-2 text-orange-400/80 font-['Inter',system-ui,sans-serif] text-sm">
+            <span class="material-symbols-outlined text-orange-400 text-lg mt-0.5">smart_toy</span>
+            <span>Basic AI chatbot</span>
+          </li>
+        </ul>
+        <a href="#contact" class="rounded-lg py-3 px-6 border border-zinc-800 text-center cursor-pointer hover:bg-zinc-800 transition-colors mt-auto">
+          <span class="text-zinc-50 font-['Inter',system-ui,sans-serif] font-semibold text-sm">Get Started</span>
+        </a>
+      </div>
+
+      <%# Tier 2: Professional (Featured) %>
+      <div class="flex flex-col gap-6 rounded-xl bg-zinc-900/50 border border-orange-500/40 p-6 md:p-8 relative">
+        <div class="absolute -top-3 left-1/2 -translate-x-1/2">
+          <span class="text-zinc-950 bg-orange-500 font-mono text-[11px] font-bold py-1 px-3 rounded-full uppercase">Most Popular</span>
+        </div>
+        <div class="flex flex-col gap-2">
+          <span class="text-zinc-500 font-mono text-xs">PROFESSIONAL</span>
+          <h3 class="text-zinc-50 font-['Barlow_Condensed',system-ui,sans-serif] font-bold text-2xl uppercase m-0">Full Service</h3>
+          <p class="text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm leading-[1.6] m-0">A complete web presence with menus, galleries, reviews, and everything your customers need.</p>
+        </div>
+        <div class="flex flex-col gap-1">
+          <span class="text-zinc-50 font-['Barlow_Condensed',system-ui,sans-serif] font-bold text-3xl m-0">$1,000</span>
+          <span class="text-zinc-500 font-['Inter',system-ui,sans-serif] text-xs">One-time build fee</span>
+          <span class="text-zinc-50 font-['Barlow_Condensed',system-ui,sans-serif] font-bold text-xl m-0 mt-2">$125<span class="text-zinc-500 text-sm font-normal">/month</span></span>
+          <span class="text-zinc-500 font-['Inter',system-ui,sans-serif] text-xs">Hosting + maintenance</span>
+        </div>
+        <ul class="flex flex-col gap-3 m-0 p-0 list-none">
+          <li class="flex items-start gap-2 text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm">
+            <span class="material-symbols-outlined text-green-400 text-lg mt-0.5">check_circle</span>
+            <span>Everything in Starter</span>
+          </li>
+          <li class="flex items-start gap-2 text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm">
+            <span class="material-symbols-outlined text-green-400 text-lg mt-0.5">check_circle</span>
+            <span>Menu / service catalog</span>
+          </li>
+          <li class="flex items-start gap-2 text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm">
+            <span class="material-symbols-outlined text-green-400 text-lg mt-0.5">check_circle</span>
+            <span>Photo gallery</span>
+          </li>
+          <li class="flex items-start gap-2 text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm">
+            <span class="material-symbols-outlined text-green-400 text-lg mt-0.5">check_circle</span>
+            <span>Customer reviews section</span>
+          </li>
+          <li class="flex items-start gap-2 text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm">
+            <span class="material-symbols-outlined text-green-400 text-lg mt-0.5">check_circle</span>
+            <span>SEO optimization</span>
+          </li>
+          <li class="flex items-start gap-2 text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm">
+            <span class="material-symbols-outlined text-green-400 text-lg mt-0.5">check_circle</span>
+            <span>Admin dashboard</span>
+          </li>
+          <li class="flex items-start gap-2 text-orange-400/80 font-['Inter',system-ui,sans-serif] text-sm">
+            <span class="material-symbols-outlined text-orange-400 text-lg mt-0.5">smart_toy</span>
+            <span>AI chatbot + content gen</span>
+          </li>
+          <li class="flex items-start gap-2 text-orange-400/80 font-['Inter',system-ui,sans-serif] text-sm">
+            <span class="material-symbols-outlined text-orange-400 text-lg mt-0.5">reviews</span>
+            <span>AI review management</span>
+          </li>
+        </ul>
+        <a href="#contact" class="rounded-lg py-3 px-6 bg-orange-600 text-center cursor-pointer hover:bg-orange-500 transition-colors mt-auto">
+          <span class="uppercase text-zinc-950 font-['Inter',system-ui,sans-serif] font-bold text-sm">Get Started</span>
+        </a>
+      </div>
+
+      <%# Tier 3: Custom %>
+      <div class="flex flex-col gap-6 rounded-xl bg-zinc-900/50 border border-zinc-800 p-6 md:p-8">
+        <div class="flex flex-col gap-2">
+          <span class="text-zinc-500 font-mono text-xs">CUSTOM</span>
+          <h3 class="text-zinc-50 font-['Barlow_Condensed',system-ui,sans-serif] font-bold text-2xl uppercase m-0">Platform Build</h3>
+          <p class="text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm leading-[1.6] m-0">Custom web applications, booking systems, ordering platforms, or anything your business needs.</p>
+        </div>
+        <div class="flex flex-col gap-1">
+          <span class="text-zinc-50 font-['Barlow_Condensed',system-ui,sans-serif] font-bold text-3xl m-0">$1,500</span>
+          <span class="text-zinc-500 font-['Inter',system-ui,sans-serif] text-xs">One-time build fee</span>
+          <span class="text-zinc-50 font-['Barlow_Condensed',system-ui,sans-serif] font-bold text-xl m-0 mt-2">$250<span class="text-zinc-500 text-sm font-normal">/month</span></span>
+          <span class="text-zinc-500 font-['Inter',system-ui,sans-serif] text-xs">Hosting + maintenance + ongoing dev</span>
+        </div>
+        <ul class="flex flex-col gap-3 m-0 p-0 list-none">
+          <li class="flex items-start gap-2 text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm">
+            <span class="material-symbols-outlined text-green-400 text-lg mt-0.5">check_circle</span>
+            <span>Everything in Professional</span>
+          </li>
+          <li class="flex items-start gap-2 text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm">
+            <span class="material-symbols-outlined text-green-400 text-lg mt-0.5">check_circle</span>
+            <span>Custom functionality</span>
+          </li>
+          <li class="flex items-start gap-2 text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm">
+            <span class="material-symbols-outlined text-green-400 text-lg mt-0.5">check_circle</span>
+            <span>Database & user accounts</span>
+          </li>
+          <li class="flex items-start gap-2 text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm">
+            <span class="material-symbols-outlined text-green-400 text-lg mt-0.5">check_circle</span>
+            <span>API integrations</span>
+          </li>
+          <li class="flex items-start gap-2 text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm">
+            <span class="material-symbols-outlined text-green-400 text-lg mt-0.5">check_circle</span>
+            <span>Ongoing development</span>
+          </li>
+          <li class="flex items-start gap-2 text-orange-400/80 font-['Inter',system-ui,sans-serif] text-sm">
+            <span class="material-symbols-outlined text-orange-400 text-lg mt-0.5">smart_toy</span>
+            <span>Full AI suite + custom AI tools</span>
+          </li>
+          <li class="flex items-start gap-2 text-orange-400/80 font-['Inter',system-ui,sans-serif] text-sm">
+            <span class="material-symbols-outlined text-orange-400 text-lg mt-0.5">trending_up</span>
+            <span>AI search optimization</span>
+          </li>
+        </ul>
+        <a href="#contact" class="rounded-lg py-3 px-6 border border-zinc-800 text-center cursor-pointer hover:bg-zinc-800 transition-colors mt-auto">
+          <span class="text-zinc-50 font-['Inter',system-ui,sans-serif] font-semibold text-sm">Discuss Your Project</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <%# ─── AI CAPABILITIES ─── %>
+  <section class="flex flex-col items-center w-full py-16 md:py-24 gap-12 md:gap-16 px-6 md:px-16 border-t border-zinc-800">
+    <div class="flex flex-col items-center gap-3 max-w-200">
+      <span class="text-orange-500 font-mono text-[13px]">AI-POWERED</span>
+      <h2 class="text-3xl md:text-5xl tracking-[0.02em] uppercase text-center text-zinc-50 font-['Barlow_Condensed',system-ui,sans-serif] font-bold m-0">Your Website, Now<br>with AI.</h2>
+      <p class="text-base md:text-[18px] leading-[1.6] text-center text-zinc-400 font-['Inter',system-ui,sans-serif] max-w-162 m-0">Your customers are searching at 10 PM. They have questions at 6 AM. Your AI never sleeps, never takes a day off, and never puts someone on hold.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-200">
+      <%# AI Chatbot %>
+      <div class="flex flex-col gap-4 rounded-xl bg-zinc-900/50 border border-zinc-800 p-6 md:p-8">
+        <div class="flex items-center gap-3">
+          <span class="material-symbols-outlined text-orange-500 text-2xl">smart_toy</span>
+          <h3 class="text-zinc-50 font-['Barlow_Condensed',system-ui,sans-serif] font-bold text-xl uppercase m-0">AI Chatbot</h3>
+        </div>
+        <p class="text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm leading-[1.6] m-0">Answers common questions — hours, menu, pricing, directions — even when you can't. Captures leads while you sleep. Your customers get instant help, you get more business.</p>
+      </div>
+      <%# AI Content %>
+      <div class="flex flex-col gap-4 rounded-xl bg-zinc-900/50 border border-zinc-800 p-6 md:p-8">
+        <div class="flex items-center gap-3">
+          <span class="material-symbols-outlined text-orange-500 text-2xl">edit_note</span>
+          <h3 class="text-zinc-50 font-['Barlow_Condensed',system-ui,sans-serif] font-bold text-xl uppercase m-0">AI Content</h3>
+        </div>
+        <p class="text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm leading-[1.6] m-0">Auto-generates menu descriptions, service details, and blog posts. SEO-friendly content written in your voice — no copywriter needed. You focus on running your business.</p>
+      </div>
+      <%# AI Reviews %>
+      <div class="flex flex-col gap-4 rounded-xl bg-zinc-900/50 border border-zinc-800 p-6 md:p-8">
+        <div class="flex items-center gap-3">
+          <span class="material-symbols-outlined text-orange-500 text-2xl">reviews</span>
+          <h3 class="text-zinc-50 font-['Barlow_Condensed',system-ui,sans-serif] font-bold text-xl uppercase m-0">AI Review Manager</h3>
+        </div>
+        <p class="text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm leading-[1.6] m-0">Auto-drafts professional responses to Google reviews. Flags negative reviews for your attention. Turns review management from a chore into a 2-minute task.</p>
+      </div>
+      <%# AI SEO %>
+      <div class="flex flex-col gap-4 rounded-xl bg-zinc-900/50 border border-zinc-800 p-6 md:p-8">
+        <div class="flex items-center gap-3">
+          <span class="material-symbols-outlined text-orange-500 text-2xl">trending_up</span>
+          <h3 class="text-zinc-50 font-['Barlow_Condensed',system-ui,sans-serif] font-bold text-xl uppercase m-0">AI Search Boost</h3>
+        </div>
+        <p class="text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm leading-[1.6] m-0">Auto-generates meta descriptions, alt tags, and keywords. Keeps your Google listing fresh and optimized. More visibility means more customers finding you first.</p>
+      </div>
+    </div>
+
+    <%# Rocky callout %>
+    <div class="w-full max-w-200 rounded-xl bg-orange-500/5 border border-orange-500/20 p-6 md:p-8">
+      <div class="flex flex-col md:flex-row items-start md:items-center gap-4">
+        <span class="material-symbols-outlined text-orange-500 text-3xl shrink-0">psychology</span>
+        <div class="flex flex-col gap-2">
+          <span class="text-orange-500 font-mono text-[13px]">BUILT & TESTED IN-HOUSE</span>
+          <p class="text-zinc-300 font-['Inter',system-ui,sans-serif] text-base leading-[1.6] m-0">We don't just talk about AI — we build it. <span class="text-zinc-50 font-semibold">Wayland</span>, our in-house AI assistant, powers this site's Lab experience. Wayland knows the Lab — every project, every tool, every process. Every AI feature we offer has been tested in production before it reaches your site.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <%# ─── PORTFOLIO ─── %>
+  <section id="portfolio" class="flex flex-col items-center w-full py-16 md:py-24 gap-12 md:gap-16 px-6 md:px-16 border-t border-zinc-800">
+    <div class="flex flex-col items-center gap-3 max-w-200">
+      <span class="text-orange-500 font-mono text-[13px]">RECENT WORK</span>
+      <h2 class="text-3xl md:text-5xl tracking-[0.02em] uppercase text-center text-zinc-50 font-['Barlow_Condensed',system-ui,sans-serif] font-bold m-0">Built & Shipped</h2>
+      <p class="text-base md:text-[18px] leading-[1.6] text-center text-zinc-400 font-['Inter',system-ui,sans-serif] max-w-162 m-0">Real projects for real local businesses. Every site custom-built with care.</p>
+    </div>
+
+    <div class="flex flex-col gap-10 w-full max-w-200">
+      <%# Clough Campaign %>
+      <div class="flex flex-col lg:flex-row items-center gap-8 lg:gap-12 rounded-xl bg-zinc-900/50 border border-zinc-800 p-6 md:p-8">
+        <div class="w-full lg:w-1/2 h-48 lg:h-64 rounded-lg overflow-hidden bg-zinc-800">
+          <%= image_tag "clough-og.jpg", alt: "Clough for Congress", class: "w-full h-full object-cover" %>
+        </div>
+        <div class="w-full lg:w-1/2 flex flex-col gap-4">
+          <span class="text-orange-500 font-mono text-[13px]">POLITICAL CAMPAIGN</span>
+          <h3 class="text-zinc-50 font-['Barlow_Condensed',system-ui,sans-serif] font-bold text-2xl uppercase m-0">Clough for Congress</h3>
+          <p class="text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm leading-[1.6] m-0">A full-stack campaign site built with Rails 8. Featuring SEO/AEO optimization, dynamic content management, and a bold visual identity. Enough is Enough.</p>
+          <div class="flex gap-3">
+            <a href="https://rml-clough-97072a2e05ec.herokuapp.com/" target="_blank" class="rounded-lg py-2 px-4 bg-orange-600 cursor-pointer hover:bg-orange-500 transition-colors">
+              <span class="uppercase text-zinc-950 font-['Inter',system-ui,sans-serif] font-bold text-xs">View Live</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <%# Italian Garden %>
+      <div class="flex flex-col lg:flex-row-reverse items-center gap-8 lg:gap-12 rounded-xl bg-zinc-900/50 border border-zinc-800 p-6 md:p-8">
+        <div class="w-full lg:w-1/2 h-48 lg:h-64 rounded-lg overflow-hidden bg-zinc-800 flex items-center justify-center">
+          <span class="text-zinc-600 font-['Barlow_Condensed',system-ui,sans-serif] text-xl uppercase">Italian Garden</span>
+        </div>
+        <div class="w-full lg:w-1/2 flex flex-col gap-4">
+          <span class="text-orange-500 font-mono text-[13px]">RESTAURANT</span>
+          <h3 class="text-zinc-50 font-['Barlow_Condensed',system-ui,sans-serif] font-bold text-2xl uppercase m-0">Italian Garden Restaurant</h3>
+          <p class="text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm leading-[1.6] m-0">A warm, inviting restaurant site with online menu, photo gallery, reviews, and Google Maps integration. Built to bring in diners who are searching for a great meal.</p>
+          <div class="flex gap-3">
+            <span class="rounded-lg py-2 px-4 border border-zinc-800 text-zinc-500 font-['Inter',system-ui,sans-serif] text-xs">Coming Soon</span>
+          </div>
+        </div>
+      </div>
+
+      <%# El Mexicano %>
+      <div class="flex flex-col lg:flex-row items-center gap-8 lg:gap-12 rounded-xl bg-zinc-900/50 border border-zinc-800 p-6 md:p-8">
+        <div class="w-full lg:w-1/2 h-48 lg:h-64 rounded-lg overflow-hidden bg-zinc-800 flex items-center justify-center">
+          <span class="text-zinc-600 font-['Barlow_Condensed',system-ui,sans-serif] text-xl uppercase">El Mexicano</span>
+        </div>
+        <div class="w-full lg:w-1/2 flex flex-col gap-4">
+          <span class="text-orange-500 font-mono text-[13px]">RESTAURANT</span>
+          <h3 class="text-zinc-50 font-['Barlow_Condensed',system-ui,sans-serif] font-bold text-2xl uppercase m-0">El Mexicano</h3>
+          <p class="text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm leading-[1.6] m-0">Authentic Mexican restaurant site with admin dashboard, menu management, and a bold visual identity. Custom-built with Rails 8 and Tailwind CSS.</p>
+          <div class="flex gap-3">
+            <span class="rounded-lg py-2 px-4 border border-zinc-800 text-zinc-500 font-['Inter',system-ui,sans-serif] text-xs">Coming Soon</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <%# ─── ABOUT ─── %>
+  <section class="flex flex-col items-center w-full py-16 md:py-24 gap-8 md:gap-12 px-6 md:px-16 border-t border-zinc-800">
+    <div class="flex flex-col lg:flex-row items-center gap-8 lg:gap-16 w-full max-w-200">
+      <div class="w-full lg:w-2/5 flex justify-center">
+        <div class="w-48 h-48 md:w-64 md:h-64 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center overflow-hidden">
+          <%= image_tag "mason_roberts_3.png", alt: "Mason Roberts", class: "w-full h-full object-cover" %>
+        </div>
+      </div>
+      <div class="w-full lg:w-3/5 flex flex-col gap-5">
+        <span class="text-orange-500 font-mono text-[13px]">THE DEVELOPER</span>
+        <h2 class="text-3xl md:text-4xl tracking-[0.02em] text-zinc-50 font-['Barlow_Condensed',system-ui,sans-serif] font-bold m-0">Mason Roberts</h2>
+        <p class="text-zinc-400 font-['Inter',system-ui,sans-serif] text-base leading-[1.7] m-0">I'm an auto technician by trade and a developer by passion. I spent years turning wrenches in Rock Hill before I started building web applications. I know what it's like to run a small business — the long hours, the tight budgets, the pride in doing honest work.</p>
+        <p class="text-zinc-400 font-['Inter',system-ui,sans-serif] text-base leading-[1.7] m-0">That's why I build websites differently. No cookie-cutter templates. No confusing contracts. No disappearing after launch. I build sites the way I'd want someone to fix my truck — with care, transparency, and the kind of craftsmanship you can see.</p>
+        <p class="text-zinc-400 font-['Inter',system-ui,sans-serif] text-base leading-[1.7] m-0">Rogue Media Lab is my studio. Every project is built with Ruby on Rails, hosted on enterprise-grade infrastructure, and maintained so you never have to worry about it.</p>
+      </div>
+    </div>
+  </section>
+
+  <%# ─── CONTACT ─── %>
+  <section id="contact" class="flex flex-col items-center w-full py-16 md:py-24 gap-12 md:gap-16 px-6 md:px-16 border-t border-zinc-800">
+    <div class="flex flex-col items-center gap-3 max-w-200">
+      <span class="text-orange-500 font-mono text-[13px]">GET IN TOUCH</span>
+      <h2 class="text-3xl md:text-5xl tracking-[0.02em] uppercase text-center text-zinc-50 font-['Barlow_Condensed',system-ui,sans-serif] font-bold m-0">Start Your Project</h2>
+      <p class="text-base md:text-[18px] leading-[1.6] text-center text-zinc-400 font-['Inter',system-ui,sans-serif] max-w-162 m-0">Tell me about your business and what you need. I'll get back to you within 24 hours.</p>
+    </div>
+
+    <div id="contact_form" class="w-full max-w-lg">
+      <%= form_with model: @contact, url: contacts_path, class: "flex flex-col gap-5" do |form| %>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="flex flex-col gap-2">
+            <%= form.label :f_name, "First Name", class: "text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm" %>
+            <%= form.text_field :f_name, class: "w-full rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-50 font-['Inter',system-ui,sans-serif] text-sm px-4 py-3 focus:border-orange-500 focus:outline-none transition-colors", placeholder: "John" %>
+          </div>
+          <div class="flex flex-col gap-2">
+            <%= form.label :l_name, "Last Name", class: "text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm" %>
+            <%= form.text_field :l_name, class: "w-full rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-50 font-['Inter',system-ui,sans-serif] text-sm px-4 py-3 focus:border-orange-500 focus:outline-none transition-colors", placeholder: "Smith" %>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="flex flex-col gap-2">
+            <%= form.label :email, "Email", class: "text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm" %>
+            <%= form.email_field :email, class: "w-full rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-50 font-['Inter',system-ui,sans-serif] text-sm px-4 py-3 focus:border-orange-500 focus:outline-none transition-colors", placeholder: "john@example.com" %>
+          </div>
+          <div class="flex flex-col gap-2">
+            <%= form.label :phone, "Phone", class: "text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm" %>
+            <%= form.telephone_field :phone, class: "w-full rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-50 font-['Inter',system-ui,sans-serif] text-sm px-4 py-3 focus:border-orange-500 focus:outline-none transition-colors", placeholder: "(803) 555-1234" %>
+          </div>
+        </div>
+        <div class="flex flex-col gap-2">
+          <%= form.label :description, "Tell us about your project", class: "text-zinc-400 font-['Inter',system-ui,sans-serif] text-sm" %>
+          <%= form.text_area :description, rows: 5, class: "w-full rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-50 font-['Inter',system-ui,sans-serif] text-sm px-4 py-3 focus:border-orange-500 focus:outline-none transition-colors resize-none", placeholder: "What does your business do? What kind of site are you looking for?" %>
+        </div>
+        <div>
+          <%= form.submit "Send Message", class: "w-full rounded-lg py-3 px-6 bg-orange-600 cursor-pointer hover:bg-orange-500 transition-colors text-zinc-950 font-['Inter',system-ui,sans-serif] font-bold text-sm uppercase" %>
+        </div>
+      <% end %>
+    </div>
+  </section>
+
+  <%= render "shared/workbench_footer", section_name: "The Lab" %>
+
+</div>

@@ -238,7 +238,7 @@
 
       <!-- Right Column - Contact Form -->
       <div class="bg-white border border-gray-300 flex flex-col">
-        <div class="p-8 lg:p-12 flex-grow" id="hermit_contact_form">
+        <div class="p-8 lg:p-12 flex-grow" id="contact_form">
           <%= form_with(model: Contact.new, url: contacts_path, class: "w-full space-y-6",
                         data: { controller: "hermit-contact", hermit_contact_target: "form", action: "submit->hermit-contact#submit" }) do |form| %>
             <div>

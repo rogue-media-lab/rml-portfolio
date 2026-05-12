@@ -126,6 +126,9 @@ Rails.application.routes.draw do
   # The Studio
   get "studio", to: "studio#index", as: :studio
 
+  # The Lab — Client-facing hire/contact page
+  get "lab", to: "lab#index", as: :lab
+
   resources :contacts, only: [ :new, :create ]
   resources :projects, only: [ :index ]
   resources :skills, only: [ :index ]
