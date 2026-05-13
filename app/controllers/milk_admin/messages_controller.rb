@@ -7,4 +7,10 @@ class MilkAdmin::MessagesController < ApplicationController
 
     render layout: false if turbo_frame_request?
   end
+
+  def show
+    @contact = Contact.find(params[:id])
+
+    render layout: false if turbo_frame_request?
+  end
 end

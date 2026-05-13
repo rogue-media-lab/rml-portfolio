@@ -22,6 +22,7 @@ Rails.application.routes.draw do
     get "pills/dashboard", to: "pills#dashboard", as: :pills_dashboard
     get "songs/dashboard", to: "songs#dashboard", as: :songs_dashboard
     get "messages/dashboard", to: "messages#dashboard", as: :messages_dashboard
+    resources :messages, only: [ :show ]
 
     resources :blogs, only: [ :index, :new, :create, :edit, :update, :destroy ] do
       member do
