@@ -11,7 +11,7 @@ module RestaurantScoped
   def set_restaurant
     @restaurant = Restaurant.find_by!(slug: params[:restaurant_slug])
   rescue ActiveRecord::RecordNotFound
-    redirect_to root_path, alert: "Restaurant not found"
+    redirect_to root_path, notice: "Welcome, site ready."
   end
 
   def current_restaurant
