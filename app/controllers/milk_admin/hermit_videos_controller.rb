@@ -58,6 +58,95 @@ class MilkAdmin::HermitVideosController < ApplicationController
     end
   end
 
+  # YouTube Fetch: Show the form to input a YouTube channel URL
+  def fetch
+    render layout: false if turbo_frame_request?
+  end
+
+  # YouTube Fetch: Process the channel URL and present suggestions
+  def fetch_results
+    @channel_input = params[:channel_url]
+    @max_results = (params[:max_results] || 10).to_i
+
+    if @channel_input.blank?
+      redirect_to fetch_milk_admin_hermit_videos_path, alert: "Please provide a YouTube channel URL or ID."
+      return
+    end
+
+    begin
+      channel_id = YoutubeService.resolve_channel_id(@channel_input)
+
+      if channel_id.blank?
+        redirect_to fetch_milk_admin_hermit_videos_path, alert: "Could not resolve a valid YouTube channel ID from that input."
+        return
+      end
+
+      @suggestions = YoutubeService.search_channel_videos(channel_id, max_results: @max_results)
+
+      if @suggestions.empty?
+        redirect_to fetch_milk_admin_hermit_videos_path, alert: "No videos found for that channel. Check the URL and try again."
+        return
+      end
+
+      # Fetch full details for better thumbnails
+      video_ids = @suggestions.map { |s| s[:video_id] }.compact
+      @details = YoutubeService.video_details(video_ids) if video_ids.any?
+
+      # Merge details into suggestions for display
+      @suggestions.each do |suggestion|
+        detail = @details&.dig(suggestion[:video_id])
+        if detail
+          suggestion[:thumbnail_url] = detail[:thumbnail_url] if detail[:thumbnail_url].present?
+          suggestion[:duration] = detail[:duration]
+          suggestion[:view_count] = detail[:view_count]
+        end
+      end
+
+      @hermits = Hermit.all.order(:alias)
+      render layout: false if turbo_frame_request?
+    rescue YoutubeService::QuotaExceeded
+      redirect_to fetch_milk_admin_hermit_videos_path, alert: "YouTube API quota exceeded. Try again tomorrow or check your API key."
+    rescue YoutubeService::InvalidKey
+      redirect_to fetch_milk_admin_hermit_videos_path, alert: "Invalid YouTube API key. Check your YOUTUBE_API_KEY environment variable."
+    rescue YoutubeService::Error => e
+      redirect_to fetch_milk_admin_hermit_videos_path, alert: "YouTube API error: #{e.message}"
+    end
+  end
+
+  # Create multiple videos from fetch results
+  def bulk_create
+    videos_params = params[:videos] || []
+    created = 0
+    skipped = 0
+
+    videos_params.each do |_, video_data|
+      next unless video_data["selected"] == "1"
+
+      hermit = Hermit.find_by(id: video_data["hermit_id"])
+      next unless hermit
+
+      youtube_id = video_data["youtube_video_id"]
+
+      # Skip if already exists
+      if HermitVideo.exists?(youtube_video_id: youtube_id)
+        skipped += 1
+        next
+      end
+
+      HermitVideo.create!(
+        hermit: hermit,
+        youtube_video_id: youtube_id,
+        title: video_data["title"],
+        thumbnail_url: video_data["thumbnail_url"],
+        season: video_data["season"].to_i,
+        episode: video_data["episode"].to_i
+      )
+      created += 1
+    end
+
+    redirect_to milk_admin_hermit_videos_dashboard_path, notice: "Created #{created} videos. Skipped #{skipped} duplicates."
+  end
+
   private
 
   def set_hermit_video

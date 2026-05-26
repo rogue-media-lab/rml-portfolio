@@ -63,6 +63,9 @@ Rails.application.routes.draw do
     end
 
     get "hermit_videos/dashboard", to: "hermit_videos#dashboard", as: :hermit_videos_dashboard
+    get "hermit_videos/fetch", to: "hermit_videos#fetch", as: :fetch_hermit_videos
+    post "hermit_videos/fetch_results", to: "hermit_videos#fetch_results", as: :hermit_videos_fetch_results
+    post "hermit_videos/bulk_create", to: "hermit_videos#bulk_create", as: :hermit_videos_bulk_create
     resources :hermit_videos, only: [ :index, :new, :create, :edit, :update, :destroy ]
 
     get "hermits/dashboard", to: "hermits#dashboard", as: :hermits_dashboard

@@ -1,0 +1,44 @@
+<%= turbo_frame_tag "dashboard_content" do %>
+  <div class="flex justify-between items-center mb-4">
+    <h1 class="text-3xl">Fetch from YouTube</h1>
+    <%= link_to "Back to Videos", milk_admin_hermit_videos_dashboard_path, data: { turbo_frame: "dashboard_content" }, class: "btn btn-secondary" %>
+  </div>
+
+  <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+    <p class="text-gray-600 mb-4">
+      Enter a YouTube channel URL, handle, or channel ID to fetch recent uploads.
+      The API will return video suggestions that you can review and assign to hermits.
+    </p>
+
+    <%= form_with url: hermit_videos_fetch_results_path, method: :post, data: { turbo_frame: "dashboard_content" } do |form| %>
+      <div class="mb-4">
+        <%= form.label :channel_url, "YouTube Channel URL or ID", class: "block text-sm font-medium text-gray-700" %>
+        <%= form.text_field :channel_url,
+            placeholder: "https://www.youtube.com/@bdoubleo100  or  UC...",
+            class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500",
+            required: true %>
+      </div>
+
+      <div class="mb-4">
+        <%= form.label :max_results, "Max Results (1-50)", class: "block text-sm font-medium text-gray-700" %>
+        <%= form.number_field :max_results, value: 10, min: 1, max: 50,
+            class: "mt-1 block w-32 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" %>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <%= form.submit "Fetch Videos", class: "btn btn-primary" %>
+        <span class="text-sm text-gray-500">Quota cost: ~100 units per search + 1 per video detail</span>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
+    <h3 class="font-semibold text-yellow-800 mb-2">Tips</h3>
+    <ul class="text-sm text-yellow-700 list-disc list-inside">
+      <li>Full URLs: <code>https://www.youtube.com/@channelname</code></li>
+      <li>Channel IDs: <code>UCxxxxxxxxxxxxxxxxxxxxxxxx</code></li>
+      <li>Custom URLs: <code>https://www.youtube.com/c/channelname</code></li>
+      <li>Free tier quota: 10,000 units/day</li>
+    </ul>
+  </div>
+<% end %>
