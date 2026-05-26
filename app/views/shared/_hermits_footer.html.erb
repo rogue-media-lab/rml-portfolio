@@ -1,0 +1,49 @@
+<footer class="w-full bg-hermit-dk-green border-t border-hermit-burnt">
+  <div class="max-w-7xl mx-auto px-4 py-10">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
+
+      <%# Brand Column %>
+      <div class="flex flex-col gap-3">
+        <%= link_to root_path, class: "flex items-center gap-3 w-fit" do %>
+          <%= image_tag "RogueMediaLab.png", alt: "Rogue Media Lab logo", class: "w-10 h-10" %>
+          <span class="font-kanit text-xl font-bold text-hermit-yellow drop-shadow-dark">Rogue Media Lab</span>
+        <% end %>
+        <p class="text-hermit-yellow/70 font-mPlusCode text-sm max-w-xs">
+          Indie dev studio building personality-driven apps. Crafted with Rails, AI, and a little bit of chaos.
+        </p>
+      </div>
+
+      <%# Links Column %>
+      <div class="flex flex-col gap-3">
+        <h4 class="font-kanit text-lg font-bold text-hermit-yellow uppercase tracking-wide">Explore</h4>
+        <ul class="flex flex-col gap-2">
+          <li><%= link_to "The Studio", studio_path, class: "text-hermit-yellow/70 hover:text-hermit-yellow font-mPlusCode text-sm transition-colors" %></li>
+          <li><%= link_to "The Lab", lab_path, class: "text-hermit-yellow/70 hover:text-hermit-yellow font-mPlusCode text-sm transition-colors" %></li>
+          <li><%= link_to "Zuke Music", zuke_index_path, class: "text-hermit-yellow/70 hover:text-hermit-yellow font-mPlusCode text-sm transition-colors" %></li>
+          <li><%= link_to "Blog", blogs_path, class: "text-hermit-yellow/70 hover:text-hermit-yellow font-mPlusCode text-sm transition-colors" %></li>
+        </ul>
+      </div>
+
+      <%# Connect Column %>
+      <div class="flex flex-col gap-3">
+        <h4 class="font-kanit text-lg font-bold text-hermit-yellow uppercase tracking-wide">Connect</h4>
+        <ul class="flex flex-col gap-2">
+          <li><%= link_to "GitHub", "https://github.com/rogue-media-lab", target: "_blank", class: "text-hermit-yellow/70 hover:text-hermit-yellow font-mPlusCode text-sm transition-colors" %></li>
+          <li><%= link_to "Patreon", "https://patreon.com/RogueMediaLab", target: "_blank", class: "text-hermit-yellow/70 hover:text-hermit-yellow font-mPlusCode text-sm transition-colors" %></li>
+          <li><%= mail_to "rogue.media.lab@gmail.com", "Email", class: "text-hermit-yellow/70 hover:text-hermit-yellow font-mPlusCode text-sm transition-colors" %></li>
+        </ul>
+      </div>
+
+    </div>
+
+    <%# Bottom Bar %>
+    <div class="mt-10 pt-6 border-t border-hermit-burnt flex flex-col md:flex-row justify-between items-center gap-4">
+      <p class="text-hermit-yellow/50 font-mPlusCode text-xs">
+        &copy; <%= Time.current.year %> Rogue Media Lab. All rights reserved.
+      </p>
+      <p class="text-hermit-yellow/50 font-mPlusCode text-xs">
+        Hermit Plus is a fan project. Not affiliated with Hermitcraft.
+      </p>
+    </div>
+  </div>
+</footer>
