@@ -1,77 +1,215 @@
-require "google/apis/youtube_v3"
+require "net/http"
+require "json"
+require "uri"
 
-# Fetches and processes videos from a hermit's YouTube channel.
 class YoutubeService
-  def initialize(hermit)
-    @hermit = hermit
-    @youtube = Google::Apis::YoutubeV3::YouTubeService.new
-    @youtube.key = Rails.application.credentials.dig(:youtube, :api_key)
+  API_KEY = ENV["YOUTUBE_API_KEY"]
+  BASE_URL = "https://www.googleapis.com/youtube/v3"
+
+  class Error < StandardError; end
+  class QuotaExceeded < Error; end
+  class InvalidKey < Error; end
+
+  # --- PUBLIC API ---
+
+  # Search for recent uploads from a channel
+  # Returns array of video hashes:
+  #   { video_id:, title:, description:, thumbnail_url:, published_at: }
+  def self.search_channel_videos(channel_id, max_results: 50)
+    return [] if API_KEY.blank?
+
+    params = {
+      "part"       => "snippet",
+      "channelId"  => channel_id,
+      "maxResults" => max_results,
+      "order"      => "date",
+      "type"       => "video",
+      "key"        => API_KEY
+    }
+
+    response = get("/search", params)
+    items = response["items"] || []
+
+    items.map do |item|
+      snippet = item["snippet"]
+      {
+        video_id:      item.dig("id", "videoId"),
+        title:         snippet["title"],
+        description:   snippet["description"],
+        thumbnail_url: best_thumbnail(snippet["thumbnails"]),
+        published_at:  snippet["publishedAt"]
+      }
+    end.compact
   end
 
-  def fetch_videos
-    handle = @hermit.youtube.strip
-    uploads_playlist_id = get_uploads_playlist_id(handle)
-    return unless uploads_playlist_id
+  # Batch fetch video details (duration, stats, etc.)
+  # video_ids: array of YouTube video IDs
+  # Returns array of hashes keyed by video_id
+  def self.video_details(video_ids)
+    return {} if API_KEY.blank? || video_ids.empty?
 
-    videos = get_videos_from_playlist(uploads_playlist_id)
-    videos.each do |video|
-      save_video(video)
+    # API limit: 50 IDs per call
+    results = {}
+    video_ids.each_slice(50) do |batch|
+      params = {
+        "part" => "snippet,contentDetails,statistics",
+        "id"   => batch.join(","),
+        "key"  => API_KEY
+      }
+
+      response = get("/videos", params)
+      (response["items"] || []).each do |item|
+        vid = item["id"]
+        snippet = item["snippet"]
+        results[vid] = {
+          video_id:       vid,
+          title:          snippet["title"],
+          description:    snippet["description"],
+          thumbnail_url:  best_thumbnail(snippet["thumbnails"]),
+          published_at:   snippet["publishedAt"],
+          duration:       item.dig("contentDetails", "duration"),
+          view_count:     item.dig("statistics", "viewCount"),
+          like_count:     item.dig("statistics", "likeCount"),
+          channel_id:     snippet["channelId"],
+          channel_title:  snippet["channelTitle"]
+        }
+      end
     end
+
+    results
   end
 
-  private
+  # Resolve a YouTube channel URL or handle to a channel ID
+  # Accepts: @handle, channel/UC..., user/username, c/channelname, or full URLs
+  def self.resolve_channel_id(input)
+    return nil if API_KEY.blank? || input.blank?
 
-  def get_uploads_playlist_id(handle)
-    # First, search for the channel by its handle to get the channel ID
-    search_response = @youtube.list_searches("snippet", q: handle, type: "channel", max_results: 1)
-    channel_id = search_response.items.first&.id&.channel_id
-    return nil unless channel_id
+    # Already a channel ID
+    return input if input.start_with?("UC") && input.length == 24
 
-    # Then, use the channel ID to get the uploads playlist ID
-    channel_response = @youtube.list_channels("contentDetails", id: channel_id)
-    channel_response.items.first&.content_details&.related_playlists&.uploads
-  rescue Google::Apis::ClientError => e
-    Rails.logger.error "YouTube API error while fetching channel details: #{e.message}"
+    # Extract from a full URL
+    uri = URI.parse(input)
+    path = uri.path.to_s
+
+    if path.start_with?("/channel/")
+      return path.split("/").last
+    elsif path.start_with?("/c/", "/user/")
+      # Need to search by forUsername or custom URL
+      handle = path.split("/").last
+      return search_channel_by_handle(handle)
+    elsif path.start_with?("/@")
+      handle = path[2..].split("/").first
+      return search_channel_by_handle("@#{handle}")
+    end
+
+    # Bare @handle or channel name
+    if input.start_with?("@")
+      search_channel_by_handle(input)
+    else
+      search_channel_by_handle("@#{input}")
+    end
+  rescue URI::InvalidURIError
+    search_channel_by_handle(input)
+  end
+
+  # Search for a channel by handle or name, return first matching channel ID
+  def self.search_channel_by_handle(handle)
+    return nil if API_KEY.blank?
+
+    params = {
+      "part"      => "snippet",
+      "q"         => handle,
+      "type"      => "channel",
+      "maxResults"=> 1,
+      "key"       => API_KEY
+    }
+
+    response = get("/search", params)
+    item = response.dig("items", 0)
+    item&.dig("id", "channelId")
+  end
+
+  # Validate that a thumbnail URL still returns HTTP 200
+  def self.validate_thumbnail_url(url)
+    return false if url.blank?
+
+    uri = URI.parse(url)
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = true
+    http.open_timeout = 5
+    http.read_timeout = 5
+
+    request = Net::HTTP::Head.new(uri.request_uri)
+    response = http.request(request)
+    response.is_a?(Net::HTTPSuccess)
+  rescue StandardError
+    false
+  end
+
+  # Extract video ID from a YouTube URL
+  def self.extract_video_id(url)
+    return nil if url.blank?
+
+    patterns = [
+      %r{youtube\.com/watch\?v=([a-zA-Z0-9_-]{11})},
+      %r{youtu\.be/([a-zA-Z0-9_-]{11})},
+      %r{youtube\.com/embed/([a-zA-Z0-9_-]{11})},
+      %r{youtube\.com/v/([a-zA-Z0-9_-]{11})}
+    ]
+
+    patterns.each do |pattern|
+      match = url.match(pattern)
+      return match[1] if match
+    end
+
     nil
   end
 
-  def get_videos_from_playlist(playlist_id)
-    videos = []
-    next_page_token = nil
-    loop do
-      response = @youtube.list_playlist_items("snippet", playlist_id: playlist_id, max_results: 50, page_token: next_page_token)
-      videos.concat(response.items)
-      next_page_token = response.next_page_token
-      break unless next_page_token
+  # --- PRIVATE ---
+
+  def self.get(endpoint, params)
+    uri = URI.parse("#{BASE_URL}#{endpoint}")
+    uri.query = URI.encode_www_form(params)
+
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = true
+    http.open_timeout = 15
+    http.read_timeout = 15
+
+    request = Net::HTTP::Get.new(uri.request_uri)
+    response = http.request(request)
+
+    handle_errors!(response)
+
+    JSON.parse(response.body)
+  end
+
+  def self.handle_errors!(response)
+    return if response.is_a?(Net::HTTPSuccess)
+
+    body = JSON.parse(response.body) rescue {}
+    error = body.dig("error", "errors", 0, "reason") || "unknown"
+    message = body.dig("error", "message") || "YouTube API error"
+
+    case error
+    when "quotaExceeded"
+      raise QuotaExceeded, message
+    when "keyInvalid"
+      raise InvalidKey, message
+    else
+      raise Error, "#{error}: #{message}"
     end
-    videos
-  rescue Google::Apis::ClientError => e
-    Rails.logger.error "YouTube API error while fetching playlist items: #{e.message}"
-    []
+  rescue JSON::ParserError
+    raise Error, "YouTube API returned non-JSON: #{response.code}"
   end
 
-  def save_video(video)
-    video_id = video.snippet.resource_id.video_id
-    existing_video = @hermit.hermit_videos.find_by(youtube_video_id: video_id)
-    return if existing_video
+  # Pick the highest-resolution available thumbnail
+  def self.best_thumbnail(thumbnails)
+    return nil if thumbnails.blank?
 
-    title = video.snippet.title
-    season, episode = extract_season_and_episode(title)
-
-    @hermit.hermit_videos.create(
-      youtube_video_id: video_id,
-      thumbnail_url: video.snippet.thumbnails.high.url,
-      title: title,
-      season: season,
-      episode: episode
-    )
-  end
-
-  def extract_season_and_episode(title)
-    # This is a simple regex, it might need to be adjusted based on the video title format
-    match = title.match(/Season (\d+).*Episode (\d+)/i)
-    return [ nil, nil ] unless match
-
-    [ match[1].to_i, match[2].to_i ]
+    %w[maxres high medium standard default].each do |quality|
+      return thumbnails.dig(quality, "url") if thumbnails[quality].present?
+    end
+    nil
   end
 end

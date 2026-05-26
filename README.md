@@ -77,6 +77,12 @@ Things you may want to cover:
 * Deployment instructions
   Procfile, package.json set for Heroku deployment. Updated per dependabot requests.
 
+* Environment Variables
+  `YOUTUBE_API_KEY` — Required for Hermit Plus YouTube Data API v3 integration.
+  Set in `.env` locally or Heroku config vars for production.
+  Get a key at https://console.cloud.google.com/apis/credentials
+  Quota: 10,000 units/day (free tier)
+
 * ...
 
 

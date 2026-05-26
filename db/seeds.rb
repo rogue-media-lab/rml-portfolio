@@ -1,6 +1,9 @@
 # Load restaurant seeds
 require_relative "seeds/restaurants"
 
+# Load Hermit Plus Season 8 seeds
+require_relative "seeds/hermit_plus_season_8"
+
 puts "Deleting all videos..."
 SaltAndTarVideo.destroy_all
 

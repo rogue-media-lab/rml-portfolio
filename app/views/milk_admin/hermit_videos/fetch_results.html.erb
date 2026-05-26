@@ -1,0 +1,100 @@
+<%= turbo_frame_tag "dashboard_content" do %>
+  <div class="flex justify-between items-center mb-4">
+    <h1 class="text-3xl">YouTube Fetch Results</h1>
+    <%= link_to "Back to Fetch", fetch_milk_admin_hermit_videos_path, data: { turbo_frame: "dashboard_content" }, class: "btn btn-secondary" %>
+  </div>
+
+  <% if @suggestions.any? %>
+    <div class="bg-blue-50 border border-blue-200 p-4 rounded-lg mb-6">
+      <p class="text-blue-800">
+        <strong>Channel:</strong> <%= @channel_input %><br>
+        <strong>Results:</strong> <%= @suggestions.size %> videos found
+      </p>
+    </div>
+
+    <%= form_with url: hermit_videos_bulk_create_path, method: :post, data: { turbo_frame: "dashboard_content" } do |form| %>
+      <div class="overflow-x-auto">
+        <table class="min-w-full bg-white">
+          <thead class="bg-gray-800 text-white">
+            <tr>
+              <th class="py-3 px-4 text-left w-12">
+                <input type="checkbox" id="select_all" class="rounded" data-action="click->checkbox#toggleAll">
+              </th>
+              <th class="py-3 px-4 text-left">Thumbnail</th>
+              <th class="py-3 px-4 text-left">Title</th>
+              <th class="py-3 px-4 text-left w-48">Hermit</th>
+              <th class="py-3 px-4 text-left w-24">Season</th>
+              <th class="py-3 px-4 text-left w-24">Episode</th>
+            </tr>
+          </thead>
+          <tbody class="text-gray-700">
+            <% @suggestions.each_with_index do |suggestion, index| %>
+              <tr class="border-b hover:bg-gray-50">
+                <td class="py-3 px-4">
+                  <%= check_box_tag "videos[#{index}][selected]", "1", false, class: "rounded video-checkbox" %>
+                </td>
+                <td class="py-3 px-4">
+                  <% if suggestion[:thumbnail_url].present? %>
+                    <img src="<%= suggestion[:thumbnail_url] %>" alt="" class="h-16 w-auto rounded">
+                  <% else %>
+                    <div class="h-16 w-24 bg-gray-200 rounded flex items-center justify-center text-xs text-gray-500">No thumb</div>
+                  <% end %>
+                </td>
+                <td class="py-3 px-4">
+                  <div class="font-medium"><%= suggestion[:title] %></div>
+                  <div class="text-xs text-gray-500 mt-1">
+                    <%= suggestion[:published_at]&.to_date %>
+                    <% if suggestion[:duration].present? %>
+                      &middot; <%= suggestion[:duration] %>
+                    <% end %>
+                    <% if suggestion[:view_count].present? %>
+                      &middot; <%= number_with_delimiter(suggestion[:view_count]) %> views
+                    <% end %>
+                  </div>
+                  <div class="text-xs text-gray-400 mt-1 truncate max-w-md">
+                    <%= suggestion[:description]&.truncate(120) %>
+                  </div>
+                  <%= hidden_field_tag "videos[#{index}][youtube_video_id]", suggestion[:video_id] %>
+                  <%= hidden_field_tag "videos[#{index}][title]", suggestion[:title] %>
+                  <%= hidden_field_tag "videos[#{index}][thumbnail_url]", suggestion[:thumbnail_url] %>
+                </td>
+                <td class="py-3 px-4">
+                  <%= select_tag "videos[#{index}][hermit_id]",
+                      options_from_collection_for_select(@hermits, :id, :alias),
+                      include_blank: "Select hermit...",
+                      class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm" %>
+                </td>
+                <td class="py-3 px-4">
+                  <%= number_field_tag "videos[#{index}][season]", 8, min: 1, max: 20,
+                      class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm" %>
+                </td>
+                <td class="py-3 px-4">
+                  <%= number_field_tag "videos[#{index}][episode]", 1, min: 1,
+                      class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm" %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="mt-6 flex items-center gap-4">
+        <%= form.submit "Save Selected Videos", class: "btn btn-primary" %>
+        <span class="text-sm text-gray-500">Only checked rows will be imported. Episode numbers must be set manually.</span>
+      </div>
+    <% end %>
+  <% else %>
+    <div class="bg-yellow-50 border border-yellow-200 p-6 rounded-lg">
+      <p class="text-yellow-800">No videos found for that channel. Try a different URL or check your API key.</p>
+      <%= link_to "Try Again", fetch_milk_admin_hermit_videos_path, data: { turbo_frame: "dashboard_content" }, class: "text-blue-600 hover:text-blue-800 mt-2 inline-block" %>
+    </div>
+  <% end %>
+
+  <script>
+    document.getElementById('select_all').addEventListener('change', function(e) {
+      document.querySelectorAll('.video-checkbox').forEach(function(cb) {
+        cb.checked = e.target.checked;
+      });
+    });
+  </script>
+<% end %>
