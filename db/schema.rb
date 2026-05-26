@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_12_171833) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_26_170114) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -137,11 +137,50 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_12_171833) do
     t.index ["soundcloud_track_id"], name: "index_custom_sound_cloud_artworks_on_soundcloud_track_id", unique: true
   end
 
+  create_table "favorites", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "hermit_video_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["hermit_video_id"], name: "index_favorites_on_hermit_video_id"
+    t.index ["user_id", "hermit_video_id"], name: "index_favorites_on_user_id_and_hermit_video_id", unique: true
+    t.index ["user_id"], name: "index_favorites_on_user_id"
+  end
+
   create_table "genres", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["name"], name: "index_genres_on_name", unique: true
+  end
+
+  create_table "hermit_appearances", force: :cascade do |t|
+    t.bigint "hermit_video_id", null: false
+    t.bigint "hermit_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["hermit_id"], name: "index_hermit_appearances_on_hermit_id"
+    t.index ["hermit_video_id"], name: "index_hermit_appearances_on_hermit_video_id"
+  end
+
+  create_table "hermit_crew_memberships", force: :cascade do |t|
+    t.bigint "hermit_crew_id", null: false
+    t.bigint "hermit_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["hermit_crew_id"], name: "index_hermit_crew_memberships_on_hermit_crew_id"
+    t.index ["hermit_id"], name: "index_hermit_crew_memberships_on_hermit_id"
+  end
+
+  create_table "hermit_crews", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "slug", null: false
+    t.text "description"
+    t.string "image_url"
+    t.integer "season", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["slug"], name: "index_hermit_crews_on_slug", unique: true
   end
 
   create_table "hermit_videos", force: :cascade do |t|
@@ -176,6 +215,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_12_171833) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "alias_image_url"
+    t.string "from"
+    t.string "skin_url"
+    t.string "face_url"
+    t.text "info2"
+    t.string "slug"
+    t.index ["slug"], name: "index_hermits_on_slug", unique: true
   end
 
   create_table "hours", force: :cascade do |t|
@@ -605,6 +650,17 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_12_171833) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "user_hermit_profiles", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "waitlist_status", default: "pending"
+    t.bigint "favorite_hermit_id"
+    t.boolean "notifications_enabled", default: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["favorite_hermit_id"], name: "index_user_hermit_profiles_on_favorite_hermit_id"
+    t.index ["user_id"], name: "index_user_hermit_profiles_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
@@ -617,6 +673,19 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_12_171833) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  create_table "watch_progresses", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "hermit_video_id", null: false
+    t.integer "progress_seconds", default: 0
+    t.boolean "completed", default: false
+    t.datetime "last_watched_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["hermit_video_id"], name: "index_watch_progresses_on_hermit_video_id"
+    t.index ["user_id", "hermit_video_id"], name: "index_watch_progresses_on_user_id_and_hermit_video_id", unique: true
+    t.index ["user_id"], name: "index_watch_progresses_on_user_id"
+  end
+
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "albums", "artists"
@@ -625,6 +694,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_12_171833) do
   add_foreign_key "blogs", "milk_admins"
   add_foreign_key "chat_messages", "chat_sessions"
   add_foreign_key "chat_sessions", "users"
+  add_foreign_key "favorites", "hermit_videos"
+  add_foreign_key "favorites", "users"
+  add_foreign_key "hermit_appearances", "hermit_videos"
+  add_foreign_key "hermit_appearances", "hermits"
+  add_foreign_key "hermit_crew_memberships", "hermit_crews"
+  add_foreign_key "hermit_crew_memberships", "hermits"
   add_foreign_key "hermit_videos", "hermits"
   add_foreign_key "hours", "restaurants"
   add_foreign_key "menu_categories", "restaurants"
@@ -652,4 +727,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_12_171833) do
   add_foreign_key "songs", "artists"
   add_foreign_key "tasks", "projects"
   add_foreign_key "testimonials", "restaurants"
+  add_foreign_key "user_hermit_profiles", "hermits", column: "favorite_hermit_id"
+  add_foreign_key "user_hermit_profiles", "users"
+  add_foreign_key "watch_progresses", "hermit_videos"
+  add_foreign_key "watch_progresses", "users"
 end

@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user: one
+  waitlist_status: MyString
+  favorite_hermit: one
+  notifications_enabled: false
+
+two:
+  user: two
+  waitlist_status: MyString
+  favorite_hermit: two
+  notifications_enabled: false

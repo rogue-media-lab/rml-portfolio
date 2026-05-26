@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user: one
+  hermit_video: one
+  progress_seconds: 1
+  completed: false
+  last_watched_at: 2026-05-26 13:01:15
+
+two:
+  user: two
+  hermit_video: two
+  progress_seconds: 1
+  completed: false
+  last_watched_at: 2026-05-26 13:01:15
