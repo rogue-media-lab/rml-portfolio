@@ -1,9 +1,1 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
-
-one:
-  user: one
-  hermit_video: one
-
-two:
-  user: two
-  hermit_video: two
+# favorites fixtures - empty to avoid FK violations (no users.yml present)
