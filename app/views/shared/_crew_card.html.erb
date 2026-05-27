@@ -5,9 +5,9 @@
 <%= link_to hermit_crew_path(crew), class: "block group" do %>
   <div class="relative rounded-lg overflow-hidden shadow-lg transition-all duration-300 ease-out group-hover:scale-105 group-hover:shadow-[0_40px_58px_-10px_rgba(0,75,0,0.8)] border-2 border-transparent group-hover:border-white/80 bg-black">
     <% if crew.image_url.present? %>
-      <%= image_tag crew.image_url, alt: crew.name, class: "w-full h-48 object-cover" %>
+      <%= image_tag crew.image_url, alt: crew.name, class: "w-full h-72 object-cover" %>
     <% else %>
-      <div class="w-full h-48 bg-hermit-dk-green flex items-center justify-center">
+      <div class="w-full h-72 bg-hermit-dk-green flex items-center justify-center">
         <span class="font-kanit text-hermit-yellow text-2xl font-bold"><%= crew.name %></span>
       </div>
     <% end %>
