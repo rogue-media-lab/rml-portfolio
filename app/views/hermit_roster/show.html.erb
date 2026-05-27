@@ -1,0 +1,194 @@
+<%# Public Hermit Profile — Purple Dominant Design %>
+<section class="relative w-full min-h-screen bg-[#5E3B8D] -mt-16 md:-mt-20">
+  <%# Noise texture overlay for depth %>
+  <div class="fixed inset-0 z-0 opacity-10 pointer-events-none" style="background-image: url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.9%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E');"></div>
+
+  <%# Content %>
+  <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-8">
+    <%# Back link %>
+    <div class="mb-6">
+      <%= link_to hermit_roster_path, class: "inline-flex items-center text-[#A0D9F7] hover:text-white font-mPlusCode text-sm transition-colors" do %>
+        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        Back to Roster
+      <% end %>
+    </div>
+
+    <%# Top Tag Row %>
+    <div class="flex flex-wrap gap-2 mb-6">
+      <span class="px-3 py-1 rounded-full bg-[#7A5BAF] text-[#A0D9F7] text-xs font-mPlusCode font-semibold tracking-wide">HERMITCRAFT</span>
+      <span class="px-3 py-1 rounded-full bg-[#7A5BAF] text-[#A0D9F7] text-xs font-mPlusCode font-semibold tracking-wide">MINECRAFT</span>
+      <% if @hermit.category.present? %>
+        <span class="px-3 py-1 rounded-full bg-[#7A5BAF] text-[#A0D9F7] text-xs font-mPlusCode font-semibold tracking-wide"><%= @hermit.category.upcase %></span>
+      <% end %>
+    </div>
+
+    <%# Main Grid: Left Info | Center Skin | Right Episodes %>
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <%# Left Column — Metadata (3 cols) %>
+      <div class="lg:col-span-3 space-y-6">
+        <%# Alias & Year %>
+        <div>
+          <h1 class="text-4xl font-bold text-white font-teko uppercase tracking-wide leading-none"><%= @hermit.alias %></h1>
+          <% if @hermit.from.present? %>
+            <p class="text-[#A0D9F7] font-mPlusCode text-sm mt-1">(<%= @hermit.from %>)</p>
+          <% end %>
+        </div>
+
+        <%# Family Friendly Badge %>
+        <div class="flex items-center gap-2">
+          <svg class="w-4 h-4 text-[#A0D9F7]" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+          <span class="text-[#A0D9F7] font-mPlusCode text-xs font-semibold">FAMILY FRIENDLY</span>
+        </div>
+
+        <%# Subscribers %>
+        <% if @hermit.subs.present? %>
+          <div class="border-t border-[#7A5BAF]/50 pt-4">
+            <p class="text-white/50 font-mPlusCode text-xs mb-1">Subscribers</p>
+            <p class="text-white font-bold font-mPlusCode text-lg"><%= number_to_human(@hermit.subs, precision: 2, units: { thousand: "K", million: "M", billion: "B" }) %></p>
+          </div>
+        <% end %>
+
+        <%# Bio / Description %>
+        <div class="border-t border-[#7A5BAF]/50 pt-4">
+          <% if @hermit.description.present? %>
+            <p class="text-white/80 font-mPlusCode text-sm leading-relaxed"><%= @hermit.description %></p>
+          <% elsif @hermit.info.present? %>
+            <p class="text-white/80 font-mPlusCode text-sm leading-relaxed"><%= @hermit.info %></p>
+            <% if @hermit.info2.present? %>
+              <p class="text-white/60 font-mPlusCode text-sm leading-relaxed mt-2"><%= @hermit.info2 %></p>
+            <% end %>
+          <% end %>
+        </div>
+
+        <%# Social Links %>
+        <div class="border-t border-[#7A5BAF]/50 pt-4">
+          <p class="text-white/50 font-mPlusCode text-xs mb-3">Follow</p>
+          <div class="flex flex-wrap gap-3">
+            <% if @hermit.youtube.present? %>
+              <%= link_to @hermit.youtube, target: "_blank", rel: "noopener", class: "text-[#A0D9F7] hover:text-white transition-colors", title: "YouTube" do %>
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+              <% end %>
+            <% end %>
+            <% if @hermit.twitter.present? %>
+              <%= link_to @hermit.twitter, target: "_blank", rel: "noopener", class: "text-[#A0D9F7] hover:text-white transition-colors", title: "Twitter" do %>
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              <% end %>
+            <% end %>
+            <% if @hermit.instagram.present? %>
+              <%= link_to @hermit.instagram, target: "_blank", rel: "noopener", class: "text-[#A0D9F7] hover:text-white transition-colors", title: "Instagram" do %>
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/></svg>
+              <% end %>
+            <% end %>
+            <% if @hermit.twitch.present? %>
+              <%= link_to @hermit.twitch, target: "_blank", rel: "noopener", class: "text-[#A0D9F7] hover:text-white transition-colors", title: "Twitch" do %>
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0H6zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714V11.143z"/></svg>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+
+        <%# Barcode / Stylized Element %>
+        <div class="border-t border-[#7A5BAF]/50 pt-6">
+          <div class="flex gap-1 h-16 items-end opacity-60">
+            <% [20, 40, 16, 52, 26, 48, 18, 36, 24, 44, 30, 38, 14, 50, 16, 24, 36, 24, 44, 30].each do |h| %>
+              <div class="w-1 bg-[#A0D9F7] rounded-sm" style="height: <%= h %>px;"></div>
+            <% end %>
+          </div>
+          <p class="text-[#A0D9F7]/40 font-mPlusCode text-lg mt-3 tracking-[0.3em]"><%= @hermit.slug&.upcase || @hermit.alias.upcase %></p>
+        </div>
+      </div>
+
+      <%# Center Column — Skin Render (5 cols) %>
+      <div class="lg:col-span-5 flex flex-col items-center justify-start pt-4">
+        <%# 3D Minecraft Character Rendering %>
+        <div class="relative w-full max-w-sm">
+          <%# Glow effect behind character %>
+          <div class="absolute inset-0 bg-[#A0D9F7]/20 blur-3xl rounded-full scale-75"></div>
+          
+          <%# Character container with slight float animation via CSS %>
+          <div class="relative animate-[float_6s_ease-in-out_infinite]">
+            <% if @hermit.alias_image_url.present? %>
+              <%= image_tag @hermit.alias_image_url, alt: "#{@hermit.alias} skin", class: "w-full h-auto object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]" %>
+            <% elsif @hermit.skin_image.attached? %>
+              <%= image_tag @hermit.skin_image, alt: "#{@hermit.alias} skin", class: "w-full h-auto object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]" %>
+            <% elsif @hermit.avatar_url.present? %>
+              <%= image_tag @hermit.avatar_url, alt: "#{@hermit.alias} avatar", class: "w-full h-auto object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]" %>
+            <% else %>
+              <%# Fallback 3D skin render using mc-heads or minotar %>
+              <% skin_username = @hermit.alias.downcase.gsub(/[^a-z0-9_]/, '') %>
+              <img src="https://mc-heads.net/body/<%= skin_username %>" alt="<%= @hermit.alias %> 3D skin" class="w-full h-auto object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+            <% end %>
+          </div>
+        </div>
+
+        <%# Crew badges below skin %>
+        <% if @crews.any? %>
+          <div class="flex flex-wrap gap-2 justify-center mt-6">
+            <% @crews.each do |crew| %>
+              <%= link_to hermit_crew_path(crew), class: "px-4 py-1.5 rounded-full bg-[#7A5BAF] hover:bg-[#8B6CBF] text-[#A0D9F7] font-mPlusCode text-xs transition-colors" do %>
+                <%= crew.name %>
+              <% end %>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+
+      <%# Right Column — Season Selector & Episodes (4 cols) %>
+      <div class="lg:col-span-4">
+        <%# Season Selector (Locked to Season 8) %>
+        <div class="mb-6">
+          <div class="flex items-center justify-between mb-3">
+            <h2 class="text-white font-teko text-2xl uppercase tracking-wide">Episodes</h2>
+            <div class="relative">
+              <select disabled class="appearance-none bg-[#7A5BAF] text-[#A0D9F7] font-mPlusCode text-sm px-4 py-2 pr-8 rounded-lg cursor-not-allowed opacity-80">
+                <option>Season 8</option>
+              </select>
+              <svg class="w-4 h-4 text-[#A0D9F7] absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </div>
+          </div>
+          <div class="h-px bg-[#7A5BAF]/50"></div>
+        </div>
+
+        <%# Episode List (Scrollable) %>
+        <% if @videos.any? %>
+          <div class="space-y-4 max-h-[70vh] overflow-y-auto pr-2 custom-scroll">
+            <% @videos.each do |video| %>
+              <%= link_to hermit_video_path(video), class: "flex gap-3 group p-2 rounded-lg hover:bg-[#7A5BAF]/30 transition-colors" do %>
+                <%# Thumbnail %>
+                <div class="flex-shrink-0 w-24 h-14 rounded-md overflow-hidden bg-[#4A2F6E]">
+                  <% if video.thumbnail_url.present? %>
+                    <%= image_tag video.thumbnail_url, alt: video.title, class: "w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" %>
+                  <% else %>
+                    <div class="w-full h-full flex items-center justify-center">
+                      <span class="text-[#A0D9F7]/50 text-xs font-mPlusCode">EP <%= video.episode %></span>
+                    </div>
+                  <% end %>
+                </div>
+                <%# Info %>
+                <div class="flex-1 min-w-0">
+                  <p class="text-white font-mPlusCode text-sm font-semibold truncate group-hover:text-[#A0D9F7] transition-colors"><%= video.title %></p>
+                  <p class="text-white/50 font-mPlusCode text-xs mt-0.5">Episode <%= video.episode %></p>
+                  <% if video.description.present? %>
+                    <p class="text-white/40 font-mPlusCode text-xs mt-1 line-clamp-2"><%= video.description %></p>
+                  <% end %>
+                </div>
+              <% end %>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="text-center py-12">
+            <p class="text-[#A0D9F7]/50 font-mPlusCode text-sm">No episodes available for Season 8.</p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</section>
+
+<%# Float animation keyframes %>
+<style>
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+</style>

@@ -18,7 +18,7 @@ class ThumbnailHealthCheckJob < ApplicationJob
 
       if video.youtube_video_id.present?
         begin
-          details = YoutubeService.video_details([video.youtube_video_id])
+          details = YoutubeService.video_details([ video.youtube_video_id ])
           info = details[video.youtube_video_id]
 
           if info.present? && info[:thumbnail_url].present?

@@ -1,0 +1,22 @@
+<%# Netflix-style video card partial
+  Required locals:
+    video: HermitVideo instance
+%>
+<%= link_to hermit_video_path(video), class: "block group" do %>
+  <div class="relative rounded-lg overflow-hidden shadow-lg transition-all duration-300 ease-out group-hover:scale-105 group-hover:shadow-[0_40px_58px_-10px_rgba(0,75,0,0.8),0_30px_22px_-10px_rgba(0,50,0,0.72)] border-2 border-transparent group-hover:border-white/80">
+    <% if video.thumbnail_url.present? %>
+      <%= image_tag video.thumbnail_url, alt: video.title, class: "w-full aspect-video object-cover" %>
+    <% else %>
+      <div class="w-full aspect-video bg-hermit-dk-green flex items-center justify-center">
+        <span class="font-kanit text-hermit-yellow text-sm font-bold"><%= video.hermit&.alias || "Episode #{video.episode}" %></span>
+      </div>
+    <% end %>
+    <%# Gradient overlay on hover %>
+    <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+    <%# Info overlay on hover %>
+    <div class="absolute bottom-0 left-0 right-0 p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 translate-y-2 group-hover:translate-y-0">
+      <p class="text-white font-kanit text-sm font-bold truncate"><%= video.title %></p>
+      <p class="text-white/80 font-mPlusCode text-xs mt-0.5"><%= video.hermit&.alias %> — Ep <%= video.episode %></p>
+    </div>
+  </div>
+<% end %>

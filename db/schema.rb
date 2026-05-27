@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_26_170114) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_27_005141) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -220,6 +220,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_26_170114) do
     t.string "face_url"
     t.text "info2"
     t.string "slug"
+    t.string "category"
+    t.text "info"
+    t.text "description"
     t.index ["slug"], name: "index_hermits_on_slug", unique: true
   end
 

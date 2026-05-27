@@ -1,0 +1,30 @@
+<!-- My Favorites Page -->
+<section class="w-full min-h-screen bg-hermit-lt-blue pt-20">
+  <div class="max-w-7xl mx-auto px-4 py-10">
+    <h1 class="font-teko text-5xl md:text-6xl font-bold text-hermit-burnt uppercase tracking-wide mb-2">Your Favorites</h1>
+    <p class="text-hermit-burnt/60 font-mPlusCode text-sm mb-8">
+      <%= @favorites.count %> saved episode<%= "s" unless @favorites.count == 1 %>
+    </p>
+
+    <% if @favorites.any? %>
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+        <% @favorites.each do |favorite| %>
+          <%= render "shared/video_card", video: favorite.hermit_video %>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="flex flex-col items-center justify-center py-20 text-center">
+        <div class="w-16 h-16 rounded-full bg-hermit-dk-green flex items-center justify-center mb-4">
+          <svg class="w-8 h-8 text-hermit-yellow" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        </div>
+        <h2 class="font-kanit text-xl font-bold text-hermit-burnt mb-2">No favorites yet</h2>
+        <p class="text-hermit-burnt/60 font-mPlusCode text-sm max-w-md">
+          Start browsing Season 8 episodes and click the heart icon on any video to add it here.
+        </p>
+        <%= link_to hermit_plus_home_path, class: "mt-6 inline-flex items-center gap-2 bg-hermit-dk-green hover:bg-hermit-lt-green text-hermit-yellow font-bold py-3 px-6 rounded-md uppercase tracking-wider font-mPlusCode transition-colors shadow-md" do %>
+          Browse Episodes
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</section>

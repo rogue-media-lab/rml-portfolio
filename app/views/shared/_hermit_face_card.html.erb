@@ -1,0 +1,23 @@
+<%# Hermit face card partial — React playerCard style
+  Required locals:
+    hermit: Hermit instance
+%>
+<%= link_to hermit_profile_path(hermit), class: "block group", data: { turbo_frame: "_top" } do %>
+  <div class="flex flex-col items-center bg-hermit-lt-blue/50 rounded-lg p-2 transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-lg">
+    <div class="w-full text-center relative overflow-hidden rounded-lg border-2 border-hermit-burnt/20 group-hover:border-hermit-teal transition-colors">
+      <% if hermit.avatar_url.present? %>
+        <%= image_tag hermit.avatar_url, alt: hermit.alias, class: "w-full aspect-square object-cover mask-gradient-fade" %>
+      <% else %>
+        <div class="w-full aspect-square bg-hermit-dk-green flex items-center justify-center">
+          <span class="font-kanit text-hermit-yellow text-3xl font-bold"><%= hermit.alias.first(2) %></span>
+        </div>
+      <% end %>
+      <%# Gradient mask overlay for fade effect like React %>
+      <div class="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-hermit-lt-blue/90 to-transparent pointer-events-none"></div>
+    </div>
+    <h3 class="font-kanit text-base font-bold text-hermit-burnt mt-2 group-hover:text-hermit-teal transition-colors"><%= hermit.alias %></h3>
+    <% if hermit.nick_name.present? %>
+      <p class="text-hermit-burnt/60 font-mPlusCode text-[10px]"><%= hermit.nick_name %></p>
+    <% end %>
+  </div>
+<% end %>

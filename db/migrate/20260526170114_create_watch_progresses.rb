@@ -10,6 +10,6 @@ class CreateWatchProgresses < ActiveRecord::Migration[8.0]
       t.timestamps
     end
 
-    add_index :watch_progresses, [:user_id, :hermit_video_id], unique: true
+    add_index :watch_progresses, [ :user_id, :hermit_video_id ], unique: true
   end
 end

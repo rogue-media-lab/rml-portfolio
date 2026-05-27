@@ -1,0 +1,26 @@
+<!-- Hermit Roster Index — React playerCard style -->
+<section class="w-full min-h-screen bg-hermit-lt-blue">
+  <div class="max-w-7xl mx-auto px-4 py-10">
+    <h1 class="font-teko text-5xl md:text-7xl font-bold text-hermit-burnt uppercase tracking-wide mb-2">Hermit Roster</h1>
+    <p class="text-hermit-burnt/70 font-mPlusCode mb-8">Season 8 — Meet the hermits</p>
+
+    <!-- Crew Filter Tabs -->
+    <div class="flex flex-wrap gap-2 mb-10">
+      <%= link_to hermit_roster_path, class: "px-5 py-2 rounded-full font-kanit text-sm font-bold transition-all duration-200 #{params[:crew].blank? ? 'bg-hermit-teal text-white shadow-md' : 'bg-white/70 text-hermit-burnt hover:bg-hermit-teal/10'}" do %>
+        All
+      <% end %>
+      <% @crews.each do |crew| %>
+        <%= link_to hermit_roster_path(crew: crew.slug), class: "px-5 py-2 rounded-full font-kanit text-sm font-bold transition-all duration-200 #{params[:crew] == crew.slug ? 'bg-hermit-teal text-white shadow-md' : 'bg-white/70 text-hermit-burnt hover:bg-hermit-teal/10'}" do %>
+          <%= crew.name %>
+        <% end %>
+      <% end %>
+    </div>
+
+    <!-- Hermit Grid -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-5">
+      <% @hermits.each do |hermit| %>
+        <%= render "shared/hermit_face_card", hermit: hermit %>
+      <% end %>
+    </div>
+  </div>
+</section>

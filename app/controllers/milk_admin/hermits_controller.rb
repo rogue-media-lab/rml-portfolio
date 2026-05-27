@@ -60,10 +60,10 @@ class MilkAdmin::HermitsController < ApplicationController
   private
 
   def set_hermit
-    @hermit = Hermit.find(params[:id])
+    @hermit = Hermit.find_by!(slug: params[:id])
   end
 
   def hermit_params
-    params.require(:hermit).permit(:first_name, :last_name, :alias, :alias_image_alt, :nick_name, :subs, :quote, :youtube, :twitch, :twitter, :instagram, :patreon, :skin_alt, :face_alt, :avatar_url, :banner_url, :alias_image_url)
+    params.require(:hermit).permit(:first_name, :last_name, :alias, :alias_image_alt, :nick_name, :subs, :quote, :from, :description, :youtube, :twitch, :twitter, :instagram, :patreon, :skin_alt, :face_alt, :avatar_url, :banner_url, :face_url, :alias_image_url, :category)
   end
 end

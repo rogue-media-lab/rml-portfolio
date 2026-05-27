@@ -1,9 +1,8 @@
-<%= form_with(model: [:milk_admin, hermit_video], local: true) do |form| %>
+<%= form_with(model: [:milk_admin, hermit_video], local: true, class: "space-y-6") do |form| %>
   <% if hermit_video.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(hermit_video.errors.count, "error") %> prohibited this hermit_video from being saved:</h2>
-
-      <ul>
+    <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+      <h2 class="text-red-800 font-semibold text-sm mb-2"><%= pluralize(hermit_video.errors.count, "error") %> prohibited this video from being saved:</h2>
+      <ul class="list-disc list-inside text-sm text-red-700 space-y-1">
         <% hermit_video.errors.full_messages.each do |message| %>
           <li><%= message %></li>
         <% end %>
@@ -11,37 +10,57 @@
     </div>
   <% end %>
 
-  <div class="field">
-    <%= form.label :hermit_id %>
-    <%= form.collection_select :hermit_id, @hermits, :id, :alias, prompt: "Select a Hermit" %>
+  <%# Hermit & Identity Section %>
+  <div class="bg-white border border-gray-200 rounded-lg p-6">
+    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Video Identity</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <%= form.label :hermit_id, "Hermit", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.collection_select :hermit_id, @hermits, :id, :alias, { prompt: "Select a Hermit" }, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white" %>
+      </div>
+
+      <div>
+        <%= form.label :title, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :title, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" %>
+      </div>
+
+      <div>
+        <%= form.label :youtube_video_id, "YouTube Video ID", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :youtube_video_id, placeholder: "e.g. dQw4w9WgXcQ", class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" %>
+        <p class="text-gray-400 text-xs mt-1">The 11-character ID from the YouTube URL</p>
+      </div>
+
+      <div>
+        <%= form.label :thumbnail_url, "Thumbnail URL", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :thumbnail_url, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" %>
+        <% if hermit_video.thumbnail_url.present? %>
+          <div class="mt-2">
+            <img src="<%= hermit_video.thumbnail_url %>" alt="Thumbnail preview" class="h-16 w-auto rounded-lg object-cover border border-gray-200" />
+          </div>
+        <% end %>
+      </div>
+    </div>
   </div>
 
-  <div class="field">
-    <%= form.label :youtube_video_id %>
-    <%= form.text_field :youtube_video_id %>
+  <%# Season & Episode Section %>
+  <div class="bg-white border border-gray-200 rounded-lg p-6">
+    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Season & Episode</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <%= form.label :season, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.number_field :season, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" %>
+      </div>
+
+      <div>
+        <%= form.label :episode, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.number_field :episode, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" %>
+      </div>
+    </div>
   </div>
 
-  <div class="field">
-    <%= form.label :title %>
-    <%= form.text_field :title %>
-  </div>
-
-  <div class="field">
-    <%= form.label :thumbnail_url %>
-    <%= form.text_field :thumbnail_url %>
-  </div>
-
-  <div class="field">
-    <%= form.label :season %>
-    <%= form.number_field :season %>
-  </div>
-
-  <div class="field">
-    <%= form.label :episode %>
-    <%= form.number_field :episode %>
-  </div>
-
-  <div class="actions">
-    <%= form.submit %>
+  <%# Actions %>
+  <div class="flex items-center gap-3 pt-2">
+    <%= form.submit "Save Video", class: "bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2.5 rounded-lg transition-colors cursor-pointer" %>
+    <%= link_to "Cancel", milk_admin_hermit_videos_dashboard_path, data: { turbo_frame: "dashboard_content" }, class: "text-gray-500 hover:text-gray-700 text-sm font-medium px-4 py-2.5 transition-colors" %>
   </div>
 <% end %>

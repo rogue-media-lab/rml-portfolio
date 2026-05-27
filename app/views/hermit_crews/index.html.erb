@@ -1,0 +1,40 @@
+<!-- Crews Index — Netflix-style grid -->
+<section class="w-full min-h-screen bg-hermit-lt-blue pt-20">
+  <div class="max-w-7xl mx-auto px-4 py-10">
+    <h1 class="font-teko text-5xl md:text-6xl font-bold text-hermit-burnt uppercase tracking-wide mb-2">Season 8 Crews</h1>
+    <p class="text-hermit-burnt/60 font-mPlusCode text-sm mb-10">The groups that defined this season</p>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <% @hermit_crews.each do |crew| %>
+        <div class="group relative bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-2 border-transparent hover:border-hermit-dk-green">
+          <%= link_to hermit_crew_path(crew) do %>
+            <div class="aspect-video relative overflow-hidden">
+              <% if crew.image_url.present? %>
+                <%= image_tag crew.image_url, alt: crew.name, class: "w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" %>
+              <% else %>
+                <div class="w-full h-full bg-hermit-dk-green flex items-center justify-center">
+                  <span class="font-kanit text-hermit-yellow text-xl font-bold"><%= crew.name %></span>
+                </div>
+              <% end %>
+              <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+            </div>
+            <div class="p-4">
+              <h3 class="font-teko text-2xl font-bold text-hermit-burnt"><%= crew.name %></h3>
+              <p class="text-hermit-burnt/60 font-mPlusCode text-sm mt-1 line-clamp-2"><%= crew.description %></p>
+              <div class="flex items-center gap-2 mt-3">
+                <div class="flex -space-x-2">
+                  <% crew.hermits.limit(4).each do |hermit| %>
+                    <% if hermit.face_url.present? %>
+                      <%= image_tag hermit.face_url, alt: hermit.alias, class: "w-6 h-6 rounded-full border-2 border-white object-cover" %>
+                    <% end %>
+                  <% end %>
+                </div>
+                <span class="text-hermit-burnt/50 font-mPlusCode text-xs"><%= crew.hermits.count %> members</span>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</section>

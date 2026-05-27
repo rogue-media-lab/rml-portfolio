@@ -1,0 +1,36 @@
+<!-- Crew Show Page -->
+<section class="w-full min-h-screen bg-hermit-lt-blue pt-20">
+  <div class="max-w-7xl mx-auto px-4 py-10">
+    <!-- Crew Header -->
+    <div class="flex flex-col md:flex-row items-start md:items-center gap-6 mb-10">
+      <% if @hermit_crew.image_url.present? %>
+        <div class="w-32 h-32 rounded-xl overflow-hidden shadow-lg flex-shrink-0">
+          <%= image_tag @hermit_crew.image_url, alt: @hermit_crew.name, class: "w-full h-full object-cover" %>
+        </div>
+      <% end %>
+      <div>
+        <h1 class="font-teko text-5xl md:text-6xl font-bold text-hermit-burnt uppercase tracking-wide"><%= @hermit_crew.name %></h1>
+        <p class="text-hermit-burnt/60 font-mPlusCode text-sm mt-1">Season <%= @hermit_crew.season %></p>
+        <p class="text-hermit-burnt/80 font-mPlusCode text-base mt-3 max-w-2xl"><%= @hermit_crew.description %></p>
+      </div>
+    </div>
+
+    <!-- Members -->
+    <div class="mb-12">
+      <h2 class="font-teko text-3xl font-bold text-hermit-burnt uppercase tracking-wide mb-6">Members</h2>
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+        <%= render partial: "shared/hermit_face_card", collection: @hermit_crew.hermits, as: :hermit %>
+      </div>
+    </div>
+
+    <!-- Episodes -->
+    <div>
+      <h2 class="font-teko text-3xl font-bold text-hermit-burnt uppercase tracking-wide mb-6">Episodes</h2>
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+        <% @videos.each do |video| %>
+          <%= render "shared/video_card", video: video %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</section>

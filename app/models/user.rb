@@ -11,4 +11,12 @@ class User < ApplicationRecord
   has_many :favorites, dependent: :destroy
   has_many :favorite_videos, through: :favorites, source: :hermit_video
   has_many :watch_progresses, dependent: :destroy
+
+  after_create :create_hermit_profile
+
+  private
+
+  def create_hermit_profile
+    create_user_hermit_profile!(waitlist_status: "pending")
+  end
 end
