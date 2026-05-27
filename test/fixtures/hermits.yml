@@ -1,37 +1,37 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:
-  first_name: MyString
-  last_name: MyString
-  alias: MyString
-  alias_image_alt: MyString
-  nick_name: MyString
+  first_name: John
+  last_name: Doe
+  alias: BDubs
+  alias_image_alt: bdoubleo100 skin
+  nick_name: Bdubs
   subs: 1.5
-  quote: MyString
-  youtube: MyString
-  twitch: MyString
-  twitter: MyString
-  instagram: MyString
-  patreon: MyString
-  skin_alt: MyString
-  face_alt: MyString
-  avatar_url: MyString
-  banner_url: MyString
+  quote: gotta sheep
+  youtube: "@bdoubleo"
+  twitch: ""
+  twitter: ""
+  instagram: ""
+  patreon: ""
+  skin_alt: ""
+  face_alt: ""
+  avatar_url: https://example.com/avatar1.png
+  banner_url: https://example.com/banner1.png
 
 two:
-  first_name: MyString
-  last_name: MyString
-  alias: MyString
-  alias_image_alt: MyString
-  nick_name: MyString
-  subs: 1.5
-  quote: MyString
-  youtube: MyString
-  twitch: MyString
-  twitter: MyString
-  instagram: MyString
-  patreon: MyString
-  skin_alt: MyString
-  face_alt: MyString
-  avatar_url: MyString
-  banner_url: MyString
+  first_name: Jane
+  last_name: Smith
+  alias: GeminiTay
+  alias_image_alt: geminitay skin
+  nick_name: Gemini
+  subs: 2.5
+  quote: building time
+  youtube: "@GeminiTay"
+  twitch: ""
+  twitter: ""
+  instagram: ""
+  patreon: ""
+  skin_alt: ""
+  face_alt: ""
+  avatar_url: https://example.com/avatar2.png
+  banner_url: https://example.com/banner2.png
