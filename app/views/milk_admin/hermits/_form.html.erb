@@ -1,9 +1,8 @@
-<%= form_with(model: [:milk_admin, hermit], local: true) do |form| %>
+<%= form_with(model: [:milk_admin, hermit], local: true, class: "space-y-6") do |form| %>
   <% if hermit.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(hermit.errors.count, "error") %> prohibited this hermit from being saved:</h2>
-
-      <ul>
+    <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+      <h2 class="text-red-800 font-semibold text-sm mb-2"><%= pluralize(hermit.errors.count, "error") %> prohibited this hermit from being saved:</h2>
+      <ul class="list-disc list-inside text-sm text-red-700 space-y-1">
         <% hermit.errors.full_messages.each do |message| %>
           <li><%= message %></li>
         <% end %>
@@ -11,47 +10,158 @@
     </div>
   <% end %>
 
-  <div class="field">
-    <%= form.label :alias %>
-    <%= form.text_field :alias %>
+  <%# Identity Section %>
+  <div class="bg-white border border-gray-200 rounded-lg p-6">
+    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Identity</h3>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div>
+        <%= form.label :alias, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :alias, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" %>
+      </div>
+
+      <div>
+        <%= form.label :first_name, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :first_name, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" %>
+      </div>
+
+      <div>
+        <%= form.label :last_name, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :last_name, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" %>
+      </div>
+
+      <div>
+        <%= form.label :nick_name, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :nick_name, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" %>
+      </div>
+
+      <div>
+        <%= form.label :quote, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :quote, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" %>
+      </div>
+
+      <div>
+        <%= form.label :from, "Year Started", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.number_field :from, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" %>
+      </div>
+
+      <div>
+        <%= form.label :subs, "Subscribers", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :subs, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" %>
+      </div>
+
+      <div>
+        <%= form.label :category, "Category", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.select :category, options_for_select(["Engineering", "Architect", "Both", "Builder", "Redstone", "Content"], hermit.category), { include_blank: "Select a category" }, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" %>
+      </div>
+    </div>
+
+    <div class="mt-4">
+      <%= form.label :description, "Description", class: "block text-sm font-medium text-gray-700 mb-1" %>
+      <%= form.text_area :description, rows: 4, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-y" %>
+    </div>
   </div>
 
-  <div class="field">
-    <%= form.label :first_name %>
-    <%= form.text_field :first_name %>
+  <%# Social Links Section %>
+  <div class="bg-white border border-gray-200 rounded-lg p-6">
+    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Social Links</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <%= form.label :youtube, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :youtube, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" %>
+      </div>
+
+      <div>
+        <%= form.label :twitch, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :twitch, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" %>
+      </div>
+
+      <div>
+        <%= form.label :twitter, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :twitter, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" %>
+      </div>
+
+      <div>
+        <%= form.label :instagram, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :instagram, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" %>
+      </div>
+
+      <div>
+        <%= form.label :patreon, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :patreon, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" %>
+      </div>
+    </div>
   </div>
 
-  <div class="field">
-    <%= form.label :last_name %>
-    <%= form.text_field :last_name %>
+  <%# Images Section %>
+  <div class="bg-white border border-gray-200 rounded-lg p-6">
+    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Images</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <%= form.label :avatar_url, "Avatar URL", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :avatar_url, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" %>
+        <% if hermit.avatar_url.present? %>
+          <div class="mt-2">
+            <img src="<%= hermit.avatar_url %>" alt="<%= hermit.alias %> avatar" class="h-16 w-16 rounded-lg object-cover border border-gray-200" />
+          </div>
+        <% end %>
+      </div>
+
+      <div>
+        <%= form.label :banner_url, "Banner URL", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :banner_url, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" %>
+        <% if hermit.banner_url.present? %>
+          <div class="mt-2">
+            <img src="<%= hermit.banner_url %>" alt="<%= hermit.alias %> banner" class="h-16 w-auto rounded-lg object-cover border border-gray-200" />
+          </div>
+        <% end %>
+      </div>
+
+      <div>
+        <%= form.label :face_url, "Face URL", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :face_url, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" %>
+        <% if hermit.face_url.present? %>
+          <div class="mt-2">
+            <img src="<%= hermit.face_url %>" alt="<%= hermit.alias %> face" class="h-16 w-16 rounded-lg object-cover border border-gray-200" />
+          </div>
+        <% end %>
+      </div>
+
+      <div>
+        <%= form.label :alias_image_url, "Skin URL", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :alias_image_url, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" %>
+        <% if hermit.alias_image_url.present? %>
+          <div class="mt-2">
+            <img src="<%= hermit.alias_image_url %>" alt="<%= hermit.alias %> skin" class="h-16 w-auto rounded-lg object-cover border border-gray-200" />
+          </div>
+        <% end %>
+      </div>
+    </div>
   </div>
 
-  <div class="field">
-    <%= form.label :youtube %>
-    <%= form.text_field :youtube %>
+  <%# Alt Text Section %>
+  <div class="bg-white border border-gray-200 rounded-lg p-6">
+    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Alt Text</h3>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div>
+        <%= form.label :alias_image_alt, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :alias_image_alt, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" %>
+      </div>
+
+      <div>
+        <%= form.label :skin_alt, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :skin_alt, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" %>
+      </div>
+
+      <div>
+        <%= form.label :face_alt, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :face_alt, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" %>
+      </div>
+    </div>
   </div>
 
-  <div class="field">
-    <%= form.label :twitch %>
-    <%= form.text_field :twitch %>
-  </div>
-
-  <div class="field">
-    <%= form.label :twitter %>
-    <%= form.text_field :twitter %>
-  </div>
-
-  <div class="field">
-    <%= form.label :instagram %>
-    <%= form.text_field :instagram %>
-  </div>
-
-  <div class="field">
-    <%= form.label :quote %>
-    <%= form.text_area :quote %>
-  </div>
-
-  <div class="actions">
-    <%= form.submit %>
+  <%# Actions %>
+  <div class="flex items-center gap-3 pt-2">
+    <%= form.submit "Save Hermit", class: "bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2.5 rounded-lg transition-colors cursor-pointer" %>
+    <%= link_to "Cancel", milk_admin_hermits_dashboard_path, data: { turbo_frame: "dashboard_content" }, class: "text-gray-500 hover:text-gray-700 text-sm font-medium px-4 py-2.5 transition-colors" %>
   </div>
 <% end %>

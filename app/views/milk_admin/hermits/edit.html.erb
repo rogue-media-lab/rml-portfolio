@@ -1,5 +1,12 @@
 <%= turbo_frame_tag "dashboard_content" do %>
-  <h1>Editing Hermit</h1>
+  <div class="max-w-4xl mx-auto">
+    <div class="flex items-center gap-3 mb-6">
+      <h1 class="text-2xl font-bold text-gray-800">Editing <%= @hermit.alias %></h1>
+      <% if @hermit.face_url.present? %>
+        <img src="<%= @hermit.face_url %>" alt="<%= @hermit.alias %> face" class="h-10 w-10 rounded-full object-cover border-2 border-gray-200" />
+      <% end %>
+    </div>
 
-  <%= render "form", hermit: @hermit %>
+    <%= render "form", hermit: @hermit %>
+  </div>
 <% end %>

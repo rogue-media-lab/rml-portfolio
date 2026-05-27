@@ -1,5 +1,6 @@
 <%= turbo_frame_tag "dashboard_content" do %>
-  <h1>Editing Hermit Video</h1>
-
-  <%= render "form", hermit_video: @hermit_video %>
+  <div class="max-w-4xl mx-auto">
+    <h1 class="text-2xl font-bold text-gray-900 mb-6">Edit Hermit Video</h1>
+    <%= render "form", hermit_video: @hermit_video %>
+  </div>
 <% end %>

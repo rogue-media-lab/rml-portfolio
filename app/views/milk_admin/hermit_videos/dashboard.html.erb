@@ -2,31 +2,81 @@
   <div class="flex justify-between items-center mb-4">
     <h1 class="text-3xl">Hermit Videos</h1>
     <div class="flex gap-2">
-      <%= link_to "Fetch from YouTube", fetch_milk_admin_hermit_videos_path, data: { turbo_frame: "dashboard_content" }, class: "btn btn-secondary" %>
-      <%= link_to "New Hermit Video", new_milk_admin_hermit_video_path, data: { turbo_frame: "dashboard_content" }, class: "btn btn-primary" %>
+      <%= link_to "Fetch from YouTube", milk_admin_fetch_hermit_videos_path, data: { turbo_frame: "dashboard_content" }, class: "bg-gray-600 hover:bg-gray-700 text-white font-semibold px-4 py-2 rounded-lg text-sm transition-colors" %>
+      <%= link_to "New Hermit Video", new_milk_admin_hermit_video_path, data: { turbo_frame: "dashboard_content" }, class: "bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg text-sm transition-colors" %>
     </div>
   </div>
+
+  <%# Filters %>
+  <div class="bg-white rounded-lg border border-gray-200 p-4 mb-4">
+    <%= form_with url: milk_admin_hermit_videos_dashboard_path, method: :get, data: { turbo_frame: "dashboard_content" }, class: "flex flex-wrap items-end gap-4" do |f| %>
+      <div>
+        <%= f.label :hermit_id, "Hermit", class: "block text-xs font-semibold text-gray-500 uppercase mb-1" %>
+        <%= f.select :hermit_id,
+              options_for_select([["All Hermits", ""]] + @filter_hermits.map { |h| [h.alias, h.id] }, params[:hermit_id]),
+              {}, class: "border border-gray-300 rounded px-3 py-2 text-sm min-w-[160px]" %>
+      </div>
+
+      <div class="flex items-center gap-2 pb-2">
+        <%= f.check_box :health, { checked: params[:health] == "bad" }, "bad", nil %>
+        <%= f.label :health, "Bad health only", class: "text-sm text-gray-700 cursor-pointer select-none" %>
+      </div>
+
+      <div class="flex gap-2">
+        <%= f.submit "Apply", class: "bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded transition-colors" %>
+        <%= link_to "Clear", milk_admin_hermit_videos_dashboard_path, data: { turbo_frame: "dashboard_content" }, class: "text-sm text-gray-500 hover:text-gray-700 px-3 py-2" %>
+      </div>
+    <% end %>
+  </div>
+
+  <%# Active filter badge %>
+  <% if @selected_hermit %>
+    <div class="flex items-center gap-3 mb-3">
+      <span class="text-sm text-gray-600">Showing <%= @hermit_videos.count %> video<%= "s" unless @hermit_videos.count == 1 %> for</span>
+      <span class="inline-flex items-center px-3 py-1 text-sm font-medium bg-hermit-lt-blue text-hermit-dk-green rounded-full">
+        <%= @selected_hermit.alias %>
+      </span>
+    </div>
+  <% end %>
 
   <div class="overflow-x-auto">
     <table class="min-w-full bg-white">
       <thead class="bg-gray-800 text-white">
         <tr>
-          <th class="w-1/4 py-3 px-4 uppercase font-semibold text-sm">Thumbnail</th>
+          <th class="w-1/6 py-3 px-4 uppercase font-semibold text-sm">Thumbnail</th>
           <th class="w-1/4 py-3 px-4 uppercase font-semibold text-sm">Title</th>
-          <th class="w-1/8 py-3 px-4 uppercase font-semibold text-sm">Season</th>
-          <th class="w-1/8 py-3 px-4 uppercase font-semibold text-sm">Episode</th>
-          <th class="w-1/4 py-3 px-4 uppercase font-semibold text-sm">Hermit</th>
+          <th class="w-1/12 py-3 px-4 uppercase font-semibold text-sm">Season</th>
+          <th class="w-1/12 py-3 px-4 uppercase font-semibold text-sm">Episode</th>
+          <th class="w-1/6 py-3 px-4 uppercase font-semibold text-sm">Hermit</th>
+          <th class="w-1/12 py-3 px-4 uppercase font-semibold text-sm">Health</th>
           <th class="text-left py-3 px-4 uppercase font-semibold text-sm">Actions</th>
         </tr>
       </thead>
       <tbody class="text-gray-700">
         <% @hermit_videos.each do |hermit_video| %>
-          <tr>
-            <td class="w-1/4 py-3 px-4"><img src="<%= hermit_video.thumbnail_url %>" alt="<%= hermit_video.title %>" class="h-16 w-auto" /></td>
+          <tr class="<%= 'bg-red-50' if hermit_video.thumbnail_url.blank? || hermit_video.youtube_video_id.blank? %>">
+            <td class="w-1/6 py-3 px-4">
+              <% if hermit_video.thumbnail_url.present? %>
+                <img src="<%= hermit_video.thumbnail_url %>" alt="<%= hermit_video.title %>" class="h-16 w-auto rounded" loading="lazy" />
+              <% else %>
+                <div class="h-16 w-24 bg-gray-200 rounded flex items-center justify-center text-xs text-gray-500">No thumb</div>
+              <% end %>
+            </td>
             <td class="w-1/4 py-3 px-4"><%= hermit_video.title %></td>
-            <td class="w-1/8 py-3 px-4"><%= hermit_video.season %></td>
-            <td class="w-1/8 py-3 px-4"><%= hermit_video.episode %></td>
-            <td class="w-1/4 py-3 px-4"><%= hermit_video.hermit.alias %></td>
+            <td class="w-1/12 py-3 px-4"><%= hermit_video.season %></td>
+            <td class="w-1/12 py-3 px-4"><%= hermit_video.episode %></td>
+            <td class="w-1/6 py-3 px-4"><%= hermit_video.hermit&.alias || "—" %></td>
+            <td class="w-1/12 py-3 px-4">
+              <% if hermit_video.thumbnail_url.present? && hermit_video.youtube_video_id.present? %>
+                <span class="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-green-100 text-green-700 font-medium">
+                  <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> OK
+                </span>
+              <% else %>
+                <span class="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-red-100 text-red-700 font-medium">
+                  <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Missing
+                </span>
+              <% end %>
+            </td>
             <td class="text-left py-3 px-4">
               <%= link_to "Edit", edit_milk_admin_hermit_video_path(hermit_video), data: { turbo_frame: "dashboard_content" }, class: "text-blue-500 hover:text-blue-700" %>
               <%= link_to "Delete", milk_admin_hermit_video_path(hermit_video), data: { "turbo-method": :delete, "turbo-confirm": "Are you sure?" }, class: "text-red-500 hover:text-red-700 ml-4" %>

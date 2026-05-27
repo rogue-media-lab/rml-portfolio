@@ -1,11 +1,27 @@
 <% if notice %>
-  <div class="flash flash-notice mt-14 text-center w-full" data-controller="flash" data-action="animationend->flash#remove">
-    <%= notice %>
+  <div data-controller="flash"
+       class="fixed top-4 right-4 z-[100] max-w-sm w-full bg-green-50 border border-green-200 text-green-800 rounded-lg px-4 py-3 shadow-lg cursor-pointer transition-all duration-300"
+       style="transform:translateX(120%);opacity:0"
+       data-action="click->flash#dismiss">
+    <div class="flex items-start gap-3">
+      <svg class="w-5 h-5 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+      </svg>
+      <p class="text-sm font-medium"><%= notice %></p>
+    </div>
   </div>
 <% end %>
 
 <% if alert %>
-  <div class="flash flash-alert mt-14 text-center w-full" data-controller="flash" data-action="animationend->flash#remove">
-    <%= alert %>
+  <div data-controller="flash"
+       class="fixed top-4 right-4 z-[100] max-w-sm w-full bg-red-50 border border-red-200 text-red-800 rounded-lg px-4 py-3 shadow-lg cursor-pointer transition-all duration-300"
+       style="transform:translateX(120%);opacity:0"
+       data-action="click->flash#dismiss">
+    <div class="flex items-start gap-3">
+      <svg class="w-5 h-5 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+      </svg>
+      <p class="text-sm font-medium"><%= alert %></p>
+    </div>
   </div>
 <% end %>

@@ -9,7 +9,24 @@ class MilkAdmin::HermitVideosController < ApplicationController
   end
 
   def dashboard
-    @hermit_videos = HermitVideo.all.includes(:hermit)
+    @hermit_videos = HermitVideo.includes(:hermit)
+
+    # Filter by hermit
+    if params[:hermit_id].present?
+      @hermit_videos = @hermit_videos.where(hermit_id: params[:hermit_id])
+      @selected_hermit = Hermit.find_by(id: params[:hermit_id])
+    end
+
+    # Filter by health
+    if params[:health] == "bad"
+      @hermit_videos = @hermit_videos.where("thumbnail_url IS NULL OR thumbnail_url = '' OR youtube_video_id IS NULL OR youtube_video_id = ''")
+    end
+
+    @hermit_videos = @hermit_videos.order(season: :desc, episode: :desc)
+
+    # All hermits for filter dropdown
+    @filter_hermits = Hermit.order(:alias)
+
     render layout: false if turbo_frame_request?
   end
 
@@ -69,7 +86,7 @@ class MilkAdmin::HermitVideosController < ApplicationController
     @max_results = (params[:max_results] || 10).to_i
 
     if @channel_input.blank?
-      redirect_to fetch_milk_admin_hermit_videos_path, alert: "Please provide a YouTube channel URL or ID."
+      redirect_to milk_admin_fetch_hermit_videos_path, alert: "Please provide a YouTube channel URL or ID."
       return
     end
 
@@ -77,14 +94,14 @@ class MilkAdmin::HermitVideosController < ApplicationController
       channel_id = YoutubeService.resolve_channel_id(@channel_input)
 
       if channel_id.blank?
-        redirect_to fetch_milk_admin_hermit_videos_path, alert: "Could not resolve a valid YouTube channel ID from that input."
+        redirect_to milk_admin_fetch_hermit_videos_path, alert: "Could not resolve a valid YouTube channel ID from that input."
         return
       end
 
       @suggestions = YoutubeService.search_channel_videos(channel_id, max_results: @max_results)
 
       if @suggestions.empty?
-        redirect_to fetch_milk_admin_hermit_videos_path, alert: "No videos found for that channel. Check the URL and try again."
+        redirect_to milk_admin_fetch_hermit_videos_path, alert: "No videos found for that channel. Check the URL and try again."
         return
       end
 
@@ -105,11 +122,11 @@ class MilkAdmin::HermitVideosController < ApplicationController
       @hermits = Hermit.all.order(:alias)
       render layout: false if turbo_frame_request?
     rescue YoutubeService::QuotaExceeded
-      redirect_to fetch_milk_admin_hermit_videos_path, alert: "YouTube API quota exceeded. Try again tomorrow or check your API key."
+      redirect_to milk_admin_fetch_hermit_videos_path, alert: "YouTube API quota exceeded. Try again tomorrow or check your API key."
     rescue YoutubeService::InvalidKey
-      redirect_to fetch_milk_admin_hermit_videos_path, alert: "Invalid YouTube API key. Check your YOUTUBE_API_KEY environment variable."
+      redirect_to milk_admin_fetch_hermit_videos_path, alert: "Invalid YouTube API key. Check your YOUTUBE_API_KEY environment variable."
     rescue YoutubeService::Error => e
-      redirect_to fetch_milk_admin_hermit_videos_path, alert: "YouTube API error: #{e.message}"
+      redirect_to milk_admin_fetch_hermit_videos_path, alert: "YouTube API error: #{e.message}"
     end
   end
 

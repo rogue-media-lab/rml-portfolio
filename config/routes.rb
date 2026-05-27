@@ -3,7 +3,7 @@ Rails.application.routes.draw do
 
   # User model planned for clients feature
   devise_for :users
-  devise_for :milk_admins, skip: [ :registrations ]
+  devise_for :milk_admins, skip: [ :registrations ], controllers: { sessions: "milk_admin/sessions" }
 
   # root for milk admin
   authenticated :milk_admin do
@@ -71,6 +71,9 @@ Rails.application.routes.draw do
     get "hermits/dashboard", to: "hermits#dashboard", as: :hermits_dashboard
     resources :hermits, only: [ :index, :new, :create, :edit, :update, :destroy ]
 
+    get "hermit_crews/dashboard", to: "hermit_crews#dashboard", as: :hermit_crews_dashboard
+    resources :hermit_crews, only: [ :index, :new, :create, :edit, :update, :destroy ]
+
     resources :pills, only: [ :index, :new, :create, :edit, :update, :destroy ]
   end
 
@@ -102,6 +105,33 @@ Rails.application.routes.draw do
 
   # root for hermits
   get "hermit-plus", to: "hermit_plus#landing", as: :hermits
+
+  # Hermit Plus App — Season 8
+  scope "/hermit-plus" do
+    get "/season/8", to: "hermit_seasons#home", as: :hermit_plus_home
+
+    # Hermit roster and profiles
+    get "/hermits", to: "hermit_roster#index", as: :hermit_roster
+    get "/hermits/:slug", to: "hermit_roster#show", as: :hermit_profile
+
+    # Video browsing
+    get "/videos/:id", to: "hermit_videos#show", as: :hermit_video
+    get "/watch/:id", to: "hermit_videos#watch", as: :hermit_watch
+
+    # Crews / specials
+    get "/crews", to: "hermit_crews#index", as: :hermit_crews
+    get "/crews/:slug", to: "hermit_crews#show", as: :hermit_crew
+
+    # User features (require authentication)
+    authenticate :user do
+      get "/favorites", to: "hermit_favorites#index", as: :hermit_favorites
+      post "/favorites/:video_id", to: "hermit_favorites#create"
+      delete "/favorites/:video_id", to: "hermit_favorites#destroy"
+      patch "/progress/:video_id", to: "hermit_progress#update"
+      resource :profile, controller: "user_hermit_profiles", only: [ :show, :edit, :update ], as: :user_hermit_profile
+    end
+  end
+
   # Public Salt and Tar routes
   resources :salt_and_tar, only: [ :index ], path: "salt-and-tar", controller: "salt_and_tar" do
     collection do

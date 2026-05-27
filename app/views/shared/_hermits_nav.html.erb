@@ -15,7 +15,10 @@
       <!-- //? Right section Page Links -->
       <div class="flex grow justify-end items-center me-4">
         <ul class="flex space-x-4 font-kanit text-hermit-yellow">
-          <li class="hidden md:flex"><%= link_to "Season 8", root_path %></li>
+          <li class="hidden md:flex"><%= link_to "Home", hermit_plus_home_path %></li>
+          <li class="hidden md:flex"><%= link_to "Hermits", hermit_roster_path %></li>
+          <li class="hidden md:flex"><%= link_to "Crews", hermit_crews_path %></li>
+          <li class="hidden md:flex"><%= link_to "Season 8", hermit_plus_home_path %></li>
         </ul>
         <button class="md:hidden pb-1 w-6" role="button" aria-label="menu" data-action="click->navbar#toggleMenu">&#9776</button>
       </div>
@@ -24,7 +27,16 @@
   <!-- //? Dropdown menu - mobile -->
   <nav class="hidden bg-zinc-800 text-gray-100 absolute w-2/3 right-0 overflow-y-auto rounded-b-sm" data-navbar-target="mobileMenu">
     <ul class="flex flex-col py-2 px-3">
-      <%= link_to root_path do %>
+      <%= link_to hermit_plus_home_path do %>
+        <li class="flex border p-2 my-1 rounded-xs">Home</li>
+      <% end %>
+      <%= link_to hermit_roster_path do %>
+        <li class="flex border p-2 my-1 rounded-xs">Hermits</li>
+      <% end %>
+      <%= link_to hermit_crews_path do %>
+        <li class="flex border p-2 my-1 rounded-xs">Crews</li>
+      <% end %>
+      <%= link_to hermit_plus_home_path do %>
         <li class="flex border p-2 my-1 rounded-xs">Season 8</li>
       <% end %>
     </ul>

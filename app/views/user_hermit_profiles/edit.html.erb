@@ -1,0 +1,33 @@
+<!-- User Hermit Profile — Edit -->
+<section class="w-full min-h-screen bg-hermit-lt-blue pt-20">
+  <div class="max-w-2xl mx-auto px-4 py-10">
+    <h1 class="font-teko text-4xl md:text-5xl font-bold text-hermit-burnt uppercase tracking-wide mb-8">Edit Profile</h1>
+
+    <div class="bg-white/50 backdrop-blur-sm rounded-xl p-6 md:p-8 shadow-lg border border-hermit-burnt/10">
+      <%= form_with model: @profile, url: user_hermit_profile_path, method: :patch, class: "space-y-6" do |f| %>
+        <div>
+          <%= f.label :favorite_hermit_id, "Favorite Hermit", class: "block font-kanit text-hermit-burnt font-bold text-sm uppercase tracking-wider mb-2" %>
+          <%= f.collection_select :favorite_hermit_id,
+              @favorite_hermits,
+              :id,
+              :alias,
+              { include_blank: "Select a hermit" },
+              class: "w-full bg-white border border-hermit-burnt/20 rounded-md px-4 py-2.5 font-mPlusCode text-hermit-burnt focus:outline-none focus:ring-2 focus:ring-hermit-dk-green" %>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <%= f.check_box :notifications_enabled,
+              class: "w-5 h-5 rounded border-hermit-burnt/30 text-hermit-dk-green focus:ring-hermit-dk-green" %>
+          <%= f.label :notifications_enabled, "Enable email notifications for new episodes", class: "font-mPlusCode text-hermit-burnt/80 text-sm" %>
+        </div>
+
+        <div class="flex flex-wrap gap-4 pt-4">
+          <%= f.submit "Save Changes",
+              class: "bg-hermit-dk-green hover:bg-hermit-lt-green text-hermit-yellow font-bold py-3 px-6 rounded-md uppercase tracking-wider font-mPlusCode transition-colors shadow-md cursor-pointer" %>
+          <%= link_to "Cancel", user_hermit_profile_path,
+              class: "inline-flex items-center bg-white/70 hover:bg-white text-hermit-burnt font-bold py-3 px-6 rounded-md uppercase tracking-wider font-mPlusCode transition-colors border border-hermit-burnt/20" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</section>

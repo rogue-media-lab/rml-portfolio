@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= content_for?(:title) ? yield(:title) : "Hermit Plus — Netflix-Style Hermitcraft Season 8" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="description" content="<%= content_for?(:meta_description) ? yield(:meta_description) : "Watch Hermitcraft Season 8 like Netflix. Browse hermits, crews, and episodes. Free accounts with favorites and progress tracking." %>">
+    <meta name="keywords" content="Hermitcraft, Season 8, Minecraft, Hermit Plus, YouTube, Netflix-style, watch, episodes">
+    <meta property="og:title" content="<%= content_for?(:title) ? yield(:title) : "Hermit Plus" %>">
+    <meta property="og:description" content="<%= content_for?(:meta_description) ? yield(:meta_description) : "Watch Hermitcraft Season 8 like Netflix." %>">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://milk-blog.s3.us-east-2.amazonaws.com/hermits/HermitPlusBend.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= display_meta_tags(default_meta_tags) %>
+
+    <%= yield :head %>
+
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="apple-touch-icon" href="/icon-192x192.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=IM+Fell+English+SC&family=Inconsolata:wght@200..900&family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=M+PLUS+Code+Latin:wght@100..700&family=Teko:wght@300..700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+
+    <% if Rails.env.development? || params[:debug] == "true" %>
+      <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+      <script>eruda.init();</script>
+    <% end %>
+
+    <script>
+      if (localStorage.getItem('color-theme') === 'dark' ||
+        (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    </script>
+  </head>
+
+  <body class="bg-hermit-lt-blue text-hermit-burnt">
+    <%= render "shared/hermit_plus_nav" %>
+    <main class="min-h-screen pt-16 md:pt-20">
+      <%= render "shared/flash_notice" %>
+      <%= turbo_frame_tag "hermit_plus_content" do %>
+        <%= yield %>
+      <% end %>
+    </main>
+    <%= render "shared/hermits_footer" %>
+  </body>
+</html>

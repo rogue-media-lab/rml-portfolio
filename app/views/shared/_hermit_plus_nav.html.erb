@@ -1,0 +1,79 @@
+<!-- Hermit Plus App Navbar -->
+<div class="fixed top-0 z-50 w-full" data-controller="navbar">
+  <nav class="relative flex justify-between items-center px-4 md:px-6 h-16 w-full bg-hermit-dk-green shadow-md shadow-hermit-burnt/20">
+    <!-- Left: Logo + Brand -->
+    <div class="flex items-center gap-3">
+      <%= link_to hermit_plus_home_path, class: "flex items-center gap-2 group", data: { turbo_frame: "hermit_plus_content" } do %>
+        <div class="w-9 h-9 rounded-full bg-hermit-lt-green flex items-center justify-center group-hover:bg-hermit-yellow transition-colors">
+          <%= image_tag "RogueMediaLab.png", alt: "Hermit Plus", class: "w-6 h-6" %>
+        </div>
+        <span class="font-kanit text-2xl font-extrabold text-hermit-yellow drop-shadow-dark hidden sm:block">Hermit Plus</span>
+      <% end %>
+    </div>
+
+    <!-- Center: Nav Links (desktop) -->
+    <div class="hidden md:flex items-center gap-6">
+      <%= link_to hermit_plus_home_path, class: "nav-link #{current_page?(hermit_plus_home_path) ? 'text-white' : 'text-hermit-yellow/80 hover:text-white'} font-kanit text-sm font-bold uppercase tracking-wider transition-colors", data: { turbo_frame: "hermit_plus_content" } do %>
+        Home
+      <% end %>
+      <%= link_to hermit_roster_path, class: "nav-link #{current_page?(hermit_roster_path) ? 'text-white' : 'text-hermit-yellow/80 hover:text-white'} font-kanit text-sm font-bold uppercase tracking-wider transition-colors", data: { turbo_frame: "hermit_plus_content" } do %>
+        Hermits
+      <% end %>
+      <%= link_to hermit_crews_path, class: "nav-link #{current_page?(hermit_crews_path) ? 'text-white' : 'text-hermit-yellow/80 hover:text-white'} font-kanit text-sm font-bold uppercase tracking-wider transition-colors", data: { turbo_frame: "hermit_plus_content" } do %>
+        Crews
+      <% end %>
+      <% if user_signed_in? %>
+        <%= link_to hermit_favorites_path, class: "nav-link #{current_page?(hermit_favorites_path) ? 'text-white' : 'text-hermit-yellow/80 hover:text-white'} font-kanit text-sm font-bold uppercase tracking-wider transition-colors", data: { turbo_frame: "hermit_plus_content" } do %>
+          Favorites
+        <% end %>
+      <% end %>
+    </div>
+
+    <!-- Right: Auth + Mobile toggle -->
+    <div class="flex items-center gap-3">
+      <% if user_signed_in? %>
+        <div class="hidden md:flex items-center gap-2 text-hermit-yellow/90">
+          <%= link_to user_hermit_profile_path, class: "flex items-center gap-2 hover:opacity-80 transition-opacity", data: { turbo_frame: "hermit_plus_content" } do %>
+            <div class="w-7 h-7 rounded-full bg-hermit-lt-green flex items-center justify-center">
+              <span class="font-kanit text-white text-xs font-bold"><%= current_user.email.first(2).upcase %></span>
+            </div>
+          <% end %>
+          <%= button_to destroy_user_session_path, method: :delete, class: "text-hermit-yellow/70 hover:text-white text-xs font-mPlusCode transition-colors ml-1", form: { class: "inline" } do %>
+            Sign Out
+          <% end %>
+        </div>
+      <% else %>
+        <%= link_to new_user_session_path, class: "hidden md:block text-hermit-yellow/80 hover:text-white font-kanit text-sm font-bold transition-colors" do %>
+          Sign In
+        <% end %>
+      <% end %>
+      <!-- Mobile hamburger -->
+      <button class="md:hidden text-hermit-yellow text-2xl pb-1" role="button" aria-label="menu" data-action="click->navbar#toggleMenu">&#9776;</button>
+    </div>
+  </nav>
+
+  <!-- Mobile dropdown menu -->
+  <nav class="hidden bg-hermit-burnt/95 backdrop-blur-md text-gray-100 absolute w-full right-0 overflow-y-auto border-t border-hermit-lt-green/20" data-navbar-target="mobileMenu">
+    <ul class="flex flex-col py-3 px-4">
+      <%= link_to hermit_plus_home_path, class: "py-3 px-4 rounded hover:bg-white/10 font-kanit text-hermit-yellow transition-colors", data: { turbo_frame: "hermit_plus_content" } do %>
+        Home
+      <% end %>
+      <%= link_to hermit_roster_path, class: "py-3 px-4 rounded hover:bg-white/10 font-kanit text-hermit-yellow transition-colors", data: { turbo_frame: "hermit_plus_content" } do %>
+        Hermits
+      <% end %>
+      <%= link_to hermit_crews_path, class: "py-3 px-4 rounded hover:bg-white/10 font-kanit text-hermit-yellow transition-colors", data: { turbo_frame: "hermit_plus_content" } do %>
+        Crews
+      <% end %>
+      <% if user_signed_in? %>
+        <%= link_to hermit_favorites_path, class: "py-3 px-4 rounded hover:bg-white/10 font-kanit text-hermit-yellow transition-colors", data: { turbo_frame: "hermit_plus_content" } do %>
+          Favorites
+        <% end %>
+        <%= button_to destroy_user_session_path, method: :delete, class: "w-full text-left py-3 px-4 rounded hover:bg-white/10 font-kanit text-hermit-yellow/70 transition-colors" %>
+      <% else %>
+        <%= link_to new_user_session_path, class: "py-3 px-4 rounded hover:bg-white/10 font-kanit text-hermit-yellow transition-colors" do %>
+          Sign In
+        <% end %>
+      <% end %>
+    </ul>
+  </nav>
+</div>

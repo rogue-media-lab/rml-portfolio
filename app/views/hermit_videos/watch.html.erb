@@ -1,0 +1,58 @@
+<!-- Watch Page — Minimal chrome like React VideoPlayer -->
+<% if user_signed_in? %>
+  <% progress = current_user.watch_progresses.find_by(hermit_video: @video) %>
+  <section class="w-full bg-black min-h-screen flex flex-col"
+           data-controller="watch-progress"
+           data-watch-progress-video-id-value="<%= @video.id %>"
+           data-watch-progress-progress-url-value="<%= hermit_progress_path(@video) %>"
+           data-watch-progress-current-progress-value="<%= progress&.progress_seconds || 0 %>">
+<% else %>
+  <section class="w-full bg-black min-h-screen flex flex-col">
+<% end %>
+  <!-- Top bar — minimal -->
+  <div class="flex items-center justify-between px-4 md:px-6 py-4 bg-black/80 backdrop-blur-sm z-10">
+    <%= link_to hermit_video_path(@video), class: "inline-flex items-center text-white/70 hover:text-white font-kanit text-sm transition-colors gap-2" do %>
+      <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+      Back
+    <% end %>
+    <span class="font-kanit text-white font-bold truncate max-w-xs md:max-w-lg text-sm md:text-base"><%= @video.title %></span>
+    <div class="w-20"></div>
+  </div>
+
+  <!-- Player -->
+  <div class="flex-grow flex items-center justify-center bg-black px-2 md:px-6">
+    <div class="w-full max-w-7xl aspect-video shadow-2xl">
+      <iframe
+        id="youtube-player"
+        class="w-full h-full rounded-lg"
+        src="<%= @video.youtube_embed_url %>?enablejsapi=1"
+        title="<%= @video.title %>"
+        frameborder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowfullscreen>
+      </iframe>
+    </div>
+  </div>
+
+  <!-- Episode info bar -->
+  <div class="bg-black/80 backdrop-blur-sm px-4 md:px-6 py-4">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div>
+        <h1 class="font-kanit text-white text-lg font-bold"><%= @video.title %></h1>
+        <p class="text-white/50 font-mPlusCode text-sm">Season <%= @video.season %> — Episode <%= @video.episode %> — <%= @video.hermit&.alias %></p>
+      </div>
+      <%= link_to hermit_profile_path(@video.hermit), class: "flex items-center gap-2 text-white/60 hover:text-white transition-colors" do %>
+        <div class="w-8 h-8 rounded-full overflow-hidden bg-hermit-dk-green">
+          <% if @video.hermit&.avatar_url.present? %>
+            <%= image_tag @video.hermit.avatar_url, alt: @video.hermit.alias, class: "w-full h-full object-cover" %>
+          <% end %>
+        </div>
+        <span class="font-kanit text-sm hidden sm:inline"><%= @video.hermit&.alias %></span>
+      <% end %>
+    </div>
+  </div>
+</section>
+
+<% if user_signed_in? %>
+  <script src="https://www.youtube.com/iframe_api"></script>
+<% end %>
