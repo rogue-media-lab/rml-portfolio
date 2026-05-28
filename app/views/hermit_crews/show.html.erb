@@ -5,7 +5,7 @@
     <div class="flex flex-col md:flex-row items-start md:items-center gap-6 mb-10">
       <% if @crew.image_url.present? %>
         <div class="w-full max-w-sm aspect-video rounded-xl overflow-hidden shadow-2xl shrink-0">
-          <%= image_tag @crew.image_url, alt: @crew.name, class: "w-full h-full object-cover object-top" %>
+          <%= image_tag @crew.image_url, alt: @crew.name, class: "w-full h-full object-cover object-[center_15%]" %>
         </div>
       <% end %>
       <div>
