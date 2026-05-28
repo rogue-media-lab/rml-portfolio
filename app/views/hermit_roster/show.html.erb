@@ -99,7 +99,7 @@
       </div>
 
       <%# Center Column — Skin Render (5 cols) %>
-      <div class="lg:col-span-5 flex flex-col items-center justify-start pt-4">
+      <div class="lg:col-span-5 flex flex-col items-center justify-center pt-4">
         <%# 3D Minecraft Character Rendering %>
         <div class="relative w-full max-w-sm">
           <%# Glow effect behind character %>
@@ -108,15 +108,15 @@
           <%# Character container with slight float animation via CSS %>
           <div class="relative animate-[float_6s_ease-in-out_infinite]">
             <% if @hermit.alias_image_url.present? %>
-              <%= image_tag @hermit.alias_image_url, alt: "#{@hermit.alias} skin", class: "w-full h-auto object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]" %>
+              <%= image_tag @hermit.alias_image_url, alt: "#{@hermit.alias} skin", class: "w-full h-96 object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]" %>
             <% elsif @hermit.skin_image.attached? %>
-              <%= image_tag @hermit.skin_image, alt: "#{@hermit.alias} skin", class: "w-full h-auto object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]" %>
+              <%= image_tag @hermit.skin_image, alt: "#{@hermit.alias} skin", class: "w-full h-96 object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]" %>
             <% elsif @hermit.avatar_url.present? %>
-              <%= image_tag @hermit.avatar_url, alt: "#{@hermit.alias} avatar", class: "w-full h-auto object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]" %>
+              <%= image_tag @hermit.avatar_url, alt: "#{@hermit.alias} avatar", class: "w-full h-96 object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]" %>
             <% else %>
               <%# Fallback 3D skin render using mc-heads or minotar %>
               <% skin_username = @hermit.alias.downcase.gsub(/[^a-z0-9_]/, '') %>
-              <img src="https://mc-heads.net/body/<%= skin_username %>" alt="<%= @hermit.alias %> 3D skin" class="w-full h-auto object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+              <img src="https://mc-heads.net/body/<%= skin_username %>" alt="<%= @hermit.alias %> 3D skin" class="w-full h-96 object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
             <% end %>
           </div>
         </div>
