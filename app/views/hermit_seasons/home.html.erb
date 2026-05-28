@@ -1,7 +1,7 @@
 <!-- Home Page: App Entry Point -->
 <section class="w-full min-h-screen bg-hermit-lt-blue">
   <!-- Banner Slider Section — React ImgSlider style -->
-  <div class="relative w-full pt-20" data-controller="banner-slider" data-banner-slider-interval-value="5000">
+  <div class="relative w-full" data-controller="banner-slider" data-banner-slider-interval-value="5000">
     <div class="relative w-full overflow-hidden">
       <% @hermits.select { |h| h.banner_url.present? }.each_with_index do |hermit, index| %>
         <div data-banner-slider-target="slide" class="absolute inset-0 transition-opacity duration-700 ease-in-out <%= index == 0 ? 'opacity-100 z-10' : 'opacity-0 z-0' %>">
