@@ -26,11 +26,16 @@
     <!-- Episodes -->
     <div>
       <h2 class="font-teko text-3xl font-bold text-hermit-burnt uppercase tracking-wide mb-6">Episodes</h2>
-      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-        <% @videos.each do |video| %>
-          <%= render "shared/video_card", video: video %>
-        <% end %>
-      </div>
+      <% @videos_by_hermit.each do |hermit, videos| %>
+        <div class="mb-8">
+          <h3 class="font-teko text-2xl font-bold text-hermit-burnt uppercase tracking-wide mb-4"><%= hermit.alias %></h3>
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+            <% videos.first(5).each do |video| %>
+              <%= render "shared/video_card", video: video %>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
     </div>
   </div>
 </section>
