@@ -1,13 +1,13 @@
 <!-- Watch Page — Minimal chrome like React VideoPlayer -->
 <% if user_signed_in? %>
   <% progress = current_user.watch_progresses.find_by(hermit_video: @video) %>
-  <section class="w-full bg-black min-h-screen flex flex-col"
+  <section class="relative w-full min-h-screen bg-black -mt-16 md:-mt-20 pt-16 md:pt-20 flex flex-col"
            data-controller="watch-progress"
            data-watch-progress-video-id-value="<%= @video.id %>"
            data-watch-progress-progress-url-value="<%= hermit_progress_path(@video) %>"
            data-watch-progress-current-progress-value="<%= progress&.progress_seconds || 0 %>">
 <% else %>
-  <section class="w-full bg-black min-h-screen flex flex-col">
+  <section class="relative w-full min-h-screen bg-black -mt-16 md:-mt-20 pt-16 md:pt-20 flex flex-col">
 <% end %>
   <!-- Top bar — minimal -->
   <div class="flex items-center justify-between px-4 md:px-6 py-4 bg-black/80 backdrop-blur-sm z-10">
