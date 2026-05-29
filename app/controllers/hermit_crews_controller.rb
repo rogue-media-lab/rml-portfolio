@@ -9,5 +9,6 @@ class HermitCrewsController < ApplicationController
     @crew = HermitCrew.find_by!(slug: params[:slug])
     @hermits = @crew.hermits.order(:alias)
     @videos = HermitVideo.where(hermit: @hermits, season: 8).includes(:hermit).order(:hermit_id, :episode)
+    @videos_by_hermit = @videos.group_by(&:hermit)
   end
 end
