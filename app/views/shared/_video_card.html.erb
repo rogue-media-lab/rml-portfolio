@@ -2,7 +2,7 @@
   Required locals:
     video: HermitVideo instance
 %>
-<%= link_to hermit_video_path(video), class: "block group" do %>
+<%= link_to hermit_video_path(video), data: { turbo_frame: "_top" }, class: "block group" do %>
   <div class="relative rounded-lg overflow-hidden shadow-lg transition-all duration-300 ease-out group-hover:scale-105 group-hover:shadow-[0_40px_58px_-10px_rgba(0,75,0,0.8),0_30px_22px_-10px_rgba(0,50,0,0.72)] border-2 border-transparent group-hover:border-white/80">
     <% if video.thumbnail_url.present? %>
       <%= image_tag video.thumbnail_url, alt: video.title, class: "w-full aspect-video object-cover" %>
