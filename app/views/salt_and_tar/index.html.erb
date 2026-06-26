@@ -1,8 +1,13 @@
 <% content_for :body_class, "bg-st-drk-primary" %>
-<section class="bg-swabbie-st-drk-primary flex flex-col justify-center items-center w-full text-base-dark">
+<div class="bg-swabbie-st-drk-primary flex flex-col justify-center items-center w-full text-base-dark">
   <%= render "header" %>
-  <%= render "hero" %>
-  <%= render "promotion" %>
-  <%= render "features" %>
-  <%= render "video" %>
-</section>
+  <section>
+    <%= render "hero" %>
+    <%= turbo_frame_tag "salt_and_tar_content" do %>
+      <%= render "promotion" %>
+    <% end %>
+    <%= render "features" %>
+    <%= render "video" %>
+  </section>
+  <%= render "footer" %>
+</div>
