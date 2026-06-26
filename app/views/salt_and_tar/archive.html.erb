@@ -1,141 +1,47 @@
 <% content_for :body_class, "bg-st-drk-primary" %>
-<section class="bg-swabbie-st-drk-primary flex flex-col justify-center items-center w-full text-base-dark">
-    <!-- Fake nav -->
-  <div id="home" class="mt-8 w-96 sm:w-[640px] lg:w-[950px] xl:w-[1024px]">
-    <header class="static max-w-5xl">
-      <div class="block rounded-t-lg bg-white">
-        <div class="block max-w-5xl">
-          <%= link_to salt_and_tar_index_path, class: "relative mt-1 ml-1" do %>
-            <%= image_tag('https://milk-blog.s3.us-east-2.amazonaws.com/saltandtar/logo.svg', class: 'block ml-5') %>
-          <% end %>
-        </div>
-      </div>
-    </header>
-  </div>
-
-  <div class="flex flex-col sm:flex-row justify-center items-start bg-white gap-5 sm:gap-8 pt-2 pb-8 w-96 sm:w-[640px] lg:w-[950px] xl:w-[1024px] px-4 sm:px-1">
-    <!-- Video Player (Top on mobile, Left on desktop) -->
-    <div class="video-player w-full sm:w-[70%] sm:max-w-[634px] order-1 sm:order-none">
-    <h1 class="text-2xl sm:text-3xl font-bold text-center w-full">The beginning of the journey</h1>
-    <p class="text-center py-1">Here are the first few videos of Salt and Tar. How the dream to sail through the tropics began in Washington state.</p>
-      <div class="polaroid-video bg-white p-4 sm:p-6 shadow-md">
-        <video controls width="100%" src="<%= @selected_video.video_url %>" class="rounded-t-sm"></video>
-        <div class="flex justify-between items-start mt-3">
-          <div class="flex-1">
-            <h2 class="text-lg sm:text-xl font-bold"><%= @selected_video.title %></h2>
-            <p class="text-sm text-gray-600 mt-1"><%= @selected_video.description %></p>
-          </div>
-          <a href="<%= @selected_video.youtube_url %>" target="_blank" class="ml-4 mt-1 flex-shrink-0" aria-label="Watch on YouTube">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" class="hover:opacity-80 transition-opacity">
-              <path fill="#FF0000" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814z"/>
-              <path fill="#FFF" d="M9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-            </svg>
-          </a>
-        </div>
-      </div>
-    </div>
-
-    <!-- Video List (Bottom on mobile, Right on desktop) -->
-    <div class="video-list w-full sm:w-[30%] sm:max-w-[317px] overflow-y-auto max-h-[70vh] order-2 sm:order-none">
-      <% @videos.each do |video| %>
-        <div class="video-thumbnail cursor-pointer mb-4" onclick="loadVideo('<%= video.video_url %>', '<%= video.title %>', '<%= video.description %>', '<%= video.youtube_url %>')">
-          <img src="<%= video.thumbnail_url || 'placeholder.jpg' %>" class="rounded-sm w-full" alt="<%= video.title %>">
-          <h3 class="text-sm sm:text-base font-semibold mt-1"><%= video.title %></h3>
-        </div>
-      <% end %>
-    </div>
-  </div>
-
-  <div class="bg-white w-96 sm:w-[640px] lg:w-[950px] xl:w-[1024px]">
-    <%= image_tag('https://milk-blog.s3.us-east-2.amazonaws.com/saltandtar/Group+28.svg', alt: "border bottom") %>
-  </div>
-
-  <div id="booking" class="flex justify-center bg-swabbie-st-lt-primary py-4 mb-4 rounded-b-lg w-96 sm:w-[640px] lg:w-[950px] xl:w-[1024px]">
-    <div class="w-full sm:w-[70%] bg-white p-6 shadow-md rounded-md">
-      <h2 class="text-2xl font-bold mb-4">Book a Sailing Experience</h2>
-      <p>Currently located around beautiful Agua Verde.</p>
-      <%= image_tag('https://milk-blog.s3.us-east-2.amazonaws.com/saltandtar/agua-verde-map.png', alt: "general map location", class: "py-1") %>
-      
-      <!-- Pricing Highlights -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-        <div class="border border-gray-200 p-3 rounded-lg text-center">
-          <p class="font-medium">Day Sail</p>
-          <p class="text-blue-600 font-bold">$250</p>
-          <p class="text-xs text-gray-500">4 hours</p>
-        </div>
-        <div class="border border-gray-200 p-3 rounded-lg text-center">
-          <p class="font-medium">Sunset Sail</p>
-          <p class="text-blue-600 font-bold">$200</p>
-          <p class="text-xs text-gray-500">3 hours</p>
-        </div>
-        <div class="border border-gray-200 p-3 rounded-lg text-center">
-          <p class="font-medium">Overnight</p>
-          <p class="text-blue-600 font-bold">$450</p>
-          <p class="text-xs text-gray-500">24 hours</p>
-        </div>
-        <div class="border border-gray-200 p-3 rounded-lg text-center">
-          <p class="font-medium">Weekend</p>
-          <p class="text-blue-600 font-bold">$800</p>
-          <p class="text-xs text-gray-500">48 hours</p>
-        </div>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <!-- Experience Type with Pricing -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Experience Type</label>
-          <select class="w-full p-2 border border-gray-300 rounded-md" id="experienceType">
-            <option data-price="250">Day Sail (4 hours) - $250</option>
-            <option data-price="200">Sunset Sail (3 hours) - $200</option>
-            <option data-price="450">Overnight Stay - $450</option>
-            <option data-price="800">Weekend Voyage - $800</option>
-          </select>
-        </div>
-        
-        <!-- Date Picker -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Date</label>
-          <input type="date" class="w-full p-2 border border-gray-300 rounded-md">
-        </div>
-        
-        <!-- Number of Guests with Dynamic Pricing -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Number of Guests</label>
-          <input type="number" min="1" max="6" value="2" class="w-full p-2 border border-gray-300 rounded-md" id="guestCount">
-        </div>
-        
-        <!-- Estimated Total -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Estimated Total</label>
-          <div class="p-2 border border-gray-300 rounded-md bg-gray-50">
-            $<span id="estimatedTotal">500</span>
-            <span class="text-xs text-gray-500 ml-1">(for 2 guests)</span>
+<div class="bg-swabbie-st-drk-primary flex flex-col justify-center items-center w-full text-base-dark">
+  <%= render "header" %>
+  <section>
+    <%= turbo_frame_tag "salt_and_tar_content" do %>
+    <div class="flex flex-col sm:flex-row justify-center items-start bg-white gap-5 sm:gap-8 pt-6 pb-8 w-96 sm:w-[640px] lg:w-[950px] xl:w-[1024px] px-4 sm:px-1">
+      <!-- Video Player (Top on mobile, Left on desktop) -->
+      <div class="video-player w-full sm:w-[70%] sm:max-w-[634px] order-1 sm:order-0">
+      <h1 class="text-2xl sm:text-3xl font-bold text-center w-full">The beginning of the journey</h1>
+      <p class="text-center py-1">Here are the first few videos of Salt and Tar. How the dream to sail through the tropics began in Washington state.</p>
+        <div class="polaroid-video bg-white p-4 sm:p-6 shadow-md">
+          <video controls width="100%" src="<%= @selected_video.video_url %>" class="rounded-t-sm"></video>
+          <div class="flex justify-between items-start mt-3">
+            <div class="flex-1">
+              <h2 class="text-lg sm:text-xl font-bold"><%= @selected_video.title %></h2>
+              <p class="text-sm text-gray-600 mt-1"><%= @selected_video.description %></p>
+            </div>
+            <a href="<%= @selected_video.youtube_url %>" target="_blank" class="ml-4 mt-1 flex-shrink-0" aria-label="Watch on YouTube">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="28" height="28" class="hover:opacity-80 transition-opacity">
+                <path fill="#FF0000" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814z"/>
+                <path fill="#FFF" d="M9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+              </svg>
+            </a>
           </div>
         </div>
-        
-        <!-- Contact Email -->
-        <div class="md:col-span-2">
-          <label class="block text-sm font-medium text-gray-700 mb-1">Contact Email</label>
-          <input type="email" placeholder="your@email.com" class="w-full p-2 border border-gray-300 rounded-md">
-        </div>
       </div>
-      
-      <!-- Special Requests -->
-      <div class="mt-4">
-        <label class="block text-sm font-medium text-gray-700 mb-1">Special Requests</label>
-        <textarea rows="3" class="w-full p-2 border border-gray-300 rounded-md" placeholder="Dietary restrictions, celebration notes, etc."></textarea>
-      </div>
-      
-      <!-- Submit Button -->
-      <div class="mt-6">
-        <button class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-md font-medium transition-colors">
-          Request Booking
-        </button>
-        <p class="text-xs text-gray-500 mt-2 text-center">We'll contact you to confirm availability and details</p>
+
+      <!-- Video List (Bottom on mobile, Right on desktop) -->
+      <div class="video-list w-full sm:w-[30%] sm:max-w-[317px] overflow-y-auto max-h-[70vh] order-2 sm:order-none">
+        <% @videos.each do |video| %>
+          <div class="video-thumbnail cursor-pointer mb-4" onclick="loadVideo('<%= video.video_url %>', '<%= video.title %>', '<%= video.description %>', '<%= video.youtube_url %>')">
+            <img src="<%= video.thumbnail_url || 'placeholder.jpg' %>" class="rounded-sm w-full" alt="<%= video.title %>">
+            <h3 class="text-sm sm:text-base font-semibold mt-1"><%= video.title %></h3>
+          </div>
+        <% end %>
       </div>
     </div>
-  </div>
-</section>
+    <div class="pt-4 bg-white">
+    <%= image_tag("saltandtar/divider.svg", alt: "border bottom") %>
+    </div>
+    <% end %>
+  </section>
+  <%= render "footer" %>
+</div>
 
 <script>
   function loadVideo(url, title, description, youtubeUrl) {
@@ -149,25 +55,4 @@
     videoDesc.textContent = description;
     videoLink.href = youtubeUrl;
   }
-</script>
-
-<script>
-  // Simple price calculator
-  document.addEventListener('DOMContentLoaded', function() {
-    const experienceSelect = document.getElementById('experienceType');
-    const guestCount = document.getElementById('guestCount');
-    const estimatedTotal = document.getElementById('estimatedTotal');
-    
-    function calculateTotal() {
-      const pricePerPerson = parseInt(experienceSelect.selectedOptions[0].dataset.price);
-      const guests = parseInt(guestCount.value);
-      const total = pricePerPerson * guests;
-      estimatedTotal.textContent = total;
-      estimatedTotal.nextElementSibling.textContent = `(for ${guests} ${guests === 1 ? 'guest' : 'guests'})`;
-    }
-    
-    experienceSelect.addEventListener('change', calculateTotal);
-    guestCount.addEventListener('change', calculateTotal);
-    guestCount.addEventListener('input', calculateTotal);
-  });
 </script>

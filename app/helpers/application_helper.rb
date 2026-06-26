@@ -1,5 +1,17 @@
 module ApplicationHelper
-  # Set up default meta tags for social sharing
+  # ── Salt & Tar helpers ──────────────────────────────────
+
+  def responsive_width_class
+    "flex w-full px-6 lg:px-0 lg:w-[950px] xl:w-[1024px]"
+  end
+
+  def menu_link(text, path, options = {})
+    base_classes = "flex p-2 my-1 hover:bg-gray-50 rounded-sm"
+    classes = "#{base_classes} #{options[:class]}"
+    link_to text, path, class: classes
+  end
+
+  # ── Meta tags ───────────────────────────────────────────
   def default_meta_tags
     {
       site: "Rogue Media Lab",

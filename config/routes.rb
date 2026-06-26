@@ -136,6 +136,7 @@ Rails.application.routes.draw do
   resources :salt_and_tar, only: [ :index ], path: "salt-and-tar", controller: "salt_and_tar" do
     collection do
       get "archive", to: "salt_and_tar#archive", as: :archive  # /salt-and-tar/archive
+      get "booking", to: "salt_and_tar#booking", as: :booking  # /salt-and-tar/booking
     end
   end
   # root for eastbounds
