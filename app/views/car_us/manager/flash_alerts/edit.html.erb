@@ -1,0 +1,53 @@
+<div class="max-w-2xl mx-auto">
+  <div class="mb-6">
+    <%= link_to "← Back to Flash Sales", manager_flash_alerts_path, class: "text-sm text-blue-600 hover:text-blue-800" %>
+  </div>
+
+  <div class="bg-white shadow rounded-lg">
+    <div class="px-6 py-5 border-b border-gray-200">
+      <h1 class="text-2xl font-bold text-gray-900">Edit Flash Sale</h1>
+    </div>
+
+    <div class="px-6 py-6">
+      <%= form_with model: @flash_alert, url: manager_flash_alert_path(@flash_alert), method: :patch, class: "space-y-4" do |f| %>
+        <% if @flash_alert.errors.any? %>
+          <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded text-sm">
+            <ul class="list-disc list-inside">
+              <% @flash_alert.errors.full_messages.each do |msg| %><li><%= msg %></li><% end %>
+            </ul>
+          </div>
+        <% end %>
+
+        <div>
+          <%= f.label :title, class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= f.text_field :title, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
+        </div>
+
+        <div>
+          <%= f.label :description, class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= f.text_area :description, rows: 2, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
+        </div>
+
+        <div>
+          <%= f.label :discount_percentage, "Discount %", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= f.number_field :discount_percentage, min: 1, max: 100, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
+        </div>
+
+        <div>
+          <%= f.label :duration_hours, "Duration (hours)", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= f.number_field :duration_hours, min: 1, max: 168, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <%= f.check_box :active, class: "rounded border-gray-300" %>
+          <%= f.label :active, "Active", class: "text-sm text-gray-700" %>
+        </div>
+
+        <div class="flex items-center gap-3 pt-2">
+          <%= f.submit "Update", class: "px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg cursor-pointer" %>
+          <%= link_to "Cancel", manager_flash_alert_path(@flash_alert), class: "px-4 py-2.5 text-gray-600 hover:text-gray-800 text-sm" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

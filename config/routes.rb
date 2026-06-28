@@ -26,7 +26,7 @@ Rails.application.routes.draw do
     # Manager Portal (authenticated technicians)
     namespace :manager, module: "car_us/manager" do
       root to: "dashboard#index"
-      resources :flash_alerts, only: [ :index, :new, :create, :show ]
+      resources :flash_alerts, only: [ :index, :new, :create, :show, :edit, :update, :destroy ]
       resources :customers, only: [ :index ] do
         collection do
           get :search
