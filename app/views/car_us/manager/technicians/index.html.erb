@@ -1,0 +1,46 @@
+<div class="space-y-6">
+  <div class="flex justify-between items-center">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Technicians</h1>
+      <p class="text-sm text-gray-500"><%= @technicians.count %> technicians at <%= current_shop.name %></p>
+    </div>
+    <%= link_to "Add Technician", new_manager_technician_path, class: "px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors" %>
+  </div>
+
+  <% if @technicians.any? %>
+    <div class="bg-white shadow rounded-lg overflow-hidden">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Joined</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">
+          <% @technicians.each do |tech| %>
+            <tr class="hover:bg-gray-50">
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="font-medium text-gray-900"><%= tech.email %></div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <%= tech.created_at.strftime("%b %d, %Y") %>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
+                <% unless tech == current_technician %>
+                  <%= link_to "Remove", manager_technician_path(tech), data: { turbo_method: :delete, turbo_confirm: "Remove #{tech.email}?" }, class: "text-red-600 hover:text-red-800 font-medium" %>
+                <% else %>
+                  <span class="text-gray-400 text-xs">You</span>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <div class="bg-white shadow rounded-lg p-12 text-center">
+      <p class="text-gray-500">No technicians yet.</p>
+    </div>
+  <% end %>
+</div>
