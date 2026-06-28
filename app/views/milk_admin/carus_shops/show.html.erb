@@ -1,3 +1,4 @@
+<%= turbo_frame_tag "dashboard_content" do %>
 <div class="space-y-6">
   <div class="flex justify-between items-center">
     <div>
@@ -11,7 +12,6 @@
     </div>
   </div>
 
-  <%# Stats %>
   <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
     <div class="bg-white shadow rounded-lg p-4">
       <dt class="text-sm text-gray-500">Customers</dt>
@@ -31,7 +31,6 @@
     </div>
   </div>
 
-  <%# Details %>
   <div class="bg-white shadow rounded-lg p-6">
     <h2 class="text-lg font-semibold text-gray-900 mb-4">Details</h2>
     <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
@@ -46,7 +45,6 @@
     </dl>
   </div>
 
-  <%# Technicians %>
   <% if @technicians.any? %>
     <div class="bg-white shadow rounded-lg p-6">
       <h2 class="text-lg font-semibold text-gray-900 mb-4">Technicians</h2>
@@ -69,3 +67,4 @@
     </div>
   <% end %>
 </div>
+<% end %>
