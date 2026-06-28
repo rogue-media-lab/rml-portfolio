@@ -1,6 +1,10 @@
 <div class="max-w-2xl mx-auto space-y-6">
   <div class="mb-4">
     <%= link_to "← Back to Flash Sales", manager_flash_alerts_path, class: "text-sm text-blue-600 hover:text-blue-800" %>
+    <div class="flex gap-3">
+      <%= link_to "Edit", edit_manager_flash_alert_path(@flash_alert), class: "px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm" %>
+      <%= link_to "Delete", manager_flash_alert_path(@flash_alert), data: { turbo_method: :delete, turbo_confirm: "Remove this flash sale?" }, class: "px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm" %>
+    </div>
   </div>
 
   <%# Header %>
