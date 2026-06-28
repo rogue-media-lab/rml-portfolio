@@ -32,6 +32,7 @@ Rails.application.routes.draw do
           get :search
         end
       end
+      resources :services, only: [ :index, :new, :create, :edit, :update, :destroy ]
     end
   end
 

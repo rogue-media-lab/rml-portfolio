@@ -1,0 +1,40 @@
+<%= form_with model: [:manager, @service], class: "space-y-4" do |f| %>
+  <% if @service.errors.any? %>
+    <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded text-sm">
+      <p class="font-medium">Please fix <%= pluralize(@service.errors.count, "error") %>:</p>
+      <ul class="list-disc list-inside mt-1">
+        <% @service.errors.full_messages.each do |msg| %><li><%= msg %></li><% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="bg-white shadow rounded-lg p-6 space-y-4">
+    <div>
+      <%= f.label :name, class: "block text-sm font-medium text-gray-700 mb-1" %>
+      <%= f.text_field :name, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm", required: true %>
+    </div>
+    <div>
+      <%= f.label :description, class: "block text-sm font-medium text-gray-700 mb-1" %>
+      <%= f.text_area :description, rows: 2, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
+    </div>
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <%= f.label :price, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= f.number_field :price, step: 0.01, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
+      </div>
+      <div>
+        <%= f.label :duration_minutes, "Duration (min)", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= f.number_field :duration_minutes, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <%= f.check_box :active, class: "rounded border-gray-300" %>
+      <%= f.label :active, "Active", class: "text-sm text-gray-700" %>
+    </div>
+  </div>
+
+  <div class="flex items-center gap-3">
+    <%= f.submit class: "px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg cursor-pointer" %>
+    <%= link_to "Cancel", manager_services_path, class: "px-4 py-2.5 text-gray-600 hover:text-gray-800 text-sm" %>
+  </div>
+<% end %>
