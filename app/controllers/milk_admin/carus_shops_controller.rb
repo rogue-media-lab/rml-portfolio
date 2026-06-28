@@ -19,8 +19,17 @@ class MilkAdmin::CarusShopsController < ApplicationController
 
   def create
     @shop = CarUs::Shop.new(shop_params)
+
     if @shop.save
-      redirect_to milk_admin_carus_shop_path(@shop), notice: "Shop created."
+      # Create technician account if credentials provided
+      if technician_params[:email].present? && technician_params[:password].present?
+        tech = @shop.technicians.create!(technician_params)
+        flash[:notice] = "Shop created. Technician #{tech.email} can log in at /carus/technicians/sign_in"
+      else
+        flash[:notice] = "Shop created. No technician account — add one from the manager portal."
+      end
+
+      redirect_to milk_admin_carus_shop_path(@shop)
     else
       render :new, status: :unprocessable_entity
     end
@@ -52,5 +61,9 @@ class MilkAdmin::CarusShopsController < ApplicationController
     params.require(:car_us_shop).permit(
       :name, :slug, :address, :phone, :email, :website, :description, :active
     )
+  end
+
+  def technician_params
+    params.fetch(:technician, {}).permit(:email, :password, :password_confirmation)
   end
 end
