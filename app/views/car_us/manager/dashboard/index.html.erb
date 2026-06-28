@@ -1,0 +1,92 @@
+<div class="space-y-6">
+  <div class="flex justify-between items-center">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900">Manager Dashboard</h1>
+      <p class="mt-1 text-sm text-gray-500"><%= current_shop.name %></p>
+    </div>
+    <%= link_to "Send Flash Sale", new_manager_flash_alert_path, class: "inline-flex items-center px-6 py-3 bg-blue-600 border border-transparent text-base font-medium rounded-md text-white hover:bg-blue-700 transition-colors" %>
+  </div>
+
+  <div class="grid grid-cols-1 gap-5 sm:grid-cols-3">
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+      <div class="px-4 py-5 sm:p-6">
+        <dt class="text-sm font-medium text-gray-500 truncate">Total Customers</dt>
+        <dd class="mt-1 text-3xl font-semibold text-gray-900"><%= @total_customers %></dd>
+      </div>
+    </div>
+
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+      <div class="px-4 py-5 sm:p-6">
+        <dt class="text-sm font-medium text-gray-500 truncate">Active Flash Sales</dt>
+        <dd class="mt-1 text-3xl font-semibold text-blue-600"><%= @active_flash_alerts %></dd>
+      </div>
+    </div>
+
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+      <div class="px-4 py-5 sm:p-6">
+        <dt class="text-sm font-medium text-gray-500 truncate">Total Redemptions</dt>
+        <dd class="mt-1 text-3xl font-semibold text-gray-900"><%= @total_redemptions %></dd>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white shadow rounded-lg">
+    <div class="px-4 py-5 sm:p-6">
+      <h2 class="text-lg font-medium text-gray-900 mb-4">Recent Flash Sales</h2>
+      <% if @recent_flash_alerts.any? %>
+        <div class="space-y-4">
+          <% @recent_flash_alerts.each do |alert| %>
+            <div class="flex items-center justify-between p-4 border border-gray-200 rounded-lg <%= alert.expired? ? 'bg-gray-50' : 'bg-green-50' %>">
+              <div class="flex-1">
+                <h3 class="text-sm font-medium text-gray-900"><%= alert.title %></h3>
+                <p class="text-sm text-gray-500 mt-1"><%= alert.description %></p>
+                <div class="mt-2 flex items-center space-x-4 text-xs text-gray-500">
+                  <span><%= alert.discount_percentage %>% off</span>
+                  <span>-</span>
+                  <span><%= alert.redemptions.count %> redemptions</span>
+                  <span>-</span>
+                  <span><%= alert.expired? ? "Expired" : "Active" %></span>
+                </div>
+              </div>
+              <div class="ml-4">
+                <%= link_to "View", manager_flash_alert_path(alert), class: "text-sm font-medium text-blue-600 hover:underline" %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="text-gray-500 text-center py-8">No Flash Sales yet. Create your first one!</p>
+      <% end %>
+      <div class="mt-4 text-center">
+        <%= link_to "View All Flash Sales", manager_flash_alerts_path, class: "text-sm font-medium text-blue-600 hover:underline" %>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white shadow rounded-lg">
+    <div class="px-4 py-5 sm:p-6">
+      <h2 class="text-lg font-medium text-gray-900 mb-4">Quick Actions</h2>
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <%= link_to manager_customers_path, class: "flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 transition-colors" do %>
+          <svg class="h-8 w-8 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+          <div class="ml-4">
+            <h3 class="text-sm font-medium text-gray-900">Customer Lookup</h3>
+            <p class="text-sm text-gray-500">Search by email or name</p>
+          </div>
+        <% end %>
+
+        <%= link_to new_manager_flash_alert_path, class: "flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 transition-colors" do %>
+          <svg class="h-8 w-8 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+          </svg>
+          <div class="ml-4">
+            <h3 class="text-sm font-medium text-gray-900">Send Flash Sale</h3>
+            <p class="text-sm text-gray-500">Fill idle bays now</p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

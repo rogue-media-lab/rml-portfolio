@@ -1,0 +1,54 @@
+<%# CarUs public landing page — shop directory (placeholder) %>
+<div class="bg-white min-h-screen">
+  <header class="bg-blue-600 text-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <h1 class="text-4xl md:text-6xl font-bold tracking-tight">CarUs</h1>
+      <p class="mt-4 text-xl text-blue-100 max-w-2xl">
+        Find your trusted auto shop. Track your vehicle maintenance.
+        Save on service with flash deals.
+      </p>
+      <div class="mt-8 flex flex-col sm:flex-row gap-4">
+        <%= link_to "Find a Shop", "#shops", class: "px-8 py-3 bg-yellow-400 text-gray-900 font-medium rounded-full text-lg hover:bg-yellow-300 shadow-lg transition duration-200 text-center" %>
+        <%= link_to "Sign In", new_car_owner_session_path, class: "px-8 py-3 bg-white bg-opacity-20 text-white font-medium rounded-full text-lg hover:bg-opacity-30 transition duration-200 text-center" %>
+      </div>
+    </div>
+  </header>
+
+  <section id="shops" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <h2 class="text-3xl font-bold text-gray-900 mb-8">Our Shops</h2>
+
+    <% if @shops.any? %>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <% @shops.each do |shop| %>
+          <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+            <h3 class="text-lg font-semibold text-gray-900"><%= shop.name %></h3>
+            <% if shop.address.present? %>
+              <p class="text-sm text-gray-500 mt-1"><%= shop.address %></p>
+            <% end %>
+            <% if shop.description.present? %>
+              <p class="text-sm text-gray-600 mt-2"><%= truncate(shop.description, length: 100) %></p>
+            <% end %>
+            <div class="mt-4">
+              <%= link_to "Join", new_car_owner_registration_path, class: "text-blue-600 hover:text-blue-800 text-sm font-medium" %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="text-center py-16 bg-gray-50 rounded-xl">
+        <p class="text-gray-500 text-lg">No shops yet. The first shop will appear here.</p>
+      </div>
+    <% end %>
+
+    <div class="mt-12 text-center">
+      <p class="text-gray-600">Are you a shop owner?</p>
+      <%= link_to "Manager Login", new_technician_session_path, class: "mt-2 inline-block text-blue-600 hover:text-blue-800 font-medium" %>
+    </div>
+  </section>
+
+  <footer class="bg-gray-100 border-t border-gray-200 mt-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <p class="text-gray-500 text-sm text-center">&copy; <%= Date.today.year %> CarUs. Built by Rogue Media Lab.</p>
+    </div>
+  </footer>
+</div>

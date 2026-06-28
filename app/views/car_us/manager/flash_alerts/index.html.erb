@@ -1,0 +1,85 @@
+<div class="space-y-6">
+  <div class="flex justify-between items-center">
+    <h1 class="text-3xl font-bold text-gray-900">Flash Sales History</h1>
+    <%= link_to "Send New Flash Sale", new_manager_flash_alert_path, class: "px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors" %>
+  </div>
+
+  <div class="bg-white shadow rounded-lg overflow-hidden">
+    <% if @flash_alerts.any? %>
+      <ul class="divide-y divide-gray-200">
+        <% @flash_alerts.each do |alert| %>
+          <li class="px-6 py-5 hover:bg-gray-50 transition-colors">
+            <div class="flex items-center justify-between">
+              <div class="flex-1">
+                <div class="flex items-center space-x-3">
+                  <h3 class="text-lg font-medium text-gray-900"><%= alert.title %></h3>
+                  <% if alert.expired? %>
+                    <span class="px-2 py-1 text-xs font-semibold bg-gray-200 text-gray-700 rounded">Expired</span>
+                  <% else %>
+                    <span class="px-2 py-1 text-xs font-semibold bg-green-100 text-green-800 rounded">Active</span>
+                  <% end %>
+                </div>
+
+                <p class="mt-1 text-sm text-gray-600"><%= alert.description %></p>
+
+                <div class="mt-3 flex items-center space-x-6 text-sm text-gray-500">
+                  <span class="flex items-center">
+                    <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                    </svg>
+                    <strong class="text-lg text-blue-600"><%= alert.discount_percentage %>%</strong>
+                    <span class="ml-1">off</span>
+                  </span>
+
+                  <span class="flex items-center">
+                    <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <%= alert.duration_hours %> hours
+                  </span>
+
+                  <span class="flex items-center">
+                    <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                    </svg>
+                    <%= alert.redemptions.count %> redemptions
+                  </span>
+
+                  <span class="flex items-center">
+                    <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                    <%= alert.created_at.strftime("%b %d, %Y at %I:%M %p") %>
+                  </span>
+                </div>
+
+                <% unless alert.expired? %>
+                  <div class="mt-2 text-sm">
+                    <span class="text-gray-500">Expires:</span>
+                    <span class="font-medium text-gray-900"><%= alert.expires_at.strftime("%b %d at %I:%M %p") %></span>
+                    <span class="ml-2 text-gray-500">(<%= distance_of_time_in_words(Time.current, alert.expires_at) %> remaining)</span>
+                  </div>
+                <% end %>
+              </div>
+
+              <div class="ml-6">
+                <%= link_to "View Details", manager_flash_alert_path(alert), class: "text-sm font-medium text-blue-600 hover:underline" %>
+              </div>
+            </div>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <div class="px-6 py-12 text-center">
+        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+        </svg>
+        <h3 class="mt-2 text-sm font-medium text-gray-900">No Flash Sales yet</h3>
+        <p class="mt-1 text-sm text-gray-500">Get started by sending your first Flash Sale.</p>
+        <div class="mt-6">
+          <%= link_to "Send Flash Sale", new_manager_flash_alert_path, class: "inline-flex items-center px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700" %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

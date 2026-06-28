@@ -1,0 +1,11 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  flash_alert: one
+  car_owner: one
+  redeemed_at: 2026-06-28 14:25:09
+
+two:
+  flash_alert: two
+  car_owner: two
+  redeemed_at: 2026-06-28 14:25:09
