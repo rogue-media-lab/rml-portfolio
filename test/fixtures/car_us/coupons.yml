@@ -1,15 +1,11 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+habibi_coupon:
+  shop: habibi
+  code: SAVE20
+  description: 20% off any service
+  expires_at: <%= 30.days.from_now %>
 
-one:
-  shop: one
-  code: MyString
-  barcode: MyString
-  description: MyText
-  expires_at: 2026-06-28 14:25:17
-
-two:
-  shop: two
-  code: MyString
-  barcode: MyString
-  description: MyText
-  expires_at: 2026-06-28 14:25:17
+generic_coupon:
+  shop:
+  code: WELCOME10
+  description: $10 off your first visit
+  expires_at:

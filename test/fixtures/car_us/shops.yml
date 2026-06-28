@@ -1,21 +1,17 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+habibi:
+  name: Habibi Mobile
+  slug: habibi-mobile
+  address: 10065 Marsh Ln
+  phone: (469) 894-1694
+  email: habibi@example.com
+  description: Mobile mechanic serving North Dallas.
+  active: true
 
-one:
-  name: MyString
-  slug: MyString
-  address: MyString
-  phone: MyString
-  email: MyString
-  website: MyString
-  description: MyText
-  active: false
-
-two:
-  name: MyString
-  slug: MyString
-  address: MyString
-  phone: MyString
-  email: MyString
-  website: MyString
-  description: MyText
-  active: false
+speedee:
+  name: SpeeDee Oil Change
+  slug: speedee-rock-hill
+  address: 123 Main St, Rock Hill, SC
+  phone: (803) 555-1000
+  email: speedee@example.com
+  description: Quick oil changes and basic maintenance.
+  active: true

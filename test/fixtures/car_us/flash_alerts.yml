@@ -1,25 +1,21 @@
-# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+brake_deal:
+  shop: habibi
+  technician: habibi_tech
+  title: 30% Off Brakes
+  description: Limited time brake deal.
+  discount_percentage: 30
+  duration_hours: 48
+  code: PCT30_a1b2c3d4
+  expires_at: <%= 2.days.from_now %>
+  active: true
 
-one:
-  shop: one
-  title: MyString
-  description: MyText
-  discount_percentage: 1
-  code: MyString
-  barcode: MyString
-  starts_at: 2026-06-28 14:25:06
-  expires_at: 2026-06-28 14:25:06
-  active: false
-  max_redemptions: 1
-
-two:
-  shop: two
-  title: MyString
-  description: MyText
-  discount_percentage: 1
-  code: MyString
-  barcode: MyString
-  starts_at: 2026-06-28 14:25:06
-  expires_at: 2026-06-28 14:25:06
-  active: false
-  max_redemptions: 1
+oil_deal:
+  shop: speedee
+  technician: speedee_tech
+  title: Free Oil Change
+  description: Free oil change with any service.
+  discount_percentage: 100
+  duration_hours: 72
+  code: PCT100_e5f6g7h8
+  expires_at: <%= 1.day.from_now %>
+  active: true
