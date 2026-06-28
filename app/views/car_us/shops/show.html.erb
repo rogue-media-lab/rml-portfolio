@@ -1,0 +1,113 @@
+<%# CarUs shop landing page — public %>
+<div class="min-h-screen bg-gray-50">
+  <%# Shop Header %>
+  <header class="bg-gradient-to-br from-blue-600 to-blue-800 text-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
+      <%= link_to "← Back to Shops", carus_root_path, class: "text-blue-200 hover:text-white text-sm mb-4 inline-block" %>
+
+      <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-6">
+        <div>
+          <h1 class="text-3xl md:text-4xl font-bold"><%= @shop.name %></h1>
+          <% if @shop.address.present? %>
+            <p class="mt-2 text-blue-100 flex items-center gap-1">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              </svg>
+              <%= @shop.address %>
+            </p>
+          <% end %>
+          <p class="mt-3 text-blue-100 max-w-xl"><%= @shop.description %></p>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-3">
+          <% if @shop.phone.present? %>
+            <a href="tel:<%= @shop.phone %>" class="px-6 py-3 bg-white text-blue-700 font-semibold rounded-lg hover:bg-blue-50 transition text-center">
+              <%= @shop.phone %>
+            </a>
+          <% end %>
+          <%= link_to "Sign Up Free", new_car_owner_registration_path, class: "px-6 py-3 bg-yellow-400 text-gray-900 font-semibold rounded-lg hover:bg-yellow-300 transition text-center shadow" %>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <%# Services Column %>
+      <div class="lg:col-span-2 space-y-6">
+        <div>
+          <h2 class="text-2xl font-bold text-gray-900">Services</h2>
+          <p class="text-sm text-gray-500 mt-1">What <%= @shop.name %> offers</p>
+        </div>
+
+        <% if @services.any? %>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <% @services.each do |service| %>
+              <div class="bg-white rounded-xl p-5 border border-gray-200 hover:shadow-md transition">
+                <h3 class="font-semibold text-gray-900"><%= service.name %></h3>
+                <p class="text-sm text-gray-500 mt-1"><%= service.description %></p>
+                <div class="mt-3 flex items-center justify-between">
+                  <% if service.price.present? %>
+                    <span class="text-lg font-bold text-blue-600"><%= number_to_currency(service.price) %></span>
+                  <% end %>
+                  <% if service.duration_minutes.present? %>
+                    <span class="text-xs text-gray-400">~<%= service.duration_minutes %> min</span>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="bg-white rounded-xl p-8 text-center border border-gray-200">
+            <p class="text-gray-500">Services coming soon.</p>
+          </div>
+        <% end %>
+      </div>
+
+      <%# Sidebar — Active Deals %>
+      <div class="space-y-6">
+        <div>
+          <h2 class="text-2xl font-bold text-gray-900">Active Deals</h2>
+          <p class="text-sm text-gray-500 mt-1">Limited-time offers</p>
+        </div>
+
+        <% if @active_deals.any? %>
+          <div class="space-y-4">
+            <% @active_deals.each do |deal| %>
+              <div class="bg-white rounded-xl border-2 border-blue-500 overflow-hidden">
+                <div class="bg-blue-600 text-white px-5 py-3">
+                  <span class="text-3xl font-bold"><%= deal.discount_percentage %>% OFF</span>
+                </div>
+                <div class="p-5">
+                  <h3 class="font-semibold text-gray-900"><%= deal.title %></h3>
+                  <p class="text-sm text-gray-500 mt-1"><%= deal.description %></p>
+                  <p class="text-xs text-gray-400 mt-3">
+                    Expires <%= deal.expires_at.strftime("%b %d at %I:%M %p") %>
+                  </p>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="bg-white rounded-xl p-6 border border-gray-200 text-center">
+            <p class="text-gray-500 text-sm">No active deals. Check back soon!</p>
+          </div>
+        <% end %>
+
+        <%# CTA %>
+        <div class="bg-blue-50 rounded-xl p-6 text-center border border-blue-200">
+          <p class="text-sm text-blue-800 mb-3">Like what you see?</p>
+          <%= link_to "Sign Up & Start Saving", new_car_owner_registration_path, class: "block w-full px-4 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition" %>
+          <p class="text-xs text-blue-500 mt-2">Already a customer? <%= link_to "Sign in", new_car_owner_session_path, class: "underline" %></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="bg-gray-900 text-gray-400 mt-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center text-sm">
+      &copy; <%= Date.today.year %> <%= @shop.name %> on CarUs. Built by Rogue Media Lab.
+    </div>
+  </footer>
+</div>

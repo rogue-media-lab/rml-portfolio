@@ -95,7 +95,7 @@
               </div>
 
               <div class="flex gap-3">
-                <%= link_to "View Shop", new_car_owner_registration_path, class: "flex-1 text-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition" %>
+                <%= link_to "View Shop", carus_shop_path(shop), class: "flex-1 text-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition" %>
                 <% if shop.phone.present? %>
                   <a href="tel:<%= shop.phone %>" class="px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition">Call</a>
                 <% end %>

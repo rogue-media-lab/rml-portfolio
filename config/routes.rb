@@ -13,6 +13,9 @@ Rails.application.routes.draw do
     # Public landing page — shop directory
     root to: "car_us/pages#home", as: :carus_root
 
+    # Individual shop landing pages
+    resources :shops, only: [ :show ], param: :slug, controller: "car_us/shops", as: :carus_shops
+
     # Customer routes (authenticated car owners)
     authenticate :car_owner do
       resources :coupons, only: [ :index, :show ], controller: "car_us/coupons"
