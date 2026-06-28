@@ -1,0 +1,60 @@
+<%= form_with model: [:milk_admin, @shop], data: { turbo_frame: "dashboard_content" }, class: "space-y-6" do |f| %>
+  <% if @shop.errors.any? %>
+    <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded">
+      <h3 class="font-medium">Please fix <%= pluralize(@shop.errors.count, "error") %>:</h3>
+      <ul class="list-disc list-inside mt-2 text-sm">
+        <% @shop.errors.full_messages.each do |msg| %><li><%= msg %></li><% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="bg-white shadow rounded-lg p-6 space-y-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <%= f.label :name, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= f.text_field :name, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm", required: true %>
+      </div>
+      <div>
+        <%= f.label :slug, "URL Slug", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= f.text_field :slug, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm font-mono", required: true %>
+        <p class="text-xs text-gray-500 mt-1">e.g. habibi-mobile, speedee-rock-hill</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <%= f.label :email, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= f.email_field :email, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
+      </div>
+      <div>
+        <%= f.label :phone, class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= f.text_field :phone, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
+      </div>
+    </div>
+
+    <div>
+      <%= f.label :address, class: "block text-sm font-medium text-gray-700 mb-1" %>
+      <%= f.text_field :address, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
+    </div>
+
+    <div>
+      <%= f.label :website, class: "block text-sm font-medium text-gray-700 mb-1" %>
+      <%= f.url_field :website, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm", placeholder: "https://" %>
+    </div>
+
+    <div>
+      <%= f.label :description, class: "block text-sm font-medium text-gray-700 mb-1" %>
+      <%= f.text_area :description, rows: 3, class: "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" %>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <%= f.check_box :active, class: "rounded border-gray-300" %>
+      <%= f.label :active, "Active (visible on CarUs)", class: "text-sm text-gray-700" %>
+    </div>
+  </div>
+
+  <div class="flex items-center gap-3">
+    <%= f.submit class: "px-6 py-2.5 bg-sky-700 hover:bg-sky-600 text-white font-semibold rounded-lg transition-colors cursor-pointer" %>
+    <%= link_to "Cancel", milk_admin_carus_shops_path, data: { turbo_frame: "dashboard_content" }, class: "px-4 py-2.5 text-gray-600 hover:text-gray-800 text-sm font-medium" %>
+  </div>
+<% end %>
