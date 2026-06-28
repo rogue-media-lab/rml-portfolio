@@ -33,6 +33,7 @@ Rails.application.routes.draw do
         end
       end
       resources :services, only: [ :index, :new, :create, :edit, :update, :destroy ]
+      resources :technicians, only: [ :index, :new, :create, :destroy ]
     end
   end
 
