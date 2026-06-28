@@ -45,7 +45,7 @@ class MilkAdmin::CarusShopsController < ApplicationController
   private
 
   def set_shop
-    @shop = CarUs::Shop.find_by!(slug: params[:id])
+    @shop = CarUs::Shop.find_by!(slug: params[:slug])
   end
 
   def shop_params
