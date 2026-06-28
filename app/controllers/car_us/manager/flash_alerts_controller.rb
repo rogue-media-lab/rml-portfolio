@@ -15,7 +15,7 @@ module CarUs
 
         if @flash_alert.save
           flash[:notice] = "Flash Sale sent to #{current_shop.car_owners.count} customers!"
-          redirect_to carus_manager_root_path
+          redirect_to manager_root_path
         else
           render :new, status: :unprocessable_entity
         end

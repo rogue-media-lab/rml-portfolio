@@ -1,0 +1,70 @@
+<div class="max-w-2xl mx-auto space-y-6">
+  <div class="mb-4">
+    <%= link_to "← Back to Flash Sales", manager_flash_alerts_path, class: "text-sm text-blue-600 hover:text-blue-800" %>
+  </div>
+
+  <%# Header %>
+  <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+    <div class="bg-blue-600 text-white px-8 py-6 text-center">
+      <p class="text-sm font-medium uppercase tracking-wide mb-1">Flash Sale</p>
+      <h1 class="text-4xl font-bold"><%= @flash_alert.discount_percentage %>% OFF</h1>
+      <p class="text-xl mt-2 text-blue-100"><%= @flash_alert.title %></p>
+    </div>
+
+    <div class="p-8 space-y-6">
+      <%# Description %>
+      <div>
+        <h3 class="text-sm font-medium text-gray-500 uppercase">Description</h3>
+        <p class="mt-1 text-gray-900"><%= @flash_alert.description %></p>
+      </div>
+
+      <%# Code %>
+      <div>
+        <h3 class="text-sm font-medium text-gray-500 uppercase">Barcode Code</h3>
+        <p class="mt-1 font-mono text-lg font-bold tracking-wider text-gray-900"><%= @flash_alert.code %></p>
+      </div>
+
+      <%# Status %>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <h3 class="text-sm font-medium text-gray-500 uppercase">Duration</h3>
+          <p class="mt-1 text-gray-900"><%= @flash_alert.duration_hours %> hours</p>
+        </div>
+        <div>
+          <h3 class="text-sm font-medium text-gray-500 uppercase">Status</h3>
+          <% if @flash_alert.expired? %>
+            <span class="inline-block px-2 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded">Expired</span>
+          <% else %>
+            <span class="inline-block px-2 py-1 text-xs font-medium bg-green-100 text-green-700 rounded">Active</span>
+          <% end %>
+        </div>
+      </div>
+
+      <%# Dates %>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <h3 class="text-sm font-medium text-gray-500 uppercase">Created</h3>
+          <p class="mt-1 text-sm text-gray-900"><%= @flash_alert.created_at.strftime("%b %d, %Y at %I:%M %p") %></p>
+        </div>
+        <div>
+          <h3 class="text-sm font-medium text-gray-500 uppercase">Expires</h3>
+          <p class="mt-1 text-sm text-gray-900"><%= @flash_alert.expires_at.strftime("%b %d, %Y at %I:%M %p") %></p>
+        </div>
+      </div>
+
+      <%# Redemptions %>
+      <div>
+        <h3 class="text-sm font-medium text-gray-500 uppercase">Redemptions</h3>
+        <p class="mt-1 text-gray-900"><%= @flash_alert.redemptions.count %></p>
+      </div>
+
+      <% unless @flash_alert.expired? %>
+        <div class="pt-4 border-t border-gray-200">
+          <p class="text-sm text-gray-500">
+            <%= distance_of_time_in_words(Time.current, @flash_alert.expires_at) %> remaining
+          </p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
