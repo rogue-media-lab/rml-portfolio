@@ -1,4 +1,4 @@
-<%= form_with model: [:milk_admin, @shop], data: { turbo_frame: "dashboard_content" }, class: "space-y-6" do |f| %>
+<%= form_with model: @shop, url: (@shop.persisted? ? milk_admin_carus_shop_path(@shop) : milk_admin_carus_shops_path), data: { turbo_frame: "dashboard_content" }, class: "space-y-6" do |f| %>
   <% if @shop.errors.any? %>
     <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded">
       <h3 class="font-medium">Please fix <%= pluralize(@shop.errors.count, "error") %>:</h3>
