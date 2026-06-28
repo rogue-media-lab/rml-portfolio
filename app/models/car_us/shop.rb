@@ -7,4 +7,8 @@ class CarUs::Shop < ApplicationRecord
   has_many :coupons, dependent: :destroy
 
   validates :name, presence: true
+
+  def to_param
+    slug
+  end
 end
