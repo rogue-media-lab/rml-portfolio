@@ -26,7 +26,7 @@ services = [
   { name: "Brake Pad Replacement", description: "Front or rear brake pad replacement with ceramic pads.", price: 149.99, duration_minutes: 90 },
   { name: "Diagnostic Scan", description: "Check engine light? We'll scan and diagnose the issue on-site.", price: 49.99, duration_minutes: 30 },
   { name: "Battery Replacement", description: "Dead battery? We'll test, replace, and dispose of the old one.", price: 129.99, duration_minutes: 20 },
-  { name: "A/C Service", description: "A/C performance check and recharge. Stay cool in the Texas heat.", price: 89.99, duration_minutes: 60 },
+  { name: "A/C Service", description: "A/C performance check and recharge. Stay cool in the Texas heat.", price: 89.99, duration_minutes: 60 }
 ]
 
 services.each do |svc|
