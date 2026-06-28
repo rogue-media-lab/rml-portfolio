@@ -1,6 +1,37 @@
 Rails.application.routes.draw do
   mount ActionCable.server => "/cable"
 
+  # =====================================================================
+  # CarUs — Two-sided auto shop + car owner platform
+  # =====================================================================
+  scope "/carus", module: nil do
+    devise_for :car_owners, controllers: {
+      registrations: "car_us/registrations"
+    }
+    devise_for :technicians, skip: [ :registrations ]  # shop-provisioned
+
+    # Public landing page — shop directory
+    root to: "car_us/pages#home", as: :carus_root
+
+    # Customer routes (authenticated car owners)
+    authenticate :car_owner do
+      resources :coupons, only: [ :index, :show ], controller: "car_us/coupons"
+      resources :services, only: [ :index ], controller: "car_us/services"
+      get "rewards", to: "car_us/rewards#index"
+    end
+
+    # Manager Portal (authenticated technicians)
+    namespace :manager, module: "car_us/manager" do
+      root to: "dashboard#index"
+      resources :flash_alerts, only: [ :index, :new, :create, :show ]
+      resources :customers, only: [ :index ] do
+        collection do
+          get :search
+        end
+      end
+    end
+  end
+
   # User model planned for clients feature
   devise_for :users
   devise_for :milk_admins, skip: [ :registrations ], controllers: { sessions: "milk_admin/sessions" }

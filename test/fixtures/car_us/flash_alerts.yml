@@ -1,0 +1,25 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  shop: one
+  title: MyString
+  description: MyText
+  discount_percentage: 1
+  code: MyString
+  barcode: MyString
+  starts_at: 2026-06-28 14:25:06
+  expires_at: 2026-06-28 14:25:06
+  active: false
+  max_redemptions: 1
+
+two:
+  shop: two
+  title: MyString
+  description: MyText
+  discount_percentage: 1
+  code: MyString
+  barcode: MyString
+  starts_at: 2026-06-28 14:25:06
+  expires_at: 2026-06-28 14:25:06
+  active: false
+  max_redemptions: 1

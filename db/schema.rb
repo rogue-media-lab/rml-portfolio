@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_27_005141) do
+ActiveRecord::Schema[8.0].define(version: 2026_06_28_182532) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -94,6 +94,87 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_27_005141) do
     t.index ["featured"], name: "index_blogs_on_featured", unique: true, where: "(featured IS TRUE)"
     t.index ["milk_admin_id"], name: "index_blogs_on_milk_admin_id"
     t.index ["slug"], name: "index_blogs_on_slug", unique: true
+  end
+
+  create_table "car_owners", force: :cascade do |t|
+    t.string "email", default: "", null: false
+    t.string "encrypted_password", default: "", null: false
+    t.string "reset_password_token"
+    t.datetime "reset_password_sent_at"
+    t.datetime "remember_created_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "shop_id"
+    t.index ["email"], name: "index_car_owners_on_email", unique: true
+    t.index ["reset_password_token"], name: "index_car_owners_on_reset_password_token", unique: true
+    t.index ["shop_id"], name: "index_car_owners_on_shop_id"
+  end
+
+  create_table "car_us_coupons", force: :cascade do |t|
+    t.bigint "shop_id"
+    t.string "code"
+    t.string "barcode"
+    t.text "description"
+    t.datetime "expires_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["shop_id"], name: "index_car_us_coupons_on_shop_id"
+  end
+
+  create_table "car_us_flash_alerts", force: :cascade do |t|
+    t.bigint "shop_id", null: false
+    t.bigint "technician_id", null: false
+    t.string "title"
+    t.text "description"
+    t.integer "discount_percentage"
+    t.integer "duration_hours"
+    t.string "code"
+    t.datetime "expires_at"
+    t.boolean "active", default: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["shop_id"], name: "index_car_us_flash_alerts_on_shop_id"
+    t.index ["technician_id"], name: "index_car_us_flash_alerts_on_technician_id"
+  end
+
+  create_table "car_us_redemptions", force: :cascade do |t|
+    t.string "redeemable_type", null: false
+    t.bigint "redeemable_id", null: false
+    t.bigint "car_owner_id", null: false
+    t.bigint "shop_id", null: false
+    t.bigint "technician_id"
+    t.datetime "redeemed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["car_owner_id"], name: "index_car_us_redemptions_on_car_owner_id"
+    t.index ["redeemable_type", "redeemable_id"], name: "index_car_us_redemptions_on_redeemable"
+    t.index ["shop_id"], name: "index_car_us_redemptions_on_shop_id"
+    t.index ["technician_id"], name: "index_car_us_redemptions_on_technician_id"
+  end
+
+  create_table "car_us_services", force: :cascade do |t|
+    t.bigint "shop_id", null: false
+    t.string "name"
+    t.text "description"
+    t.decimal "price"
+    t.integer "duration_minutes"
+    t.boolean "active", default: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["shop_id"], name: "index_car_us_services_on_shop_id"
+  end
+
+  create_table "car_us_shops", force: :cascade do |t|
+    t.string "name"
+    t.string "slug"
+    t.string "address"
+    t.string "phone"
+    t.string "email"
+    t.string "website"
+    t.text "description"
+    t.boolean "active"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "chat_messages", force: :cascade do |t|
@@ -633,6 +714,20 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_27_005141) do
     t.index ["project_id"], name: "index_tasks_on_project_id"
   end
 
+  create_table "technicians", force: :cascade do |t|
+    t.string "email", default: "", null: false
+    t.string "encrypted_password", default: "", null: false
+    t.string "reset_password_token"
+    t.datetime "reset_password_sent_at"
+    t.datetime "remember_created_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "shop_id", null: false
+    t.index ["email"], name: "index_technicians_on_email", unique: true
+    t.index ["reset_password_token"], name: "index_technicians_on_reset_password_token", unique: true
+    t.index ["shop_id"], name: "index_technicians_on_shop_id"
+  end
+
   create_table "testimonials", force: :cascade do |t|
     t.bigint "restaurant_id", null: false
     t.string "customer_name", null: false
@@ -695,6 +790,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_27_005141) do
   add_foreign_key "albums", "genres"
   add_foreign_key "blogs", "blog_categories"
   add_foreign_key "blogs", "milk_admins"
+  add_foreign_key "car_owners", "car_us_shops", column: "shop_id"
+  add_foreign_key "car_us_coupons", "car_us_shops", column: "shop_id"
+  add_foreign_key "car_us_flash_alerts", "car_us_shops", column: "shop_id"
+  add_foreign_key "car_us_flash_alerts", "technicians"
+  add_foreign_key "car_us_redemptions", "car_owners"
+  add_foreign_key "car_us_redemptions", "car_us_shops", column: "shop_id"
+  add_foreign_key "car_us_redemptions", "technicians"
+  add_foreign_key "car_us_services", "car_us_shops", column: "shop_id"
   add_foreign_key "chat_messages", "chat_sessions"
   add_foreign_key "chat_sessions", "users"
   add_foreign_key "favorites", "hermit_videos"
@@ -729,6 +832,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_27_005141) do
   add_foreign_key "songs", "albums"
   add_foreign_key "songs", "artists"
   add_foreign_key "tasks", "projects"
+  add_foreign_key "technicians", "car_us_shops", column: "shop_id"
   add_foreign_key "testimonials", "restaurants"
   add_foreign_key "user_hermit_profiles", "hermits", column: "favorite_hermit_id"
   add_foreign_key "user_hermit_profiles", "users"

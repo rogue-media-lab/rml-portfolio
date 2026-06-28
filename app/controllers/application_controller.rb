@@ -1,25 +1,43 @@
 class ApplicationController < ActionController::Base
-  # Set meta tags
   before_action :set_meta_data
-  # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
   allow_browser versions: :modern
-  # Ensure the admin layout is used when signed in
   layout :layout_by_resource
 
+  # Route CarUs users to the correct destination after sign-in/sign-up
+  # Must be protected to override Devise's defaults
+  def after_sign_in_path_for(resource)
+    case resource
+    when CarOwner
+      coupons_path
+    when Technician
+      manager_root_path
+    else
+      super
+    end
+  end
+
+  def after_sign_up_path_for(resource)
+    "/carus"  # safe landing — avoid auth-required pages
+  end
+
   private
-  # Choose the layout based on whether the user is signed in or not.
-  #
-  # If the user is signed in, it will use the milk_admin layout.
-  # Otherwise, it will use the application layout.
+
   def layout_by_resource
     if milk_admin_signed_in?
       "milk_admin"
+    elsif devise_controller?
+      if resource_class == CarOwner
+        "car_us/car_owner"
+      elsif resource_class == Technician
+        "car_us/technician"
+      else
+        "application"
+      end
     else
       "application"
     end
   end
 
-  # app/controllers/application_controller.rb
   def set_meta_data
     set_meta_tags site: "https://www.roguemedialab.com",
                   title: "Rogue Media Lab | Mason Roberts",

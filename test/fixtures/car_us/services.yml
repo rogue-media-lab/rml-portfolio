@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  shop: one
+  name: MyString
+  description: MyText
+  price: 9.99
+  duration_minutes: 1
+  active: false
+
+two:
+  shop: two
+  name: MyString
+  description: MyText
+  price: 9.99
+  duration_minutes: 1
+  active: false
