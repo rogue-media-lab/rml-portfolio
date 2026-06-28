@@ -105,6 +105,8 @@ Rails.application.routes.draw do
     get "hermit_crews/dashboard", to: "hermit_crews#dashboard", as: :hermit_crews_dashboard
     resources :hermit_crews, only: [ :index, :new, :create, :edit, :update, :destroy ]
 
+    resources :carus_shops, param: :slug, only: [ :index, :show, :new, :create, :edit, :update, :destroy ]
+
     resources :pills, only: [ :index, :new, :create, :edit, :update, :destroy ]
   end
 
