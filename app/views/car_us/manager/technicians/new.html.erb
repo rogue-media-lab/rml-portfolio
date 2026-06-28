@@ -1,7 +1,7 @@
 <div class="max-w-md">
   <h1 class="text-2xl font-bold text-gray-900 mb-6">Add Technician</h1>
 
-  <%= form_with model: [:manager, @technician], class: "space-y-4" do |f| %>
+  <%= form_with model: @technician, url: manager_technicians_path, class: "space-y-4" do |f| %>
     <% if @technician.errors.any? %>
       <div class="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded text-sm">
         <p class="font-medium">Please fix <%= pluralize(@technician.errors.count, "error") %>:</p>
