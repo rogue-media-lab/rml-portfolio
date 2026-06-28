@@ -1,3 +1,4 @@
+<%= turbo_frame_tag "dashboard_content" do %>
 <div class="max-w-3xl">
   <div class="mb-4">
     <%= link_to "← View Shop", milk_admin_carus_shop_path(@shop), data: { turbo_frame: "dashboard_content" }, class: "text-sm text-sky-600 hover:text-sky-800" %>
@@ -5,3 +6,4 @@
   <h1 class="text-2xl font-bold text-gray-900 mb-6">Edit <%= @shop.name %></h1>
   <%= render "form", shop: @shop %>
 </div>
+<% end %>
