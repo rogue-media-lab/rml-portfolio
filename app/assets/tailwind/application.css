@@ -39,6 +39,16 @@
   --color-background-dark: #101822;
   --color-card-dark: #1a2432;
 
+  --color-carus-black: #0D0D0D;
+  --color-carus-panel: #141414;
+  --color-carus-field: #1A1A1A;
+  --color-carus-green: #0FB900;
+  --color-carus-border: #FFFFFF14;
+  --color-carus-text-muted: #FFFFFF4D;
+  --color-carus-text-dim: #FFFFFF33;
+
+  --font-montserrat: "Montserrat", sans-serif;
+
   --font-teko: "Teko", sans-serif;
   --font-display: "Space Grotesk", sans-serif;
 }

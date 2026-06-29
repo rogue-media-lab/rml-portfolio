@@ -1,0 +1,51 @@
+<%= content_for :head do %>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<% end %>
+
+<div class="min-h-screen bg-carus-black font-montserrat flex flex-col justify-between">
+  <%# Header %>
+  <div class="flex flex-col items-center pt-20 px-10">
+    <div class="mb-5 rounded-[20px] py-1.25 px-3.5 bg-carus-green/[0.12] border border-carus-green/30">
+      <span class="text-center text-base/[20px] text-white">Step 1 of 3</span>
+    </div>
+    <h1 class="mb-2 text-[28px]/[34px] font-extrabold text-white tracking-[-0.5px] text-center">Create Your Account</h1>
+    <p class="opacity-35 text-center text-[13px]/[16px] font-medium text-white">Enter your details to get started with carus.</p>
+  </div>
+
+  <%# Form %>
+  <%= form_with model: resource, as: resource_name, url: registration_path(resource_name), class: "flex flex-col px-6 gap-3" do |f| %>
+    <%# Name fields %>
+    <div class="flex gap-2.5">
+      <div class="grow flex flex-col gap-1.5">
+        <label class="opacity-50 tracking-[1px] uppercase text-[10px]/[12px] font-bold text-white">First Name</label>
+        <%= f.text_field :first_name, placeholder: "Mason", class: "w-full bg-carus-field border border-[#2A2A2A] rounded-xl py-[15px] px-3.5 text-sm/[18px] text-white placeholder:text-white/25 focus:outline-none focus:border-carus-green/40" %>
+      </div>
+      <div class="grow flex flex-col gap-1.5">
+        <label class="opacity-50 tracking-[1px] uppercase text-[10px]/[12px] font-bold text-white">Last Name</label>
+        <%= f.text_field :last_name, placeholder: "Roberts", class: "w-full bg-carus-field border border-[#2A2A2A] rounded-xl py-[15px] px-3.5 text-sm/[18px] text-white placeholder:text-white/25 focus:outline-none focus:border-carus-green/40" %>
+      </div>
+    </div>
+
+    <%# Email %>
+    <div class="flex flex-col gap-1.5">
+      <label class="opacity-50 tracking-[1px] uppercase text-[10px]/[12px] font-bold text-white">Email</label>
+      <%= f.email_field :email, placeholder: "you@email.com", required: true, class: "w-full bg-carus-field border border-[#2A2A2A] rounded-xl py-[15px] px-3.5 text-sm/[18px] text-white placeholder:text-white/25 focus:outline-none focus:border-carus-green/40" %>
+    </div>
+
+    <%# Password %>
+    <div class="flex flex-col gap-1.5">
+      <label class="opacity-50 tracking-[1px] uppercase text-[10px]/[12px] font-bold text-white">Password</label>
+      <%= f.password_field :password, placeholder: "········", required: true, class: "w-full bg-carus-field border border-carus-green rounded-xl py-[15px] px-3.5 tracking-[3px] text-lg/[22px] text-white placeholder:text-white/25 focus:outline-none" %>
+    </div>
+
+    <%# Submit %>
+    <%= f.submit "Continue →", class: "w-full mt-1 rounded-[14px] p-4.5 bg-carus-green text-[15px]/[18px] font-extrabold text-black cursor-pointer" %>
+  <% end %>
+
+  <%# Footer %>
+  <div class="flex justify-center pb-9">
+    <%= link_to "Already have an account? Sign In", new_session_path(resource_name), class: "opacity-20 text-[11px]/[14px] font-medium text-white" %>
+  </div>
+</div>

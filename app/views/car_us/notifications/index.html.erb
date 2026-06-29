@@ -1,0 +1,68 @@
+<%= content_for :head do %>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<% end %>
+
+<div class="min-h-screen bg-carus-black font-montserrat flex flex-col">
+  <div class="flex flex-col pt-14 gap-0.75 px-6">
+    <h1 class="text-[22px]/[28px] font-extrabold text-white tracking-[-0.4px]">Alerts</h1>
+    <p class="text-xs/[16px] font-medium text-[#FFFFFF59]">All vehicles</p>
+  </div>
+
+  <div class="grow flex flex-col pt-5 gap-2.5 px-6">
+    <% if @notifications.any? %>
+      <% @notifications.each do |n| %>
+        <div class="flex flex-col rounded-[18px] py-4 px-4.5 gap-2.5 <%= n.read ? 'opacity-50 bg-carus-field border border-[#FFFFFF0A]' : 'bg-[#1A1010] border border-[#FF626033]' %>">
+          <div class="flex justify-between items-center">
+            <span class="uppercase tracking-[0.8px] text-[10px]/[12px] font-bold <%= n.read ? 'text-[#FFFFFF4D]' : 'text-[#FF6260]' %>"><%= n.category || n.title %></span>
+            <span class="text-[10px]/[12px] text-[#FFFFFF40]"><%= n.read ? 'Read' : 'Unread' %></span>
+          </div>
+          <p class="text-[15px]/[18px] font-extrabold text-white"><%= n.title %></p>
+          <p class="text-[12px] leading-[160%] text-[#FFFFFF73]"><%= n.body %></p>
+          <% if n.read %>
+            <span class="text-xs/[16px] font-bold text-[#FFFFFF4D]">Completed ✓</span>
+          <% end %>
+        </div>
+      <% end %>
+    <% else %>
+      <div class="flex flex-col items-center justify-center py-16 gap-3 opacity-40">
+        <svg width="40" height="40" viewBox="0 0 40 40" class="shrink-0">
+          <circle cx="20" cy="20" r="18" fill="none" stroke="#FFFFFF33" stroke-width="1.5"/>
+          <line x1="20" y1="12" x2="20" y2="22" stroke="#FFFFFF33" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="20" cy="27" r="1" fill="#FFFFFF33"/>
+        </svg>
+        <p class="text-sm font-medium text-white">No alerts yet</p>
+        <p class="text-xs text-[#FFFFFF4D]">You'll see service reminders and tech flags here.</p>
+      </div>
+    <% end %>
+  </div>
+
+  <%# Tab bar — Alerts active %>
+  <div class="h-20.5 flex items-center justify-around shrink-0 pb-4 px-4 bg-[#111111] border-t border-[#FFFFFF12] mt-auto">
+    <%= link_to vehicles_path, class: "flex flex-col items-center gap-1.25" do %>
+      <div class="flex items-center justify-center shrink-0 size-6">
+        <div class="w-2.75 h-2.75 rounded-xs shrink-0 border-2 border-[#FFFFFF33]"></div>
+      </div>
+      <span class="text-[10px]/[12px] font-medium text-carus-text-dim">Garage</span>
+    <% end %>
+    <div class="flex flex-col items-center gap-1.25">
+      <div class="flex items-center justify-center shrink-0 size-6">
+        <div class="rounded-[3px] shrink-0 border-2 border-[#FFFFFF33] size-3.5"></div>
+      </div>
+      <span class="text-[10px]/[12px] font-medium text-carus-text-dim">History</span>
+    </div>
+    <div class="flex flex-col items-center gap-1.25">
+      <div class="flex items-center justify-center rounded-[7px] shrink-0 bg-carus-green/15 size-6">
+        <div class="rounded-full shrink-0 border-2 border-carus-green size-3.5"></div>
+      </div>
+      <span class="text-[10px]/[12px] font-bold text-carus-green">Alerts</span>
+    </div>
+    <%= link_to profile_path, class: "flex flex-col items-center gap-1.25" do %>
+      <div class="flex items-center justify-center shrink-0 size-6">
+        <div class="rounded-full shrink-0 border-2 border-[#FFFFFF33] size-3.5"></div>
+      </div>
+      <span class="text-[10px]/[12px] font-medium text-carus-text-dim">Profile</span>
+    <% end %>
+  </div>
+</div>
