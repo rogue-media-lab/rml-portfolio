@@ -1,0 +1,93 @@
+<%= content_for :head do %>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<% end %>
+
+<div class="min-h-screen bg-carus-black font-montserrat flex flex-col">
+  <div class="flex flex-col pt-14 gap-0.75 px-6">
+    <p class="uppercase tracking-[1.5px] text-[11px]/[14px] font-semibold text-carus-green">Tech View</p>
+    <h1 class="text-xl/[24px] font-extrabold text-white tracking-[-0.4px]">2020 Honda Accord</h1>
+    <p class="text-xs/[16px] text-[#FFFFFF59]">2.0T Sport · Sedan</p>
+  </div>
+
+  <div class="grow flex flex-col pt-4.5 gap-2.5 px-6">
+    <%# Engine Oil %>
+    <div class="rounded-2xl py-4 px-4.5 bg-carus-field border border-[#FFFFFF0F]">
+      <p class="uppercase tracking-[1px] mb-2.5 text-[10px]/[12px] font-bold text-carus-green">Engine Oil</p>
+      <div class="flex gap-2.5">
+        <% [["Viscosity", "0W-20"], ["Capacity", "4.4 qts"], ["Filter #", "M1-110A"]].each_with_index do |(label, val), i| %>
+          <div class="<%= i == 2 ? 'grow-[1.4]' : 'grow' %> flex flex-col gap-0.5">
+            <span class="text-[10px]/[12px] font-medium text-[#FFFFFF59]"><%= label %></span>
+            <span class="text-[15px]/[18px] font-extrabold text-white"><%= val %></span>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <%# Tires %>
+    <div class="rounded-2xl py-4 px-4.5 bg-carus-field border border-[#FFFFFF0F]">
+      <p class="uppercase tracking-[1px] mb-2.5 text-[10px]/[12px] font-bold text-carus-green">Tires</p>
+      <div class="flex gap-2.5">
+        <% [["Size", "235/40R19", "1.6"], ["Front PSI", "35", ""], ["Rear PSI", "33", ""]].each_with_index do |(label, val, grow), i| %>
+          <div class="<%= i == 0 ? 'grow-[1.6]' : 'grow' %> flex flex-col gap-0.5">
+            <span class="text-[10px]/[12px] font-medium text-[#FFFFFF59]"><%= label %></span>
+            <span class="text-[15px]/[18px] font-extrabold text-white"><%= val %></span>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <%# Fluids %>
+    <div class="rounded-2xl py-4 px-4.5 bg-carus-field border border-[#FFFFFF0F]">
+      <p class="uppercase tracking-[1px] mb-2.5 text-[10px]/[12px] font-bold text-carus-green">Fluids</p>
+      <div class="flex gap-2.5">
+        <% [["Coolant", "Honda OAT"], ["Freon", "R-1234yf"], ["Brake Fluid", "DOT 3"]].each do |label, val| %>
+          <div class="grow flex flex-col gap-0.5">
+            <span class="text-[10px]/[12px] font-medium text-[#FFFFFF59]"><%= label %></span>
+            <span class="text-[13px]/[16px] font-extrabold text-white"><%= val %></span>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <%# Filters & Plugs %>
+    <div class="rounded-2xl py-4 px-4.5 bg-carus-field border border-[#FFFFFF0F]">
+      <p class="uppercase tracking-[1px] mb-2.5 text-[10px]/[12px] font-bold text-carus-green">Filters & Plugs</p>
+      <div class="flex gap-2.5">
+        <% [["Air Filter", "CA10755"], ["Cabin Filter", "CF11179"], ["Spark Plug", "NGK 96122"]].each do |label, val| %>
+          <div class="grow flex flex-col gap-0.5">
+            <span class="text-[10px]/[12px] font-medium text-[#FFFFFF59]"><%= label %></span>
+            <span class="text-[13px]/[16px] font-extrabold text-white"><%= val %></span>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-center rounded-[14px] py-3.5 px-4.5 gap-2 bg-carus-green">
+      <span class="text-sm/[18px] font-extrabold text-black">+ Flag a Concern for Customer</span>
+    </div>
+  </div>
+
+  <%# Tab bar %>
+  <div class="h-20.5 flex items-center justify-around shrink-0 pb-4 px-4 bg-[#111111] border-t border-[#FFFFFF12] mt-auto">
+    <%= link_to tech_lookups_path, class: "flex flex-col items-center gap-1.25" do %>
+      <div class="flex items-center justify-center shrink-0 size-6">
+        <div class="w-2.75 h-2.75 rounded-xs shrink-0 border-2 border-[#FFFFFF33]"></div>
+      </div>
+      <span class="text-[10px]/[12px] font-medium text-carus-text-dim">Lookup</span>
+    <% end %>
+    <div class="flex flex-col items-center gap-1.25">
+      <div class="flex items-center justify-center shrink-0 size-6">
+        <div class="rounded-[3px] shrink-0 border-2 border-[#FFFFFF33] size-3.5"></div>
+      </div>
+      <span class="text-[10px]/[12px] font-medium text-carus-text-dim">Customers</span>
+    </div>
+    <%= link_to tech_profile_path, class: "flex flex-col items-center gap-1.25" do %>
+      <div class="flex items-center justify-center shrink-0 size-6">
+        <div class="rounded-full shrink-0 border-2 border-[#FFFFFF33] size-3.5"></div>
+      </div>
+      <span class="text-[10px]/[12px] font-medium text-carus-text-dim">Profile</span>
+    <% end %>
+  </div>
+</div>
