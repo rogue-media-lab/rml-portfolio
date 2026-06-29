@@ -1,0 +1,98 @@
+<%= content_for :head do %>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<% end %>
+
+<div class="min-h-screen bg-carus-black font-montserrat flex flex-col">
+  <div class="pt-14 pb-4 px-5">
+    <p class="opacity-45 tracking-[1.5px] uppercase mb-1 text-[11px]/[14px] font-semibold text-white">Tech Tools</p>
+    <h1 class="mb-4 text-[26px]/[32px] font-extrabold text-white tracking-[-0.5px]">Customer Lookup</h1>
+    <div class="flex items-center rounded-xl py-[13px] px-4 gap-2.5 bg-carus-field border border-[#2A2A2A]">
+      <svg width="16" height="16" viewBox="0 0 16 16" class="shrink-0">
+        <circle cx="7" cy="7" r="5" fill="none" stroke="#FFFFFF4D" stroke-width="1.4"/>
+        <line x1="11" y1="11" x2="14" y2="14" stroke="#FFFFFF4D" stroke-width="1.4" stroke-linecap="round"/>
+      </svg>
+      <span class="opacity-25 text-[13px]/[16px] font-medium text-white">Name, plate, or phone...</span>
+    </div>
+  </div>
+
+  <div class="flex flex-col pb-8 gap-3 px-5">
+    <p class="opacity-35 tracking-[1.5px] uppercase text-[10px]/[12px] font-bold text-white">Recent Customers</p>
+    <div class="flex flex-col gap-2">
+      <% [
+        ["Mason Roberts", "2020 Honda Accord · 1.5L Turbo", "47,320 mi", "Mar 12", "#0FB900"],
+        ["Jane Doe", "2018 Toyota Camry · 2.5L", "91,050 mi", "Mar 10", "#E8A020"],
+        ["Tom Riley", "2015 Ford F-150 · 5.0L V8", "138,400 mi", "Mar 8", "#FF6260"],
+        ["Sara Kim", "2022 Hyundai Tucson · 2.5L", "18,900 mi", "Mar 5", "#0FB900"]
+      ].each do |name, car, miles, date, color| %>
+        <div class="flex items-center rounded-[14px] gap-3.5 p-4 bg-carus-field border border-[#2A2A2A]">
+          <div class="flex items-center justify-center shrink-0 rounded-[22px] bg-[#0D2B0D] border-[1.5px] border-carus-green size-11">
+            <span class="text-sm/[18px] font-extrabold text-carus-green"><%= name.split.map(&:first).join %></span>
+          </div>
+          <div class="grow">
+            <p class="mb-0.5 text-sm/[18px] font-bold text-white"><%= name %></p>
+            <p class="opacity-40 text-[11px]/[14px] font-medium text-white"><%= car %></p>
+          </div>
+          <div>
+            <p class="mb-0.5 text-right text-[11px]/[14px] font-bold" style="color: <%= color %>"><%= miles %></p>
+            <p class="opacity-30 text-right text-[10px]/[12px] text-white"><%= date %></p>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <p class="opacity-35 tracking-[1.5px] uppercase mt-2 mb-1 text-[10px]/[12px] font-bold text-white">Due In This Week</p>
+    <div class="rounded-[14px] overflow-hidden bg-carus-field border border-[#2A2A2A]">
+      <div class="flex items-center justify-between py-3.5 px-4 border-b border-[#2A2A2A]">
+        <div>
+          <p class="mb-0.5 text-[13px]/[16px] font-bold text-white">Carl Evans · 2019 Chevy Equinox</p>
+          <p class="opacity-35 text-[11px]/[14px] text-white">Oil change overdue · 3,200 mi past</p>
+        </div>
+        <div class="rounded-md py-0.75 px-2 bg-[#FF6260]/15">
+          <span class="text-[9px]/[12px] font-bold text-[#FF6260] uppercase">Overdue</span>
+        </div>
+      </div>
+      <div class="flex items-center justify-between py-3.5 px-4">
+        <div>
+          <p class="mb-0.5 text-[13px]/[16px] font-bold text-white">Amy Lawson · 2017 Honda CR-V</p>
+          <p class="opacity-35 text-[11px]/[14px] text-white">Tire rotation coming up · ~400 mi</p>
+        </div>
+        <div class="rounded-md py-0.75 px-2 bg-[#E8A020]/15">
+          <span class="text-[9px]/[12px] font-bold text-[#E8A020] uppercase">Soon</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%# Tab bar %>
+  <div class="mt-auto flex bg-carus-black border-t border-[#1A1A1A]">
+    <%= link_to tech_lookups_path, class: "grow flex flex-col items-center pt-3 pb-5 gap-1" do %>
+      <svg width="22" height="22" viewBox="0 0 22 22" class="shrink-0">
+        <circle cx="9" cy="9" r="6" fill="none" stroke="#0FB900" stroke-width="1.5"/>
+        <line x1="14" y1="14" x2="19" y2="19" stroke="#0FB900" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <span class="text-[10px]/[12px] font-bold text-carus-green">Lookup</span>
+    <% end %>
+    <%= link_to vehicles_path, class: "grow flex flex-col items-center pt-3 pb-5 gap-1" do %>
+      <svg width="22" height="22" viewBox="0 0 22 22" class="shrink-0">
+        <path d="M4 18V8L11 3L18 8V18" fill="none" stroke="#FFFFFF59" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <rect x="8" y="13" width="6" height="5" rx="1" fill="none" stroke="#FFFFFF59" stroke-width="1.5"/>
+      </svg>
+      <span class="opacity-35 text-[10px]/[12px] font-semibold text-white">Garage</span>
+    <% end %>
+    <div class="grow flex flex-col items-center pt-3 pb-5 gap-1">
+      <svg width="22" height="22" viewBox="0 0 22 22" class="shrink-0">
+        <path d="M4 4H14L10 9.5H14L4 18" fill="none" stroke="#FFFFFF59" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="opacity-35 text-[10px]/[12px] font-semibold text-white">Flag</span>
+    </div>
+    <%= link_to tech_profile_path, class: "grow flex flex-col items-center pt-3 pb-5 gap-1" do %>
+      <svg width="22" height="22" viewBox="0 0 22 22" class="shrink-0">
+        <circle cx="11" cy="8" r="3.5" fill="none" stroke="#FFFFFF59" stroke-width="1.5"/>
+        <path d="M4 19C4 15.134 7.134 12 11 12C14.866 12 18 15.134 18 19" fill="none" stroke="#FFFFFF59" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <span class="opacity-35 text-[10px]/[12px] font-semibold text-white">Profile</span>
+    <% end %>
+  </div>
+</div>

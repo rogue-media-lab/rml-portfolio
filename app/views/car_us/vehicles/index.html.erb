@@ -1,0 +1,111 @@
+<%= content_for :head do %>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<% end %>
+
+<div class="min-h-screen bg-carus-black font-montserrat pb-8">
+  <%# Status bar %>
+  <div class="flex justify-between items-center pt-3.5 px-5">
+    <span class="text-xs/[16px] font-semibold text-white">9:41</span>
+    <svg width="25" height="12" viewBox="0 0 25 12" class="shrink-0">
+      <rect x="0.5" y="0.5" width="21" height="11" rx="2.5" fill="#000" stroke="#FFFFFF59"/>
+      <rect x="2" y="2" width="16" height="8" rx="1.5" fill="#FFFFFF"/>
+    </svg>
+  </div>
+
+  <%# Header %>
+  <div class="flex justify-between items-center pt-5 pb-1 px-5">
+    <div>
+      <p class="opacity-45 tracking-[1.5px] uppercase mb-1 text-[11px]/[14px] font-semibold text-white">My Garage</p>
+      <h1 class="text-[26px]/[32px] font-extrabold text-white tracking-[-0.5px]">Your Vehicles</h1>
+    </div>
+    <%= link_to new_vehicle_path, class: "flex items-center justify-center rounded-[20px] shrink-0 bg-carus-field border border-[#2A2A2A] size-10" do %>
+      <svg width="16" height="16" viewBox="0 0 16 16" class="shrink-0">
+        <line x1="8" y1="3" x2="8" y2="13" stroke="#FFFFFF80" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="3" y1="8" x2="13" y2="8" stroke="#FFFFFF80" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    <% end %>
+  </div>
+
+  <p class="opacity-35 mb-5 text-xs/[16px] font-medium text-white px-5">
+    <%= @vehicles.count %> of 4 slots used
+  </p>
+
+  <%# Vehicle cards %>
+  <div class="flex flex-col px-5 gap-4">
+    <% @vehicles.each do |vehicle| %>
+      <div class="rounded-2xl overflow-hidden bg-carus-field border border-[#2A2A2A]">
+        <%# Car image banner %>
+        <div class="w-full h-42 relative overflow-hidden bg-gradient-to-b from-carus-field to-black/60">
+          <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/70"></div>
+          <div class="absolute top-3 right-3 flex items-center rounded-[20px] py-1 px-2.5 gap-1.25 bg-carus-green/10 border border-carus-green">
+            <div class="rounded-[3px] shrink-0 bg-carus-green size-1.5"></div>
+            <span class="tracking-[0.5px] text-[10px]/[12px] font-bold text-carus-green uppercase">Healthy</span>
+          </div>
+        </div>
+
+        <%# Card content %>
+        <div class="p-4">
+          <div class="flex justify-between items-start mb-2.5">
+            <div>
+              <p class="mb-0.5 text-[17px]/[22px] font-extrabold text-white">
+                <%= [vehicle.year, vehicle.make, vehicle.model].compact.join(" ") %>
+              </p>
+              <p class="opacity-45 text-xs/[16px] font-medium text-white">
+                <%= [vehicle.engine_size, vehicle.trim].compact.join(" · ") %>
+              </p>
+            </div>
+            <% if vehicle.vin.present? %>
+              <div class="rounded-lg py-1.5 px-2.5 bg-[#2A2A2A]">
+                <p class="opacity-40 tracking-[0.8px] mb-px text-center text-[9px]/[12px] font-semibold text-white uppercase">Vin</p>
+                <p class="text-center font-mono text-xs/[16px] font-bold text-white">·· <%= vehicle.vin.last(6) %></p>
+              </div>
+            <% end %>
+          </div>
+
+          <%# Stats row %>
+          <div class="flex mb-3.5 gap-2">
+            <div class="grow rounded-[10px] p-2.5 bg-carus-black">
+              <p class="mb-0.5 text-center text-[15px]/[18px] font-extrabold text-carus-green">
+                <%= number_with_delimiter(vehicle.mileage || 0) %>
+              </p>
+              <p class="opacity-35 tracking-[0.5px] text-center text-[9px]/[12px] font-semibold text-white uppercase">Est. Miles</p>
+            </div>
+            <div class="grow rounded-[10px] p-2.5 bg-carus-black">
+              <p class="mb-0.5 text-center text-[15px]/[18px] font-extrabold text-carus-green">—</p>
+              <p class="opacity-35 tracking-[0.5px] text-center text-[9px]/[12px] font-semibold text-white uppercase">To Oil Change</p>
+            </div>
+            <div class="grow rounded-[10px] p-2.5 bg-carus-black">
+              <p class="mb-0.5 text-center text-[15px]/[18px] font-extrabold text-carus-green">0</p>
+              <p class="opacity-35 tracking-[0.5px] text-center text-[9px]/[12px] font-semibold text-white uppercase">Alerts</p>
+            </div>
+          </div>
+
+          <%# Footer row %>
+          <div class="flex justify-between items-center">
+            <p class="opacity-30 text-[11px]/[14px] font-medium text-white">
+              Last visit: —
+            </p>
+            <%= link_to vehicle_path(vehicle), class: "flex items-center gap-1" do %>
+              <span class="text-xs/[16px] font-bold text-carus-green">View</span>
+              <svg width="14" height="14" viewBox="0 0 14 14" class="shrink-0">
+                <path d="M5 3L9 7L5 11" fill="none" stroke="#0FB900" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <%# Add a Vehicle card (always shown) %>
+    <%= link_to new_vehicle_path, class: "h-20 flex items-center justify-center rounded-2xl gap-2.5 shrink-0 bg-carus-field border-[1.5px] border-dashed border-[#2A2A2A]" do %>
+      <svg width="20" height="20" viewBox="0 0 20 20" class="shrink-0">
+        <circle cx="10" cy="10" r="9" fill="none" stroke="#FFFFFF33" stroke-width="1.5"/>
+        <line x1="10" y1="6" x2="10" y2="14" stroke="#FFFFFF40" stroke-width="1.5" stroke-linecap="round"/>
+        <line x1="6" y1="10" x2="14" y2="10" stroke="#FFFFFF40" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <span class="opacity-25 text-[13px]/[16px] font-semibold text-white">Add a Vehicle</span>
+    <% end %>
+  </div>
+</div>

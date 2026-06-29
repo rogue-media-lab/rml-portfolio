@@ -1,0 +1,68 @@
+<%= content_for :head do %>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<% end %>
+
+<div class="min-h-screen bg-carus-black font-montserrat">
+  <div class="flex flex-col pt-14 gap-0.75 px-6">
+    <p class="uppercase tracking-[1.5px] text-[11px]/[14px] font-semibold text-carus-green">Vehicle Concern</p>
+    <h1 class="text-[22px]/[28px] font-extrabold text-white tracking-[-0.4px]">Flag a Concern</h1>
+  </div>
+
+  <%# Vehicle info %>
+  <div class="mt-4 flex justify-between items-center rounded-[14px] py-3 px-4 bg-carus-field border border-[#FFFFFF12] mx-6">
+    <div class="flex flex-col gap-0.5">
+      <p class="text-sm/[18px] font-bold text-white"><%= @vehicle.year %> <%= @vehicle.make %> <%= @vehicle.model %></p>
+      <p class="text-[11px]/[14px] text-[#FFFFFF59]"><%= @vehicle.trim %> · <%= @vehicle.engine_size %> · <%= number_with_delimiter(@vehicle.mileage || 0) %> mi</p>
+    </div>
+  </div>
+
+  <%= form_with model: [@vehicle, @concern], url: vehicle_concerns_path(@vehicle), class: "grow flex flex-col pt-4 gap-3.5 px-6" do |f| %>
+    <%# Category %>
+    <div class="flex flex-col gap-2">
+      <label class="uppercase tracking-[0.8px] text-[11px]/[14px] font-bold text-[#FFFFFF59]">Category</label>
+      <div class="flex flex-wrap gap-2">
+        <% %w[Brakes Oil Tires Cooling Suspension].each_with_index do |cat, i| %>
+          <label class="cursor-pointer rounded-[20px] py-2 px-3.5 <%= i == 0 ? 'bg-[#FF6260]' : 'bg-carus-field border border-carus-border' %>">
+            <span class="text-xs/[16px] font-bold <%= i == 0 ? 'text-black' : 'text-[#FFFFFF66]' %>"><%= cat %></span>
+            <%= f.radio_button :category, cat, checked: (i == 0), class: "hidden" %>
+          </label>
+        <% end %>
+      </div>
+    </div>
+
+    <%# Severity %>
+    <div class="flex flex-col gap-2">
+      <label class="uppercase tracking-[0.8px] text-[11px]/[14px] font-bold text-[#FFFFFF59]">Urgency</label>
+      <div class="flex gap-2">
+        <% [
+          ["Urgent", "Address this visit", "#FF6260", "bg-[#1A1010]", "border-[#FF6260]"],
+          ["Schedule Soon", "Within 30–60 days", "#E8A020", "bg-[#161200]", "border-[#E8A02080]"],
+          ["Monitor", "Keep an eye on it", "#FFFFFF66", "bg-carus-field", "border-carus-border"]
+        ].each_with_index do |(label, hint, color, bg, border), i| %>
+          <label class="cursor-pointer grow flex flex-col items-center rounded-xl gap-0.5 p-3 <%= bg %> border-[1.5px] <%= border %>">
+            <span class="text-[13px]/[16px] font-extrabold" style="color: <%= color %>"><%= label %></span>
+            <span class="text-center text-[10px]/[12px] text-[#FFFFFF4D]"><%= hint %></span>
+            <%= f.radio_button :severity, label, checked: (i == 0), class: "hidden" %>
+          </label>
+        <% end %>
+      </div>
+    </div>
+
+    <%# Title %>
+    <div class="flex flex-col gap-2">
+      <label class="uppercase tracking-[0.8px] text-[11px]/[14px] font-bold text-[#FFFFFF59]">What's the issue?</label>
+      <%= f.text_field :title, placeholder: "Rear brake pads wearing thin", class: "w-full bg-carus-field border border-carus-border rounded-[14px] py-3.5 px-4 text-[13px]/[16px] text-white placeholder:text-white/30 focus:outline-none focus:border-carus-green/40" %>
+    </div>
+
+    <%# Description %>
+    <div class="flex flex-col gap-2">
+      <label class="uppercase tracking-[0.8px] text-[11px]/[14px] font-bold text-[#FFFFFF59]">Details</label>
+      <%= f.text_area :description, rows: 4, placeholder: "Describe what you found, % remaining, any specific observations...", class: "w-full min-h-20 bg-carus-field border border-carus-border rounded-[14px] py-3.5 px-4 text-[13px] leading-[160%] text-white placeholder:text-white/30 focus:outline-none focus:border-carus-green/40 resize-none" %>
+    </div>
+
+    <%# Submit %>
+    <%= f.submit "Flag This Concern", class: "w-full mt-2 rounded-[14px] py-4 px-4.5 bg-[#FF6260] text-[15px]/[18px] font-extrabold text-white cursor-pointer" %>
+  <% end %>
+</div>

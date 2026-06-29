@@ -13,11 +13,22 @@ Rails.application.routes.draw do
     # Public landing page — shop directory
     root to: "car_us/pages#home", as: :carus_root
 
+    # Post-registration welcome
+    get "welcome", to: "car_us/pages#welcome", as: :carus_welcome
+
     # Individual shop landing pages
     resources :shops, only: [ :show ], param: :slug, controller: "car_us/shops", as: :carus_shops
 
     # Customer routes (authenticated car owners)
     authenticate :car_owner do
+      resource :profile, only: [ :show ], controller: "car_us/profiles"
+      resources :notifications, only: [ :index ], controller: "car_us/notifications"
+      resources :vehicles, only: [ :index, :show, :new, :create ], controller: "car_us/vehicles" do
+        resource :manual, only: [ :show ], controller: "car_us/manuals"
+        resources :service_records, only: [ :index ], controller: "car_us/service_records"
+        resources :booking_requests, only: [ :new, :create ], controller: "car_us/booking_requests"
+        resources :concerns, only: [ :new, :create ], controller: "car_us/concerns"
+      end
       resources :coupons, only: [ :index, :show ], controller: "car_us/coupons"
       resources :services, only: [ :index ], controller: "car_us/services"
       get "rewards", to: "car_us/rewards#index"
@@ -34,6 +45,13 @@ Rails.application.routes.draw do
       end
       resources :services, only: [ :index, :new, :create, :edit, :update, :destroy ]
       resources :technicians, only: [ :index, :new, :create, :destroy ]
+    end
+
+    # Tech mobile tools (authenticated technicians, Paper design)
+    authenticate :technician do
+      resource :tech_profile, only: [ :show ], controller: "car_us/tech_profiles"
+      resources :tech_lookups, only: [ :index, :show ], controller: "car_us/tech_lookups"
+      get "customer_lookups", to: "car_us/tech_lookups#customer_lookup", as: :customer_lookups
     end
   end
 
