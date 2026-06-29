@@ -1,0 +1,142 @@
+<%= content_for :head do %>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<% end %>
+
+<div class="min-h-screen bg-carus-black font-montserrat flex flex-col">
+  <div class="pt-14 pb-5 px-5">
+    <p class="opacity-45 tracking-[1.5px] uppercase mb-1 text-[11px]/[14px] font-semibold text-white">Tech Profile</p>
+    <h1 class="text-[26px]/[32px] font-extrabold text-white tracking-[-0.5px]">My Profile</h1>
+  </div>
+
+  <div class="flex flex-col pb-6 gap-3 px-5">
+    <%# Identity card %>
+    <div class="flex items-start min-h-25 rounded-2xl gap-4 p-5 bg-carus-field border border-[#2A2A2A]">
+      <div class="w-15 h-15 flex items-center justify-center shrink-0 rounded-[30px] bg-[#0D2B0D] border-2 border-carus-green">
+        <span class="text-xl/[24px] font-extrabold text-carus-green"><%= current_technician.email.first(2).upcase %></span>
+      </div>
+      <div class="flex flex-col grow gap-1">
+        <p class="text-[17px] leading-[120%] font-extrabold text-white"><%= current_technician.email.split("@").first.capitalize %></p>
+        <p class="opacity-45 text-[11px] leading-[130%] font-medium text-white">Midas / SpeeDee · Rock Hill SC</p>
+        <div class="inline-flex self-start mt-0.5 rounded-xl py-0.75 px-2 bg-carus-green/[0.12] border border-carus-green/35">
+          <span class="tracking-[0.8px] uppercase text-[10px]/[12px] font-bold text-carus-green">Technician</span>
+        </div>
+      </div>
+      <div class="shrink-0 rounded-lg py-2 px-2.5 bg-[#2A2A2A]">
+        <p class="mb-0.5 text-center text-base/[20px] font-extrabold text-carus-green">6</p>
+        <p class="opacity-35 tracking-[0.5px] uppercase text-center text-[9px]/[12px] font-semibold text-white">YRS</p>
+      </div>
+    </div>
+
+    <%# Stats %>
+    <div class="flex gap-2">
+      <div class="grow rounded-xl p-3.5 bg-carus-field border border-[#2A2A2A]">
+        <p class="mb-0.5 text-center text-lg/[22px] font-extrabold text-carus-green">312</p>
+        <p class="opacity-35 tracking-[0.5px] uppercase text-center text-[9px]/[12px] font-semibold text-white">Vehicles</p>
+      </div>
+      <div class="grow rounded-xl p-3.5 bg-carus-field border border-[#2A2A2A]">
+        <p class="mb-0.5 text-center text-lg/[22px] font-extrabold text-[#FF6260]">47</p>
+        <p class="opacity-35 tracking-[0.5px] uppercase text-center text-[9px]/[12px] font-semibold text-white">Flags</p>
+      </div>
+    </div>
+
+    <%# Quick Tools %>
+    <p class="opacity-35 tracking-[1.5px] uppercase mt-2 mb-1 text-[10px]/[12px] font-bold text-white">Quick Tools</p>
+    <div class="flex gap-3">
+      <%= link_to tech_lookups_path, class: "grow flex flex-col rounded-[14px] gap-2.5 p-4 bg-carus-field border border-[#2A2A2A]" do %>
+        <div class="flex items-center justify-center rounded-[10px] shrink-0 bg-[#0D2B0D] size-9">
+          <svg width="18" height="18" viewBox="0 0 18 18" class="shrink-0">
+            <circle cx="8" cy="8" r="5.5" fill="none" stroke="#0FB900" stroke-width="1.5"/>
+            <line x1="12" y1="12" x2="16" y2="16" stroke="#0FB900" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div>
+          <p class="mb-0.5 text-[13px]/[16px] font-bold text-white">Tech Lookup</p>
+          <p class="opacity-35 text-[10px]/[12px] font-medium text-white">Vehicle specs by year/make</p>
+        </div>
+      <% end %>
+      <div class="grow flex flex-col rounded-[14px] gap-2.5 p-4 bg-carus-field border border-[#2A2A2A]">
+        <div class="flex items-center justify-center rounded-[10px] shrink-0 bg-[#0D2B0D] size-9">
+          <svg width="18" height="18" viewBox="0 0 18 18" class="shrink-0">
+            <rect x="3" y="2" width="12" height="14" rx="2" fill="none" stroke="#0FB900" stroke-width="1.5"/>
+            <line x1="6" y1="6" x2="12" y2="6" stroke="#0FB900" stroke-width="1.2" stroke-linecap="round"/>
+            <line x1="6" y1="9" x2="12" y2="9" stroke="#0FB900" stroke-width="1.2" stroke-linecap="round"/>
+            <line x1="6" y1="12" x2="10" y2="12" stroke="#0FB900" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div>
+          <p class="mb-0.5 text-[13px]/[16px] font-bold text-white">Spec Sheet</p>
+          <p class="opacity-35 text-[10px]/[12px] font-medium text-white">Parts, fluids, torque specs</p>
+        </div>
+      </div>
+    </div>
+
+    <%# Flag a Concern link %>
+    <div class="flex items-center rounded-[14px] gap-3.5 p-4 bg-carus-field border border-[#2A2A2A]">
+      <div class="flex items-center justify-center shrink-0 rounded-[10px] bg-[#2B0D0D] size-10">
+        <svg width="20" height="20" viewBox="0 0 20 20" class="shrink-0">
+          <path d="M4 3V17" fill="none" stroke="#FF6260" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M4 3H14L11 8H14L4 17" fill="none" stroke="#FF6260" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="grow">
+        <p class="mb-0.5 text-[13px]/[16px] font-bold text-white">Flag a Concern</p>
+        <p class="opacity-35 text-[10px]/[12px] font-medium text-white">Log issues for a customer vehicle</p>
+      </div>
+      <svg width="16" height="16" viewBox="0 0 16 16" class="shrink-0">
+        <path d="M6 4L10 8L6 12" fill="none" stroke="#FFFFFF4D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+
+    <%# Account %>
+    <p class="opacity-35 tracking-[1.5px] uppercase mt-2 mb-1 text-[10px]/[12px] font-bold text-white">Account</p>
+    <div class="rounded-[14px] overflow-hidden bg-carus-field border border-[#2A2A2A]">
+      <div class="flex items-center justify-between p-4 border-b border-[#2A2A2A]">
+        <span class="text-[13px]/[16px] font-semibold text-white">Edit Profile</span>
+        <svg width="16" height="16" viewBox="0 0 16 16" class="shrink-0"><path d="M6 4L10 8L6 12" fill="none" stroke="#FFFFFF4D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="flex items-center justify-between p-4 border-b border-[#2A2A2A]">
+        <span class="text-[13px]/[16px] font-semibold text-white">Notifications</span>
+        <svg width="16" height="16" viewBox="0 0 16 16" class="shrink-0"><path d="M6 4L10 8L6 12" fill="none" stroke="#FFFFFF4D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <%= link_to destroy_technician_session_path, data: { turbo_method: :delete }, class: "flex items-center justify-between p-4" do %>
+        <span class="text-[13px]/[16px] font-semibold text-[#FF6260]">Sign Out</span>
+        <svg width="16" height="16" viewBox="0 0 16 16" class="shrink-0"><path d="M6 4L10 8L6 12" fill="none" stroke="#FF626080" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <% end %>
+    </div>
+  </div>
+
+  <%# Tab bar — Profile active %>
+  <div class="mt-auto flex bg-carus-black border-t border-[#1A1A1A]">
+    <%= link_to tech_lookups_path, class: "grow flex flex-col items-center pt-3 pb-5 gap-1" do %>
+      <svg width="22" height="22" viewBox="0 0 22 22" class="shrink-0">
+        <rect x="3" y="3" width="7" height="7" rx="1.5" fill="none" stroke="#FFFFFF59" stroke-width="1.5"/>
+        <rect x="12" y="3" width="7" height="7" rx="1.5" fill="none" stroke="#FFFFFF59" stroke-width="1.5"/>
+        <rect x="3" y="12" width="7" height="7" rx="1.5" fill="none" stroke="#FFFFFF59" stroke-width="1.5"/>
+        <rect x="12" y="12" width="7" height="7" rx="1.5" fill="none" stroke="#FFFFFF59" stroke-width="1.5"/>
+      </svg>
+      <span class="opacity-35 text-[10px]/[12px] font-semibold text-white">Lookup</span>
+    <% end %>
+    <%= link_to vehicles_path, class: "grow flex flex-col items-center pt-3 pb-5 gap-1" do %>
+      <svg width="22" height="22" viewBox="0 0 22 22" class="shrink-0">
+        <path d="M4 18L4 8L11 3L18 8V18" fill="none" stroke="#FFFFFF59" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <rect x="8" y="13" width="6" height="5" rx="1" fill="none" stroke="#FFFFFF59" stroke-width="1.5"/>
+      </svg>
+      <span class="opacity-35 text-[10px]/[12px] font-semibold text-white">Garage</span>
+    <% end %>
+    <div class="grow flex flex-col items-center pt-3 pb-5 gap-1">
+      <svg width="22" height="22" viewBox="0 0 22 22" class="shrink-0">
+        <path d="M4 4H14L10 9.5H14L4 18" fill="none" stroke="#FFFFFF59" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="opacity-35 text-[10px]/[12px] font-semibold text-white">Flag</span>
+    </div>
+    <div class="grow flex flex-col items-center pt-3 pb-5 gap-1">
+      <svg width="22" height="22" viewBox="0 0 22 22" class="shrink-0">
+        <circle cx="11" cy="8" r="3.5" fill="none" stroke="#0FB900" stroke-width="1.5"/>
+        <path d="M4 19C4 15.134 7.134 12 11 12C14.866 12 18 15.134 18 19" fill="none" stroke="#0FB900" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <span class="text-[10px]/[12px] font-bold text-carus-green">Profile</span>
+    </div>
+  </div>
+</div>

@@ -1,67 +1,75 @@
-# CarUs seed data — idempotent
-puts "=== Seeding CarUs ==="
+# CarUs Seed — imports from vehicle_data.db JSON export
+# One-time: rails db:seed:carus  (or rails db:seed)
 
-# Habibi Mobile Auto Service
-habibi = CarUs::Shop.find_or_create_by!(slug: "habibi-mobile") do |s|
-  s.name = "Habibi Mobile Auto Service"
-  s.address = "10065 Marsh Ln, Dallas, TX 75229"
-  s.phone = "(469) 894-1694"
-  s.email = "habibi@example.com"
-  s.description = "Mobile mechanic serving North Dallas. We come to you — text us your location, vehicle type, and issue."
-  s.active = true
+require "json"
+
+puts "=== CarUs Seed ==="
+
+# ── Demo CarOwner ──────────────────────────────────────────────
+demo = CarOwner.find_or_create_by!(email: "demo@carus.app") do |owner|
+  owner.password = "password123"
+  owner.password_confirmation = "password123"
 end
-puts "  Shop: #{habibi.name} (#{habibi.slug})"
+puts "  CarOwner: #{demo.email}"
 
-# Technician account
-tech = Technician.find_or_create_by!(email: "habibi@example.com") do |t|
-  t.password = "password123"
-  t.password_confirmation = "password123"
-  t.shop = habibi
+# ── Labor Times ─────────────────────────────────────────────────
+labor_data = JSON.parse(File.read(Rails.root.join("db/seeds/data/labor_times.json")))
+if defined?(CarUs::LaborTime) && CarUs::LaborTime.table_exists?
+  labor_data.each do |lt|
+    CarUs::LaborTime.find_or_create_by!(service: lt["service"]) do |l|
+      l.category = lt["category"]
+      l.hours = lt["hours"]
+    end
+  end
+  puts "  LaborTimes: #{labor_data.size}"
 end
-puts "  Technician: #{tech.email}"
 
-# Demo Services
-services = [
-  { name: "Oil Change", description: "Full synthetic oil change with filter. We come to your location.", price: 59.99, duration_minutes: 45 },
-  { name: "Brake Pad Replacement", description: "Front or rear brake pad replacement with ceramic pads.", price: 149.99, duration_minutes: 90 },
-  { name: "Diagnostic Scan", description: "Check engine light? We'll scan and diagnose the issue on-site.", price: 49.99, duration_minutes: 30 },
-  { name: "Battery Replacement", description: "Dead battery? We'll test, replace, and dispose of the old one.", price: 129.99, duration_minutes: 20 },
-  { name: "A/C Service", description: "A/C performance check and recharge. Stay cool in the Texas heat.", price: 89.99, duration_minutes: 60 }
-]
+# ── Vehicles ────────────────────────────────────────────────────
+vehicle_data = JSON.parse(File.read(Rails.root.join("db/seeds/data/vehicles.json")))
+vehicle_id_map = {} # old SQLite id → new AR id
 
-services.each do |svc|
-  CarUs::Service.find_or_create_by!(shop: habibi, name: svc[:name]) do |s|
-    s.description = svc[:description]
-    s.price = svc[:price]
-    s.duration_minutes = svc[:duration_minutes]
-    s.active = true
+vehicle_data.each do |v|
+  next if v["vin"].present? && CarUs::Vehicle.exists?(vin: v["vin"])
+
+  vehicle = demo.vehicles.find_or_create_by!(vin: v["vin"].presence) do |veh|
+    veh.year = v["year"]
+    veh.make = v["make"]
+    veh.model = v["model"]
+    veh.trim = v["trim"]
+    veh.engine_size = v["engine_size"]
+    veh.transmission = v["transmission"]
+    veh.mileage = v["mileage_in"]
+  end
+  vehicle_id_map[v["id"]] = vehicle.id
+end
+puts "  Vehicles: #{vehicle_data.size} (map: #{vehicle_id_map.size})"
+
+# ── Service Records (jobs) ──────────────────────────────────────
+job_data = JSON.parse(File.read(Rails.root.join("db/seeds/data/jobs.json")))
+
+job_data.each do |j|
+  vehicle_id = vehicle_id_map[j["vehicle_id"]]
+  next unless vehicle_id
+
+  CarUs::ServiceRecord.find_or_create_by!(
+    vehicle_id: vehicle_id,
+    description: j["description"],
+    service_date: Date.parse(j["start_date"] || j["created_at"] || "2026-01-01")
+  ) do |sr|
+    sr.mileage = j["mileage_at_service"]
+    sr.technician_name = "Mason R."
+    sr.cost = j["total_parts_cost"] || j["total_labor_cost"]
   end
 end
-puts "  Services: #{habibi.services.count}"
+puts "  ServiceRecords: #{job_data.size}"
 
-# Demo Flash Alerts (one active, one expired)
-unless habibi.flash_alerts.exists?(title: "30% Off Brake Service")
-  habibi.flash_alerts.create!(
-    technician: tech,
-    title: "30% Off Brake Service",
-    description: "Limited time! Front or rear brake pads — we come to you. Dallas only.",
-    discount_percentage: 30,
-    duration_hours: 48,
-    active: true
-  )
-end
+# ── Parts ───────────────────────────────────────────────────────
+part_data = JSON.parse(File.read(Rails.root.join("db/seeds/data/job_parts.json")))
+# job_parts reference old SQLite job_ids — skip for now unless we map
+puts "  Parts: #{part_data.size} (stored as JSON, not yet mapped)"
 
-unless habibi.flash_alerts.exists?(title: "Free Oil Change with Brake Job")
-  habibi.flash_alerts.create!(
-    technician: tech,
-    title: "Free Oil Change with Brake Job",
-    description: "Book any brake service this week and get a free synthetic oil change.",
-    discount_percentage: 100,
-    duration_hours: 168,
-    active: true
-  )
-end
+# ── Procedures ──────────────────────────────────────────────────
+proc_data = JSON.parse(File.read(Rails.root.join("db/seeds/data/procedures.json")))
+puts "  Procedures: #{proc_data.size} (stored as JSON, not yet mapped)"
 
-puts "  Flash Alerts: #{habibi.flash_alerts.count}"
-
-puts "=== CarUs seed complete ==="
+puts "=== Seed complete ==="

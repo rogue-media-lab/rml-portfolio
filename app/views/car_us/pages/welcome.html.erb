@@ -1,0 +1,56 @@
+<%= content_for :head do %>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<% end %>
+
+<div class="min-h-screen bg-carus-black font-montserrat flex flex-col items-center pt-15 pb-10 px-6">
+  <%# Checkmark %>
+  <div class="flex items-center justify-center mb-6 rounded-[40px] shrink-0 border-[3px] border-carus-green size-20">
+    <svg width="36" height="28" viewBox="0 0 36 28" class="shrink-0">
+      <path d="M3 14L13 24L33 4" fill="none" stroke="#0FB900" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+
+  <%# Step badge %>
+  <div class="mb-5 rounded-[20px] py-1.25 px-3.5 bg-carus-green/15 border border-carus-green">
+    <span class="text-base/[20px] text-white">Step 3 of 3 — You're In</span>
+  </div>
+
+  <h1 class="text-[28px] text-center mb-3 leading-[120%] font-extrabold text-white">Welcome to carus</h1>
+
+  <p class="text-[13px] text-center leading-[160%] mb-9 w-full text-[#FFFFFF80]">
+    Your account is set up<% if @vehicle %> and your <%= @vehicle.make %> is linked<% end %>. You'll start getting updates after your next visit.
+  </p>
+
+  <%# What Happens Next card %>
+  <div class="w-full mb-10 rounded-2xl p-6 bg-carus-field">
+    <p class="tracking-[1px] uppercase mb-4 text-[10px]/[12px] font-bold text-[#FFFFFF66]">What Happens Next</p>
+
+    <div class="flex items-start mb-4 w-full gap-3">
+      <div class="min-w-7 flex items-center justify-center rounded-[14px] shrink-0 bg-carus-green size-7">
+        <span class="text-xs/[16px] font-extrabold text-black">1</span>
+      </div>
+      <p class="text-[13px] leading-[150%] grow min-w-0 text-[#FFFFFFBF]">Bring your car in for your next visit — your tech will log your service and mileage.</p>
+    </div>
+
+    <div class="flex items-start mb-4 w-full gap-3">
+      <div class="min-w-7 flex items-center justify-center rounded-[14px] shrink-0 bg-carus-green size-7">
+        <span class="text-xs/[16px] font-extrabold text-black">2</span>
+      </div>
+      <p class="text-[13px] leading-[150%] grow min-w-0 text-[#FFFFFFBF]">The app tracks mileage in the background to flag upcoming maintenance before it's due.</p>
+    </div>
+
+    <div class="flex items-start w-full gap-3">
+      <div class="min-w-7 flex items-center justify-center rounded-[14px] shrink-0 bg-carus-green size-7">
+        <span class="text-xs/[16px] font-extrabold text-black">3</span>
+      </div>
+      <p class="text-[13px] leading-[150%] grow min-w-0 text-[#FFFFFFBF]">You'll get plain-English alerts when something needs attention — no jargon.</p>
+    </div>
+  </div>
+
+  <%# CTA %>
+  <%= link_to vehicles_path, class: "w-full h-13.5 flex items-center justify-center rounded-[14px] bg-carus-green text-[15px]/[18px] font-extrabold text-black tracking-[0.3px]" do %>
+    Go to My Garage
+  <% end %>
+</div>
