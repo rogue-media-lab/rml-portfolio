@@ -1,0 +1,65 @@
+<%= content_for :head do %>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<% end %>
+
+<div class="min-h-screen bg-carus-black font-montserrat flex flex-col">
+  <%# Header %>
+  <div class="flex items-center gap-3 pt-14 px-6 pb-3">
+    <%= link_to conversations_path, class: "flex items-center justify-center rounded-[18px] shrink-0 bg-carus-field border border-[#2A2A2A] size-9" do %>
+      <svg width="16" height="16" viewBox="0 0 16 16" class="shrink-0"><path d="M10 4L6 8L10 12" fill="none" stroke="#FFFFFF80" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <% end %>
+    <div class="grow min-w-0">
+      <h1 class="text-[17px]/[22px] font-extrabold text-white truncate"><%= @conversation.title_or_default %></h1>
+      <% if @conversation.vehicle %>
+        <p class="text-[11px]/[14px] text-[#FFFFFF4D]"><%= @conversation.vehicle.vin&.last(8) %> · <%= @conversation.messages.count %> messages</p>
+      <% end %>
+    </div>
+  </div>
+
+  <%# Messages %>
+  <div class="grow flex flex-col gap-3 px-5 pt-2 pb-4 overflow-y-auto" id="messages">
+    <% @messages.each do |msg| %>
+      <% if msg.role == "tech" %>
+        <%# Tech message — right aligned %>
+        <div class="flex justify-end">
+          <div class="max-w-[80%] rounded-2xl rounded-br-md px-4 py-3 bg-carus-green/15 border border-carus-green/20">
+            <p class="text-sm leading-[150%] text-white"><%= msg.content %></p>
+            <% if msg.photo.attached? %>
+              <%= image_tag msg.photo.variant(resize_to_limit: [300, 200]), class: "mt-2 rounded-xl w-full" %>
+            <% end %>
+            <p class="mt-1 text-[10px]/[12px] text-carus-text-dim text-right"><%= msg.created_at.strftime("%-I:%M %p") %></p>
+          </div>
+        </div>
+      <% else %>
+        <%# Assistant message — left aligned %>
+        <div class="flex gap-2.5">
+          <div class="flex items-center justify-center shrink-0 rounded-[12px] bg-[#0D2B0D] border border-carus-green/40 size-7 mt-1">
+            <svg width="12" height="12" viewBox="0 0 12 12" class="shrink-0">
+              <circle cx="6" cy="6" r="4.5" fill="none" stroke="#0FB900" stroke-width="1.3"/>
+              <line x1="6" y1="3.5" x2="6" y2="6.5" stroke="#0FB900" stroke-width="1" stroke-linecap="round"/>
+              <circle cx="6" cy="8.5" r="0.5" fill="#0FB900"/>
+            </svg>
+          </div>
+          <div class="max-w-[85%] rounded-2xl rounded-bl-md px-4 py-3 bg-carus-field border border-[#2A2A2A]">
+            <p class="text-sm leading-[150%] text-[#CCCCCC] whitespace-pre-wrap"><%= msg.content %></p>
+            <p class="mt-1 text-[10px]/[12px] text-[#FFFFFF33]"><%= msg.created_at.strftime("%-I:%M %p") %></p>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+
+  <%# Input bar %>
+  <div class="shrink-0 px-4 pb-4 pt-2 bg-carus-black border-t border-[#1A1A1A]">
+    <%= form_with url: create_message_conversation_path(@conversation), method: :post, multipart: true, class: "flex items-end gap-2" do |f| %>
+      <label class="flex items-center justify-center shrink-0 rounded-xl bg-carus-field border border-[#2A2A2A] size-11 cursor-pointer hover:border-carus-green/30 transition">
+        <svg width="18" height="18" viewBox="0 0 18 18" class="shrink-0"><path d="M2 5C2 3.895 2.895 3 4 3H14C15.105 3 16 3.895 16 5V13C16 14.105 15.105 15 14 15H4C2.895 15 2 14.105 2 13V5Z" fill="none" stroke="#FFFFFF4D" stroke-width="1.3"/><circle cx="6.5" cy="8" r="1.3" fill="#FFFFFF4D"/><path d="M2.5 14L5.5 11L7 12.5L11 9L15.5 13" fill="none" stroke="#FFFFFF4D" stroke-width="1.3" stroke-linejoin="round"/></svg>
+        <%= f.file_field :photo, accept: "image/*", capture: "environment", class: "hidden" %>
+      </label>
+      <%= f.text_area :content, rows: 1, placeholder: "Ask about this vehicle...", class: "grow bg-carus-field border border-[#2A2A2A] rounded-xl py-3 px-4 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-carus-green/40 resize-none" %>
+      <%= f.submit "Send", class: "shrink-0 h-11 px-5 rounded-xl bg-carus-green text-sm font-extrabold text-black cursor-pointer" %>
+    <% end %>
+  </div>
+</div>

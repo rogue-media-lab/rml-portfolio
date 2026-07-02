@@ -8,7 +8,7 @@ Rails.application.routes.draw do
     devise_for :car_owners, controllers: {
       registrations: "car_us/registrations"
     }
-    devise_for :technicians, skip: [ :registrations ]  # shop-provisioned
+    devise_for :technicians, skip: [ :registrations ], controllers: { sessions: "technicians/sessions" }  # shop-provisioned
 
     # Public landing page — shop directory
     root to: "car_us/pages#home", as: :carus_root
@@ -21,12 +21,17 @@ Rails.application.routes.draw do
 
     # Customer routes (authenticated car owners)
     authenticate :car_owner do
-      resource :profile, only: [ :show ], controller: "car_us/profiles"
+      resource :profile, only: [ :show, :edit, :update ], controller: "car_us/profiles"
       resources :notifications, only: [ :index ], controller: "car_us/notifications"
-      resources :vehicles, only: [ :index, :show, :new, :create ], controller: "car_us/vehicles" do
+      resources :vehicles, only: [ :index, :show, :new, :create, :edit, :update ], controller: "car_us/vehicles" do
         resource :manual, only: [ :show ], controller: "car_us/manuals"
         resources :service_records, only: [ :index ], controller: "car_us/service_records"
-        resources :booking_requests, only: [ :new, :create ], controller: "car_us/booking_requests"
+        resources :booking_requests, only: [ :new, :create ], controller: "car_us/booking_requests" do
+        collection do
+          post :confirm
+          get :thank_you
+        end
+      end
         resources :concerns, only: [ :new, :create ], controller: "car_us/concerns"
       end
       resources :coupons, only: [ :index, :show ], controller: "car_us/coupons"
@@ -45,12 +50,24 @@ Rails.application.routes.draw do
       end
       resources :services, only: [ :index, :new, :create, :edit, :update, :destroy ]
       resources :technicians, only: [ :index, :new, :create, :destroy ]
+      resources :bookings, only: [ :edit, :update ], controller: "bookings"
+      resource :settings, only: [ :edit, :update ], controller: "settings"
     end
 
     # Tech mobile tools (authenticated technicians, Paper design)
     authenticate :technician do
+      resources :conversations, only: [ :index, :show, :create ], controller: "car_us/conversations" do
+        member do
+          post :create_message
+        end
+      end
       resource :tech_profile, only: [ :show ], controller: "car_us/tech_profiles"
-      resources :tech_lookups, only: [ :index, :show ], controller: "car_us/tech_lookups"
+      resources :tech_lookups, only: [ :index, :show, :new, :create ], controller: "car_us/tech_lookups" do
+        member do
+          patch :update_specs
+        end
+        resources :service_jobs, only: [ :create, :update ], controller: "car_us/service_jobs"
+      end
       get "customer_lookups", to: "car_us/tech_lookups#customer_lookup", as: :customer_lookups
     end
   end

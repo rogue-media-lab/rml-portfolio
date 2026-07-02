@@ -16,6 +16,14 @@
 
   <%# Form %>
   <%= form_with model: resource, as: resource_name, url: registration_path(resource_name), class: "flex flex-col px-6 gap-3" do |f| %>
+    <%# Error messages %>
+    <% if resource.errors.any? %>
+      <div class="rounded-xl p-3 bg-[#FF6260]/10 border border-[#FF6260]/20">
+        <% resource.errors.full_messages.each do |msg| %>
+          <p class="text-[#FF6260] text-xs"><%= msg %></p>
+        <% end %>
+      </div>
+    <% end %>
     <%# Name fields %>
     <div class="flex gap-2.5">
       <div class="grow flex flex-col gap-1.5">
@@ -34,10 +42,33 @@
       <%= f.email_field :email, placeholder: "you@email.com", required: true, class: "w-full bg-carus-field border border-[#2A2A2A] rounded-xl py-[15px] px-3.5 text-sm/[18px] text-white placeholder:text-white/25 focus:outline-none focus:border-carus-green/40" %>
     </div>
 
+    <%# Shop selection (hidden when coming from a shop page) %>
+    <% preselected_shop = params[:shop_id].present? ? CarUs::Shop.find_by(id: params[:shop_id]) : nil %>
+    <% if preselected_shop %>
+      <%= f.hidden_field :shop_id, value: preselected_shop.id %>
+      <div class="flex flex-col gap-1.5">
+        <label class="opacity-50 tracking-[1px] uppercase text-[10px]/[12px] font-bold text-white">Your Shop</label>
+        <div class="rounded-xl py-[15px] px-3.5 bg-carus-field border border-carus-green/40">
+          <span class="text-sm/[18px] font-bold text-carus-green"><%= preselected_shop.name %></span>
+        </div>
+      </div>
+    <% else %>
+      <div class="flex flex-col gap-1.5">
+        <label class="opacity-50 tracking-[1px] uppercase text-[10px]/[12px] font-bold text-white">Choose Your Shop</label>
+        <%= f.collection_select :shop_id, CarUs::Shop.where(active: true).order(:name), :id, :name, { include_blank: "Select a shop..." }, class: "w-full bg-carus-field border border-[#2A2A2A] rounded-xl py-[15px] px-3.5 text-sm/[18px] text-white focus:outline-none focus:border-carus-green/40 appearance-none" %>
+      </div>
+    <% end %>
+
     <%# Password %>
     <div class="flex flex-col gap-1.5">
       <label class="opacity-50 tracking-[1px] uppercase text-[10px]/[12px] font-bold text-white">Password</label>
       <%= f.password_field :password, placeholder: "········", required: true, class: "w-full bg-carus-field border border-carus-green rounded-xl py-[15px] px-3.5 tracking-[3px] text-lg/[22px] text-white placeholder:text-white/25 focus:outline-none" %>
+    </div>
+
+    <%# Password Confirmation %>
+    <div class="flex flex-col gap-1.5">
+      <label class="opacity-50 tracking-[1px] uppercase text-[10px]/[12px] font-bold text-white">Confirm Password</label>
+      <%= f.password_field :password_confirmation, placeholder: "········", required: true, class: "w-full bg-carus-field border border-[#2A2A2A] rounded-xl py-[15px] px-3.5 tracking-[3px] text-lg/[22px] text-white placeholder:text-white/25 focus:outline-none focus:border-carus-green/40" %>
     </div>
 
     <%# Submit %>

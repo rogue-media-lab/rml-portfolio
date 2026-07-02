@@ -75,22 +75,74 @@
       </div>
     </div>
 
-    <%# Fluids & Capacities %>
+    <%# Fluids & Capacities — from AI specs %>
+    <% specs = @vehicle.ai_specs.present? ? (JSON.parse(@vehicle.ai_specs) rescue {}) : {} %>
     <div>
       <p class="opacity-35 tracking-[1.5px] uppercase mb-2.5 text-[10px]/[12px] font-bold text-white">Fluids & Capacities</p>
-      <div class="rounded-[14px] overflow-hidden bg-carus-field border border-[#2A2A2A]">
-        <% [
-          ["Engine Oil", "0W-20 · 4.4 qts"],
-          ["Coolant", "Honda Blue Type 2"],
-          ["Brake Fluid", "DOT 3"],
-          ["Tire Pressure", "35 PSI F · 33 PSI R"]
-        ].each_with_index do |(label, value), i| %>
-          <div class="flex justify-between items-center py-[13px] px-4 <%= 'border-b border-[#2A2A2A]' unless i == 3 %>">
-            <span class="text-xs/[16px] font-semibold text-white"><%= label %></span>
-            <span class="text-xs/[16px] font-bold text-carus-green"><%= value %></span>
-          </div>
-        <% end %>
-      </div>
+      <% if specs.any? %>
+        <div class="rounded-[14px] overflow-hidden bg-carus-field border border-[#2A2A2A]">
+          <%
+            rows = []
+            rows << ["Engine Oil", "#{specs['oil_weight']} · #{specs['oil_capacity_qts']} qts"] if specs['oil_weight'] || specs['oil_capacity_qts']
+            rows << ["Oil Filter", specs['oil_filter']] if specs['oil_filter'].present?
+            rows << ["Drain Plug Torque", "#{specs['drain_plug_torque_ft_lbs']} ft/lbs"] if specs['drain_plug_torque_ft_lbs']
+            rows << ["Coolant", specs['coolant_type']] if specs['coolant_type'].present?
+            rows << ["Transmission Fluid", specs['transmission_fluid']] if specs['transmission_fluid'].present?
+            rows << ["Spark Plug", specs['spark_plug']] if specs['spark_plug'].present?
+            rows << ["Tire Pressure", "#{specs['tire_pressure_f']} PSI F · #{specs['tire_pressure_r']} PSI R"] if specs['tire_pressure_f'] || specs['tire_pressure_r']
+          %>
+          <% rows.each_with_index do |(label, value), i| %>
+            <div class="flex justify-between items-center py-[13px] px-4 <%= 'border-b border-[#2A2A2A]' unless i == rows.size - 1 %>">
+              <span class="text-xs/[16px] font-semibold text-white"><%= label %></span>
+              <span class="text-xs/[16px] font-bold text-carus-green"><%= value %></span>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="rounded-[14px] p-4 bg-carus-field border border-[#2A2A2A]">
+          <p class="opacity-40 text-xs/[16px] font-medium text-white text-center">Vehicle specs not yet available. Ask your shop to look up this vehicle.</p>
+        </div>
+      <% end %>
     </div>
+
+    <%# AI Summary — plain English from enrichment %>
+    <% if @vehicle.ai_plain_english.present? %>
+      <div>
+        <p class="opacity-35 tracking-[1.5px] uppercase mb-2.5 text-[10px]/[12px] font-bold text-white">About This Vehicle</p>
+        <div class="rounded-[14px] p-4 bg-carus-field border border-[#2A2A2A]">
+          <p class="text-xs/[16px] font-medium text-white opacity-70 leading-relaxed"><%= @vehicle.ai_plain_english %></p>
+        </div>
+      </div>
+    <% end %>
+
+    <%# Service Suggestions %>
+    <% suggestions = @vehicle.ai_suggestions.present? ? (JSON.parse(@vehicle.ai_suggestions) rescue []) : [] %>
+    <% if suggestions.any? %>
+      <div>
+        <p class="opacity-35 tracking-[1.5px] uppercase mb-2.5 text-[10px]/[12px] font-bold text-white">Service Suggestions</p>
+        <div class="flex flex-col gap-2">
+          <% suggestions.each do |suggestion| %>
+            <div class="flex items-center gap-3 rounded-[14px] py-3.5 px-4 bg-carus-field border border-[#2A2A2A]">
+              <div class="flex items-center justify-center shrink-0 rounded-full size-6 bg-carus-green/15">
+                <svg width="12" height="12" viewBox="0 0 12 12" class="shrink-0">
+                  <polyline points="2 6 5 9 10 3" fill="none" stroke="#0FB900" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <span class="text-xs/[16px] font-medium text-white opacity-80"><%= suggestion %></span>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <%# Difficulty notes %>
+    <% if @vehicle.ai_difficulty_notes.present? %>
+      <div>
+        <p class="opacity-35 tracking-[1.5px] uppercase mb-2.5 text-[10px]/[12px] font-bold text-white">Tech Notes</p>
+        <div class="rounded-[14px] p-4 bg-carus-field border border-carus-green/20">
+          <p class="text-xs/[16px] font-medium text-white opacity-60 leading-relaxed"><%= @vehicle.ai_difficulty_notes %></p>
+        </div>
+      </div>
+    <% end %>
   </div>
 </div>

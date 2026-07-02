@@ -13,15 +13,15 @@ end
 puts "  CarOwner: #{demo.email}"
 
 # ── Labor Times ─────────────────────────────────────────────────
-labor_data = JSON.parse(File.read(Rails.root.join("db/seeds/data/labor_times.json")))
 if defined?(CarUs::LaborTime) && CarUs::LaborTime.table_exists?
+  labor_data = JSON.parse(File.read(Rails.root.join("db/seeds/data/labor_times.json")))
   labor_data.each do |lt|
     CarUs::LaborTime.find_or_create_by!(service: lt["service"]) do |l|
       l.category = lt["category"]
       l.hours = lt["hours"]
     end
   end
-  puts "  LaborTimes: #{labor_data.size}"
+  puts "  LaborTimes: #{CarUs::LaborTime.count}"
 end
 
 # ── Vehicles ────────────────────────────────────────────────────

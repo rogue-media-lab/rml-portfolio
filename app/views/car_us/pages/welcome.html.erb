@@ -53,4 +53,8 @@
   <%= link_to vehicles_path, class: "w-full h-13.5 flex items-center justify-center rounded-[14px] bg-carus-green text-[15px]/[18px] font-extrabold text-black tracking-[0.3px]" do %>
     Go to My Garage
   <% end %>
+
+  <p class="mt-6 text-center text-[#FFFFFF33] text-xs">
+    Already have an account? <%= link_to "Sign In", new_car_owner_session_path, class: "text-carus-green font-semibold" %>
+  </p>
 </div>

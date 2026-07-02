@@ -1,0 +1,14 @@
+<%# CarUs Customer Top Menu — Home + Logout hamburger, shared across all views %>
+<div data-controller="menu" class="fixed top-3.5 right-4 z-30">
+  <button data-action="click->menu#toggle" class="flex items-center justify-center rounded-[18px] bg-black/45 size-9">
+    <svg width="18" height="18" viewBox="0 0 18 18" class="shrink-0">
+      <rect x="3" y="5" width="12" height="1.5" rx="0.75" fill="#FFFFFF"/>
+      <rect x="3" y="8.25" width="12" height="1.5" rx="0.75" fill="#FFFFFF"/>
+      <rect x="3" y="11.5" width="12" height="1.5" rx="0.75" fill="#FFFFFF"/>
+    </svg>
+  </button>
+  <div data-menu-target="panel" class="hidden absolute right-0 top-10 w-40 rounded-xl bg-[#1A1A1A] border border-[#2A2A2A] shadow-xl overflow-hidden">
+    <%= link_to "Home", carus_root_path, class: "block px-4 py-3 text-sm font-semibold text-white hover:bg-[#2A2A2A] border-b border-[#2A2A2A]" %>
+    <%= link_to "Logout", destroy_car_owner_session_path, data: { turbo_method: :delete }, class: "block px-4 py-3 text-sm font-semibold text-[#FF6260] hover:bg-[#2A2A2A]" %>
+  </div>
+</div>
