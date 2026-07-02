@@ -1,7 +1,9 @@
 class CarUs::Vehicle < ApplicationRecord
-  belongs_to :car_owner
+  belongs_to :car_owner, optional: true
+  has_one_attached :photo
   has_many :service_records, class_name: "CarUs::ServiceRecord", dependent: :destroy
   has_many :booking_requests, class_name: "CarUs::BookingRequest", dependent: :destroy
+  has_many :service_jobs, class_name: "CarUs::ServiceJob", dependent: :destroy
   has_many :concerns, class_name: "CarUs::Concern", dependent: :destroy
 
   validates :year, :make, :model, presence: true

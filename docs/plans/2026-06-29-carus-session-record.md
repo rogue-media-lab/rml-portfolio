@@ -180,9 +180,102 @@ get "customer_lookups", to: "car_us/tech_lookups#customer_lookup", as: :customer
 
 ### Key Waypoint Parity Gaps
 
-The Waypoint bot does: VIN → vehicle info, job logging with parts + procedures + labor time, hours tracking. CarUs tech side needs:
+The Waypoint bot does: VIN → vehicle info, job logging with parts + procedures + labor time, hours tracking, and **AI-powered contextual tips** (pain points, tool recommendations, difficulty warnings). CarUs tech side needs:
 
 1. **LaborTime model** — seed the 30 flat-rate services into a reference table
 2. **Oil Service Detail** (screen 21) — a job detail view showing labor time estimate, parts needed, step-by-step procedures
 3. **Service logging flow** — tech looks up customer → selects service → sees parts/procedures/labor → logs completion with mileage
-4. **Hours tracking** — the Waypoint bot tracks job time entries. CarUs could track technician hours per job
+4. **Hours tracking** — the Waypoint bot tracks job time entries. CarUs could track technician hours per job as `CarUs::JobTimeEntry`
+
+### AI Element (Waypoint Parity)
+
+The tech side needs AI integration matching Waypoint's intelligence:
+
+- **Contextual tips on spec sheets** — when a tech views a vehicle spec (screen 6), AI surfaces: pain points for that job, tool recommendations, difficulty level, common gotchas. Source: procedures table (14 entries) + hardcoded lookup table from plan doc §GAP 2
+- **Related-service suggestions** — static map curated by Mason. E.g.: lower control arms done → suggest tire-wear + alignment check. Not an inference engine — a lookup table. Plan doc §GAP 2 Option B
+- **Customer-facing summaries** — when a tech flags a concern or logs a service, AI generates plain-English explanation for the notification (no jargon). "Rear brake pads at 30% life" instead of "Pad thickness 4mm remaining"
+- **API-first, local-ready** — use an API (OpenRouter/Claude) for the demo, but design the integration point so it can swap to a local model later. Store generated content in the DB so it works offline after initial generation
+- **VIN decode** — already built (NHTSA vPIC API, server-side, cached 30 days)
+
+**Architecture:** A `CarUs::AiService` concern/module that wraps API calls. All prompts are templates stored in the DB or YAML files (not hardcoded). Generation happens on-demand with DB caching — same spec sheet only gets generated once per vehicle.
+
+---
+
+# Session 2 — 2026-06-29 (evening)
+
+## Booking Flow Fixes
+
+- Added date picker (min=tomorrow) + 4 time radio slots (8AM/10AM/1PM/3PM) to booking Step 1
+- Confirmation screen now shows selected date/time from params
+- Fixed `NoMethodError` in `create` — controller now rebuilds `@selected_services` on validation failure
+- Fixed model validation: `service_type` → `service_types` (matched DB column)
+- Typos fixed in verify user action typo commit
+- Added `thank_you` view — green checkmark, appointment summary, "Back to Garage" button
+- Route: `get :thank_you` on booking_requests collection
+
+## Manager Dashboard — Appointment Inbox
+
+- Added "Upcoming Appointments" section to manager dashboard
+- Query: `BookingRequest.joins(vehicle: :car_owner).where(car_owners: { shop_id: current_shop.id })`
+- Shows customer name, vehicle, services, date/time, notes
+- **Technician assignment** — migration added `technician_id` to `car_us_booking_requests`
+- Assign dropdown on each booking, submits via PATCH to `manager/bookings#update`
+- Route: `resources :bookings, only: [:update]` in manager namespace
+- Scoped to manager's shop only
+
+## Tech Views Cleanup
+
+**Removed (dead code):**
+- `oil_detail` — empty shell, route, controller action
+- `front_end_detail` — empty shell, route, controller action
+- `shop_dashboards` — empty controller + view + route + directory
+- `tech_vehicles` — merged into tech_lookups (add-vehicle form + vehicle list)
+
+**Kept (4 screens):**
+- `/tech_lookups` — home base: assigned appointments + vehicle list + add vehicle
+- `/tech_lookups/:id` — vehicle spec sheet + job history + log job
+- `/conversations` — chat threads
+- `/tech_profile` — tech profile with book hours + jobs done stats
+
+**Shared tab bar:** `_tech_tab_bar.html.erb` — Lookup | Chat | Customers | Profile
+Uses `request.path` for active-state highlighting. Replaced 7 inline tab bars across all tech views.
+
+## ServiceJob + JobPart — Hours & Procedures
+
+**Migrations:**
+- `car_us_service_jobs` — vehicle_id, technician_id, description, book_hours(decimal), status, notes, completed_at
+- `car_us_job_parts` — service_job_id, name, quantity(decimal 6,2), cost(decimal 8,2)
+- Fixed quantity from integer → decimal for floats like 4.6 quarts
+
+**Models:**
+- `CarUs::ServiceJob` — belongs_to vehicle, technician; has_many job_parts
+- `CarUs::JobPart` — belongs_to service_job
+- Associations added to Technician (`has_many :service_jobs`) and Vehicle
+
+**Controller:** `CarUs::ServiceJobsController` — create with:
+- Auto-match hours from labor_times if blank (fuzzy match on description)
+- Parts array saving (name, quantity, cost)
+- Route: `POST /tech_lookups/:id/service_jobs`
+
+**Vehicle show page (`tech_lookups/show`):**
+- "Log Job" section — description field + hours field + procedure chip library (8 quick-pick buttons from labor_times)
+- Parts fields (3 rows) — name, quantity (step=0.1), cost
+- Job History section — lists all jobs with parts, per-job hours, running total
+- 30 labor_times seeded from Waypoint data
+- Profile stats show real data (book hours sum, jobs count)
+
+## Editable Vehicle Specs
+
+- **Stimulus controller:** `specs_editor_controller.js` — toggles hidden form on Edit button
+- **Route:** `PATCH /tech_lookups/:id/update_specs`
+- Edit button on each spec card (Engine Oil, Tires, Fluids, Torque & Plugs)
+- Forms are stacked vertically with example placeholders
+- Merges into `ai_specs` JSON column on vehicle
+
+## Current State
+- **Branch:** `carus-phase4-customer`
+- **Directory:** `~/Rogue-Media-Lab/Studio-Projects/RML-Portfolio/rml-portfolio`
+- **Server:** `unset DATABASE_URL && bin/dev`
+- **Manager login:** `mason@roguemedialab.com`
+- **Tech login:** `tech@carus.com`
+- **Demo customer:** `jus18@gmail.com` (shop: SpeeDee/Midas, vehicle: 2020 Honda Accord)

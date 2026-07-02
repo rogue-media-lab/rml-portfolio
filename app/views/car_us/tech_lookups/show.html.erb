@@ -4,19 +4,102 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <% end %>
 
+<%
+  v = @vehicle
+  specs = v.ai_specs.present? ? (JSON.parse(v.ai_specs) rescue {}) : {}
+  suggestions = v.ai_suggestions.present? ? (JSON.parse(v.ai_suggestions) rescue []) : []
+  jobs = v.service_jobs.recent.includes(:job_parts)
+  total_hours = v.service_jobs.sum(:book_hours)
+  labor_times = CarUs::LaborTime.by_category
+%>
+
 <div class="min-h-screen bg-carus-black font-montserrat flex flex-col">
   <div class="flex flex-col pt-14 gap-0.75 px-6">
     <p class="uppercase tracking-[1.5px] text-[11px]/[14px] font-semibold text-carus-green">Tech View</p>
-    <h1 class="text-xl/[24px] font-extrabold text-white tracking-[-0.4px]">2020 Honda Accord</h1>
-    <p class="text-xs/[16px] text-[#FFFFFF59]">2.0T Sport · Sedan</p>
+    <h1 class="text-xl/[24px] font-extrabold text-white tracking-[-0.4px]"><%= [v.year, v.make, v.model].compact.join(" ") %></h1>
+    <p class="text-xs/[16px] text-[#FFFFFF59]">
+      <%= [v.trim, v.engine_size, v.transmission].compact.join(" · ") %>
+      <% if v.car_owner_id.present? %> · Owner: <%= v.car_owner.email.split("@").first %><% end %>
+    </p>
   </div>
 
   <div class="grow flex flex-col pt-4.5 gap-2.5 px-6">
+    <%# Log Job form %>
+    <div class="rounded-2xl py-4 px-4.5 bg-carus-field border border-carus-green/20">
+      <p class="uppercase tracking-[1px] mb-3 text-[10px]/[12px] font-bold text-carus-green">Log Job</p>
+      <%= form_with model: [v, CarUs::ServiceJob.new], url: tech_lookup_service_jobs_path(v), method: :post, local: true, data: { turbo: false }, class: "flex flex-col gap-2" do |f| %>
+        <div class="flex gap-2">
+          <%= f.text_field :description, id: "job_desc", placeholder: "What was done", class: "grow bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg py-2.5 px-3 text-sm font-bold text-white placeholder:text-white/20 focus:outline-none focus:border-carus-green/40" %>
+          <%= f.number_field :book_hours, id: "job_hours", placeholder: "Hours", step: 0.1, class: "w-20 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg py-2.5 px-2 text-sm font-bold text-carus-green placeholder:text-white/10 focus:outline-none focus:border-carus-green/40 text-center" %>
+        </div>
+
+        <%# Quick pick from procedure library %>
+        <div class="flex gap-2 flex-wrap">
+          <% labor_times.first(8).each do |lt| %>
+            <button type="button" onclick="document.getElementById('job_desc').value='<%= j lt.service %>';document.getElementById('job_hours').value='<%= lt.hours %>'" class="text-[10px]/[12px] px-2.5 py-1.5 rounded-lg bg-[#1A1A1A] border border-[#2A2A2A] text-[#FFFFFF59] hover:border-carus-green/30 hover:text-white transition whitespace-nowrap"><%= lt.service.truncate(25) %> · <%= lt.hours %>h</button>
+          <% end %>
+        </div>
+
+        <%= f.text_area :notes, rows: 2, placeholder: "Notes (optional)", class: "bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg py-2 px-3 text-xs text-[#FFFFFF4D] placeholder:text-white/15 focus:outline-none focus:border-carus-green/40 resize-none" %>
+
+        <%# Parts (max 3) %>
+        <div class="flex flex-col gap-1.5" id="parts-container">
+          <p class="text-[9px]/[12px] font-bold text-[#FFFFFF33] uppercase tracking-[0.5px]">Parts Used</p>
+          <% 3.times do |i| %>
+            <div class="flex gap-1.5">
+              <input name="parts[<%= i %>][name]" placeholder="Part name" class="grow bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg py-2 px-2.5 text-xs text-white placeholder:text-white/15 focus:outline-none focus:border-carus-green/40">
+              <input name="parts[<%= i %>][quantity]" type="number" step="0.1" value="1" class="w-14 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg py-2 px-1.5 text-xs text-white placeholder:text-white/15 focus:outline-none focus:border-carus-green/40 text-center">
+              <input name="parts[<%= i %>][cost]" type="number" step="0.01" placeholder="Cost" class="w-20 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg py-2 px-1.5 text-xs text-white placeholder:text-white/15 focus:outline-none focus:border-carus-green/40">
+            </div>
+          <% end %>
+        </div>
+
+        <%= f.submit "Log Job", class: "w-full rounded-lg py-2.5 bg-carus-green text-sm font-extrabold text-black cursor-pointer" %>
+      <% end %>
+    </div>
+
+    <%# Job history %>
+    <% if jobs.any? %>
+      <div class="rounded-2xl py-4 px-4.5 bg-carus-field border border-[#FFFFFF0F]">
+        <div class="flex justify-between items-center mb-2.5">
+          <p class="uppercase tracking-[1px] text-[10px]/[12px] font-bold text-carus-green">Job History</p>
+          <p class="text-[10px]/[12px] font-bold text-carus-green"><%= total_hours %>h total</p>
+        </div>
+        <% jobs.each_with_index do |job, i| %>
+          <div class="flex items-start justify-between py-2.5 <%= 'border-t border-[#FFFFFF0F]' unless i == 0 %>">
+            <div class="grow min-w-0">
+              <p class="text-[13px]/[16px] font-bold text-white"><%= job.description %></p>
+              <% if job.job_parts.any? %>
+                <p class="text-[10px]/[12px] text-[#FFFFFF4D] mt-0.5">
+                  Parts: <%= job.job_parts.map { |p| "#{p.name} (#{p.quantity})" }.join(", ") %>
+                </p>
+              <% end %>
+              <p class="text-[10px]/[12px] text-[#FFFFFF33] mt-0.5"><%= time_ago_in_words(job.created_at) %> ago</p>
+            </div>
+            <span class="text-sm/[18px] font-extrabold text-carus-green shrink-0 ml-3"><%= job.book_hours %>h</span>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+
     <%# Engine Oil %>
-    <div class="rounded-2xl py-4 px-4.5 bg-carus-field border border-[#FFFFFF0F]">
-      <p class="uppercase tracking-[1px] mb-2.5 text-[10px]/[12px] font-bold text-carus-green">Engine Oil</p>
+    <div class="rounded-2xl py-4 px-4.5 bg-carus-field border border-[#FFFFFF0F]" data-controller="specs-editor">
+      <div class="flex justify-between items-center mb-2.5">
+        <p class="uppercase tracking-[1px] text-[10px]/[12px] font-bold text-carus-green">Engine Oil</p>
+        <button data-action="specs-editor#toggle" class="text-[9px]/[12px] font-bold text-[#FFFFFF4D] uppercase tracking-[0.5px]">Edit</button>
+      </div>
+      <%= form_with url: update_specs_tech_lookup_path(v), method: :patch, local: true, data: { turbo: false, specs_editor_target: "form" }, class: "hidden flex flex-col gap-1.5 mb-2" do |f| %>
+        <%= f.text_field "specs[oil_weight]", value: specs["oil_weight"], placeholder: "Viscosity (e.g. 0W-20)", class: "bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg py-1.5 px-2.5 text-xs text-white placeholder:text-white/15 focus:outline-none focus:border-carus-green/40" %>
+        <%= f.text_field "specs[oil_capacity_qts]", value: specs["oil_capacity_qts"], placeholder: "Capacity (qts)", class: "bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg py-1.5 px-2.5 text-xs text-white placeholder:text-white/15 focus:outline-none focus:border-carus-green/40" %>
+        <%= f.text_field "specs[oil_filter]", value: specs["oil_filter"], placeholder: "Filter # (e.g. PF63E)", class: "bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg py-1.5 px-2.5 text-xs text-white placeholder:text-white/15 focus:outline-none focus:border-carus-green/40" %>
+        <%= f.submit "Save", class: "w-full rounded-lg py-1.5 bg-carus-green text-xs font-bold text-black cursor-pointer" %>
+      <% end %>
       <div class="flex gap-2.5">
-        <% [["Viscosity", "0W-20"], ["Capacity", "4.4 qts"], ["Filter #", "M1-110A"]].each_with_index do |(label, val), i| %>
+        <% [
+          ["Viscosity", specs["oil_weight"] || "—"],
+          ["Capacity", specs["oil_capacity_qts"] ? "#{specs["oil_capacity_qts"]} qts" : "—"],
+          ["Filter #", specs["oil_filter"] || "—"]
+        ].each_with_index do |(label, val), i| %>
           <div class="<%= i == 2 ? 'grow-[1.4]' : 'grow' %> flex flex-col gap-0.5">
             <span class="text-[10px]/[12px] font-medium text-[#FFFFFF59]"><%= label %></span>
             <span class="text-[15px]/[18px] font-extrabold text-white"><%= val %></span>
@@ -26,10 +109,23 @@
     </div>
 
     <%# Tires %>
-    <div class="rounded-2xl py-4 px-4.5 bg-carus-field border border-[#FFFFFF0F]">
-      <p class="uppercase tracking-[1px] mb-2.5 text-[10px]/[12px] font-bold text-carus-green">Tires</p>
+    <div class="rounded-2xl py-4 px-4.5 bg-carus-field border border-[#FFFFFF0F]" data-controller="specs-editor">
+      <div class="flex justify-between items-center mb-2.5">
+        <p class="uppercase tracking-[1px] text-[10px]/[12px] font-bold text-carus-green">Tires</p>
+        <button data-action="specs-editor#toggle" class="text-[9px]/[12px] font-bold text-[#FFFFFF4D] uppercase tracking-[0.5px]">Edit</button>
+      </div>
+      <%= form_with url: update_specs_tech_lookup_path(v), method: :patch, local: true, data: { turbo: false, specs_editor_target: "form" }, class: "hidden flex flex-col gap-1.5 mb-2" do |f| %>
+        <%= f.text_field "specs[tire_size]", value: specs["tire_size"], placeholder: "Size (e.g. 235/40R19)", class: "bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg py-1.5 px-2.5 text-xs text-white placeholder:text-white/15 focus:outline-none focus:border-carus-green/40" %>
+        <%= f.text_field "specs[tire_pressure_f]", value: specs["tire_pressure_f"], placeholder: "Front PSI", class: "bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg py-1.5 px-2.5 text-xs text-white placeholder:text-white/15 focus:outline-none focus:border-carus-green/40" %>
+        <%= f.text_field "specs[tire_pressure_r]", value: specs["tire_pressure_r"], placeholder: "Rear PSI", class: "bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg py-1.5 px-2.5 text-xs text-white placeholder:text-white/15 focus:outline-none focus:border-carus-green/40" %>
+        <%= f.submit "Save", class: "w-full rounded-lg py-1.5 bg-carus-green text-xs font-bold text-black cursor-pointer" %>
+      <% end %>
       <div class="flex gap-2.5">
-        <% [["Size", "235/40R19", "1.6"], ["Front PSI", "35", ""], ["Rear PSI", "33", ""]].each_with_index do |(label, val, grow), i| %>
+        <% [
+          ["Size", specs["tire_size"] || "—", "1.6"],
+          ["Front PSI", specs["tire_pressure_f"]&.to_s || "—", ""],
+          ["Rear PSI", specs["tire_pressure_r"]&.to_s || "—", ""]
+        ].each_with_index do |(label, val, grow), i| %>
           <div class="<%= i == 0 ? 'grow-[1.6]' : 'grow' %> flex flex-col gap-0.5">
             <span class="text-[10px]/[12px] font-medium text-[#FFFFFF59]"><%= label %></span>
             <span class="text-[15px]/[18px] font-extrabold text-white"><%= val %></span>
@@ -39,10 +135,23 @@
     </div>
 
     <%# Fluids %>
-    <div class="rounded-2xl py-4 px-4.5 bg-carus-field border border-[#FFFFFF0F]">
-      <p class="uppercase tracking-[1px] mb-2.5 text-[10px]/[12px] font-bold text-carus-green">Fluids</p>
+    <div class="rounded-2xl py-4 px-4.5 bg-carus-field border border-[#FFFFFF0F]" data-controller="specs-editor">
+      <div class="flex justify-between items-center mb-2.5">
+        <p class="uppercase tracking-[1px] text-[10px]/[12px] font-bold text-carus-green">Fluids</p>
+        <button data-action="specs-editor#toggle" class="text-[9px]/[12px] font-bold text-[#FFFFFF4D] uppercase tracking-[0.5px]">Edit</button>
+      </div>
+      <%= form_with url: update_specs_tech_lookup_path(v), method: :patch, local: true, data: { turbo: false, specs_editor_target: "form" }, class: "hidden flex flex-col gap-1.5 mb-2" do |f| %>
+        <%= f.text_field "specs[coolant_type]", value: specs["coolant_type"], placeholder: "Coolant (e.g. HOAT)", class: "bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg py-1.5 px-2.5 text-xs text-white placeholder:text-white/15 focus:outline-none focus:border-carus-green/40" %>
+        <%= f.text_field "specs[transmission_fluid]", value: specs["transmission_fluid"], placeholder: "Trans Fluid (e.g. ATF DW-1)", class: "bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg py-1.5 px-2.5 text-xs text-white placeholder:text-white/15 focus:outline-none focus:border-carus-green/40" %>
+        <%= f.text_field "specs[brake_fluid]", value: specs["brake_fluid"], placeholder: "Brake Fluid (e.g. DOT 3)", class: "bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg py-1.5 px-2.5 text-xs text-white placeholder:text-white/15 focus:outline-none focus:border-carus-green/40" %>
+        <%= f.submit "Save", class: "w-full rounded-lg py-1.5 bg-carus-green text-xs font-bold text-black cursor-pointer" %>
+      <% end %>
       <div class="flex gap-2.5">
-        <% [["Coolant", "Honda OAT"], ["Freon", "R-1234yf"], ["Brake Fluid", "DOT 3"]].each do |label, val| %>
+        <% [
+          ["Coolant", specs["coolant_type"] || "—"],
+          ["Trans Fluid", specs["transmission_fluid"] || "—"],
+          ["Brake Fluid", "—"]
+        ].each do |label, val| %>
           <div class="grow flex flex-col gap-0.5">
             <span class="text-[10px]/[12px] font-medium text-[#FFFFFF59]"><%= label %></span>
             <span class="text-[13px]/[16px] font-extrabold text-white"><%= val %></span>
@@ -51,11 +160,23 @@
       </div>
     </div>
 
-    <%# Filters & Plugs %>
-    <div class="rounded-2xl py-4 px-4.5 bg-carus-field border border-[#FFFFFF0F]">
-      <p class="uppercase tracking-[1px] mb-2.5 text-[10px]/[12px] font-bold text-carus-green">Filters & Plugs</p>
+    <%# Torque & Plugs %>
+    <div class="rounded-2xl py-4 px-4.5 bg-carus-field border border-[#FFFFFF0F]" data-controller="specs-editor">
+      <div class="flex justify-between items-center mb-2.5">
+        <p class="uppercase tracking-[1px] text-[10px]/[12px] font-bold text-carus-green">Torque & Plugs</p>
+        <button data-action="specs-editor#toggle" class="text-[9px]/[12px] font-bold text-[#FFFFFF4D] uppercase tracking-[0.5px]">Edit</button>
+      </div>
+      <%= form_with url: update_specs_tech_lookup_path(v), method: :patch, local: true, data: { turbo: false, specs_editor_target: "form" }, class: "hidden flex flex-col gap-1.5 mb-2" do |f| %>
+        <%= f.text_field "specs[drain_plug_torque_ft_lbs]", value: specs["drain_plug_torque_ft_lbs"], placeholder: "Drain Plug Torque (ft-lbs)", class: "bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg py-1.5 px-2.5 text-xs text-white placeholder:text-white/15 focus:outline-none focus:border-carus-green/40" %>
+        <%= f.text_field "specs[spark_plug]", value: specs["spark_plug"], placeholder: "Spark Plug (e.g. NGK 93501)", class: "bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg py-1.5 px-2.5 text-xs text-white placeholder:text-white/15 focus:outline-none focus:border-carus-green/40" %>
+        <%= f.submit "Save", class: "w-full rounded-lg py-1.5 bg-carus-green text-xs font-bold text-black cursor-pointer" %>
+      <% end %>
       <div class="flex gap-2.5">
-        <% [["Air Filter", "CA10755"], ["Cabin Filter", "CF11179"], ["Spark Plug", "NGK 96122"]].each do |label, val| %>
+        <% [
+          ["Drain Plug", specs["drain_plug_torque_ft_lbs"] ? "#{specs["drain_plug_torque_ft_lbs"]} ft-lbs" : "—"],
+          ["Spark Plug", specs["spark_plug"] || "—"],
+          ["VIN", v.vin || "—"]
+        ].each do |label, val| %>
           <div class="grow flex flex-col gap-0.5">
             <span class="text-[10px]/[12px] font-medium text-[#FFFFFF59]"><%= label %></span>
             <span class="text-[13px]/[16px] font-extrabold text-white"><%= val %></span>
@@ -64,30 +185,25 @@
       </div>
     </div>
 
-    <div class="flex items-center justify-center rounded-[14px] py-3.5 px-4.5 gap-2 bg-carus-green">
-      <span class="text-sm/[18px] font-extrabold text-black">+ Flag a Concern for Customer</span>
-    </div>
+    <%# AI suggestions %>
+    <% if suggestions.any? %>
+      <div class="rounded-2xl py-4 px-4.5 bg-carus-field border border-[#E8A020]/20">
+        <p class="uppercase tracking-[1px] mb-2.5 text-[10px]/[12px] font-bold text-[#E8A020]">Suggestions</p>
+        <% suggestions.each do |s| %>
+          <p class="text-[13px]/[16px] text-[#AAAAAA] mb-1">· <%= s %></p>
+        <% end %>
+      </div>
+    <% end %>
+
+    <%# Difficulty notes %>
+    <% if v.ai_difficulty_notes.present? %>
+      <div class="rounded-2xl py-4 px-4.5 bg-carus-field border border-[#FF6260]/20">
+        <p class="uppercase tracking-[1px] mb-2.5 text-[10px]/[12px] font-bold text-[#FF6260]">Watch Out</p>
+        <p class="text-[13px]/[16px] text-[#CCCCCC]"><%= v.ai_difficulty_notes %></p>
+      </div>
+    <% end %>
   </div>
 
   <%# Tab bar %>
-  <div class="h-20.5 flex items-center justify-around shrink-0 pb-4 px-4 bg-[#111111] border-t border-[#FFFFFF12] mt-auto">
-    <%= link_to tech_lookups_path, class: "flex flex-col items-center gap-1.25" do %>
-      <div class="flex items-center justify-center shrink-0 size-6">
-        <div class="w-2.75 h-2.75 rounded-xs shrink-0 border-2 border-[#FFFFFF33]"></div>
-      </div>
-      <span class="text-[10px]/[12px] font-medium text-carus-text-dim">Lookup</span>
-    <% end %>
-    <div class="flex flex-col items-center gap-1.25">
-      <div class="flex items-center justify-center shrink-0 size-6">
-        <div class="rounded-[3px] shrink-0 border-2 border-[#FFFFFF33] size-3.5"></div>
-      </div>
-      <span class="text-[10px]/[12px] font-medium text-carus-text-dim">Customers</span>
-    </div>
-    <%= link_to tech_profile_path, class: "flex flex-col items-center gap-1.25" do %>
-      <div class="flex items-center justify-center shrink-0 size-6">
-        <div class="rounded-full shrink-0 border-2 border-[#FFFFFF33] size-3.5"></div>
-      </div>
-      <span class="text-[10px]/[12px] font-medium text-carus-text-dim">Profile</span>
-    <% end %>
-  </div>
+  <%= render "car_us/shared/tech_tab_bar" %>
 </div>

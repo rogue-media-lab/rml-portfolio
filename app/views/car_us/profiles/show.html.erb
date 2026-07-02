@@ -1,28 +1,38 @@
 <%= content_for :head do %>
+<%= render "car_us/shared/top_menu" %>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <% end %>
 
-<div class="min-h-screen bg-carus-black font-montserrat flex flex-col">
+<div class="min-h-screen bg-carus-black font-montserrat flex flex-col pb-20">
   <%# Gradient header %>
   <div class="flex flex-col items-center pt-14 pb-7 px-6 bg-gradient-to-br from-[#2E4A3A] to-carus-black">
-    <%# Avatar %>
-    <div class="relative mb-3.5">
-      <div class="w-21 h-21 flex items-center justify-center rounded-[42px] bg-carus-field border-[3px] border-carus-green">
-        <span class="text-[28px]/[34px] font-extrabold text-carus-green tracking-[-1px]">
-          <%= @car_owner.email.first(2).upcase %>
-        </span>
+    <%# Avatar — tap to edit %>
+    <%= link_to edit_profile_path, class: "relative mb-3.5" do %>
+      <div class="w-21 h-21 flex items-center justify-center rounded-[42px] bg-carus-field border-[3px] border-carus-green overflow-hidden">
+        <% if @car_owner.avatar.attached? %>
+          <%= image_tag @car_owner.avatar.variant(resize_to_limit: [168, 168]), class: "w-full h-full object-cover" %>
+        <% else %>
+          <span class="text-[28px]/[34px] font-extrabold text-carus-green tracking-[-1px]">
+            <%= @car_owner.email.first(2).upcase %>
+          </span>
+        <% end %>
       </div>
-    </div>
+    <% end %>
 
     <h1 class="mb-1 text-[22px]/[28px] font-extrabold text-white tracking-[-0.5px]">
-      <%= @car_owner.email.split("@").first.capitalize %>
+      <%= [@car_owner.first_name, @car_owner.last_name].compact.join(" ").presence || @car_owner.email.split("@").first.capitalize %>
     </h1>
-    <p class="opacity-40 mb-1.5 text-xs/[16px] font-medium text-white"><%= @car_owner.email %></p>
+    <p class="opacity-40 mb-0 text-xs/[16px] font-medium text-white"><%= @car_owner.email %></p>
+    <% if @car_owner.address.present? %>
+      <p class="opacity-25 mb-1.5 text-[11px]/[14px] font-medium text-white"><%= @car_owner.address %></p>
+    <% else %>
+      <p class="opacity-25 mb-1.5 text-[11px]/[14px] font-medium text-white">No address on file</p>
+    <% end %>
 
     <div class="rounded-[20px] py-1 px-3 bg-carus-green/15 border border-carus-green/40">
-      <span class="text-base/[20px] text-white">Customer</span>
+      <span class="text-base/[20px] text-white"><%= @car_owner.shop&.name || "Customer" %></span>
     </div>
   </div>
 
@@ -102,43 +112,6 @@
       <% end %>
     </div>
   </div>
-
-  <%# Bottom tab bar %>
-  <div class="mt-auto flex bg-carus-black border-t border-[#1A1A1A]">
-    <%= link_to vehicles_path, class: "grow flex flex-col items-center pt-3 pb-5 gap-1" do %>
-      <svg width="22" height="22" viewBox="0 0 22 22" class="shrink-0">
-        <path d="M4 18L4 8L11 3L18 8V18" fill="none" stroke="#FFFFFF59" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        <rect x="8" y="13" width="6" height="5" rx="1" fill="none" stroke="#FFFFFF59" stroke-width="1.5"/>
-      </svg>
-      <span class="opacity-35 text-[10px]/[12px] font-semibold text-white">Garage</span>
-    <% end %>
-
-    <div class="grow flex flex-col items-center pt-3 pb-5 gap-1">
-      <svg width="22" height="22" viewBox="0 0 22 22" class="shrink-0">
-        <circle cx="11" cy="11" r="2" fill="#FFFFFF59"/>
-        <line x1="11" y1="3" x2="11" y2="6" stroke="#FFFFFF59" stroke-width="1.5" stroke-linecap="round"/>
-        <line x1="11" y1="16" x2="11" y2="19" stroke="#FFFFFF59" stroke-width="1.5" stroke-linecap="round"/>
-        <line x1="3" y1="11" x2="6" y2="11" stroke="#FFFFFF59" stroke-width="1.5" stroke-linecap="round"/>
-        <line x1="16" y1="11" x2="19" y2="11" stroke="#FFFFFF59" stroke-width="1.5" stroke-linecap="round"/>
-      </svg>
-      <span class="opacity-35 text-[10px]/[12px] font-semibold text-white">History</span>
-    </div>
-
-    <div class="grow flex flex-col items-center pt-3 pb-5 gap-1">
-      <svg width="22" height="22" viewBox="0 0 22 22" class="shrink-0">
-        <circle cx="11" cy="11" r="7.5" fill="none" stroke="#FFFFFF59" stroke-width="1.5"/>
-        <line x1="11" y1="8" x2="11" y2="12" stroke="#FFFFFF59" stroke-width="1.5" stroke-linecap="round"/>
-        <circle cx="11" cy="14.5" r="0.75" fill="#FFFFFF59"/>
-      </svg>
-      <span class="opacity-35 text-[10px]/[12px] font-semibold text-white">Alerts</span>
-    </div>
-
-    <div class="grow flex flex-col items-center pt-3 pb-5 gap-1">
-      <svg width="22" height="22" viewBox="0 0 22 22" class="shrink-0">
-        <circle cx="11" cy="8" r="3.5" fill="none" stroke="#0FB900" stroke-width="1.5"/>
-        <path d="M4 19C4 15.134 7.134 12 11 12C14.866 12 18 15.134 18 19" fill="none" stroke="#0FB900" stroke-width="1.5" stroke-linecap="round"/>
-      </svg>
-      <span class="text-[10px]/[12px] font-bold text-carus-green">Profile</span>
-    </div>
-  </div>
+</div>
+  <%= render "car_us/shared/customer_tab_bar" %>
 </div>

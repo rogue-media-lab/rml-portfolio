@@ -64,6 +64,13 @@
       <%= f.text_field :transmission, placeholder: "Automatic", class: "w-full bg-carus-field border border-carus-border rounded-xl py-[13px] px-3.5 text-sm/[18px] font-bold text-white placeholder:text-carus-text-dim focus:outline-none focus:border-carus-green/40" %>
     </div>
 
+    <%# Photo (not in Paper — added for Vehicle image) %>
+    <div class="flex flex-col gap-1.5">
+      <label class="uppercase tracking-[0.8px] text-[10px]/[12px] font-bold text-[#FFFFFF59]">Vehicle Photo</label>
+      <%= f.file_field :photo, accept: "image/*", class: "w-full bg-carus-field border border-carus-border rounded-xl py-[13px] px-3.5 text-sm/[18px] text-white file:mr-3 file:bg-carus-green file:text-black file:border-0 file:rounded-lg file:py-1 file:px-3 file:text-xs file:font-bold focus:outline-none" %>
+      <span class="text-[10px]/[12px] text-carus-text-dim px-0.5">Optional — adds a photo to your vehicle card.</span>
+    </div>
+
     <%# Current Mileage %>
     <div class="flex flex-col gap-1.5">
       <label class="uppercase tracking-[0.8px] text-[10px]/[12px] font-bold text-[#FFFFFF59]">Current Mileage</label>

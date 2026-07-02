@@ -8,6 +8,24 @@ module CarUs
 
     def show
       @vehicle = current_car_owner.vehicles.find(params[:id])
+      @shop = current_car_owner.shop
+      @services = @shop&.services&.order(:name) || []
+      @bookings = @vehicle.booking_requests.order(preferred_date: :desc).limit(5)
+      @service_records = @vehicle.service_records.order(service_date: :desc).limit(5)
+      @service_jobs = @vehicle.service_jobs.where(status: "completed").order(completed_at: :desc).limit(5)
+    end
+
+    def edit
+      @vehicle = current_car_owner.vehicles.find(params[:id])
+    end
+
+    def update
+      @vehicle = current_car_owner.vehicles.find(params[:id])
+      if @vehicle.update(vehicle_params)
+        redirect_to vehicle_path(@vehicle), notice: "Vehicle updated."
+      else
+        render :edit, status: :unprocessable_entity
+      end
     end
 
     def new
@@ -26,7 +44,8 @@ module CarUs
       end
 
       if @vehicle.save
-        redirect_to vehicles_path, notice: "Vehicle added to your garage."
+        destination = current_car_owner.vehicles.count == 1 ? carus_welcome_path : vehicles_path
+        redirect_to destination, notice: "Vehicle added to your garage."
       else
         render :new, status: :unprocessable_entity
       end
@@ -36,7 +55,7 @@ module CarUs
 
     def vehicle_params
       params.require(:car_us_vehicle).permit(
-        :vin, :year, :make, :model, :trim, :engine_size, :transmission, :mileage
+        :vin, :year, :make, :model, :trim, :engine_size, :transmission, :mileage, :photo
       )
     end
   end

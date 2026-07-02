@@ -1,10 +1,11 @@
 <%= content_for :head do %>
+<%= render "car_us/shared/top_menu" %>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <% end %>
 
-<div class="min-h-screen bg-carus-black font-montserrat flex flex-col">
+<div class="min-h-screen bg-carus-black font-montserrat flex flex-col pb-20">
   <%# Header %>
   <div class="flex flex-col pt-14 gap-0.75 px-6">
     <h1 class="text-[22px]/[28px] font-extrabold text-white tracking-[-0.4px]">Service History</h1>
@@ -60,34 +61,6 @@
   </div>
 
   <%# Bottom tab bar — History active %>
-  <div class="h-20.5 flex items-center justify-around shrink-0 pb-4 px-4 bg-[#111111] border-t border-[#FFFFFF12] mt-auto">
-    <%= link_to vehicles_path, class: "flex flex-col items-center gap-1.25" do %>
-      <svg width="22" height="22" viewBox="0 0 22 22" class="shrink-0">
-        <path d="M4 18L4 8L11 3L18 8V18" fill="none" stroke="#FFFFFF59" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        <rect x="8" y="13" width="6" height="5" rx="1" fill="none" stroke="#FFFFFF59" stroke-width="1.5"/>
-      </svg>
-      <span class="text-[10px]/[12px] font-medium text-carus-text-dim">Garage</span>
-    <% end %>
-
-    <div class="flex flex-col items-center gap-1.25">
-      <div class="flex items-center justify-center rounded-[7px] shrink-0 bg-carus-green/15 size-6">
-        <div class="rounded-[3px] shrink-0 border-2 border-carus-green size-3.5"></div>
-      </div>
-      <span class="text-[10px]/[12px] font-bold text-carus-green">History</span>
-    </div>
-
-    <div class="flex flex-col items-center gap-1.25">
-      <div class="flex items-center justify-center shrink-0 size-6">
-        <div class="rounded-full shrink-0 border-2 border-[#FFFFFF33] size-3.5"></div>
-      </div>
-      <span class="text-[10px]/[12px] font-medium text-carus-text-dim">Alerts</span>
-    </div>
-
-    <%= link_to profile_path, class: "flex flex-col items-center gap-1.25" do %>
-      <div class="flex items-center justify-center shrink-0 size-6">
-        <div class="rounded-full shrink-0 border-2 border-[#FFFFFF33] size-3.5"></div>
-      </div>
-      <span class="text-[10px]/[12px] font-medium text-carus-text-dim">Profile</span>
-    <% end %>
-  </div>
+</div>
+  <%= render "car_us/shared/customer_tab_bar" %>
 </div>
