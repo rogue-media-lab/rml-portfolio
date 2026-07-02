@@ -1,0 +1,40 @@
+<%= content_for :head do %>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<% end %>
+
+<div class="min-h-screen bg-carus-black font-montserrat flex flex-col">
+  <div class="flex justify-between items-start pt-14 px-6">
+    <div class="flex flex-col gap-0.75">
+      <p class="uppercase tracking-[1.5px] text-[11px]/[14px] font-semibold text-carus-green">Tech View</p>
+      <h1 class="text-[22px]/[28px] font-extrabold text-white tracking-[-0.4px]">Add Vehicle</h1>
+    </div>
+    <%= link_to tech_lookups_path, class: "mt-1 text-[11px]/[14px] font-medium text-[#FFFFFF59] hover:text-white transition" do %>
+      Cancel
+    <% end %>
+  </div>
+
+  <div class="mt-4 mx-6">
+    <%= form_with model: @vehicle, url: tech_lookups_path, method: :post, class: "flex flex-col gap-2" do |f| %>
+      <% if @vehicle.errors.any? %>
+        <div class="rounded-xl p-3 bg-[#FF6260]/10 border border-[#FF6260]/20 mb-1">
+          <% @vehicle.errors.full_messages.each do |msg| %><p class="text-[#FF6260] text-xs"><%= msg %></p><% end %>
+        </div>
+      <% end %>
+      <div class="flex gap-2">
+        <%= f.text_field :year, placeholder: "Year", class: "w-20 bg-carus-field border border-carus-border rounded-xl py-3 px-3 text-sm font-bold text-white placeholder:text-white/20 focus:outline-none focus:border-carus-green/40" %>
+        <%= f.text_field :make, placeholder: "Make", class: "grow bg-carus-field border border-carus-border rounded-xl py-3 px-3 text-sm font-bold text-white placeholder:text-white/20 focus:outline-none focus:border-carus-green/40" %>
+        <%= f.text_field :model, placeholder: "Model", class: "grow bg-carus-field border border-carus-border rounded-xl py-3 px-3 text-sm font-bold text-white placeholder:text-white/20 focus:outline-none focus:border-carus-green/40" %>
+      </div>
+      <div class="flex gap-2">
+        <%= f.text_field :vin, placeholder: "VIN (optional)", class: "grow bg-carus-field border border-carus-border rounded-xl py-2.5 px-3 text-xs text-[#FFFFFF4D] placeholder:text-white/15 focus:outline-none focus:border-carus-green/40" %>
+        <%= f.text_field :mileage, placeholder: "Mileage", class: "w-24 bg-carus-field border border-carus-border rounded-xl py-2.5 px-3 text-xs font-bold text-white placeholder:text-white/20 focus:outline-none focus:border-carus-green/40" %>
+        <%= f.submit "Add", class: "shrink-0 h-11 px-5 rounded-xl bg-carus-green text-sm font-extrabold text-black cursor-pointer" %>
+      </div>
+    <% end %>
+  </div>
+
+  <%# Tab bar %>
+  <%= render "car_us/shared/tech_tab_bar" %>
+</div>

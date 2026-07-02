@@ -1,0 +1,61 @@
+<%= content_for :head do %>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<% end %>
+
+<div class="min-h-screen bg-carus-black font-montserrat flex flex-col">
+  <div class="flex justify-between items-start pt-14 px-6">
+    <div class="flex flex-col gap-0.75">
+      <p class="uppercase tracking-[1.5px] text-[11px]/[14px] font-semibold text-carus-green">Tech View</p>
+      <h1 class="text-[22px]/[28px] font-extrabold text-white tracking-[-0.4px]">Conversations</h1>
+    </div>
+    <%= link_to destroy_technician_session_path, data: { turbo_method: :delete }, class: "mt-1 text-[11px]/[14px] font-medium text-[#FFFFFF33] hover:text-[#FF6260] transition" do %>
+      Sign Out
+    <% end %>
+  </div>
+
+  <%# New conversation form %>
+  <div class="mt-4 mx-6">
+    <%= form_with url: conversations_path, method: :post, multipart: true, class: "flex items-end gap-2" do |f| %>
+      <label class="flex items-center justify-center shrink-0 rounded-xl bg-carus-field border border-[#2A2A2A] size-11 cursor-pointer hover:border-carus-green/30 transition">
+        <svg width="18" height="18" viewBox="0 0 18 18" class="shrink-0"><path d="M2 5C2 3.895 2.895 3 4 3H14C15.105 3 16 3.895 16 5V13C16 14.105 15.105 15 14 15H4C2.895 15 2 14.105 2 13V5Z" fill="none" stroke="#FFFFFF4D" stroke-width="1.3"/><circle cx="6.5" cy="8" r="1.3" fill="#FFFFFF4D"/><path d="M2.5 14L5.5 11L7 12.5L11 9L15.5 13" fill="none" stroke="#FFFFFF4D" stroke-width="1.3" stroke-linejoin="round"/></svg>
+        <%= f.file_field :photo, accept: "image/*", capture: "environment", class: "hidden" %>
+      </label>
+      <%= f.text_area :content, rows: 1, placeholder: "Oil change, 47k mi — or snap a VIN...", class: "grow bg-carus-field border border-carus-border rounded-xl py-3 px-4 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-carus-green/40 resize-none" %>
+      <%= f.submit "→", class: "shrink-0 h-11 px-5 rounded-xl bg-carus-green text-sm font-extrabold text-black cursor-pointer" %>
+    <% end %>
+    <p class="mt-1.5 text-[10px] text-[#FFFFFF33] px-1">Type a VIN, describe the job, or snap a photo of the VIN plate.</p>
+  </div>
+
+  <%# Conversation list %>
+  <div class="grow flex flex-col mt-5 gap-2 px-6">
+    <% if @conversations.any? %>
+      <% @conversations.each do |conv| %>
+        <%= link_to conversation_path(conv), class: "flex items-center rounded-[14px] gap-3.5 p-4 bg-carus-field border border-[#2A2A2A] hover:border-carus-green/30 transition" do %>
+          <div class="flex items-center justify-center shrink-0 rounded-[14px] bg-[#0D2B0D] size-10">
+            <svg width="18" height="18" viewBox="0 0 18 18" class="shrink-0">
+              <path d="M3 5C3 3.895 3.895 3 5 3H13C14.105 3 15 3.895 15 5V11C15 12.105 14.105 13 13 13H7L3 15V5Z" fill="none" stroke="#0FB900" stroke-width="1.5" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="grow min-w-0">
+            <p class="text-sm/[18px] font-bold text-white truncate"><%= conv.title_or_default %></p>
+            <p class="text-[11px]/[14px] text-[#FFFFFF4D] truncate"><%= conv.messages.last&.content&.truncate(60) || "No messages" %></p>
+          </div>
+          <span class="text-[10px]/[12px] text-[#FFFFFF33] shrink-0"><%= time_ago_in_words(conv.updated_at) %> ago</span>
+        <% end %>
+      <% end %>
+    <% else %>
+      <div class="flex flex-col items-center justify-center py-16 gap-3 opacity-40">
+        <svg width="40" height="40" viewBox="0 0 40 40" class="shrink-0">
+          <path d="M8 10C8 7.791 9.791 6 12 6H28C30.209 6 32 7.791 32 10V22C32 24.209 30.209 26 28 26H16L8 32V10Z" fill="none" stroke="#FFFFFF33" stroke-width="1.5" stroke-linejoin="round"/>
+        </svg>
+        <p class="text-sm font-medium text-white">No conversations yet</p>
+        <p class="text-xs text-[#FFFFFF4D] text-center">Type a VIN or service above to start.</p>
+      </div>
+    <% end %>
+  </div>
+
+  <%# Tab bar %>
+  <%= render "car_us/shared/tech_tab_bar" %>
+</div>

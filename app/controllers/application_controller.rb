@@ -8,9 +8,9 @@ class ApplicationController < ActionController::Base
   def after_sign_in_path_for(resource)
     case resource
     when CarOwner
-      coupons_path
+      vehicles_path
     when Technician
-      manager_root_path
+      resource.manager? ? manager_root_path : conversations_path
     else
       super
     end
@@ -29,7 +29,7 @@ class ApplicationController < ActionController::Base
       if resource_class == CarOwner
         "car_us/car_owner"
       elsif resource_class == Technician
-        "car_us/technician"
+        "car_us/car_owner"
       else
         "application"
       end

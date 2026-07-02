@@ -6,6 +6,7 @@ class CarOwner < ApplicationRecord
          :recoverable, :rememberable, :validatable
 
   belongs_to :shop, class_name: "CarUs::Shop", optional: true
+  has_one_attached :avatar
   has_many :vehicles, class_name: "CarUs::Vehicle", dependent: :destroy
   has_many :notifications, class_name: "CarUs::Notification", dependent: :destroy
 end

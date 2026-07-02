@@ -1,0 +1,83 @@
+<%= content_for :head do %>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<% end %>
+
+<div class="min-h-screen bg-carus-black font-montserrat">
+  <div class="flex flex-col pt-14 gap-1.5 px-6">
+    <h1 class="text-[22px]/[28px] font-extrabold text-white tracking-[-0.4px]">Edit Vehicle</h1>
+    <p class="text-[13px] leading-[150%] text-[#FFFFFF66]"><%= @vehicle.year %> <%= @vehicle.make %> <%= @vehicle.model %></p>
+  </div>
+
+  <%= form_with model: @vehicle, url: vehicle_path(@vehicle), method: :patch, class: "grow flex flex-col pt-6 gap-3.5 px-6" do |f| %>
+    <% if @vehicle.errors.any? %>
+      <div class="rounded-xl p-3 bg-red-500/10 border border-red-500/20">
+        <% @vehicle.errors.full_messages.each do |msg| %>
+          <p class="text-red-400 text-xs"><%= msg %></p>
+        <% end %>
+      </div>
+    <% end %>
+
+    <div class="flex gap-2.5">
+      <div class="grow flex flex-col gap-1.5">
+        <label class="uppercase tracking-[0.8px] text-[10px]/[12px] font-bold text-[#FFFFFF59]">Year</label>
+        <%= f.text_field :year, value: @vehicle.year, class: "w-full bg-carus-field border border-carus-border rounded-xl py-[13px] px-3.5 text-sm/[18px] font-bold text-white focus:outline-none focus:border-carus-green/40" %>
+      </div>
+      <div class="grow-[1.8] flex flex-col gap-1.5">
+        <label class="uppercase tracking-[0.8px] text-[10px]/[12px] font-bold text-[#FFFFFF59]">Make</label>
+        <%= f.text_field :make, value: @vehicle.make, class: "w-full bg-carus-field border border-carus-border rounded-xl py-[13px] px-3.5 text-sm/[18px] font-bold text-white focus:outline-none focus:border-carus-green/40" %>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-1.5">
+      <label class="uppercase tracking-[0.8px] text-[10px]/[12px] font-bold text-[#FFFFFF59]">Model</label>
+      <%= f.text_field :model, value: @vehicle.model, class: "w-full bg-carus-field border border-carus-green/40 rounded-xl py-[13px] px-3.5 text-sm/[18px] font-bold text-carus-green focus:outline-none focus:border-carus-green" %>
+    </div>
+
+    <div class="flex flex-col gap-1.5">
+      <label class="uppercase tracking-[0.8px] text-[10px]/[12px] font-bold text-[#FFFFFF59]">Engine</label>
+      <div class="flex justify-between items-center rounded-xl py-[13px] px-3.5 bg-[#141414] border border-[#FFFFFF0D]">
+        <%= f.text_field :engine_size, value: @vehicle.engine_size, class: "bg-transparent w-full text-sm/[18px] font-bold text-[#FFFFFF73] focus:outline-none" %>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-1.5">
+      <label class="uppercase tracking-[0.8px] text-[10px]/[12px] font-bold text-[#FFFFFF59]">Transmission</label>
+      <%= f.text_field :transmission, value: @vehicle.transmission, class: "w-full bg-carus-field border border-carus-border rounded-xl py-[13px] px-3.5 text-sm/[18px] font-bold text-white focus:outline-none focus:border-carus-green/40" %>
+    </div>
+
+    <%# Current photo %>
+    <% if @vehicle.photo.attached? %>
+      <div class="flex flex-col gap-1.5">
+        <label class="uppercase tracking-[0.8px] text-[10px]/[12px] font-bold text-[#FFFFFF59]">Current Photo</label>
+        <%= image_tag @vehicle.photo.variant(resize_to_limit: [300, 200]), class: "rounded-xl w-full h-42 object-cover" %>
+      </div>
+    <% end %>
+
+    <div class="flex flex-col gap-1.5">
+      <label class="uppercase tracking-[0.8px] text-[10px]/[12px] font-bold text-[#FFFFFF59]"><%= @vehicle.photo.attached? ? "Replace Photo" : "Vehicle Photo" %></label>
+      <%= f.file_field :photo, accept: "image/*", class: "w-full bg-carus-field border border-carus-border rounded-xl py-[13px] px-3.5 text-sm/[18px] text-white file:mr-3 file:bg-carus-green file:text-black file:border-0 file:rounded-lg file:py-1 file:px-3 file:text-xs file:font-bold focus:outline-none" %>
+    </div>
+
+    <div class="flex flex-col gap-1.5">
+      <label class="uppercase tracking-[0.8px] text-[10px]/[12px] font-bold text-[#FFFFFF59]">Current Mileage</label>
+      <div class="flex items-center rounded-xl py-[13px] px-3.5 gap-2 bg-carus-field border border-carus-border focus-within:border-carus-green/40">
+        <%= f.text_field :mileage, value: @vehicle.mileage, class: "bg-transparent w-full text-sm/[18px] font-extrabold text-white focus:outline-none" %>
+        <span class="text-xs/[16px] text-[#FFFFFF40]">mi</span>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-1.5">
+      <div class="flex justify-between items-center">
+        <label class="uppercase tracking-[0.8px] text-[10px]/[12px] font-bold text-[#FFFFFF59]">VIN</label>
+      </div>
+      <%= f.text_field :vin, value: @vehicle.vin, class: "w-full bg-carus-field border border-[#FFFFFF0F] rounded-xl py-[13px] px-3.5 text-[13px]/[16px] text-[#FFFFFF33] focus:outline-none focus:border-carus-green/40" %>
+    </div>
+
+    <div class="flex gap-3 mt-1">
+      <%= link_to "Cancel", vehicle_path(@vehicle), class: "grow h-13 flex items-center justify-center rounded-[14px] border-[1.5px] border-white/10 text-[15px]/[18px] font-semibold text-white/50" %>
+      <%= f.submit "Save Changes", class: "grow h-13 rounded-[14px] bg-carus-green text-[15px]/[18px] font-extrabold text-black cursor-pointer" %>
+    </div>
+  <% end %>
+</div>
