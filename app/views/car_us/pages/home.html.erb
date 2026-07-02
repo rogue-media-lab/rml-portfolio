@@ -1,135 +1,213 @@
-<%# CarUs public landing page — shop directory %>
-<div class="min-h-screen bg-gray-50">
-  <%# Hero %>
-  <header class="bg-gradient-to-br from-blue-600 to-blue-800 text-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28">
+<%# CarUs landing page — your car is talking %>
+<div class="min-h-screen bg-carus-black font-montserrat text-white">
+
+  <%# Hero — the car is the protagonist %>
+  <header class="relative overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-br from-carus-green/10 via-transparent to-carus-green/5"></div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-36 relative z-10">
       <div class="max-w-3xl">
-        <h1 class="text-4xl md:text-6xl font-bold tracking-tight leading-tight">
-          Your Car,<br>Your Shop,<br>Your Deal.
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-carus-green/10 border border-carus-green/20 text-carus-green text-xs font-semibold tracking-wider uppercase mb-6">
+          <span class="w-1.5 h-1.5 rounded-full bg-carus-green animate-pulse"></span>
+          AI-Powered Vehicle Intelligence
+        </div>
+        <h1 class="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-tight">
+          Your car is talking.<br>
+          <span class="text-carus-green">Are you listening?</span>
         </h1>
-        <p class="mt-6 text-lg md:text-xl text-blue-100 max-w-xl leading-relaxed">
-          CarUs connects you with trusted local auto shops. Track your maintenance, grab flash deals, and never miss a service again.
+        <p class="mt-6 text-lg md:text-xl text-white/60 max-w-xl leading-relaxed">
+          CarUs builds a relationship between you and your vehicle. AI knows your car — its history, its needs, its voice. When it's time for service, we connect you. No sales pitch. Just your car, looking out for you.
         </p>
         <div class="mt-10 flex flex-col sm:flex-row gap-4">
-          <%= link_to "Find Your Shop", "#shops", class: "px-8 py-4 bg-yellow-400 text-gray-900 font-semibold rounded-full text-lg hover:bg-yellow-300 transition shadow-lg text-center" %>
-          <%= link_to "Sign Up Free", new_car_owner_registration_path, class: "px-8 py-4 bg-white/15 text-white font-semibold rounded-full text-lg hover:bg-white/25 transition border border-white/30 text-center" %>
+          <%= link_to "Get Started", new_car_owner_registration_path, class: "px-8 py-4 bg-carus-green text-carus-black font-bold rounded-full text-lg hover:bg-carus-green/90 transition text-center" %>
+          <%= link_to "See How It Works", "#how-it-works", class: "px-8 py-4 bg-white/5 text-white font-semibold rounded-full text-lg hover:bg-white/10 transition border border-white/10 text-center" %>
         </div>
-        <p class="mt-4 text-sm text-blue-200">
-          Already have a shop? <%= link_to "Shop Login", new_technician_session_path, class: "underline hover:text-white" %>
+        <p class="mt-4 text-sm text-white/30">
+          $4.99/month per vehicle. Family plans available.
         </p>
       </div>
     </div>
   </header>
 
-  <%# How It Works %>
-  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
-    <div class="text-center mb-12">
-      <h2 class="text-3xl font-bold text-gray-900">How CarUs Works</h2>
-      <p class="mt-3 text-gray-500 text-lg">Three steps to smarter car care</p>
+  <%# How It Works — three steps, car as protagonist %>
+  <section id="how-it-works" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28">
+    <div class="text-center mb-16">
+      <h2 class="text-3xl md:text-4xl font-bold">How CarUs Works</h2>
+      <p class="mt-3 text-white/50 text-lg">Your car knows what it needs. We handle the rest.</p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      <div class="text-center">
-        <div class="w-16 h-16 mx-auto bg-blue-100 rounded-2xl flex items-center justify-center mb-4">
-          <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
+      <%# Step 1 — Car Knows %>
+      <div class="relative text-center group">
+        <div class="w-20 h-20 mx-auto bg-carus-green/10 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-carus-green/20 transition">
+          <svg class="h-10 w-10 text-carus-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"></path>
           </svg>
         </div>
-        <h3 class="text-lg font-semibold text-gray-900">Find Your Shop</h3>
-        <p class="mt-2 text-sm text-gray-500">Browse trusted mechanics in your area. Mobile or shop — we've got both.</p>
+        <div class="absolute top-0 right-0 text-carus-green/10 text-8xl font-extrabold hidden md:block">1</div>
+        <h3 class="text-xl font-bold mb-3">Your Car Knows</h3>
+        <p class="text-white/50 leading-relaxed">AI tracks your vehicle's health — mileage, service history, wear patterns. It knows when the coolant is aging, the brakes are thinning, the oil is due. Your car speaks. You listen.</p>
       </div>
 
-      <div class="text-center">
-        <div class="w-16 h-16 mx-auto bg-green-100 rounded-2xl flex items-center justify-center mb-4">
-          <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+      <%# Step 2 — You Approve %>
+      <div class="relative text-center group">
+        <div class="w-20 h-20 mx-auto bg-carus-green/10 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-carus-green/20 transition">
+          <svg class="h-10 w-10 text-carus-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
           </svg>
         </div>
-        <h3 class="text-lg font-semibold text-gray-900">Sign Up Free</h3>
-        <p class="mt-2 text-sm text-gray-500">Create an account in seconds. No credit card needed.</p>
+        <div class="absolute top-0 right-0 text-carus-green/10 text-8xl font-extrabold hidden md:block">2</div>
+        <h3 class="text-xl font-bold mb-3">You Approve</h3>
+        <p class="text-white/50 leading-relaxed">One tap. Your car recommends. You say yes. Pick a time, pick a shop — or let us find one. No phone tag. No "let me check with the service writer." Your car already did the homework.</p>
       </div>
 
-      <div class="text-center">
-        <div class="w-16 h-16 mx-auto bg-yellow-100 rounded-2xl flex items-center justify-center mb-4">
-          <svg class="h-8 w-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+      <%# Step 3 — Shop Fulfills %>
+      <div class="relative text-center group">
+        <div class="w-20 h-20 mx-auto bg-carus-green/10 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-carus-green/20 transition">
+          <svg class="h-10 w-10 text-carus-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12"></path>
           </svg>
         </div>
-        <h3 class="text-lg font-semibold text-gray-900">Grab Flash Deals</h3>
-        <p class="mt-2 text-sm text-gray-500">Shops push time-limited deals. Oil changes, brakes, diagnostics — save big.</p>
+        <div class="absolute top-0 right-0 text-carus-green/10 text-8xl font-extrabold hidden md:block">3</div>
+        <h3 class="text-xl font-bold mb-3">Shop Fulfills</h3>
+        <p class="text-white/50 leading-relaxed">Your trusted shop gets the booking. They do the work. Your vehicle history updates automatically. No clipboard. No "what did we do last time?" The relationship grows with every service.</p>
       </div>
     </div>
   </section>
 
-  <%# Shops Directory %>
-  <section id="shops" class="bg-white py-16 md:py-24">
+  <%# Features — what CarUs does %>
+  <section class="bg-carus-panel">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl md:text-4xl font-bold">Everything Your Car Remembers</h2>
+        <p class="mt-3 text-white/50 text-lg">One place for your vehicle's entire story.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <% features = [
+          { icon: "M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z", title: "Maintenance Awareness", desc: "AI tracks what's due, what's aging, what's next. Never guess about your car's health again." },
+          { icon: "M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25", title: "Service History", desc: "Every oil change, brake job, coolant flush. Your car's full medical record, always current." },
+          { icon: "M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.043-.025a15.994 15.994 0 011.622-3.395m3.42 3.42a15.995 15.995 0 004.764-4.648l3.876-5.814a1.151 1.151 0 00-1.597-1.597L14.146 6.32a15.996 15.996 0 00-4.649 4.763m3.42 3.42a6.776 6.776 0 00-3.42-3.42", title: "Digital Manual", desc: "Fluids, specs, torque values, tire pressures. Your car's factory data, decoded by AI." },
+          { icon: "M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5", title: "Easy Booking", desc: "Your car says it's time. You pick a time. Done. The shop gets everything they need." }
+        ] %>
+        <% features.each do |f| %>
+          <div class="bg-carus-black/50 border border-white/5 rounded-2xl p-6 hover:border-carus-green/20 transition-all duration-300">
+            <div class="w-12 h-12 bg-carus-green/10 rounded-xl flex items-center justify-center mb-4">
+              <svg class="h-6 w-6 text-carus-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="<%= f[:icon] %>"></path>
+              </svg>
+            </div>
+            <h3 class="font-bold text-lg mb-2"><%= f[:title] %></h3>
+            <p class="text-white/40 text-sm leading-relaxed"><%= f[:desc] %></p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+  <%# For Two Kinds of Drivers %>
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28">
+    <div class="text-center mb-16">
+      <h2 class="text-3xl md:text-4xl font-bold">Built for Every Relationship</h2>
+      <p class="mt-3 text-white/50 text-lg">Whether your shop knows your name or just your VIN — CarUs works.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <%# Consumer card %>
+      <div class="bg-carus-panel border border-white/5 rounded-2xl p-8 md:p-10">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-10 h-10 bg-carus-green/10 rounded-xl flex items-center justify-center">
+            <svg class="h-5 w-5 text-carus-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold">For You</h3>
+        </div>
+        <p class="text-white/50 leading-relaxed mb-6">Your car. Your data. Your relationship. AI tracks everything — maintenance, history, specs. When something's due, you know. When you need a shop, we connect you. No cold calls. No upselling. Just your car looking out for you.</p>
+        <div class="flex items-center gap-4 text-sm">
+          <span class="text-white/80 font-semibold">$4.99<span class="text-white/30 font-normal">/month</span></span>
+          <span class="text-white/15">·</span>
+          <span class="text-white/30">per vehicle</span>
+        </div>
+        <div class="mt-6">
+          <%= link_to "Start Your Free Trial", new_car_owner_registration_path, class: "inline-block px-6 py-3 bg-carus-green text-carus-black font-semibold rounded-full text-sm hover:bg-carus-green/90 transition" %>
+        </div>
+      </div>
+
+      <%# Shop card — positioned as fulfillment %>
+      <div class="bg-carus-panel border border-white/5 rounded-2xl p-8 md:p-10">
+        <div class="flex items-center gap-3 mb-6">
+          <div class="w-10 h-10 bg-carus-green/10 rounded-xl flex items-center justify-center">
+            <svg class="h-5 w-5 text-carus-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349M3.75 21V9.349m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.015a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72l1.189-1.19A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72M6.75 18h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.75c0 .414.336.75.75.75z"></path>
+            </svg>
+          </div>
+          <h3 class="text-xl font-bold">For Your Shop</h3>
+        </div>
+        <p class="text-white/50 leading-relaxed mb-6">Plug into the fulfillment network. Customers come to you with a service need already identified — no selling required. Manage bookings, techs, and fleet accounts. Your loyal customers get a direct line. New customers flow through structured booking.</p>
+        <div class="flex items-center gap-4 text-sm">
+          <span class="text-white/80 font-semibold">from $75<span class="text-white/30 font-normal">/month</span></span>
+        </div>
+        <div class="mt-6">
+          <%= link_to "Shop Login", new_technician_session_path, class: "inline-block px-6 py-3 bg-white/5 text-white font-semibold rounded-full text-sm hover:bg-white/10 transition border border-white/10" %>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <%# Shops on the network %>
+  <% if @shops.any? %>
+  <section id="shops" class="bg-carus-panel py-20 md:py-28">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="text-center mb-12">
-        <h2 class="text-3xl font-bold text-gray-900">Shops on CarUs</h2>
-        <p class="mt-3 text-gray-500 text-lg">Find your mechanic and start saving</p>
+        <h2 class="text-3xl md:text-4xl font-bold">Shops on the Network</h2>
+        <p class="mt-3 text-white/50 text-lg">Trusted shops ready to fulfill when your car calls.</p>
       </div>
 
-      <% if @shops.any? %>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <% @shops.each do |shop| %>
-            <div class="bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-lg hover:border-blue-300 transition-all duration-200">
-              <div class="flex items-start justify-between mb-4">
-                <div>
-                  <h3 class="text-lg font-semibold text-gray-900"><%= shop.name %></h3>
-                  <p class="text-sm text-gray-500 mt-1 flex items-center gap-1">
-                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                    </svg>
-                    <%= shop.address %>
-                  </p>
-                </div>
-                <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-700 rounded-full">Active</span>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <% @shops.each do |shop| %>
+          <div class="bg-carus-black/50 border border-white/5 rounded-2xl p-6 hover:border-carus-green/20 transition-all duration-200">
+            <div class="flex items-start justify-between mb-4">
+              <div>
+                <h3 class="text-lg font-semibold"><%= shop.name %></h3>
+                <p class="text-sm text-white/30 mt-1 flex items-center gap-1">
+                  <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  </svg>
+                  <%= shop.address %>
+                </p>
               </div>
-
-              <p class="text-sm text-gray-600 mb-4 line-clamp-2"><%= shop.description %></p>
-
-              <div class="flex items-center justify-between text-sm text-gray-500 mb-4">
-                <span><%= shop.services.count %> services</span>
-                <span><%= shop.flash_alerts.active_alerts.count %> active deals</span>
-              </div>
-
-              <div class="flex gap-3">
-                <%= link_to "View Shop", carus_shop_path(shop), class: "flex-1 text-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition" %>
-                <% if shop.phone.present? %>
-                  <a href="tel:<%= shop.phone %>" class="px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition">Call</a>
-                <% end %>
-              </div>
+              <span class="px-2 py-1 text-xs font-medium bg-carus-green/10 text-carus-green rounded-full">Active</span>
             </div>
-          <% end %>
-        </div>
-      <% else %>
-        <div class="text-center py-16 bg-gray-50 rounded-2xl">
-          <p class="text-gray-500 text-lg">Shops are joining soon. Be the first!</p>
-        </div>
-      <% end %>
-    </div>
-  </section>
 
-  <%# CTA %>
-  <section class="bg-blue-600">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
-      <h2 class="text-3xl font-bold text-white">Are you a shop owner?</h2>
-      <p class="mt-3 text-blue-100 text-lg">Join CarUs and start pushing flash deals to customers in your area.</p>
-      <div class="mt-8">
-        <%= link_to "Shop Login", new_technician_session_path, class: "px-8 py-4 bg-white text-blue-600 font-semibold rounded-full text-lg hover:bg-blue-50 transition shadow-lg" %>
+            <p class="text-sm text-white/40 mb-4 line-clamp-2"><%= shop.description %></p>
+
+            <div class="flex items-center justify-between text-sm text-white/20 mb-4">
+              <span><%= shop.services.count %> services</span>
+              <span><%= shop.flash_alerts.active_alerts.count %> active deals</span>
+            </div>
+
+            <div class="flex gap-3">
+              <%= link_to "View Shop", carus_shop_path(shop), class: "flex-1 text-center px-4 py-2 bg-carus-green/10 text-carus-green text-sm font-medium rounded-lg hover:bg-carus-green/20 transition border border-carus-green/20" %>
+              <% if shop.phone.present? %>
+                <a href="tel:<%= shop.phone %>" class="px-4 py-2 border border-white/10 text-white/50 text-sm font-medium rounded-lg hover:bg-white/5 hover:text-white transition">Call</a>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
       </div>
     </div>
   </section>
+  <% end %>
 
   <%# Footer %>
-  <footer class="bg-gray-900 text-gray-400">
+  <footer class="border-t border-white/5">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-        <p class="text-sm">&copy; <%= Date.today.year %> CarUs. Built by <a href="https://www.roguemedialab.com" class="text-blue-400 hover:text-blue-300">Rogue Media Lab</a>.</p>
-        <div class="flex gap-6 text-sm">
-          <%= link_to "Car Owner Login", new_car_owner_session_path, class: "hover:text-white transition" %>
-          <%= link_to "Shop Login", new_technician_session_path, class: "hover:text-white transition" %>
+        <p class="text-sm text-white/20">&copy; <%= Date.today.year %> CarUs. Built by <a href="https://www.roguemedialab.com" class="text-carus-green/60 hover:text-carus-green transition">Rogue Media Lab</a>.</p>
+        <div class="flex gap-6 text-sm text-white/25">
+          <%= link_to "Sign In", new_car_owner_session_path, class: "hover:text-white/60 transition" %>
+          <%= link_to "Shop Login", new_technician_session_path, class: "hover:text-white/60 transition" %>
         </div>
       </div>
     </div>
