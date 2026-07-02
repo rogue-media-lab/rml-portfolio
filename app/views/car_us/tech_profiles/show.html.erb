@@ -32,12 +32,12 @@
     <%# Stats %>
     <div class="flex gap-2">
       <div class="grow rounded-xl p-3.5 bg-carus-field border border-[#2A2A2A]">
-        <p class="mb-0.5 text-center text-lg/[22px] font-extrabold text-carus-green">312</p>
-        <p class="opacity-35 tracking-[0.5px] uppercase text-center text-[9px]/[12px] font-semibold text-white">Vehicles</p>
+        <p class="mb-0.5 text-center text-lg/[22px] font-extrabold text-carus-green"><%= @total_hours.round(1) %></p>
+        <p class="opacity-35 tracking-[0.5px] uppercase text-center text-[9px]/[12px] font-semibold text-white">Book Hours</p>
       </div>
       <div class="grow rounded-xl p-3.5 bg-carus-field border border-[#2A2A2A]">
-        <p class="mb-0.5 text-center text-lg/[22px] font-extrabold text-[#FF6260]">47</p>
-        <p class="opacity-35 tracking-[0.5px] uppercase text-center text-[9px]/[12px] font-semibold text-white">Flags</p>
+        <p class="mb-0.5 text-center text-lg/[22px] font-extrabold text-[#E8A020]"><%= @total_jobs %></p>
+        <p class="opacity-35 tracking-[0.5px] uppercase text-center text-[9px]/[12px] font-semibold text-white">Jobs Done</p>
       </div>
     </div>
 
@@ -108,35 +108,5 @@
   </div>
 
   <%# Tab bar — Profile active %>
-  <div class="mt-auto flex bg-carus-black border-t border-[#1A1A1A]">
-    <%= link_to tech_lookups_path, class: "grow flex flex-col items-center pt-3 pb-5 gap-1" do %>
-      <svg width="22" height="22" viewBox="0 0 22 22" class="shrink-0">
-        <rect x="3" y="3" width="7" height="7" rx="1.5" fill="none" stroke="#FFFFFF59" stroke-width="1.5"/>
-        <rect x="12" y="3" width="7" height="7" rx="1.5" fill="none" stroke="#FFFFFF59" stroke-width="1.5"/>
-        <rect x="3" y="12" width="7" height="7" rx="1.5" fill="none" stroke="#FFFFFF59" stroke-width="1.5"/>
-        <rect x="12" y="12" width="7" height="7" rx="1.5" fill="none" stroke="#FFFFFF59" stroke-width="1.5"/>
-      </svg>
-      <span class="opacity-35 text-[10px]/[12px] font-semibold text-white">Lookup</span>
-    <% end %>
-    <%= link_to vehicles_path, class: "grow flex flex-col items-center pt-3 pb-5 gap-1" do %>
-      <svg width="22" height="22" viewBox="0 0 22 22" class="shrink-0">
-        <path d="M4 18L4 8L11 3L18 8V18" fill="none" stroke="#FFFFFF59" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        <rect x="8" y="13" width="6" height="5" rx="1" fill="none" stroke="#FFFFFF59" stroke-width="1.5"/>
-      </svg>
-      <span class="opacity-35 text-[10px]/[12px] font-semibold text-white">Garage</span>
-    <% end %>
-    <div class="grow flex flex-col items-center pt-3 pb-5 gap-1">
-      <svg width="22" height="22" viewBox="0 0 22 22" class="shrink-0">
-        <path d="M4 4H14L10 9.5H14L4 18" fill="none" stroke="#FFFFFF59" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-      <span class="opacity-35 text-[10px]/[12px] font-semibold text-white">Flag</span>
-    </div>
-    <div class="grow flex flex-col items-center pt-3 pb-5 gap-1">
-      <svg width="22" height="22" viewBox="0 0 22 22" class="shrink-0">
-        <circle cx="11" cy="8" r="3.5" fill="none" stroke="#0FB900" stroke-width="1.5"/>
-        <path d="M4 19C4 15.134 7.134 12 11 12C14.866 12 18 15.134 18 19" fill="none" stroke="#0FB900" stroke-width="1.5" stroke-linecap="round"/>
-      </svg>
-      <span class="text-[10px]/[12px] font-bold text-carus-green">Profile</span>
-    </div>
-  </div>
+  <%= render "car_us/shared/tech_tab_bar" %>
 </div>

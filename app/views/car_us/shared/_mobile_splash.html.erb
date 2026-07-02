@@ -1,0 +1,54 @@
+<%# CarUs Mobile Splash — Paper screen 1 %>
+<%# Used for mobile app install / PWA launch flow — not the web landing page %>
+<% content_for :head do %>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<% end %>
+
+<div class="min-h-screen bg-carus-black font-montserrat flex flex-col items-center justify-end relative overflow-hidden">
+  <div class="absolute inset-0 bg-gradient-to-b from-[#1F3529] via-carus-black to-carus-black"></div>
+
+  <%# Device graphic %>
+  <div class="absolute top-15 flex flex-col items-center gap-2 inset-x-0 z-10">
+    <div class="w-35 h-1.5 rounded-[3px] shrink-0 bg-white/8"></div>
+    <p class="tracking-[3px] uppercase font-bold text-carus-green text-[11px]/[14px]">carus</p>
+  </div>
+
+  <div class="absolute top-30 left-1/2 w-55 h-85 flex items-center justify-center z-10" style="translate: -50%">
+    <div class="w-45 h-75 flex items-center justify-center relative rounded-3xl overflow-hidden shrink-0 bg-gradient-to-br from-[#3A5C47] via-[#2E4A3A] to-[#1F3529]">
+      <div class="absolute bottom-0 h-30 inset-x-0 bg-gradient-to-b from-transparent to-carus-black"></div>
+      <div class="flex flex-col items-center opacity-60 gap-3 relative">
+        <div class="w-15 h-15 flex items-center justify-center rounded-full shrink-0 bg-[#2A2A2A]">
+          <div class="rounded-full shrink-0 size-7 border-[3px] border-carus-green"></div>
+        </div>
+        <div class="w-20 h-2 rounded-sm shrink-0 bg-[#2A2A2A]"></div>
+        <div class="w-15 h-2 rounded-sm shrink-0 bg-[#222222]"></div>
+      </div>
+    </div>
+  </div>
+
+  <%# Bottom panel %>
+  <div class="absolute bottom-0 h-105 flex flex-col pt-8 pb-12 px-7 bg-carus-panel inset-x-0 rounded-t-4xl z-20">
+    <h1 class="text-[28px] leading-[115%] tracking-[-0.5px] font-extrabold text-white">
+      Preventing costly repairs, and keeping you safe on the road.
+    </h1>
+    <p class="text-[14px] leading-[160%] mt-3.5 text-[#FFFFFF73]">
+      Your shop keeps you informed — service history, maintenance alerts, and plain-language answers for every item on your car.
+    </p>
+
+    <div class="flex mt-6 gap-1.5">
+      <div class="w-5 h-1.25 rounded-[3px] shrink-0 bg-carus-green"></div>
+      <div class="w-1.5 h-1.25 rounded-[3px] shrink-0 bg-white/20"></div>
+      <div class="w-1.5 h-1.25 rounded-[3px] shrink-0 bg-white/20"></div>
+    </div>
+
+    <div class="flex mt-7 gap-3">
+      <%= link_to "Log in", new_car_owner_session_path, class: "grow h-13 flex items-center justify-center rounded-[26px] border-[1.5px] border-white/20 text-[15px]/[18px] font-semibold text-white" %>
+      <%= link_to "Sign up", new_car_owner_registration_path, class: "grow h-13 flex items-center justify-center rounded-[26px] bg-carus-green text-[15px]/[18px] font-bold text-black" %>
+    </div>
+
+    <p class="mt-5 text-center tracking-[0.3px] font-medium text-white/18 text-[10px]/[12px]">powered by Midas / SpeeDee Rock Hill SC</p>
+  </div>
+</div>

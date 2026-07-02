@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_06_29_112339) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_02_013113) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -105,6 +105,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_29_112339) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "shop_id"
+    t.string "first_name"
+    t.string "last_name"
+    t.string "address"
     t.index ["email"], name: "index_car_owners_on_email", unique: true
     t.index ["reset_password_token"], name: "index_car_owners_on_reset_password_token", unique: true
     t.index ["shop_id"], name: "index_car_owners_on_shop_id"
@@ -119,6 +122,11 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_29_112339) do
     t.string "status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "service_types"
+    t.bigint "technician_id"
+    t.datetime "shop_notified_at"
+    t.integer "flash_alert_id"
+    t.index ["technician_id"], name: "index_car_us_booking_requests_on_technician_id"
     t.index ["vehicle_id"], name: "index_car_us_booking_requests_on_vehicle_id"
   end
 
@@ -131,6 +139,17 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_29_112339) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["vehicle_id"], name: "index_car_us_concerns_on_vehicle_id"
+  end
+
+  create_table "car_us_conversations", force: :cascade do |t|
+    t.bigint "technician_id", null: false
+    t.bigint "vehicle_id"
+    t.string "title"
+    t.boolean "active", default: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["technician_id"], name: "index_car_us_conversations_on_technician_id"
+    t.index ["vehicle_id"], name: "index_car_us_conversations_on_vehicle_id"
   end
 
   create_table "car_us_coupons", force: :cascade do |t|
@@ -160,6 +179,36 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_29_112339) do
     t.index ["technician_id"], name: "index_car_us_flash_alerts_on_technician_id"
   end
 
+  create_table "car_us_job_parts", force: :cascade do |t|
+    t.bigint "service_job_id", null: false
+    t.string "name", null: false
+    t.decimal "quantity", precision: 6, scale: 2, default: "1.0"
+    t.decimal "cost", precision: 8, scale: 2
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["service_job_id"], name: "index_car_us_job_parts_on_service_job_id"
+  end
+
+  create_table "car_us_labor_times", force: :cascade do |t|
+    t.string "service", null: false
+    t.string "category"
+    t.decimal "hours", null: false
+    t.text "notes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["service"], name: "index_car_us_labor_times_on_service", unique: true
+  end
+
+  create_table "car_us_messages", force: :cascade do |t|
+    t.bigint "conversation_id", null: false
+    t.string "role", default: "tech", null: false
+    t.text "content"
+    t.jsonb "metadata"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["conversation_id"], name: "index_car_us_messages_on_conversation_id"
+  end
+
   create_table "car_us_notifications", force: :cascade do |t|
     t.bigint "car_owner_id", null: false
     t.string "title"
@@ -184,6 +233,20 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_29_112339) do
     t.index ["redeemable_type", "redeemable_id"], name: "index_car_us_redemptions_on_redeemable"
     t.index ["shop_id"], name: "index_car_us_redemptions_on_shop_id"
     t.index ["technician_id"], name: "index_car_us_redemptions_on_technician_id"
+  end
+
+  create_table "car_us_service_jobs", force: :cascade do |t|
+    t.bigint "vehicle_id", null: false
+    t.bigint "technician_id", null: false
+    t.string "description", null: false
+    t.decimal "book_hours", precision: 4, scale: 2
+    t.string "status", default: "completed", null: false
+    t.text "notes"
+    t.datetime "completed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["technician_id"], name: "index_car_us_service_jobs_on_technician_id"
+    t.index ["vehicle_id"], name: "index_car_us_service_jobs_on_vehicle_id"
   end
 
   create_table "car_us_service_records", force: :cascade do |t|
@@ -221,6 +284,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_29_112339) do
     t.boolean "active"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.jsonb "settings", default: {}
   end
 
   create_table "car_us_vehicles", force: :cascade do |t|
@@ -235,6 +299,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_29_112339) do
     t.integer "mileage"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "ai_specs"
+    t.text "ai_suggestions"
+    t.text "ai_plain_english"
+    t.text "ai_difficulty_notes"
+    t.datetime "last_lookup_at"
+    t.integer "looked_up_by"
     t.index ["car_owner_id"], name: "index_car_us_vehicles_on_car_owner_id"
     t.index ["vin"], name: "index_car_us_vehicles_on_vin", unique: true
   end
@@ -785,8 +855,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_29_112339) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "shop_id", null: false
+    t.string "role", default: "tech", null: false
     t.index ["email"], name: "index_technicians_on_email", unique: true
     t.index ["reset_password_token"], name: "index_technicians_on_reset_password_token", unique: true
+    t.index ["role"], name: "index_technicians_on_role"
     t.index ["shop_id"], name: "index_technicians_on_shop_id"
   end
 
@@ -845,3 +917,71 @@ ActiveRecord::Schema[8.0].define(version: 2026_06_29_112339) do
     t.index ["user_id", "hermit_video_id"], name: "index_watch_progresses_on_user_id_and_hermit_video_id", unique: true
     t.index ["user_id"], name: "index_watch_progresses_on_user_id"
   end
+
+  add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "albums", "artists"
+  add_foreign_key "albums", "genres"
+  add_foreign_key "blogs", "blog_categories"
+  add_foreign_key "blogs", "milk_admins"
+  add_foreign_key "car_owners", "car_us_shops", column: "shop_id"
+  add_foreign_key "car_us_booking_requests", "car_us_vehicles", column: "vehicle_id"
+  add_foreign_key "car_us_booking_requests", "technicians"
+  add_foreign_key "car_us_concerns", "car_us_vehicles", column: "vehicle_id"
+  add_foreign_key "car_us_conversations", "car_us_vehicles", column: "vehicle_id"
+  add_foreign_key "car_us_conversations", "technicians"
+  add_foreign_key "car_us_coupons", "car_us_shops", column: "shop_id"
+  add_foreign_key "car_us_flash_alerts", "car_us_shops", column: "shop_id"
+  add_foreign_key "car_us_flash_alerts", "technicians"
+  add_foreign_key "car_us_job_parts", "car_us_service_jobs", column: "service_job_id"
+  add_foreign_key "car_us_messages", "car_us_conversations", column: "conversation_id"
+  add_foreign_key "car_us_notifications", "car_owners"
+  add_foreign_key "car_us_redemptions", "car_owners"
+  add_foreign_key "car_us_redemptions", "car_us_shops", column: "shop_id"
+  add_foreign_key "car_us_redemptions", "technicians"
+  add_foreign_key "car_us_service_jobs", "car_us_vehicles", column: "vehicle_id"
+  add_foreign_key "car_us_service_jobs", "technicians"
+  add_foreign_key "car_us_service_records", "car_us_vehicles", column: "vehicle_id"
+  add_foreign_key "car_us_services", "car_us_shops", column: "shop_id"
+  add_foreign_key "car_us_vehicles", "car_owners"
+  add_foreign_key "chat_messages", "chat_sessions"
+  add_foreign_key "chat_sessions", "users"
+  add_foreign_key "favorites", "hermit_videos"
+  add_foreign_key "favorites", "users"
+  add_foreign_key "hermit_appearances", "hermit_videos"
+  add_foreign_key "hermit_appearances", "hermits"
+  add_foreign_key "hermit_crew_memberships", "hermit_crews"
+  add_foreign_key "hermit_crew_memberships", "hermits"
+  add_foreign_key "hermit_videos", "hermits"
+  add_foreign_key "hours", "restaurants"
+  add_foreign_key "menu_categories", "restaurants"
+  add_foreign_key "menu_items", "menu_categories"
+  add_foreign_key "menu_items", "restaurants"
+  add_foreign_key "milk_admin_profiles", "milk_admins"
+  add_foreign_key "order_items", "menu_items"
+  add_foreign_key "order_items", "orders"
+  add_foreign_key "orders", "restaurants"
+  add_foreign_key "pills", "resumes"
+  add_foreign_key "playlist_songs", "playlists"
+  add_foreign_key "playlist_songs", "songs"
+  add_foreign_key "projects", "resumes"
+  add_foreign_key "reservations", "restaurants"
+  add_foreign_key "rock_pets", "users"
+  add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
+  add_foreign_key "solid_queue_claimed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
+  add_foreign_key "solid_queue_failed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
+  add_foreign_key "solid_queue_ready_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
+  add_foreign_key "solid_queue_recurring_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
+  add_foreign_key "solid_queue_scheduled_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
+  add_foreign_key "song_genres", "genres"
+  add_foreign_key "song_genres", "songs"
+  add_foreign_key "songs", "albums"
+  add_foreign_key "songs", "artists"
+  add_foreign_key "tasks", "projects"
+  add_foreign_key "technicians", "car_us_shops", column: "shop_id"
+  add_foreign_key "testimonials", "restaurants"
+  add_foreign_key "user_hermit_profiles", "hermits", column: "favorite_hermit_id"
+  add_foreign_key "user_hermit_profiles", "users"
+  add_foreign_key "watch_progresses", "hermit_videos"
+  add_foreign_key "watch_progresses", "users"
+end

@@ -1,21 +1,13 @@
 <%= content_for :head do %>
+<%= render "car_us/shared/top_menu" %>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <% end %>
 
 <div class="min-h-screen bg-carus-black font-montserrat pb-8">
-  <%# Status bar %>
-  <div class="flex justify-between items-center pt-3.5 px-5">
-    <span class="text-xs/[16px] font-semibold text-white">9:41</span>
-    <svg width="25" height="12" viewBox="0 0 25 12" class="shrink-0">
-      <rect x="0.5" y="0.5" width="21" height="11" rx="2.5" fill="#000" stroke="#FFFFFF59"/>
-      <rect x="2" y="2" width="16" height="8" rx="1.5" fill="#FFFFFF"/>
-    </svg>
-  </div>
-
   <%# Header %>
-  <div class="flex justify-between items-center pt-5 pb-1 px-5">
+  <div class="flex justify-between items-center pt-14 pb-1 px-5">
     <div>
       <p class="opacity-45 tracking-[1.5px] uppercase mb-1 text-[11px]/[14px] font-semibold text-white">My Garage</p>
       <h1 class="text-[26px]/[32px] font-extrabold text-white tracking-[-0.5px]">Your Vehicles</h1>
@@ -37,9 +29,14 @@
     <% @vehicles.each do |vehicle| %>
       <div class="rounded-2xl overflow-hidden bg-carus-field border border-[#2A2A2A]">
         <%# Car image banner %>
-        <div class="w-full h-42 relative overflow-hidden bg-gradient-to-b from-carus-field to-black/60">
+        <div class="w-full h-42 relative overflow-hidden">
+          <% if vehicle.photo.attached? %>
+            <%= image_tag vehicle.photo.variant(resize_to_limit: [780, 336]), class: "w-full h-full object-cover" %>
+          <% else %>
+            <div class="w-full h-full bg-gradient-to-b from-carus-field to-black/60"></div>
+          <% end %>
           <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/70"></div>
-          <div class="absolute top-3 right-3 flex items-center rounded-[20px] py-1 px-2.5 gap-1.25 bg-carus-green/10 border border-carus-green">
+          <div class="absolute top-3 right-3 flex items-center rounded-[20px] py-1 px-2.5 gap-1.25 bg-black/60 backdrop-blur-sm border border-white/10">
             <div class="rounded-[3px] shrink-0 bg-carus-green size-1.5"></div>
             <span class="tracking-[0.5px] text-[10px]/[12px] font-bold text-carus-green uppercase">Healthy</span>
           </div>
@@ -108,4 +105,6 @@
       <span class="opacity-25 text-[13px]/[16px] font-semibold text-white">Add a Vehicle</span>
     <% end %>
   </div>
+
+  <%= render "car_us/shared/customer_tab_bar" %>
 </div>

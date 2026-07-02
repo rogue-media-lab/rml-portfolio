@@ -1,0 +1,48 @@
+<%= content_for :head do %>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<% end %>
+
+<div class="min-h-screen bg-carus-black font-montserrat">
+  <div class="flex flex-col pt-14 gap-0.75 px-6">
+    <h1 class="text-[22px]/[28px] font-extrabold text-white tracking-[-0.4px]">Edit Profile</h1>
+  </div>
+
+  <%= form_with model: @car_owner, url: profile_path, method: :patch, class: "flex flex-col pt-6 gap-4 px-6" do |f| %>
+    <%# Avatar %>
+    <div class="flex flex-col items-center gap-3">
+      <div class="w-21 h-21 flex items-center justify-center rounded-[42px] bg-carus-field border-[3px] border-carus-green overflow-hidden">
+        <% if @car_owner.avatar.attached? %>
+          <%= image_tag @car_owner.avatar.variant(resize_to_limit: [168, 168]), class: "w-full h-full object-cover" %>
+        <% else %>
+          <span class="text-[28px]/[34px] font-extrabold text-carus-green"><%= @car_owner.email.first(2).upcase %></span>
+        <% end %>
+      </div>
+      <%= f.file_field :avatar, accept: "image/*", class: "w-full bg-carus-field border border-carus-border rounded-xl py-3 px-4 text-sm text-white file:mr-3 file:bg-carus-green file:text-black file:border-0 file:rounded-lg file:py-1 file:px-3 file:text-xs file:font-bold focus:outline-none" %>
+    </div>
+
+    <%# Name fields %>
+    <div class="flex gap-2.5">
+      <div class="grow flex flex-col gap-1.5">
+        <label class="opacity-50 tracking-[1px] uppercase text-[10px]/[12px] font-bold text-white">First Name</label>
+        <%= f.text_field :first_name, value: @car_owner.first_name, class: "w-full bg-carus-field border border-carus-border rounded-xl py-3.5 px-3.5 text-sm text-white focus:outline-none focus:border-carus-green/40" %>
+      </div>
+      <div class="grow flex flex-col gap-1.5">
+        <label class="opacity-50 tracking-[1px] uppercase text-[10px]/[12px] font-bold text-white">Last Name</label>
+        <%= f.text_field :last_name, value: @car_owner.last_name, class: "w-full bg-carus-field border border-carus-border rounded-xl py-3.5 px-3.5 text-sm text-white focus:outline-none focus:border-carus-green/40" %>
+      </div>
+    </div>
+
+    <%# Address %>
+    <div class="flex flex-col gap-1.5">
+      <label class="opacity-50 tracking-[1px] uppercase text-[10px]/[12px] font-bold text-white">Address</label>
+      <%= f.text_field :address, value: @car_owner.address, class: "w-full bg-carus-field border border-carus-border rounded-xl py-3.5 px-3.5 text-sm text-white focus:outline-none focus:border-carus-green/40" %>
+    </div>
+
+    <div class="flex gap-3">
+      <%= link_to "Cancel", profile_path, class: "grow h-13 flex items-center justify-center rounded-[14px] border-[1.5px] border-white/10 text-[15px]/[18px] font-semibold text-white/50" %>
+      <%= f.submit "Save", class: "grow h-13 rounded-[14px] bg-carus-green text-[15px]/[18px] font-extrabold text-black cursor-pointer" %>
+    </div>
+  <% end %>
+</div>

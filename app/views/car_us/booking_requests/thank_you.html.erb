@@ -1,0 +1,87 @@
+<%= content_for :head do %>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<% end %>
+
+<div class="min-h-screen bg-carus-black font-montserrat flex flex-col pb-20">
+  <%= render "car_us/shared/top_menu" %>
+
+  <div class="pt-14 pb-5 px-5 text-center">
+    <div class="flex justify-center mb-5">
+      <div class="flex items-center justify-center rounded-full size-20 bg-carus-green/15 border-2 border-carus-green">
+        <svg width="36" height="36" viewBox="0 0 36 36"><path d="M6 18L15 27L30 9" fill="none" stroke="#0FB900" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </div>
+    <p class="opacity-45 tracking-[1.5px] uppercase mb-1 text-[11px]/[14px] font-semibold text-white"><%= @vehicle.year %> <%= @vehicle.make %> <%= @vehicle.model %></p>
+    <h1 class="text-[26px]/[32px] font-extrabold text-white tracking-[-0.5px]">Appointment<br>Confirmed</h1>
+  </div>
+
+  <div class="flex flex-col gap-4 px-5">
+    <%# Services %>
+    <div>
+      <p class="opacity-35 tracking-[1.5px] uppercase mb-2 text-[10px]/[12px] font-bold text-white">Services</p>
+      <div class="rounded-[14px] overflow-hidden bg-carus-field border border-[#2A2A2A]">
+        <% @selected_services.each_with_index do |svc, i| %>
+          <div class="flex justify-between items-center py-3.5 px-4 <%= 'border-b border-[#2A2A2A]' unless i == @selected_services.length - 1 %>">
+            <span class="text-sm/[18px] font-semibold text-white"><%= svc.name %></span>
+            <span class="text-sm/[18px] font-bold text-carus-green"><%= number_to_currency(svc.price || 0, precision: 0) %></span>
+          </div>
+        <% end %>
+        <%# Fees & Tax %>
+        <% if @breakdown[:has_supplies] %>
+          <div class="flex justify-between items-center py-2.5 px-4 border-b border-[#2A2A2A]">
+            <span class="text-xs/[16px] text-[#FFFFFF59]"><%= @breakdown[:supplies_label] %></span>
+            <span class="text-xs/[16px] text-[#FFFFFF59]"><%= number_to_currency(@breakdown[:supplies_fee], precision: 0) %></span>
+          </div>
+        <% end %>
+        <% if @breakdown[:has_travel] %>
+          <div class="flex justify-between items-center py-2.5 px-4 border-b border-[#2A2A2A]">
+            <span class="text-xs/[16px] text-[#FFFFFF59]"><%= @breakdown[:travel_label] %></span>
+            <span class="text-xs/[16px] text-[#FFFFFF59]"><%= number_to_currency(@breakdown[:travel_fee], precision: 0) %></span>
+          </div>
+        <% end %>
+        <% if @breakdown[:has_tax] %>
+          <div class="flex justify-between items-center py-2.5 px-4 border-b border-[#2A2A2A]">
+            <span class="text-xs/[16px] text-[#FFFFFF59]">Tax (<%= @breakdown[:tax_rate] %>%)</span>
+            <span class="text-xs/[16px] text-[#FFFFFF59]"><%= number_to_currency(@breakdown[:tax], precision: 0) %></span>
+          </div>
+        <% end %>
+        <% if @booking.flash_alert %>
+          <div class="flex justify-between items-center py-2.5 px-4 bg-carus-green/5 border-b border-[#2A2A2A]">
+            <span class="text-xs/[16px] font-medium text-carus-green"><%= @booking.flash_alert.title %> (<%= @booking.flash_alert.discount_percentage %>% off)</span>
+            <span class="text-xs/[16px] font-bold text-carus-green">-<%= number_to_currency(@discount, precision: 0) %></span>
+          </div>
+        <% end %>
+        <div class="flex justify-between items-center py-3.5 px-4 bg-[#222222]">
+          <span class="text-xs/[16px] font-bold text-[#555555] uppercase tracking-[0.5px]">Total</span>
+          <span class="text-[15px]/[18px] font-extrabold text-white"><%= number_to_currency(@breakdown[:total] - @discount, precision: 0) %></span>
+        </div>
+      </div>
+    </div>
+
+    <%# Date & Time %>
+    <div class="rounded-[14px] p-4 bg-carus-field border border-[#2A2A2A]">
+      <p class="text-[10px]/[12px] font-bold text-[#FFFFFF4D] uppercase tracking-[0.8px] mb-2">Date & Time</p>
+      <p class="text-[15px]/[18px] font-extrabold text-white"><%= @booking.preferred_date&.strftime("%B %-d, %Y") || "TBD" %> at <%= @booking.preferred_time || "TBD" %></p>
+    </div>
+
+    <%# Notes %>
+    <% if @booking.notes.present? %>
+      <div class="rounded-[14px] p-4 bg-carus-field border border-[#2A2A2A]">
+        <p class="text-[10px]/[12px] font-bold text-[#FFFFFF4D] uppercase tracking-[0.8px] mb-1">Notes</p>
+        <p class="text-[13px] text-[#AAAAAA]"><%= @booking.notes %></p>
+      </div>
+    <% end %>
+
+    <%# Shop notification status %>
+    <div class="flex items-center rounded-[14px] py-3.5 px-4 gap-2.5 bg-carus-field border border-carus-green/30">
+      <svg width="16" height="16" viewBox="0 0 16 16" class="shrink-0"><circle cx="8" cy="8" r="6.5" fill="none" stroke="#0FB900" stroke-width="1.3"/><path d="M5 8L7 10L11 6" fill="none" stroke="#0FB900" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <p class="text-[11px]/[14px] font-medium text-carus-green">Sent to <%= @shop&.name || "your shop" %> for review.</p>
+    </div>
+
+    <%= link_to "Back to Garage", vehicle_path(@vehicle), class: "w-full text-center rounded-[14px] p-4.5 bg-carus-green text-[15px]/[18px] font-extrabold text-black mt-2" %>
+  </div>
+
+  <%= render "car_us/shared/customer_tab_bar" %>
+</div>

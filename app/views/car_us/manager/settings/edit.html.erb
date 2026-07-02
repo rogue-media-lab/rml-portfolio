@@ -1,0 +1,91 @@
+<% content_for(:title, "Shop Settings — #{current_shop.name}") %>
+
+<div class="max-w-2xl mx-auto">
+  <div class="mb-6">
+    <%= link_to manager_root_path, class: "text-sm text-gray-500 hover:text-gray-700" do %>
+      ← Back to Dashboard
+    <% end %>
+  </div>
+
+  <h1 class="text-2xl font-bold text-gray-900 mb-1">Shop Settings</h1>
+  <p class="text-sm text-gray-500 mb-8"><%= current_shop.name %></p>
+
+  <%= form_with url: manager_settings_path, method: :patch, local: true, data: { turbo: false }, class: "space-y-6" do |f| %>
+    <%# Pricing %>
+    <div class="bg-white rounded-lg border border-gray-200 p-6">
+      <h2 class="text-lg font-semibold text-gray-900 mb-4">Pricing</h2>
+
+      <div class="space-y-4">
+        <%# Tax Rate %>
+        <div>
+          <%= f.label "settings[tax_rate]", "Tax Rate (%)", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <div class="flex items-center gap-2">
+            <%= f.number_field "settings[tax_rate]", value: current_shop.tax_rate,
+                  step: 0.1, min: 0, max: 20,
+                  class: "w-24 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" %>
+            <span class="text-sm text-gray-500">%</span>
+          </div>
+        </div>
+
+        <%# Supplies Fee %>
+        <div class="border-t border-gray-100 pt-4">
+          <label class="flex items-center gap-3 mb-2">
+            <%= f.check_box "settings[supplies_fee_enabled]", { checked: current_shop.supplies_fee_enabled? },
+                  true, false %>
+            <span class="text-sm font-medium text-gray-700">Shop Supplies Fee</span>
+          </label>
+          <div class="flex items-center gap-2 ml-8">
+            <span class="text-sm text-gray-500">$</span>
+            <%= f.number_field "settings[supplies_fee]", value: current_shop.supplies_fee,
+                  step: 0.01, min: 0,
+                  class: "w-24 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" %>
+            <span class="text-sm text-gray-400">flat fee per booking</span>
+          </div>
+        </div>
+
+        <%# Travel Fee %>
+        <div class="border-t border-gray-100 pt-4">
+          <label class="flex items-center gap-3 mb-2">
+            <%= f.check_box "settings[travel_fee_enabled]", { checked: current_shop.travel_fee_enabled? },
+                  true, false %>
+            <span class="text-sm font-medium text-gray-700">Travel Fee</span>
+            <span class="text-xs text-gray-400">(mobile mechanics)</span>
+          </label>
+          <div class="ml-8 space-y-2">
+            <div class="flex items-center gap-2">
+              <%= f.text_field "settings[travel_fee_label]", value: current_shop.travel_fee_label,
+                    placeholder: "Mobile Service Fee",
+                    class: "w-44 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" %>
+              <span class="text-sm text-gray-400">label</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-sm text-gray-500">$</span>
+              <%= f.number_field "settings[travel_fee]", value: current_shop.travel_fee,
+                    step: 0.01, min: 0,
+                    class: "w-24 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" %>
+              <span class="text-sm text-gray-400">per booking</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <%# Scheduling %>
+    <div class="bg-white rounded-lg border border-gray-200 p-6">
+      <h2 class="text-lg font-semibold text-gray-900 mb-4">Scheduling</h2>
+
+      <div>
+        <%= f.label "settings[max_bookings_per_slot]", "Max bookings per time slot", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= f.number_field "settings[max_bookings_per_slot]", value: current_shop.max_bookings_per_slot,
+              min: 1, max: 10,
+              class: "w-24 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" %>
+        <p class="text-xs text-gray-400 mt-1">How many vehicles can be booked at the same time (8AM, 10AM, 1PM, 3PM).</p>
+      </div>
+    </div>
+
+    <div class="flex gap-3">
+      <%= f.submit "Save Settings", class: "bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-5 py-2.5 rounded-lg cursor-pointer transition-colors" %>
+      <%= link_to "Cancel", manager_root_path, class: "text-sm text-gray-500 hover:text-gray-700 px-5 py-2.5" %>
+    </div>
+  <% end %>
+</div>

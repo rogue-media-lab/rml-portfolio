@@ -1,98 +1,137 @@
-<%= content_for :head do %>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<% end %>
-
-<%# Splash Hero — Paper design %>
-<div class="min-h-screen bg-carus-black font-montserrat flex flex-col items-center justify-end relative overflow-hidden">
-  <div class="absolute inset-0 bg-gradient-to-b from-[#1F3529] via-carus-black to-carus-black"></div>
-
-  <%# Device graphic area %>
-  <div class="absolute top-15 flex flex-col items-center gap-2 inset-x-0 z-10">
-    <div class="w-35 h-1.5 rounded-[3px] shrink-0 bg-white/8"></div>
-    <p class="tracking-[3px] uppercase font-bold text-carus-green text-[11px]/[14px]">carus</p>
-  </div>
-
-  <div class="absolute top-30 left-1/2 w-55 h-85 flex items-center justify-center z-10" style="translate: -50%">
-    <div class="w-45 h-75 flex items-center justify-center relative rounded-3xl overflow-hidden shrink-0 bg-gradient-to-br from-[#3A5C47] via-[#2E4A3A] to-[#1F3529]">
-      <div class="absolute bottom-0 h-30 inset-x-0 bg-gradient-to-b from-transparent to-carus-black"></div>
-      <div class="flex flex-col items-center opacity-60 gap-3 relative">
-        <div class="w-15 h-15 flex items-center justify-center rounded-full shrink-0 bg-[#2A2A2A]">
-          <div class="rounded-full shrink-0 size-7 border-[3px] border-carus-green"></div>
+<%# CarUs public landing page — shop directory %>
+<div class="min-h-screen bg-gray-50">
+  <%# Hero %>
+  <header class="bg-gradient-to-br from-blue-600 to-blue-800 text-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28">
+      <div class="max-w-3xl">
+        <h1 class="text-4xl md:text-6xl font-bold tracking-tight leading-tight">
+          Your Car,<br>Your Shop,<br>Your Deal.
+        </h1>
+        <p class="mt-6 text-lg md:text-xl text-blue-100 max-w-xl leading-relaxed">
+          CarUs connects you with trusted local auto shops. Track your maintenance, grab flash deals, and never miss a service again.
+        </p>
+        <div class="mt-10 flex flex-col sm:flex-row gap-4">
+          <%= link_to "Find Your Shop", "#shops", class: "px-8 py-4 bg-yellow-400 text-gray-900 font-semibold rounded-full text-lg hover:bg-yellow-300 transition shadow-lg text-center" %>
+          <%= link_to "Sign Up Free", new_car_owner_registration_path, class: "px-8 py-4 bg-white/15 text-white font-semibold rounded-full text-lg hover:bg-white/25 transition border border-white/30 text-center" %>
         </div>
-        <div class="w-20 h-2 rounded-sm shrink-0 bg-[#2A2A2A]"></div>
-        <div class="w-15 h-2 rounded-sm shrink-0 bg-[#222222]"></div>
+        <p class="mt-4 text-sm text-blue-200">
+          Already have a shop? <%= link_to "Shop Login", new_technician_session_path, class: "underline hover:text-white" %>
+        </p>
       </div>
     </div>
-  </div>
+  </header>
 
-  <%# Bottom panel %>
-  <div class="absolute bottom-0 h-105 flex flex-col pt-8 pb-12 px-7 bg-carus-panel inset-x-0 rounded-t-4xl z-20">
-    <h1 class="text-[28px] leading-[115%] tracking-[-0.5px] font-extrabold text-white">
-      Preventing costly repairs, and keeping you safe on the road.
-    </h1>
-    <p class="text-[14px] leading-[160%] mt-3.5 text-[#FFFFFF73]">
-      Your shop keeps you informed — service history, maintenance alerts, and plain-language answers for every item on your car.
-    </p>
-
-    <%# Dots %>
-    <div class="flex mt-6 gap-1.5">
-      <div class="w-5 h-1.25 rounded-[3px] shrink-0 bg-carus-green"></div>
-      <div class="w-1.5 h-1.25 rounded-[3px] shrink-0 bg-white/20"></div>
-      <div class="w-1.5 h-1.25 rounded-[3px] shrink-0 bg-white/20"></div>
-    </div>
-
-    <%# Buttons %>
-    <div class="flex mt-7 gap-3">
-      <%= link_to "Log in", new_car_owner_session_path, class: "grow h-13 flex items-center justify-center rounded-[26px] border-[1.5px] border-white/20 text-[15px]/[18px] font-semibold text-white" %>
-      <%= link_to "Sign up", new_car_owner_registration_path, class: "grow h-13 flex items-center justify-center rounded-[26px] bg-carus-green text-[15px]/[18px] font-bold text-black" %>
-    </div>
-
-    <p class="mt-5 text-center tracking-[0.3px] font-medium text-white/18 text-[10px]/[12px]">powered by Midas / SpeeDee Rock Hill SC</p>
-  </div>
-</div>
-
-<%# Shops directory — scroll below splash %>
-<section id="shops" class="bg-white py-16 md:py-24">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <%# How It Works %>
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
     <div class="text-center mb-12">
-      <h2 class="text-3xl font-bold text-gray-900">Shops on CarUs</h2>
-      <p class="mt-3 text-gray-500 text-lg">Find your mechanic and start saving</p>
+      <h2 class="text-3xl font-bold text-gray-900">How CarUs Works</h2>
+      <p class="mt-3 text-gray-500 text-lg">Three steps to smarter car care</p>
     </div>
 
-    <% if @shops.any? %>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <% @shops.each do |shop| %>
-          <div class="bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-lg hover:border-blue-300 transition-all duration-200">
-            <h3 class="text-lg font-semibold text-gray-900"><%= shop.name %></h3>
-            <p class="text-sm text-gray-500 mt-1"><%= shop.address %></p>
-            <p class="text-sm text-gray-600 mt-3 line-clamp-2"><%= shop.description %></p>
-            <div class="flex items-center justify-between text-sm text-gray-500 mt-3">
-              <span><%= shop.services.count %> services</span>
-              <span><%= shop.flash_alerts.active.count %> deals</span>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div class="text-center">
+        <div class="w-16 h-16 mx-auto bg-blue-100 rounded-2xl flex items-center justify-center mb-4">
+          <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-900">Find Your Shop</h3>
+        <p class="mt-2 text-sm text-gray-500">Browse trusted mechanics in your area. Mobile or shop — we've got both.</p>
+      </div>
+
+      <div class="text-center">
+        <div class="w-16 h-16 mx-auto bg-green-100 rounded-2xl flex items-center justify-center mb-4">
+          <svg class="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-900">Sign Up Free</h3>
+        <p class="mt-2 text-sm text-gray-500">Create an account in seconds. No credit card needed.</p>
+      </div>
+
+      <div class="text-center">
+        <div class="w-16 h-16 mx-auto bg-yellow-100 rounded-2xl flex items-center justify-center mb-4">
+          <svg class="h-8 w-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+          </svg>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-900">Grab Flash Deals</h3>
+        <p class="mt-2 text-sm text-gray-500">Shops push time-limited deals. Oil changes, brakes, diagnostics — save big.</p>
+      </div>
+    </div>
+  </section>
+
+  <%# Shops Directory %>
+  <section id="shops" class="bg-white py-16 md:py-24">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl font-bold text-gray-900">Shops on CarUs</h2>
+        <p class="mt-3 text-gray-500 text-lg">Find your mechanic and start saving</p>
+      </div>
+
+      <% if @shops.any? %>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <% @shops.each do |shop| %>
+            <div class="bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-lg hover:border-blue-300 transition-all duration-200">
+              <div class="flex items-start justify-between mb-4">
+                <div>
+                  <h3 class="text-lg font-semibold text-gray-900"><%= shop.name %></h3>
+                  <p class="text-sm text-gray-500 mt-1 flex items-center gap-1">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    <%= shop.address %>
+                  </p>
+                </div>
+                <span class="px-2 py-1 text-xs font-medium bg-green-100 text-green-700 rounded-full">Active</span>
+              </div>
+
+              <p class="text-sm text-gray-600 mb-4 line-clamp-2"><%= shop.description %></p>
+
+              <div class="flex items-center justify-between text-sm text-gray-500 mb-4">
+                <span><%= shop.services.count %> services</span>
+                <span><%= shop.flash_alerts.active_alerts.count %> active deals</span>
+              </div>
+
+              <div class="flex gap-3">
+                <%= link_to "View Shop", carus_shop_path(shop), class: "flex-1 text-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition" %>
+                <% if shop.phone.present? %>
+                  <a href="tel:<%= shop.phone %>" class="px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition">Call</a>
+                <% end %>
+              </div>
             </div>
-            <%= link_to "View Shop", carus_shop_path(shop), class: "block mt-4 text-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition" %>
-          </div>
-        <% end %>
-      </div>
-    <% else %>
-      <div class="text-center py-16 bg-gray-50 rounded-2xl">
-        <p class="text-gray-500 text-lg">Shops are joining soon. Be the first!</p>
-      </div>
-    <% end %>
-  </div>
-</section>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="text-center py-16 bg-gray-50 rounded-2xl">
+          <p class="text-gray-500 text-lg">Shops are joining soon. Be the first!</p>
+        </div>
+      <% end %>
+    </div>
+  </section>
 
-<%# Footer %>
-<footer class="bg-gray-900 text-gray-400">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-      <p class="text-sm">&copy; <%= Date.today.year %> CarUs. Built by Rogue Media Lab.</p>
-      <div class="flex gap-6 text-sm">
-        <%= link_to "Manager Login", new_technician_session_path, class: "hover:text-white transition" %>
+  <%# CTA %>
+  <section class="bg-blue-600">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+      <h2 class="text-3xl font-bold text-white">Are you a shop owner?</h2>
+      <p class="mt-3 text-blue-100 text-lg">Join CarUs and start pushing flash deals to customers in your area.</p>
+      <div class="mt-8">
+        <%= link_to "Shop Login", new_technician_session_path, class: "px-8 py-4 bg-white text-blue-600 font-semibold rounded-full text-lg hover:bg-blue-50 transition shadow-lg" %>
       </div>
     </div>
-  </div>
-</footer>
+  </section>
+
+  <%# Footer %>
+  <footer class="bg-gray-900 text-gray-400">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+        <p class="text-sm">&copy; <%= Date.today.year %> CarUs. Built by <a href="https://www.roguemedialab.com" class="text-blue-400 hover:text-blue-300">Rogue Media Lab</a>.</p>
+        <div class="flex gap-6 text-sm">
+          <%= link_to "Car Owner Login", new_car_owner_session_path, class: "hover:text-white transition" %>
+          <%= link_to "Shop Login", new_technician_session_path, class: "hover:text-white transition" %>
+        </div>
+      </div>
+    </div>
+  </footer>
+</div>
