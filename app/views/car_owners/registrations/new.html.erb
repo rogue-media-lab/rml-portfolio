@@ -36,6 +36,20 @@
       </div>
     </div>
 
+    <%# Address %>
+    <div class="flex flex-col gap-1.5">
+      <label class="opacity-50 tracking-[1px] uppercase text-[10px]/[12px] font-bold text-white">Street Address</label>
+      <%= f.text_field :address, placeholder: "123 Main St, Rock Hill, SC", class: "w-full bg-carus-field border border-[#2A2A2A] rounded-xl py-[15px] px-3.5 text-sm/[18px] text-white placeholder:text-white/25 focus:outline-none focus:border-carus-green/40" %>
+      <span class="text-[10px]/[12px] text-white/20 px-0.5">So your car knows where home is.</span>
+    </div>
+
+    <%# Work Address %>
+    <div class="flex flex-col gap-1.5">
+      <label class="opacity-50 tracking-[1px] uppercase text-[10px]/[12px] font-bold text-white">Work Address</label>
+      <%= f.text_field :work_address, placeholder: "456 Commerce Dr, Charlotte, NC", class: "w-full bg-carus-field border border-[#2A2A2A] rounded-xl py-[15px] px-3.5 text-sm/[18px] text-white placeholder:text-white/25 focus:outline-none focus:border-carus-green/40" %>
+      <span class="text-[10px]/[12px] text-white/20 px-0.5">Helps us understand your commute.</span>
+    </div>
+
     <%# Email %>
     <div class="flex flex-col gap-1.5">
       <label class="opacity-50 tracking-[1px] uppercase text-[10px]/[12px] font-bold text-white">Email</label>
