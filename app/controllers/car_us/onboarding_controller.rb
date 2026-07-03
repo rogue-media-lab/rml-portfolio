@@ -15,7 +15,16 @@ module CarUs
 
     def chat
       @vehicle = current_car_owner.vehicles.order(created_at: :desc).first
-      @question_index = (params[:q] || 0).to_i
+      all_messages = current_car_owner.onboarding_messages || []
+
+      # Auto-advance: count how many questions have been answered (owner messages)
+      # This handles page refreshes where the Turbo Stream response was lost
+      answered = all_messages.count { |m| m["role"] == "owner" }
+
+      # If the user has answered more questions than the q param, advance
+      q_from_param = (params[:q] || 0).to_i
+      @question_index = [ q_from_param, answered ].max
+
       @question = CannedQuestions[@question_index]
 
       if @question.nil?
@@ -23,7 +32,7 @@ module CarUs
         redirect_to carus_welcome_path and return
       end
 
-      @messages = (current_car_owner.onboarding_messages || []).map { |m| m.symbolize_keys }
+      @messages = all_messages.map { |m| m.symbolize_keys }
     end
 
     def message
