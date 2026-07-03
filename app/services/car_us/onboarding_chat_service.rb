@@ -1,28 +1,44 @@
+require "net/http"
+require "json"
+
 module CarUs
   module OnboardingChatService
+    OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions".freeze
+
     extend self
 
     def respond(car_owner:, vehicle:, question:, owner_reply:, conversation_history: [])
-      # Build the prompt for qwen
+      api_key = ENV["OPENROUTER_API_KEY"] || Rails.application.credentials.dig(:openrouter, :api_key)
+      return fallback_reply(owner_reply) unless api_key
+
       messages = build_messages(car_owner, vehicle, question, owner_reply, conversation_history)
 
       begin
-        client = OpenAI::Client.new(
-          uri_base: "https://openrouter.ai/api/v1",
-          access_token: ENV.fetch("OPENROUTER_API_KEY", ""),
-          request_timeout: 30
-        )
+        uri = URI(OPENROUTER_URL)
+        http = Net::HTTP.new(uri.host, uri.port)
+        http.use_ssl = true
+        http.read_timeout = 15
+        http.open_timeout = 5
 
-        response = client.chat(
-          parameters: {
-            model: "qwen/qwen3.7-plus",
-            messages: messages,
-            max_tokens: 200,
-            temperature: 0.8
-          }
-        )
+        request = Net::HTTP::Post.new(uri.path)
+        request["Content-Type"] = "application/json"
+        request["Authorization"] = "Bearer #{api_key}"
+        request.body = {
+          model: "qwen/qwen3.7-plus",
+          messages: messages,
+          max_tokens: 200,
+          temperature: 0.8
+        }.to_json
 
-        response.dig("choices", 0, "message", "content")&.strip || fallback_reply(owner_reply)
+        response = http.request(request)
+
+        if response.code.to_i == 200
+          body = JSON.parse(response.body)
+          body.dig("choices", 0, "message", "content")&.strip || fallback_reply(owner_reply)
+        else
+          Rails.logger.warn("OnboardingChatService: HTTP #{response.code}")
+          fallback_reply(owner_reply)
+        end
       rescue => e
         Rails.logger.warn("OnboardingChatService error: #{e.message}")
         fallback_reply(owner_reply)
@@ -34,7 +50,8 @@ module CarUs
     def build_messages(car_owner, vehicle, question, owner_reply, conversation_history)
       name = car_owner.first_name.presence || "there"
       specs = [
-        vehicle.year, vehicle.make, vehicle.model, vehicle.engine_size, vehicle.transmission
+        vehicle.year, vehicle.make, vehicle.model,
+        vehicle.engine_size, vehicle.transmission
       ].compact.join(" ")
 
       system_prompt = <<~PROMPT
@@ -56,15 +73,12 @@ module CarUs
 
       messages = [ { role: "system", content: system_prompt } ]
 
-      # Add conversation history for context
       conversation_history.each do |msg|
         role = msg[:role] == "owner" ? "user" : "assistant"
         messages << { role: role, content: msg[:content] }
       end
 
-      # Add the latest owner reply
       messages << { role: "user", content: owner_reply }
-
       messages
     end
 
