@@ -44,7 +44,7 @@ module CarUs
       end
 
       if @vehicle.save
-        destination = current_car_owner.vehicles.count == 1 ? carus_welcome_path : vehicles_path
+        destination = current_car_owner.vehicles.count == 1 ? onboarding_processing_path : vehicles_path
         redirect_to destination, notice: "Vehicle added to your garage."
       else
         render :new, status: :unprocessable_entity
