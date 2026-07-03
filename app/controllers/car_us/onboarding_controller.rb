@@ -10,7 +10,6 @@ module CarUs
     ].freeze
 
     def processing
-      # Loading screen — give the AI a moment to analyze the photo and decode the VIN
       @vehicle = current_car_owner.vehicles.order(created_at: :desc).first
     end
 
@@ -20,12 +19,11 @@ module CarUs
       @question = CannedQuestions[@question_index]
 
       if @question.nil?
-        # Chat complete — mark onboarding done
         current_car_owner.update!(onboarding_completed: true, onboarding_step: "complete")
         redirect_to carus_welcome_path and return
       end
 
-      @messages = session[:onboarding_messages] || []
+      @messages = (current_car_owner.onboarding_messages || []).map { |m| m.symbolize_keys }
     end
 
     def message
@@ -33,26 +31,24 @@ module CarUs
       question_index = params[:question_index].to_i
       owner_reply = params[:message].to_s.strip
 
-      # Store messages in session
-      session[:onboarding_messages] ||= []
-      session[:onboarding_messages] << { role: "owner", content: owner_reply }
+      messages = current_car_owner.onboarding_messages || []
+      messages << { "role" => "owner", "content" => owner_reply }
 
-      # Build context for AI response
       question = CannedQuestions[question_index]
 
-      # Get AI reply
       reply = OnboardingChatService.respond(
         car_owner: current_car_owner,
         vehicle: @vehicle,
         question: question,
         owner_reply: owner_reply,
-        conversation_history: session[:onboarding_messages]
+        conversation_history: messages.map { |m| m.symbolize_keys }
       )
 
-      session[:onboarding_messages] << { role: "assistant", content: reply }
+      messages << { "role" => "assistant", "content" => reply }
+      current_car_owner.update!(onboarding_messages: messages)
 
-      # Move to next question
       next_index = question_index + 1
+      symbolized = messages.map { |m| m.symbolize_keys }
 
       respond_to do |format|
         format.turbo_stream do
@@ -60,7 +56,7 @@ module CarUs
             "onboarding_chat",
             partial: "car_us/onboarding/chat_messages",
             locals: {
-              messages: session[:onboarding_messages],
+              messages: symbolized,
               question_index: next_index,
               next_question: CannedQuestions[next_index],
               vehicle: @vehicle
