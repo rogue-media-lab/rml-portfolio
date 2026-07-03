@@ -6,7 +6,10 @@ class CarUs::RegistrationsController < Devise::RegistrationsController
   protected
 
   def configure_sign_up_params
-    devise_parameter_sanitizer.permit(:sign_up, keys: [ :shop_id, :first_name, :last_name ])
+    devise_parameter_sanitizer.permit(:sign_up, keys: [
+      :shop_id, :first_name, :last_name,
+      :address, :work_address
+    ])
   end
 
   def after_sign_up_path_for(resource)
