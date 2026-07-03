@@ -20,6 +20,7 @@ Rails.application.routes.draw do
     get "onboarding/processing", to: "car_us/onboarding#processing", as: :onboarding_processing
     get "onboarding/chat", to: "car_us/onboarding#chat", as: :onboarding_chat
     post "onboarding/chat", to: "car_us/onboarding#message"
+    get "onboarding/waiting", to: "car_us/onboarding#waiting", as: :onboarding_waiting
 
     # Individual shop landing pages
     resources :shops, only: [ :show ], param: :slug, controller: "car_us/shops", as: :carus_shops
