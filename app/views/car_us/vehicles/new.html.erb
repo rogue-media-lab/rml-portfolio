@@ -17,7 +17,7 @@
 
     <h1 class="text-[22px]/[28px] font-extrabold text-white tracking-[-0.4px]">Add Your Vehicle</h1>
 
-    <p class="text-[13px] leading-[150%] text-[#FFFFFF66]">We'll use this to pull the right specs and track your maintenance.</p>
+    <p class="text-[13px] leading-[150%] text-[#FFFFFF66]">VIN + a photo. We'll decode the specs and learn your car's story.</p>
   </div>
 
   <%# Form %>
@@ -31,7 +31,26 @@
       </div>
     <% end %>
 
-    <%# Year + Make side by side %>
+    <%# VIN — required, first field %>
+    <div class="flex flex-col gap-1.5">
+      <div class="flex justify-between items-center">
+        <label class="uppercase tracking-[0.8px] text-[10px]/[12px] font-bold text-carus-green">VIN <span class="text-carus-green/60">*</span></label>
+        <span class="text-[10px]/[12px] font-medium text-white/25">17 characters</span>
+      </div>
+      <%= f.text_field :vin, placeholder: "1HGCV2F34LA984823", required: true, class: "w-full bg-carus-field border border-carus-green/30 rounded-xl py-[13px] px-3.5 text-[13px]/[16px] font-bold text-carus-green placeholder:text-carus-green/20 focus:outline-none focus:border-carus-green tracking-wider" %>
+      <p class="text-[10px]/[12px] text-carus-text-dim px-0.5">We decode this to pull your vehicle's factory specs — engine, transmission, everything.</p>
+    </div>
+
+    <%# Photo — required %>
+    <div class="flex flex-col gap-1.5">
+      <div class="flex justify-between items-center">
+        <label class="uppercase tracking-[0.8px] text-[10px]/[12px] font-bold text-carus-green">Vehicle Photo <span class="text-carus-green/60">*</span></label>
+      </div>
+      <%= f.file_field :photo, accept: "image/*", required: true, class: "w-full bg-carus-field border border-carus-green/30 rounded-xl py-[13px] px-3.5 text-sm/[18px] text-white file:mr-3 file:bg-carus-green file:text-black file:border-0 file:rounded-lg file:py-1 file:px-3 file:text-xs file:font-bold focus:outline-none" %>
+      <p class="text-[10px]/[12px] text-carus-text-dim px-0.5">We analyze the color, condition, and type. This helps your car find its voice.</p>
+    </div>
+
+    <%# Year + Make side by side (auto-filled from VIN decode) %>
     <div class="flex gap-2.5">
       <div class="grow flex flex-col gap-1.5">
         <label class="uppercase tracking-[0.8px] text-[10px]/[12px] font-bold text-[#FFFFFF59]">Year</label>
@@ -46,10 +65,10 @@
     <%# Model %>
     <div class="flex flex-col gap-1.5">
       <label class="uppercase tracking-[0.8px] text-[10px]/[12px] font-bold text-[#FFFFFF59]">Model</label>
-      <%= f.text_field :model, placeholder: "Accord — 2.0T Sport", class: "w-full bg-carus-field border border-carus-green/40 rounded-xl py-[13px] px-3.5 text-sm/[18px] font-bold text-carus-green placeholder:text-carus-green/30 focus:outline-none focus:border-carus-green" %>
+      <%= f.text_field :model, placeholder: "Accord — 2.0T Sport", class: "w-full bg-carus-field border border-carus-border rounded-xl py-[13px] px-3.5 text-sm/[18px] font-bold text-white placeholder:text-carus-text-dim focus:outline-none focus:border-carus-green/40" %>
     </div>
 
-    <%# Engine (auto-filled display) %>
+    <%# Engine (auto-filled from VIN) %>
     <div class="flex flex-col gap-1.5">
       <label class="uppercase tracking-[0.8px] text-[10px]/[12px] font-bold text-[#FFFFFF59]">Engine</label>
       <div class="flex justify-between items-center rounded-xl py-[13px] px-3.5 bg-[#141414] border border-[#FFFFFF0D]">
@@ -64,13 +83,6 @@
       <%= f.text_field :transmission, placeholder: "Automatic", class: "w-full bg-carus-field border border-carus-border rounded-xl py-[13px] px-3.5 text-sm/[18px] font-bold text-white placeholder:text-carus-text-dim focus:outline-none focus:border-carus-green/40" %>
     </div>
 
-    <%# Photo (not in Paper — added for Vehicle image) %>
-    <div class="flex flex-col gap-1.5">
-      <label class="uppercase tracking-[0.8px] text-[10px]/[12px] font-bold text-[#FFFFFF59]">Vehicle Photo</label>
-      <%= f.file_field :photo, accept: "image/*", class: "w-full bg-carus-field border border-carus-border rounded-xl py-[13px] px-3.5 text-sm/[18px] text-white file:mr-3 file:bg-carus-green file:text-black file:border-0 file:rounded-lg file:py-1 file:px-3 file:text-xs file:font-bold focus:outline-none" %>
-      <span class="text-[10px]/[12px] text-carus-text-dim px-0.5">Optional — adds a photo to your vehicle card.</span>
-    </div>
-
     <%# Current Mileage %>
     <div class="flex flex-col gap-1.5">
       <label class="uppercase tracking-[0.8px] text-[10px]/[12px] font-bold text-[#FFFFFF59]">Current Mileage</label>
@@ -78,16 +90,7 @@
         <%= f.text_field :mileage, placeholder: "68,080", class: "bg-transparent w-full text-sm/[18px] font-extrabold text-white placeholder:text-carus-text-dim focus:outline-none" %>
         <span class="text-xs/[16px] text-[#FFFFFF40]">mi</span>
       </div>
-      <p class="text-[10px]/[12px] text-carus-text-dim px-0.5">Enter the odometer reading from your last shop visit or current reading.</p>
-    </div>
-
-    <%# VIN %>
-    <div class="flex flex-col gap-1.5">
-      <div class="flex justify-between items-center">
-        <label class="uppercase tracking-[0.8px] text-[10px]/[12px] font-bold text-[#FFFFFF59]">VIN</label>
-        <span class="text-[10px]/[12px] font-semibold text-[#FFFFFF40]">Optional — 17 characters</span>
-      </div>
-      <%= f.text_field :vin, placeholder: "1HGCV2F34LA984823", class: "w-full bg-carus-field border border-[#FFFFFF0F] rounded-xl py-[13px] px-3.5 text-[13px]/[16px] text-[#FFFFFF33] placeholder:text-carus-text-dim focus:outline-none focus:border-carus-green/40" %>
+      <p class="text-[10px]/[12px] text-carus-text-dim px-0.5">Current odometer reading. Helps us track maintenance intervals.</p>
     </div>
 
     <%# Submit %>
