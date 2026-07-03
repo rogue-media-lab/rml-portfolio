@@ -26,7 +26,7 @@ module CarUs
         request.body = {
           model: "qwen/qwen3.7-plus",
           messages: messages,
-          max_tokens: 200,
+          max_tokens: 100,
           temperature: 0.8
         }.to_json
 
