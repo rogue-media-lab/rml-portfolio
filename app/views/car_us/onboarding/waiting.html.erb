@@ -1,0 +1,19 @@
+<%= content_for :head do %>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <meta http-equiv="refresh" content="2;url=<%= onboarding_waiting_path(q: @next_q) %>">
+<% end %>
+
+<div class="min-h-screen bg-carus-black font-montserrat flex flex-col items-center justify-center px-6 text-center">
+  <div class="flex flex-col items-center gap-5">
+    <%# Thinking indicator %>
+    <div class="flex gap-2">
+      <div class="w-3 h-3 rounded-full bg-carus-green animate-bounce"></div>
+      <div class="w-3 h-3 rounded-full bg-carus-green animate-bounce" style="animation-delay: 0.15s"></div>
+      <div class="w-3 h-3 rounded-full bg-carus-green animate-bounce" style="animation-delay: 0.3s"></div>
+    </div>
+
+    <p class="text-white/50 text-sm">Your <%= @vehicle.make.presence || "car" %> is thinking...</p>
+  </div>
+</div>

@@ -17,11 +17,7 @@ module CarUs
       @vehicle = current_car_owner.vehicles.order(created_at: :desc).first
       all_messages = current_car_owner.onboarding_messages || []
 
-      # Auto-advance: count how many questions have been answered (owner messages)
-      # This handles page refreshes where the Turbo Stream response was lost
       answered = all_messages.count { |m| m["role"] == "owner" }
-
-      # If the user has answered more questions than the q param, advance
       q_from_param = (params[:q] || 0).to_i
       @question_index = [ q_from_param, answered ].max
 
@@ -39,41 +35,60 @@ module CarUs
       @vehicle = current_car_owner.vehicles.order(created_at: :desc).first
       question_index = params[:question_index].to_i
       owner_reply = params[:message].to_s.strip
+      return redirect_to onboarding_chat_path(q: question_index) if owner_reply.blank?
 
+      # Save owner message immediately
       messages = current_car_owner.onboarding_messages || []
       messages << { "role" => "owner", "content" => owner_reply }
-
-      question = CannedQuestions[question_index]
-
-      reply = OnboardingChatService.respond(
-        car_owner: current_car_owner,
-        vehicle: @vehicle,
-        question: question,
-        owner_reply: owner_reply,
-        conversation_history: messages.map { |m| m.symbolize_keys }
-      )
-
-      messages << { "role" => "assistant", "content" => reply }
       current_car_owner.update!(onboarding_messages: messages)
 
-      next_index = question_index + 1
-      symbolized = messages.map { |m| m.symbolize_keys }
+      # Fire AI in background thread
+      question = CannedQuestions[question_index]
+      car_owner_id = current_car_owner.id
+      history = messages.map { |m| m.symbolize_keys }
 
-      respond_to do |format|
-        format.turbo_stream do
-          render turbo_stream: turbo_stream.replace(
-            "onboarding_chat",
-            partial: "car_us/onboarding/chat_messages",
-            locals: {
-              messages: symbolized,
-              question_index: next_index,
-              next_question: CannedQuestions[next_index],
-              vehicle: @vehicle
-            }
+      Thread.new do
+        ActiveRecord::Base.connection_pool.with_connection do
+          owner = CarOwner.find(car_owner_id)
+          msgs = owner.onboarding_messages || []
+
+          reply = OnboardingChatService.respond(
+            car_owner: owner,
+            vehicle: owner.vehicles.order(created_at: :desc).first,
+            question: question,
+            owner_reply: owner_reply,
+            conversation_history: history
           )
+
+          msgs << { "role" => "assistant", "content" => reply }
+          owner.update!(onboarding_messages: msgs)
         end
-        format.html { redirect_to onboarding_chat_path(q: next_index) }
       end
+
+      redirect_to onboarding_waiting_path(q: question_index + 1)
+    end
+
+    def waiting
+      @vehicle = current_car_owner.vehicles.order(created_at: :desc).first
+      next_index = (params[:q] || 1).to_i
+
+      # Check if AI response is ready
+      messages = current_car_owner.onboarding_messages || []
+      owner_count = messages.count { |m| m["role"] == "owner" }
+      assistant_count = messages.count { |m| m["role"] == "assistant" }
+
+      if assistant_count >= owner_count && owner_count > 0
+        # AI is done — redirect to next question
+        if CannedQuestions[next_index].nil?
+          current_car_owner.update!(onboarding_completed: true, onboarding_step: "complete")
+          redirect_to carus_welcome_path and return
+        else
+          redirect_to onboarding_chat_path(q: next_index) and return
+        end
+      end
+
+      # Still waiting — show loading, auto-refresh
+      @next_q = next_index
     end
 
     private

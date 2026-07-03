@@ -39,11 +39,11 @@
 
     <%# Input bar %>
     <div class="mt-auto pt-4">
-      <%= form_with url: onboarding_chat_path, method: :post, data: { turbo: true }, class: "flex gap-2" do |f| %>
+      <%= form_with url: onboarding_chat_path, method: :post, local: true, class: "flex gap-2" do |f| %>
         <%= f.hidden_field :question_index, value: question_index %>
         <%= f.text_field :message, placeholder: "Type your answer...", autofocus: true,
               class: "flex-1 bg-carus-field border border-[#2A2A2A] rounded-xl py-3.5 px-4 text-sm text-white placeholder:text-white/25 focus:outline-none focus:border-carus-green/40" %>
-        <%= f.submit "Send", data: { disable_with: "..." }, class: "px-5 py-3.5 bg-carus-green text-carus-black text-sm font-bold rounded-xl hover:bg-carus-green/90 transition disabled:opacity-50 disabled:cursor-wait" %>
+        <%= f.submit "Send", class: "px-5 py-3.5 bg-carus-green text-carus-black text-sm font-bold rounded-xl hover:bg-carus-green/90 transition" %>
       <% end %>
     </div>
   <% else %>
