@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_03_013655) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_04_002913) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -312,6 +312,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_03_013655) do
     t.text "ai_difficulty_notes"
     t.datetime "last_lookup_at"
     t.integer "looked_up_by"
+    t.jsonb "chat_messages"
+    t.jsonb "ai_personality", default: {}
     t.index ["car_owner_id"], name: "index_car_us_vehicles_on_car_owner_id"
     t.index ["vin"], name: "index_car_us_vehicles_on_vin", unique: true
   end
