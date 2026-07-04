@@ -25,6 +25,7 @@ module CarUs
 
       if @question.nil?
         current_car_owner.update!(onboarding_completed: true, onboarding_step: "complete")
+        generate_personality_async(current_car_owner, @vehicle)
         redirect_to carus_welcome_path and return
       end
 
@@ -81,6 +82,7 @@ module CarUs
         # AI is done — redirect to next question
         if CannedQuestions[next_index].nil?
           current_car_owner.update!(onboarding_completed: true, onboarding_step: "complete")
+          generate_personality_async(current_car_owner, @vehicle)
           redirect_to carus_welcome_path and return
         else
           redirect_to onboarding_chat_path(q: next_index) and return
@@ -96,6 +98,34 @@ module CarUs
     def require_onboarding
       return if current_car_owner.onboarding_completed != true
       redirect_to vehicles_path
+    end
+
+    def generate_personality_async(owner, vehicle)
+      return unless vehicle.present?
+      messages = owner.onboarding_messages || []
+      return if messages.blank?
+
+      owner_id = owner.id
+      vehicle_id = vehicle.id
+
+      Thread.new do
+        ActiveRecord::Base.connection_pool.with_connection do
+          v = CarUs::Vehicle.find(vehicle_id)
+          o = CarOwner.find(owner_id)
+
+          personality = CarUs::PersonalityGenerationService.call(
+            vehicle: v,
+            onboarding_messages: o.onboarding_messages || []
+          )
+
+          if personality.present?
+            v.update!(ai_personality: personality)
+            Rails.logger.info("Personality generated for vehicle #{v.id}: #{personality['voice_archetype']}")
+          else
+            Rails.logger.warn("Personality generation failed for vehicle #{v.id}")
+          end
+        end
+      end
     end
   end
 end
