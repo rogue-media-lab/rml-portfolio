@@ -8,12 +8,15 @@
     <span class="text-[10px]/[12px] <%= request.path.match?(/\/vehicles/) ? 'font-bold text-carus-green' : 'font-medium text-carus-text-dim' %>">Garage</span>
   <% end %>
 
-  <%= link_to coupons_path, class: "flex flex-col items-center gap-1.25" do %>
+  <%= link_to vehicles_path, class: "flex flex-col items-center gap-1.25" do %>
     <svg width="22" height="22" viewBox="0 0 22 22" class="shrink-0">
-      <rect x="3" y="5" width="16" height="12" rx="2" fill="none" stroke="<%= current_page?(coupons_path) ? '#0FB900' : '#FFFFFF59' %>" stroke-width="1.5"/>
-      <path d="M3 10H8L10 7L12 13L14 10H19" fill="none" stroke="<%= current_page?(coupons_path) ? '#0FB900' : '#FFFFFF59' %>" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M4 4H18V14.5C18 16.5 17 18 11 18C5 18 4 16.5 4 14.5V4Z" fill="none" stroke="#FFFFFF59" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M4 8H18" fill="none" stroke="#FFFFFF59" stroke-width="1.5"/>
+      <circle cx="8" cy="12" r="1" fill="#FFFFFF59"/>
+      <circle cx="11" cy="12" r="1" fill="#FFFFFF59"/>
+      <circle cx="14" cy="12" r="1" fill="#FFFFFF59"/>
     </svg>
-    <span class="text-[10px]/[12px] <%= current_page?(coupons_path) ? 'font-bold text-carus-green' : 'font-medium text-carus-text-dim' %>">Deals</span>
+    <span class="text-[10px]/[12px] font-medium text-carus-text-dim">Chat</span>
   <% end %>
 
   <%= link_to notifications_path, class: "flex flex-col items-center gap-1.25" do %>
