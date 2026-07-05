@@ -1,4 +1,8 @@
 <%= content_for :head do %>
+  <% pending = @messages.last&.role == "tech" %>
+  <% if pending %>
+    <meta http-equiv="refresh" content="3">
+  <% end %>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -48,6 +52,16 @@
           </div>
         </div>
       <% end %>
+    <% end %>
+    <% if pending %>
+      <div class="flex gap-2.5">
+        <div class="flex items-center justify-center shrink-0 rounded-[12px] bg-[#0D2B0D] border border-carus-green/40 size-7 mt-1">
+          <svg width="12" height="12" viewBox="0 0 12 12" class="shrink-0"><circle cx="6" cy="6" r="4.5" fill="none" stroke="#0FB900" stroke-width="1.3"/><line x1="6" y1="3.5" x2="6" y2="6.5" stroke="#0FB900" stroke-width="1" stroke-linecap="round"/><circle cx="6" cy="8.5" r="0.5" fill="#0FB900"/></svg>
+        </div>
+        <div class="max-w-[85%] rounded-2xl rounded-bl-md px-4 py-3 bg-carus-field border border-[#2A2A2A]">
+          <p class="text-sm leading-[150%] text-[#FFFFFF4D] animate-pulse">Processing...</p>
+        </div>
+      </div>
     <% end %>
   </div>
 
