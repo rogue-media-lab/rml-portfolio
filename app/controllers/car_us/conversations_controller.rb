@@ -22,6 +22,13 @@ module CarUs
         role: "tech",
         content: content
       )
+      # Capture photo data BEFORE attach consumes the stream
+      has_photo = params[:photo].present?
+      photo_data = has_photo ? params[:photo].read : nil
+      photo_original_filename = has_photo ? params[:photo].original_filename : nil
+      photo_content_type = has_photo ? params[:photo].content_type : nil
+      params[:photo].rewind if has_photo
+
       message.photo.attach(params[:photo]) if params[:photo].present?
 
       # Text-based VIN extraction fallback (only if no photo)
@@ -30,11 +37,6 @@ module CarUs
       # Fire AI in background thread to avoid Heroku 30s timeout
       conversation_id = @conversation.id
       message_id = message.id
-      has_photo = params[:photo].present?
-      photo_data = has_photo ? params[:photo].read : nil
-      photo_original_filename = has_photo ? params[:photo].original_filename : nil
-      photo_content_type = has_photo ? params[:photo].content_type : nil
-      params[:photo].rewind if has_photo
 
       Thread.new do
         ActiveRecord::Base.connection_pool.with_connection do
@@ -100,6 +102,13 @@ module CarUs
         role: "tech",
         content: params[:content]
       )
+      # Capture photo data BEFORE attach consumes the stream
+      has_photo = params[:photo].present?
+      photo_data = has_photo ? params[:photo].read : nil
+      photo_original_filename = has_photo ? params[:photo].original_filename : nil
+      photo_content_type = has_photo ? params[:photo].content_type : nil
+      params[:photo].rewind if has_photo
+
       message.photo.attach(params[:photo]) if params[:photo].present?
 
       # Text-based VIN extraction fallback (only if no vehicle yet and no photo)
@@ -108,11 +117,6 @@ module CarUs
       # Fire AI in background thread
       conversation_id = @conversation.id
       message_id = message.id
-      has_photo = params[:photo].present?
-      photo_data = has_photo ? params[:photo].read : nil
-      photo_original_filename = has_photo ? params[:photo].original_filename : nil
-      photo_content_type = has_photo ? params[:photo].content_type : nil
-      params[:photo].rewind if has_photo
 
       Thread.new do
         ActiveRecord::Base.connection_pool.with_connection do
