@@ -73,7 +73,11 @@ module CarUs
     def update_specs
       @vehicle = CarUs::Vehicle.find(params[:id])
       specs = JSON.parse(@vehicle.ai_specs.presence || "{}") rescue {}
-      specs.merge!(params.require(:specs).permit!.to_h)
+      specs.merge!(params.require(:specs).permit(
+        :oil_weight, :oil_capacity_qts, :oil_filter, :drain_plug_torque_ft_lbs,
+        :coolant_type, :transmission_fluid, :spark_plug,
+        :tire_pressure_f, :tire_pressure_r
+      ).to_h)
       @vehicle.update!(ai_specs: specs.to_json)
       redirect_to tech_lookup_path(@vehicle), notice: "Specs updated."
     end
