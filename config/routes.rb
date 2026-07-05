@@ -31,6 +31,7 @@ Rails.application.routes.draw do
       resources :notifications, only: [ :index ], controller: "car_us/notifications"
       resources :vehicles, only: [ :index, :show, :new, :create, :edit, :update ], controller: "car_us/vehicles" do
         resource :manual, only: [ :show ], controller: "car_us/manuals"
+        resource :chat, only: [ :create ], controller: "car_us/vehicle_chat"
         resources :service_records, only: [ :index ], controller: "car_us/service_records"
         resources :booking_requests, only: [ :new, :create ], controller: "car_us/booking_requests" do
         collection do
