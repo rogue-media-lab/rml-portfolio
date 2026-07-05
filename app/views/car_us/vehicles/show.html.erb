@@ -91,6 +91,14 @@
       </svg>
     <% end %>
 
+    <%# Digital Manual %>
+    <%= link_to vehicle_manual_path(@vehicle), class: "flex items-center justify-center rounded-2xl py-4 gap-2 bg-carus-field border border-[#FFFFFF0D]" do %>
+      <span class="text-sm/[18px] font-semibold text-white opacity-70">Digital Manual</span>
+      <svg width="16" height="16" viewBox="0 0 16 16" class="shrink-0">
+        <path d="M3 8H13M10 5L13 8L10 11" fill="none" stroke="#FFFFFF80" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    <% end %>
+
     <%# Upcoming Bookings %>
     <% if @bookings.any? %>
       <p class="opacity-35 tracking-[1.5px] uppercase mt-1 text-[10px]/[12px] font-bold text-white px-1">Appointments</p>
