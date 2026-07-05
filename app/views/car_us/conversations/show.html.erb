@@ -1,5 +1,5 @@
+<% pending = @messages.last&.role == "tech" %>
 <%= content_for :head do %>
-  <% pending = @messages.last&.role == "tech" %>
   <% if pending %>
     <meta http-equiv="refresh" content="3">
   <% end %>

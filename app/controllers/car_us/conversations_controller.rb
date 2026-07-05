@@ -31,20 +31,21 @@ module CarUs
       conversation_id = @conversation.id
       message_id = message.id
       has_photo = params[:photo].present?
-      photo_tempfile = has_photo ? params[:photo].tempfile.path : nil
+      photo_data = has_photo ? params[:photo].read : nil
       photo_original_filename = has_photo ? params[:photo].original_filename : nil
       photo_content_type = has_photo ? params[:photo].content_type : nil
+      params[:photo].rewind if has_photo
 
       Thread.new do
         ActiveRecord::Base.connection_pool.with_connection do
           conv = current_technician.conversations.find(conversation_id)
           msg = conv.messages.find(message_id)
 
-          # Reconstruct photo if needed for the thread
-          raw_photo = if has_photo
+          # Reconstruct photo from in-memory data for the thread
+          raw_photo = if photo_data
             tempfile = Tempfile.new([ "photo", File.extname(photo_original_filename.to_s) ])
             tempfile.binmode
-            tempfile.write(File.read(photo_tempfile))
+            tempfile.write(photo_data)
             tempfile.rewind
             ActionDispatch::Http::UploadedFile.new(
               tempfile: tempfile,
@@ -108,19 +109,20 @@ module CarUs
       conversation_id = @conversation.id
       message_id = message.id
       has_photo = params[:photo].present?
-      photo_tempfile = has_photo ? params[:photo].tempfile.path : nil
+      photo_data = has_photo ? params[:photo].read : nil
       photo_original_filename = has_photo ? params[:photo].original_filename : nil
       photo_content_type = has_photo ? params[:photo].content_type : nil
+      params[:photo].rewind if has_photo
 
       Thread.new do
         ActiveRecord::Base.connection_pool.with_connection do
           conv = CarUs::Conversation.find(conversation_id)
           msg = conv.messages.find(message_id)
 
-          raw_photo = if has_photo
+          raw_photo = if photo_data
             tempfile = Tempfile.new([ "photo", File.extname(photo_original_filename.to_s) ])
             tempfile.binmode
-            tempfile.write(File.read(photo_tempfile))
+            tempfile.write(photo_data)
             tempfile.rewind
             ActionDispatch::Http::UploadedFile.new(
               tempfile: tempfile,
