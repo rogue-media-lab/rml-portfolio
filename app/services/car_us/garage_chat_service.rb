@@ -123,7 +123,7 @@ module CarUs
     end
 
     def fallback_reply(vehicle)
-      name = [vehicle.year, vehicle.make, vehicle.model].compact.join(" ")
+      name = [ vehicle.year, vehicle.make, vehicle.model ].compact.join(" ")
       "I'm having trouble connecting right now. Try again in a moment — I want to help with your #{name}."
     end
 
