@@ -1,8 +1,5 @@
 <% pending = @messages.last&.role == "tech" %>
 <%= content_for :head do %>
-  <% if pending %>
-    <meta http-equiv="refresh" content="3">
-  <% end %>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -77,3 +74,19 @@
     <% end %>
   </div>
 </div>
+<% if pending %>
+<script>
+  (function() {
+    var count = <%= @messages.count %>;
+    var url = '<%= poll_conversation_path(@conversation) %>';
+    var interval = setInterval(function() {
+      fetch(url).then(function(r) { return r.json(); }).then(function(data) {
+        if (data.message_count !== count || data.last_role === 'assistant') {
+          clearInterval(interval);
+          window.location.reload();
+        }
+      });
+    }, 3000);
+  })();
+</script>
+<% end %>
