@@ -1,7 +1,7 @@
 module CarUs
   class ConversationsController < CarUs::BaseController
     before_action :authenticate_technician!
-    before_action :set_conversation, only: [ :show, :create_message ]
+    before_action :set_conversation, only: [ :show, :create_message, :poll ]
     layout "car_us/car_owner"
 
     def index
@@ -175,6 +175,11 @@ module CarUs
 
       @conversation.touch
       redirect_to conversation_path(@conversation)
+    end
+
+    def poll
+      @conversation = current_technician.conversations.find(params[:id])
+      render json: { message_count: @conversation.messages.count, last_role: @conversation.messages.order(:created_at).last&.role }
     end
 
     private

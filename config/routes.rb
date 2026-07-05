@@ -66,6 +66,7 @@ Rails.application.routes.draw do
       resources :conversations, only: [ :index, :show, :create ], controller: "car_us/conversations" do
         member do
           post :create_message
+          get :poll
         end
       end
       resource :tech_profile, only: [ :show ], controller: "car_us/tech_profiles"
