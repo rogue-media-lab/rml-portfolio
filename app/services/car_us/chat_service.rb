@@ -14,10 +14,15 @@ class CarUs::ChatService
   def respond_to(message, photo: nil)
     api_key = ENV["OPENROUTER_API_KEY"] || Rails.application.credentials.dig(:openrouter, :api_key)
 
-    # Quick return: if vehicle already linked with specs, respond from cache
+    # Quick return: if vehicle already linked with specs AND this is the first
+    # message (no assistant responses yet), respond from cache. For follow-ups,
+    # let the AI handle context-aware responses with labor times.
     if @conversation.vehicle&.ai_specs.present? && photo.nil?
-      specs = JSON.parse(@conversation.vehicle.ai_specs) rescue {}
-      return cached_vehicle_response(message, specs)
+      assistant_count = @conversation.messages.where(role: "assistant").count
+      if assistant_count == 0
+        specs = JSON.parse(@conversation.vehicle.ai_specs) rescue {}
+        return cached_vehicle_response(message, specs)
+      end
     end
 
     return fallback_response unless api_key
@@ -91,7 +96,7 @@ class CarUs::ChatService
       Current vehicle context:
       #{vehicle_context}
 
-      If the tech sends a photo of a vehicle or VIN plate, extract the VIN and identify the vehicle (year, make, model, engine). Then provide relevant specs (oil weight, capacity, filter, torque specs, fluid types).
+      If the tech sends a photo of a vehicle or VIN plate, extract the VIN precisely and identify the vehicle (year, make, model, engine) from the VIN itself — do NOT guess the model from the photo. Then provide relevant specs (oil weight, capacity, filter, torque specs, fluid types).
       If the tech asks about a specific service, include specs and labor time estimates.
       Keep responses short — 2-4 sentences unless listing specs.
       If you extract a VIN from a photo, respond with: "VIN: [VIN] | [Year] [Make] [Model] | Engine: [size]" followed by key specs.
