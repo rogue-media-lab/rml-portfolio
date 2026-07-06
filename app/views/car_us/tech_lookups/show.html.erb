@@ -66,7 +66,7 @@
           <p class="text-[10px]/[12px] font-bold text-carus-green"><%= total_hours %>h total</p>
         </div>
         <% jobs.each_with_index do |job, i| %>
-          <div class="flex items-start justify-between py-2.5 <%= 'border-t border-[#FFFFFF0F]' unless i == 0 %>">
+          <%= link_to tech_lookup_service_job_path(@vehicle, job), class: "flex items-start justify-between py-2.5 #{'border-t border-[#FFFFFF0F]' unless i == 0} hover:bg-white/[0.02] -mx-2 px-2 rounded-lg transition" do %>
             <div class="grow min-w-0">
               <p class="text-[13px]/[16px] font-bold text-white"><%= job.description %></p>
               <% if job.job_parts.any? %>
@@ -77,8 +77,8 @@
               <p class="text-[10px]/[12px] text-[#FFFFFF33] mt-0.5"><%= time_ago_in_words(job.created_at) %> ago</p>
             </div>
             <span class="text-sm/[18px] font-extrabold text-carus-green shrink-0 ml-3"><%= job.book_hours %>h</span>
-          </div>
         <% end %>
+      <% end %>
       </div>
     <% end %>
 
