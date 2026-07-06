@@ -78,15 +78,18 @@ module CarUs
                 vehicle.update!(last_lookup_at: Time.current, looked_up_by: current_technician.id)
                 conv.update!(vehicle: vehicle, title: "#{vehicle.year} #{vehicle.make} #{vehicle.model}")
 
-                enriched = CarUs::AiEnrichmentService.new(vin: vin, decoded: decoded, notes: "").enrich
-                if enriched.present?
-                  specs = enriched["specs"] || {}
-                  vehicle.update!(
-                    ai_specs: specs.to_json,
-                    ai_suggestions: enriched["service_suggestions"]&.to_json,
-                    ai_plain_english: enriched["plain_english"],
-                    ai_difficulty_notes: enriched["difficulty_notes"]
-                  )
+                # Only enrich if vehicle doesn't already have specs
+                if vehicle.ai_specs.blank?
+                  enriched = CarUs::AiEnrichmentService.new(vin: vin, decoded: decoded, notes: "").enrich
+                  if enriched.present?
+                    specs = enriched["specs"] || {}
+                    vehicle.update!(
+                      ai_specs: specs.to_json,
+                      ai_suggestions: enriched["service_suggestions"]&.to_json,
+                      ai_plain_english: enriched["plain_english"],
+                      ai_difficulty_notes: enriched["difficulty_notes"]
+                    )
+                  end
                 end
               end
             end
@@ -157,15 +160,18 @@ module CarUs
                 vehicle.update!(last_lookup_at: Time.current, looked_up_by: current_technician.id)
                 conv.update!(vehicle: vehicle, title: "#{vehicle.year} #{vehicle.make} #{vehicle.model}")
 
-                enriched = CarUs::AiEnrichmentService.new(vin: vin, decoded: decoded, notes: "").enrich
-                if enriched.present?
-                  specs = enriched["specs"] || {}
-                  vehicle.update!(
-                    ai_specs: specs.to_json,
-                    ai_suggestions: enriched["service_suggestions"]&.to_json,
-                    ai_plain_english: enriched["plain_english"],
-                    ai_difficulty_notes: enriched["difficulty_notes"]
-                  )
+                # Only enrich if vehicle doesn't already have specs
+                if vehicle.ai_specs.blank?
+                  enriched = CarUs::AiEnrichmentService.new(vin: vin, decoded: decoded, notes: "").enrich
+                  if enriched.present?
+                    specs = enriched["specs"] || {}
+                    vehicle.update!(
+                      ai_specs: specs.to_json,
+                      ai_suggestions: enriched["service_suggestions"]&.to_json,
+                      ai_plain_english: enriched["plain_english"],
+                      ai_difficulty_notes: enriched["difficulty_notes"]
+                    )
+                  end
                 end
               end
             end

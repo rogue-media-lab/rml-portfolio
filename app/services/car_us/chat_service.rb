@@ -13,6 +13,13 @@ class CarUs::ChatService
   # photo: raw ActionDispatch::Http::UploadedFile (optional — for vision/VIN extraction)
   def respond_to(message, photo: nil)
     api_key = ENV["OPENROUTER_API_KEY"] || Rails.application.credentials.dig(:openrouter, :api_key)
+
+    # Quick return: if vehicle already linked with specs, respond from cache
+    if @conversation.vehicle&.ai_specs.present? && photo.nil?
+      specs = JSON.parse(@conversation.vehicle.ai_specs) rescue {}
+      return cached_vehicle_response(message, specs)
+    end
+
     return fallback_response unless api_key
 
     # Build message history
@@ -152,5 +159,21 @@ class CarUs::ChatService
     else
       "I'm ready. Send me a photo of the VIN plate or type the VIN to get started."
     end
+  end
+
+  def cached_vehicle_response(message, specs)
+    v = @conversation.vehicle
+    lines = []
+    lines << "**#{v.year} #{v.make} #{v.model}** — specs on file."
+    if specs["oil_weight"].present?
+      lines << "Oil: #{specs["oil_weight"]} | #{specs["oil_capacity_qts"]} qts | Filter: #{specs["oil_filter"]}"
+    end
+    lines << "Torque: #{specs["drain_plug_torque_ft_lbs"]} ft-lbs" if specs["drain_plug_torque_ft_lbs"].present?
+    lines << "Cabin filter: #{specs["cabin_air_filter"]}" if specs["cabin_air_filter"].present?
+    lines << "Engine filter: #{specs["engine_air_filter"]}" if specs["engine_air_filter"].present?
+    lines << "Tires: #{specs["tire_pressure_f"]}F / #{specs["tire_pressure_r"]}R" if specs["tire_pressure_f"].present?
+    lines << ""
+    lines << "What service are we doing? I'll give you labor times."
+    lines.join("\n")
   end
 end
