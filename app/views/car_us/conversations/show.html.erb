@@ -5,9 +5,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <% end %>
 
-<div class="min-h-screen bg-carus-black font-montserrat flex flex-col">
-  <%# Header %>
-  <div class="flex items-center gap-3 pt-14 px-6 pb-3">
+<div class="h-screen bg-carus-black font-montserrat flex flex-col overflow-hidden">
+  <%# Header — fixed height, shrinks 0 %>
+  <div class="shrink-0 flex items-center gap-3 pt-14 px-6 pb-3">
     <%= link_to conversations_path, class: "flex items-center justify-center rounded-[18px] shrink-0 bg-carus-field border border-[#2A2A2A] size-9" do %>
       <svg width="16" height="16" viewBox="0 0 16 16" class="shrink-0"><path d="M10 4L6 8L10 12" fill="none" stroke="#FFFFFF80" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
     <% end %>
