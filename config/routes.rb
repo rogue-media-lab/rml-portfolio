@@ -75,7 +75,7 @@ Rails.application.routes.draw do
         member do
           patch :update_specs
         end
-        resources :service_jobs, only: [ :create, :update, :show ], controller: "car_us/service_jobs"
+        resources :service_jobs, only: [ :create, :edit, :update, :show, :destroy ], controller: "car_us/service_jobs"
       end
       get "customer_lookups", to: "car_us/tech_lookups#customer_lookup", as: :customer_lookups
     end
