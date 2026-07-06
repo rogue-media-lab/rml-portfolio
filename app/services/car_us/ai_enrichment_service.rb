@@ -8,7 +8,7 @@
 #
 class CarUs::AiEnrichmentService
   OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
-  MODEL = "qwen/qwen3.7-plus"
+  MODEL = "google/gemini-2.0-flash-001"
 
   def initialize(vin:, decoded:, notes: "")
     @vin = vin
