@@ -1,7 +1,7 @@
 module CarUs
   class ConversationsController < CarUs::BaseController
     before_action :authenticate_technician!
-    before_action :set_conversation, only: [ :show, :create_message, :poll ]
+    before_action :set_conversation, only: [ :show, :create_message, :poll, :complete_job ]
     layout "car_us/car_owner"
 
     def index
@@ -180,6 +180,33 @@ module CarUs
     def poll
       @conversation = current_technician.conversations.find(params[:id])
       render json: { message_count: @conversation.messages.count, last_role: @conversation.messages.order(:created_at).last&.role }
+    end
+
+    def complete_job
+      @conversation = current_technician.conversations.find(params[:id])
+      return redirect_to conversation_path(@conversation), alert: "No vehicle linked." unless @conversation.vehicle
+
+      # Find the tech message that preceded the assistant's response
+      messages = @conversation.messages.order(:created_at)
+      tech_msg = messages.where(role: "tech").last
+
+      # Try to parse labor hours from the AI response
+      ai_msg = messages.where(role: "assistant").last
+      hours = nil
+      if ai_msg
+        hours = ai_msg.content.to_s.scan(/([\d.]+)\s*(?:hours?|hrs?|book)/i).flatten.first&.to_f
+      end
+
+      job = CarUs::ServiceJob.create!(
+        vehicle: @conversation.vehicle,
+        technician: current_technician,
+        description: tech_msg&.content.presence || "Service completed",
+        book_hours: hours,
+        status: "completed",
+        completed_at: Time.current
+      )
+
+      redirect_to conversation_path(@conversation), notice: "Job logged — #{job.book_hours.present? ? \"#{job.book_hours} hrs\" : \"hours TBD\"}"
     end
 
     private
