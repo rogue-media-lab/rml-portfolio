@@ -4,7 +4,7 @@
 #
 class CarUs::ChatService
   OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
-  MODEL = "google/gemini-2.0-flash-001"
+  MODEL = "qwen/qwen3.7-plus"
 
   def initialize(conversation)
     @conversation = conversation
@@ -58,7 +58,10 @@ class CarUs::ChatService
       }
     )
 
-    return fallback_response unless response.code.to_i == 200
+    unless response.code.to_i == 200
+      Rails.logger.error("ChatService: API returned #{response.code} — #{response.body[0..300]}")
+      return fallback_response
+    end
 
     data = JSON.parse(response.body)
     data.dig("choices", 0, "message", "content")&.strip || fallback_response
