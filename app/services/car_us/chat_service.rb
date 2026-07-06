@@ -4,7 +4,7 @@
 #
 class CarUs::ChatService
   OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
-  MODEL = "qwen/qwen3.5-plus-02-15"
+  MODEL = "openai/gpt-4o-mini"
 
   def initialize(conversation)
     @conversation = conversation
