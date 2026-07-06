@@ -51,4 +51,14 @@
       </div>
     <% end %>
   </div>
+
+  <div class="px-6 py-4 flex gap-3">
+    <%= link_to edit_tech_lookup_service_job_path(@job.vehicle, @job), class: "flex-1 flex items-center justify-center gap-2 rounded-xl bg-carus-field border border-[#2A2A2A] text-white text-[15px] font-bold py-3.5" do %>
+      <svg width="16" height="16" viewBox="0 0 16 16"><path d="M4 12l7-7M13 4v3a1 1 0 01-1 1h-2M3 5v7a1 1 0 001 1h8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Edit Job
+    <% end %>
+    <%= button_to tech_lookup_service_job_path(@job.vehicle, @job), method: :delete, form: { data: { turbo_confirm: "Delete this job? This can't be undone." } }, class: "flex-1 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-[15px] font-bold py-3.5" do %>
+      Delete Job
+    <% end %>
+  </div>
 </div>
