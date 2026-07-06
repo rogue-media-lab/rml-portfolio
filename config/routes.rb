@@ -67,6 +67,7 @@ Rails.application.routes.draw do
         member do
           post :create_message
           get :poll
+          post :complete_job
         end
       end
       resource :tech_profile, only: [ :show ], controller: "car_us/tech_profiles"

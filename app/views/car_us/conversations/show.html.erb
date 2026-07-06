@@ -46,6 +46,7 @@
           <div class="max-w-[85%] rounded-2xl rounded-bl-md px-4 py-3 bg-carus-field border border-[#2A2A2A]">
             <p class="text-sm leading-[150%] text-[#CCCCCC] whitespace-pre-wrap break-words"><%= msg.content %></p>
             <p class="mt-1 text-[10px]/[12px] text-[#FFFFFF33]"><%= msg.created_at.strftime("%-I:%M %p") %></p>
+            <%= button_to "Log Complete", complete_job_conversation_path(@conversation), method: :post, class: "mt-2 text-[10px] font-semibold text-carus-green hover:text-white transition", form_class: "inline" %>
           </div>
         </div>
       <% end %>
@@ -56,7 +57,13 @@
           <svg width="12" height="12" viewBox="0 0 12 12" class="shrink-0"><circle cx="6" cy="6" r="4.5" fill="none" stroke="#0FB900" stroke-width="1.3"/><line x1="6" y1="3.5" x2="6" y2="6.5" stroke="#0FB900" stroke-width="1" stroke-linecap="round"/><circle cx="6" cy="8.5" r="0.5" fill="#0FB900"/></svg>
         </div>
         <div class="max-w-[85%] rounded-2xl rounded-bl-md px-4 py-3 bg-carus-field border border-[#2A2A2A]">
-          <p class="text-sm leading-[150%] text-[#FFFFFF4D] animate-pulse">Processing...</p>
+          <p class="text-sm leading-[150%] text-[#FFFFFF4D]">
+          <span class="inline-flex gap-0.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-carus-green animate-pulse"></span>
+            <span class="w-1.5 h-1.5 rounded-full bg-carus-green animate-pulse" style="animation-delay: 0.2s"></span>
+            <span class="w-1.5 h-1.5 rounded-full bg-carus-green animate-pulse" style="animation-delay: 0.4s"></span>
+          </span>
+        </p>
         </div>
       </div>
     <% end %>
