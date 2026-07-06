@@ -76,6 +76,7 @@ module CarUs
       specs.merge!(params.require(:specs).permit(
         :oil_weight, :oil_capacity_qts, :oil_filter, :drain_plug_torque_ft_lbs,
         :coolant_type, :transmission_fluid, :spark_plug,
+        :cabin_air_filter, :engine_air_filter,
         :tire_pressure_f, :tire_pressure_r
       ).to_h)
       @vehicle.update!(ai_specs: specs.to_json)

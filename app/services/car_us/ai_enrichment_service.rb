@@ -43,11 +43,13 @@ class CarUs::AiEnrichmentService
         "specs": {
           "oil_weight": "the correct oil viscosity",
           "oil_capacity_qts": number,
-          "oil_filter": "the correct OEM filter part number",
+          "oil_filter": "the correct oil filter part number (include OEM and Valvoline VO-xxx if applicable)",
           "drain_plug_torque_ft_lbs": number,
           "coolant_type": "the correct coolant specification",
           "transmission_fluid": "the correct transmission fluid specification",
           "spark_plug": "the correct OEM spark plug part number",
+          "cabin_air_filter": "the correct cabin air filter part number",
+          "engine_air_filter": "the correct engine air filter part number",
           "tire_pressure_f": number,
           "tire_pressure_r": number
         },
