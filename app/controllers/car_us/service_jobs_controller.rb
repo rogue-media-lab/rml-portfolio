@@ -28,6 +28,10 @@ module CarUs
       redirect_to tech_lookup_path(@job.vehicle), notice: "Job updated."
     end
 
+    def show
+      @job = CarUs::ServiceJob.find(params[:id])
+    end
+
     private
 
     def job_params

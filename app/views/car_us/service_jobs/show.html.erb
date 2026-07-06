@@ -1,0 +1,54 @@
+<%= content_for :head do %>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<% end %>
+
+<div class="min-h-screen bg-carus-black font-montserrat flex flex-col">
+  <div class="shrink-0 flex items-center gap-3 pt-14 px-6 pb-3">
+    <%= link_to tech_lookup_path(@job.vehicle), class: "flex items-center justify-center rounded-[18px] shrink-0 bg-carus-field border border-[#2A2A2A] size-9" do %>
+      <svg width="16" height="16" viewBox="0 0 16 16"><path d="M10 4L6 8L10 12" fill="none" stroke="#FFFFFF80" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <% end %>
+    <div class="grow min-w-0">
+      <h1 class="text-[17px]/[22px] font-extrabold text-white truncate">Job Details</h1>
+      <p class="text-[11px]/[14px] text-[#FFFFFF4D]"><%= @job.vehicle.year %> <%= @job.vehicle.make %> <%= @job.vehicle.model %></p>
+    </div>
+  </div>
+
+  <div class="px-6 py-4 space-y-4">
+    <div class="rounded-2xl p-4 bg-carus-field border border-[#2A2A2A] space-y-3">
+      <div>
+        <p class="opacity-50 tracking-[1px] uppercase text-[10px]/[12px] font-bold text-white">Service</p>
+        <p class="mt-1 text-[15px] font-bold text-white"><%= @job.description %></p>
+      </div>
+
+      <div class="flex gap-6">
+        <div>
+          <p class="opacity-50 tracking-[1px] uppercase text-[10px]/[12px] font-bold text-white">Book Hours</p>
+          <p class="mt-1 text-sm font-bold text-carus-green"><%= @job.book_hours.present? ? "#{@job.book_hours} hrs" : "—" %></p>
+        </div>
+        <div>
+          <p class="opacity-50 tracking-[1px] uppercase text-[10px]/[12px] font-bold text-white">Completed</p>
+          <p class="mt-1 text-sm font-semibold text-white"><%= @job.completed_at&.strftime("%b %-d, %Y at %-I:%M %p") || @job.created_at&.strftime("%b %-d, %Y") %></p>
+        </div>
+      </div>
+
+      <div>
+        <p class="opacity-50 tracking-[1px] uppercase text-[10px]/[12px] font-bold text-white">Technician</p>
+        <p class="mt-1 text-sm font-semibold text-white"><%= @job.technician&.display_name || "—" %></p>
+      </div>
+    </div>
+
+    <% if @job.job_parts.any? %>
+      <div class="rounded-2xl p-4 bg-carus-field border border-[#2A2A2A]">
+        <p class="opacity-50 tracking-[1px] uppercase text-[10px]/[12px] font-bold text-white mb-3">Parts Used</p>
+        <% @job.job_parts.each do |part| %>
+          <div class="flex justify-between py-2 border-b border-[#FFFFFF08] last:border-0">
+            <p class="text-sm text-white"><%= part.name %> × <%= part.quantity %></p>
+            <p class="text-sm text-[#FFFFFF4D]"><%= number_to_currency(part.cost) if part.cost %></p>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>
