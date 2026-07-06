@@ -212,7 +212,7 @@ module CarUs
         completed_at: Time.current
       )
 
-      redirect_to conversation_path(@conversation), notice: "Job logged — #{job.book_hours.present? ? \"#{job.book_hours} hrs\" : \"hours TBD\"}"
+      redirect_to conversation_path(@conversation), notice: "Job logged — #{job.book_hours.present? ? "#{job.book_hours} hrs" : "hours TBD"}"
     end
 
     private
