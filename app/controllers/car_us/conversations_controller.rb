@@ -65,7 +65,7 @@ module CarUs
               vin = ai_reply.to_s.scan(/[A-HJ-NPR-Z0-9]{16,17}/).first
               if vin
                 decoded = CarUs::Vehicle.decode_vin(vin)
-                if decoded&.dig(:make).present? && decoded&.dig(:year).present?
+                if decoded&.dig(:make).present? && decoded&.dig(:year).present? && decoded&.dig(:model).present?
                   vehicle = CarUs::Vehicle.find_or_create_by!(vin: vin) do |v|
                     v.year = decoded[:year]
                     v.make = decoded[:make]
@@ -96,7 +96,6 @@ module CarUs
               end
             rescue => e
               Rails.logger.error("Vehicle link failed: #{e.message}")
-              conv.messages.create!(role: "assistant", content: "I found the VIN but couldn't look up this vehicle. Try typing the VIN directly.")
             end
           end
         end
@@ -152,7 +151,7 @@ module CarUs
               vin = ai_reply.to_s.scan(/[A-HJ-NPR-Z0-9]{16,17}/).first
               if vin
                 decoded = CarUs::Vehicle.decode_vin(vin)
-                if decoded&.dig(:make).present? && decoded&.dig(:year).present?
+                if decoded&.dig(:make).present? && decoded&.dig(:year).present? && decoded&.dig(:model).present?
                   vehicle = CarUs::Vehicle.find_or_create_by!(vin: vin) do |v|
                     v.year = decoded[:year]
                     v.make = decoded[:make]
@@ -183,7 +182,6 @@ module CarUs
               end
             rescue => e
               Rails.logger.error("Vehicle link failed: #{e.message}")
-              conv.messages.create!(role: "assistant", content: "I found the VIN but couldn't look up this vehicle. Try typing the VIN directly.")
             end
           end
         end
@@ -240,7 +238,7 @@ module CarUs
       return unless vin
 
       decoded = CarUs::Vehicle.decode_vin(vin)
-      return unless decoded&.dig(:make).present?
+      return unless decoded&.dig(:make).present? && decoded&.dig(:model).present?
 
       vehicle = CarUs::Vehicle.find_or_create_by!(vin: vin) do |v|
         v.year = decoded[:year]
@@ -281,7 +279,7 @@ module CarUs
       return unless vin
 
       decoded = CarUs::Vehicle.decode_vin(vin)
-      return unless decoded&.dig(:make).present?
+      return unless decoded&.dig(:make).present? && decoded&.dig(:model).present?
 
       vehicle = CarUs::Vehicle.find_or_create_by!(vin: vin) do |v|
         v.year = decoded[:year]
