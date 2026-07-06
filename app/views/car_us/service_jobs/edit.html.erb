@@ -1,0 +1,118 @@
+<%= content_for :head do %>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<% end %>
+
+<div class="min-h-screen bg-carus-black font-montserrat flex flex-col">
+  <div class="shrink-0 flex items-center gap-3 pt-14 px-6 pb-3">
+    <%= link_to tech_lookup_service_job_path(@job.vehicle, @job), class: "flex items-center justify-center rounded-[18px] shrink-0 bg-carus-field border border-[#2A2A2A] size-9" do %>
+      <svg width="16" height="16" viewBox="0 0 16 16"><path d="M10 4L6 8L10 12" fill="none" stroke="#FFFFFF80" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <% end %>
+    <div class="grow min-w-0">
+      <h1 class="text-[17px]/[22px] font-extrabold text-white truncate">Edit Job</h1>
+      <p class="text-[11px]/[14px] text-[#FFFFFF4D]"><%= @job.vehicle.year %> <%= @job.vehicle.make %> <%= @job.vehicle.model %></p>
+    </div>
+  </div>
+
+  <%= form_with model: [:tech_lookup, @job.vehicle, @job], local: true, class: "px-6 py-4 space-y-4" do |f| %>
+    <% if @job.errors.any? %>
+      <div class="rounded-xl p-3 bg-red-500/10 border border-red-500/20">
+        <p class="text-sm text-red-400"><%= @job.errors.full_messages.to_sentence %></p>
+      </div>
+    <% end %>
+
+    <div class="space-y-1">
+      <label class="opacity-50 tracking-[1px] uppercase text-[10px]/[12px] font-bold text-white">Description</label>
+      <%= f.text_field :description, value: @job.description, class: "w-full rounded-xl bg-carus-field border border-[#2A2A2A] text-white text-[15px] font-bold px-4 py-3 focus:outline-none focus:border-carus-green/50 placeholder:text-[#FFFFFF33]", placeholder: "e.g. Oil Change, Brake Pads" %>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+      <div class="space-y-1">
+        <label class="opacity-50 tracking-[1px] uppercase text-[10px]/[12px] font-bold text-white">Book Hours</label>
+        <%= f.number_field :book_hours, value: @job.book_hours, step: 0.1, min: 0, class: "w-full rounded-xl bg-carus-field border border-[#2A2A2A] text-white text-[15px] font-bold px-4 py-3 focus:outline-none focus:border-carus-green/50 placeholder:text-[#FFFFFF33]", placeholder: "e.g. 1.5" %>
+      </div>
+      <div class="space-y-1">
+        <label class="opacity-50 tracking-[1px] uppercase text-[10px]/[12px] font-bold text-white">Status</label>
+        <%= f.select :status, [["Completed", "completed"], ["In Progress", "in_progress"], ["Scheduled", "scheduled"]], {}, class: "w-full rounded-xl bg-carus-field border border-[#2A2A2A] text-white text-[15px] font-bold px-4 py-3 focus:outline-none focus:border-carus-green/50 appearance-none" %>
+      </div>
+    </div>
+
+    <div class="space-y-1">
+      <label class="opacity-50 tracking-[1px] uppercase text-[10px]/[12px] font-bold text-white">Notes</label>
+      <%= f.text_area :notes, value: @job.notes, rows: 3, class: "w-full rounded-xl bg-carus-field border border-[#2A2A2A] text-white text-sm px-4 py-3 focus:outline-none focus:border-carus-green/50 placeholder:text-[#FFFFFF33]", placeholder: "Any notes about this job…" %>
+    </div>
+
+    <%# Parts %>
+    <div class="rounded-2xl p-4 bg-carus-field border border-[#2A2A2A] space-y-3" data-controller="job-parts">
+      <div class="flex justify-between items-center">
+        <p class="opacity-50 tracking-[1px] uppercase text-[10px]/[12px] font-bold text-white">Parts Used</p>
+        <button type="button" data-action="click->job-parts#add" class="flex items-center gap-1 text-[11px] font-bold text-carus-green">
+          <svg width="14" height="14" viewBox="0 0 14 14"><path d="M7 3v8M3 7h8" fill="none" stroke="#0FB900" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Add Part
+        </button>
+      </div>
+
+      <div data-job-parts-target="list">
+        <% @job.job_parts.each_with_index do |part, i| %>
+          <div class="flex gap-2 items-end mb-2" data-job-parts-target="row">
+            <div class="flex-1">
+              <input type="text" name="parts[<%= i %>][name]" value="<%= part.name %>" placeholder="Part name" class="w-full rounded-lg bg-carus-black border border-[#2A2A2A] text-white text-sm px-3 py-2 focus:outline-none focus:border-carus-green/50 placeholder:text-[#FFFFFF33]">
+            </div>
+            <div class="w-16">
+              <input type="number" name="parts[<%= i %>][quantity]" value="<%= part.quantity %>" min="1" placeholder="Qty" class="w-full rounded-lg bg-carus-black border border-[#2A2A2A] text-white text-sm px-3 py-2 focus:outline-none focus:border-carus-green/50 placeholder:text-[#FFFFFF33]">
+            </div>
+            <div class="w-20">
+              <input type="text" name="parts[<%= i %>][cost]" value="<%= part.cost %>" placeholder="Cost" class="w-full rounded-lg bg-carus-black border border-[#2A2A2A] text-white text-sm px-3 py-2 focus:outline-none focus:border-carus-green/50 placeholder:text-[#FFFFFF33]">
+            </div>
+            <button type="button" data-action="click->job-parts#remove" class="shrink-0 text-[#FFFFFF33] hover:text-red-400 p-1">
+              <svg width="14" height="14" viewBox="0 0 14 14"><path d="M4 4l6 6M10 4l-6 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="flex gap-3 pt-2">
+      <%= f.submit "Save Changes", class: "flex-1 rounded-xl bg-carus-green text-carus-black text-[15px] font-extrabold py-3.5 cursor-pointer" %>
+      <%= link_to "Cancel", tech_lookup_service_job_path(@job.vehicle, @job), class: "flex-1 text-center rounded-xl bg-carus-field border border-[#2A2A2A] text-white text-[15px] font-bold py-3.5" %>
+    </div>
+  <% end %>
+</div>
+
+<script>
+  // Stimulus controller inline — add/remove part rows
+  document.addEventListener("DOMContentLoaded", () => {
+    const list = document.querySelector("[data-job-parts-target='list']");
+    const addBtn = document.querySelector("[data-action='click->job-parts#add']");
+    if (!list || !addBtn) return;
+
+    addBtn.addEventListener("click", () => {
+      const idx = list.querySelectorAll("[data-job-parts-target='row']").length;
+      const row = document.createElement("div");
+      row.className = "flex gap-2 items-end mb-2";
+      row.setAttribute("data-job-parts-target", "row");
+      row.innerHTML = `
+        <div class="flex-1">
+          <input type="text" name="parts[${idx}][name]" placeholder="Part name" class="w-full rounded-lg bg-carus-black border border-[#2A2A2A] text-white text-sm px-3 py-2 focus:outline-none focus:border-carus-green/50 placeholder:text-[#FFFFFF33]">
+        </div>
+        <div class="w-16">
+          <input type="number" name="parts[${idx}][quantity]" value="1" min="1" class="w-full rounded-lg bg-carus-black border border-[#2A2A2A] text-white text-sm px-3 py-2 focus:outline-none focus:border-carus-green/50 placeholder:text-[#FFFFFF33]">
+        </div>
+        <div class="w-20">
+          <input type="text" name="parts[${idx}][cost]" placeholder="Cost" class="w-full rounded-lg bg-carus-black border border-[#2A2A2A] text-white text-sm px-3 py-2 focus:outline-none focus:border-carus-green/50 placeholder:text-[#FFFFFF33]">
+        </div>
+        <button type="button" class="shrink-0 text-[#FFFFFF33] hover:text-red-400 p-1">
+          <svg width="14" height="14" viewBox="0 0 14 14"><path d="M4 4l6 6M10 4l-6 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+      `;
+      row.querySelector("button").addEventListener("click", () => row.remove());
+      list.appendChild(row);
+    });
+
+    // Wire up existing remove buttons
+    list.querySelectorAll("button").forEach(btn => {
+      btn.addEventListener("click", () => btn.closest("[data-job-parts-target='row']").remove());
+    });
+  });
+</script>

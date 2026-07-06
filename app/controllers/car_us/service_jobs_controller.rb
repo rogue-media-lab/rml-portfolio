@@ -1,6 +1,7 @@
 module CarUs
   class ServiceJobsController < CarUs::BaseController
     before_action :authenticate_technician!
+    before_action :set_job, only: [ :show, :edit, :update, :destroy ]
 
     def create
       @vehicle = CarUs::Vehicle.find(params[:tech_lookup_id])
@@ -22,20 +23,37 @@ module CarUs
       end
     end
 
-    def update
-      @job = current_technician.service_jobs.find(params[:id])
-      @job.update!(status: params[:status])
-      redirect_to tech_lookup_path(@job.vehicle), notice: "Job updated."
+    def show
     end
 
-    def show
-      @job = CarUs::ServiceJob.find(params[:id])
+    def edit
+    end
+
+    def update
+      if @job.update(job_params)
+        # Rebuild parts: drop old, create from params
+        @job.job_parts.destroy_all
+        save_parts(@job) if params[:parts].present?
+        redirect_to tech_lookup_service_job_path(@job.vehicle, @job), notice: "Job updated."
+      else
+        render :edit, status: :unprocessable_entity
+      end
+    end
+
+    def destroy
+      vehicle = @job.vehicle
+      @job.destroy
+      redirect_to tech_lookup_path(vehicle), notice: "Job deleted."
     end
 
     private
 
+    def set_job
+      @job = CarUs::ServiceJob.find(params[:id])
+    end
+
     def job_params
-      params.require(:car_us_service_job).permit(:description, :book_hours, :notes)
+      params.require(:car_us_service_job).permit(:description, :book_hours, :notes, :status)
     end
 
     def save_parts(job)
