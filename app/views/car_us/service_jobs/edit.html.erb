@@ -15,7 +15,7 @@
     </div>
   </div>
 
-  <%= form_with model: [:tech_lookup, @job.vehicle, @job], local: true, class: "px-6 py-4 space-y-4" do |f| %>
+  <%= form_with model: @job, url: tech_lookup_service_job_path(@job.vehicle, @job), method: :patch, local: true, class: "px-6 py-4 space-y-4" do |f| %>
     <% if @job.errors.any? %>
       <div class="rounded-xl p-3 bg-red-500/10 border border-red-500/20">
         <p class="text-sm text-red-400"><%= @job.errors.full_messages.to_sentence %></p>
