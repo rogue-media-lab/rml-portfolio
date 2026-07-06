@@ -62,35 +62,60 @@ module CarUs
           # Link vehicle from AI response if photo was used
           if raw_photo.present? && conv.vehicle.blank?
             begin
-              vin = ai_reply.to_s.scan(/[A-HJ-NPR-Z0-9]{16,17}/).first
-              if vin
-                decoded = CarUs::Vehicle.decode_vin(vin)
-                if decoded&.dig(:make).present? && decoded&.dig(:year).present? && decoded&.dig(:model).present?
-                  vehicle = CarUs::Vehicle.find_or_create_by!(vin: vin) do |v|
-                    v.year = decoded[:year]
-                    v.make = decoded[:make]
-                    v.model = decoded[:model]
-                    v.trim = decoded[:trim]
-                    v.engine_size = decoded[:engine_size]
-                    v.transmission = decoded[:transmission]
-                    v.last_lookup_at = Time.current
-                    v.looked_up_by = current_technician.id
-                  end
-                  vehicle.update!(last_lookup_at: Time.current, looked_up_by: current_technician.id)
-                  conv.update!(vehicle: vehicle, title: "#{vehicle.year} #{vehicle.make} #{vehicle.model}")
+              # -- NHTSA UNPLUGGED -- Parse vehicle info directly from AI response.
+              # AI prompt (chat_service.rb:105) guarantees format:
+              #   "VIN: [VIN] | [Year] [Make] [Model] | Engine: [size]"
+              # This is more accurate than NHTSA vPIC which often returns nil model.
+              # To re-plug NHTSA: swap this block with the commented block below.
+              parsed = ai_reply.to_s.match(/VIN:\s*([A-HJ-NPR-Z0-9]{16,17})\s*\|\s*(\d{4})\s+(.+?)\s*\|\s*Engine:\s*(.+)/)
+              if parsed
+                vin    = parsed[1]
+                year   = parsed[2].to_i
+                make_model = parsed[3].strip
+                engine = parsed[4].strip
+                make, model = make_model.split(/\s+/, 2)
+                model ||= make
 
-                  # Only enrich if vehicle doesn't already have specs
-                  if vehicle.ai_specs.blank?
-                    enriched = CarUs::AiEnrichmentService.new(vin: vin, decoded: decoded, notes: "").enrich
-                    if enriched.present?
-                      specs = enriched["specs"] || {}
-                      vehicle.update!(
-                        ai_specs: specs.to_json,
-                        ai_suggestions: enriched["service_suggestions"]&.to_json,
-                        ai_plain_english: enriched["plain_english"],
-                        ai_difficulty_notes: enriched["difficulty_notes"]
-                      )
-                    end
+                vehicle = CarUs::Vehicle.find_or_create_by!(vin: vin) do |v|
+                  v.year = year
+                  v.make = make
+                  v.model = model
+                  v.engine_size = engine
+                  v.last_lookup_at = Time.current
+                  v.looked_up_by = current_technician.id
+                end
+                vehicle.update!(last_lookup_at: Time.current, looked_up_by: current_technician.id)
+                conv.update!(vehicle: vehicle, title: "#{vehicle.year} #{vehicle.make} #{vehicle.model}")
+
+                # === NHTSA (commented out — re-plug here) ===
+                # decoded = CarUs::Vehicle.decode_vin(vin)
+                # if decoded&.dig(:make).present? && decoded&.dig(:year).present? && decoded&.dig(:model).present?
+                #   vehicle = CarUs::Vehicle.find_or_create_by!(vin: vin) do |v|
+                #     v.year = decoded[:year]
+                #     v.make = decoded[:make]
+                #     v.model = decoded[:model]
+                #     v.trim = decoded[:trim]
+                #     v.engine_size = decoded[:engine_size]
+                #     v.transmission = decoded[:transmission]
+                #     v.last_lookup_at = Time.current
+                #     v.looked_up_by = current_technician.id
+                #   end
+                #   vehicle.update!(last_lookup_at: Time.current, looked_up_by: current_technician.id)
+                #   conv.update!(vehicle: vehicle, title: "#{vehicle.year} #{vehicle.make} #{vehicle.model}")
+                # end
+                # === END NHTSA ===
+
+                # AI enrichment — store specs on the vehicle record
+                if vehicle.ai_specs.blank?
+                  enriched = CarUs::AiEnrichmentService.new(vin: vin, decoded: { year: year, make: make, model: model }, notes: "").enrich
+                  if enriched.present?
+                    specs = enriched["specs"] || {}
+                    vehicle.update!(
+                      ai_specs: specs.to_json,
+                      ai_suggestions: enriched["service_suggestions"]&.to_json,
+                      ai_plain_english: enriched["plain_english"],
+                      ai_difficulty_notes: enriched["difficulty_notes"]
+                    )
                   end
                 end
               end
@@ -148,35 +173,60 @@ module CarUs
           # Link vehicle from AI response if photo was used
           if raw_photo.present? && conv.vehicle.blank?
             begin
-              vin = ai_reply.to_s.scan(/[A-HJ-NPR-Z0-9]{16,17}/).first
-              if vin
-                decoded = CarUs::Vehicle.decode_vin(vin)
-                if decoded&.dig(:make).present? && decoded&.dig(:year).present? && decoded&.dig(:model).present?
-                  vehicle = CarUs::Vehicle.find_or_create_by!(vin: vin) do |v|
-                    v.year = decoded[:year]
-                    v.make = decoded[:make]
-                    v.model = decoded[:model]
-                    v.trim = decoded[:trim]
-                    v.engine_size = decoded[:engine_size]
-                    v.transmission = decoded[:transmission]
-                    v.last_lookup_at = Time.current
-                    v.looked_up_by = current_technician.id
-                  end
-                  vehicle.update!(last_lookup_at: Time.current, looked_up_by: current_technician.id)
-                  conv.update!(vehicle: vehicle, title: "#{vehicle.year} #{vehicle.make} #{vehicle.model}")
+              # -- NHTSA UNPLUGGED -- Parse vehicle info directly from AI response.
+              # AI prompt (chat_service.rb:105) guarantees format:
+              #   "VIN: [VIN] | [Year] [Make] [Model] | Engine: [size]"
+              # This is more accurate than NHTSA vPIC which often returns nil model.
+              # To re-plug NHTSA: swap this block with the commented block below.
+              parsed = ai_reply.to_s.match(/VIN:\s*([A-HJ-NPR-Z0-9]{16,17})\s*\|\s*(\d{4})\s+(.+?)\s*\|\s*Engine:\s*(.+)/)
+              if parsed
+                vin    = parsed[1]
+                year   = parsed[2].to_i
+                make_model = parsed[3].strip
+                engine = parsed[4].strip
+                make, model = make_model.split(/\s+/, 2)
+                model ||= make
 
-                  # Only enrich if vehicle doesn't already have specs
-                  if vehicle.ai_specs.blank?
-                    enriched = CarUs::AiEnrichmentService.new(vin: vin, decoded: decoded, notes: "").enrich
-                    if enriched.present?
-                      specs = enriched["specs"] || {}
-                      vehicle.update!(
-                        ai_specs: specs.to_json,
-                        ai_suggestions: enriched["service_suggestions"]&.to_json,
-                        ai_plain_english: enriched["plain_english"],
-                        ai_difficulty_notes: enriched["difficulty_notes"]
-                      )
-                    end
+                vehicle = CarUs::Vehicle.find_or_create_by!(vin: vin) do |v|
+                  v.year = year
+                  v.make = make
+                  v.model = model
+                  v.engine_size = engine
+                  v.last_lookup_at = Time.current
+                  v.looked_up_by = current_technician.id
+                end
+                vehicle.update!(last_lookup_at: Time.current, looked_up_by: current_technician.id)
+                conv.update!(vehicle: vehicle, title: "#{vehicle.year} #{vehicle.make} #{vehicle.model}")
+
+                # === NHTSA (commented out — re-plug here) ===
+                # decoded = CarUs::Vehicle.decode_vin(vin)
+                # if decoded&.dig(:make).present? && decoded&.dig(:year).present? && decoded&.dig(:model).present?
+                #   vehicle = CarUs::Vehicle.find_or_create_by!(vin: vin) do |v|
+                #     v.year = decoded[:year]
+                #     v.make = decoded[:make]
+                #     v.model = decoded[:model]
+                #     v.trim = decoded[:trim]
+                #     v.engine_size = decoded[:engine_size]
+                #     v.transmission = decoded[:transmission]
+                #     v.last_lookup_at = Time.current
+                #     v.looked_up_by = current_technician.id
+                #   end
+                #   vehicle.update!(last_lookup_at: Time.current, looked_up_by: current_technician.id)
+                #   conv.update!(vehicle: vehicle, title: "#{vehicle.year} #{vehicle.make} #{vehicle.model}")
+                # end
+                # === END NHTSA ===
+
+                # AI enrichment — store specs on the vehicle record
+                if vehicle.ai_specs.blank?
+                  enriched = CarUs::AiEnrichmentService.new(vin: vin, decoded: { year: year, make: make, model: model }, notes: "").enrich
+                  if enriched.present?
+                    specs = enriched["specs"] || {}
+                    vehicle.update!(
+                      ai_specs: specs.to_json,
+                      ai_suggestions: enriched["service_suggestions"]&.to_json,
+                      ai_plain_english: enriched["plain_english"],
+                      ai_difficulty_notes: enriched["difficulty_notes"]
+                    )
                   end
                 end
               end
