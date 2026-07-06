@@ -200,14 +200,16 @@ module CarUs
       ai_msg = messages.where(role: "assistant").last
       hours = nil
       if ai_msg
-        hours = ai_msg.content.to_s.scan(/([\d.]+)\s*(?:hours?|hrs?|book)/i).flatten.first&.to_f
+        # Sum ALL labor times mentioned (e.g. "Battery: 0.5 hrs, Alternator: 0.8 hrs")
+        all_hours = ai_msg.content.to_s.scan(/([\d.]+)\s*(?:hours?|hrs?|hr\b)/i).flatten.map(&:to_f)
+        hours = all_hours.sum if all_hours.any?
       end
 
       job = CarUs::ServiceJob.create!(
         vehicle: @conversation.vehicle,
         technician: current_technician,
         description: tech_msg&.content.presence || "Service completed",
-        book_hours: hours,
+        book_hours: hours&.positive? ? hours : nil,
         status: "completed",
         completed_at: Time.current
       )
