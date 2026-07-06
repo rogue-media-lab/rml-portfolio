@@ -1,67 +1,6 @@
 {
   "ignored_warnings": [
     {
-      "fingerprint": "fb2219c1ab3eeb2ee28c73b77a6440640c1df44bac428a5df9f89448144e5ea4",
-      "noteB": "Potentially unsafe model attribute in `link_to` href",
-      "file": "app/views/milk_admin/projects/index.html.erb",
-      "line": "19"
-    },
-    {
-      "fingerprint": "0b6534f84b63eb7ecf1a9d3854c562b1805ea34fda6ae5a726f96bf7f0321976",
-      "noteA": "URLs are validated before saving, sanitize() in view",
-      "file": "app/views/milk_admin/projects/index.html.erb",
-      "line": "22"
-    },
-    {
-      "fingerprint": "0b6534f84b63eb7ecf1a9d3854c562b1805ea34fda6ae5a726f96bf7f0321976",
-      "noteB": "Potentially unsafe model attribute in `link_to` href",
-      "file": "app/views/milk_admin/projects/index.html.erb",
-      "line": "22"
-    },
-    {
-      "fingerprint": "45d7de419464ee2fdb09e701dd3229136a27c33ba53d8ff125bd37936e3a5136",
-      "noteA": "URLs are validated before saving, sanitize() in view",
-      "noteB": "Potentially unsafe model attribute in `link_to` href",
-      "file": "app/views/milk_admin/projects/index.html.erb",
-      "line": "25"
-    },
-    {
-      "fingerprint": "872008b1a51607e9aa6f4cc7e4d7b6d040228242dc772d4d81e10af98aad4189",
-      "noteA": "URLs are validated before saving, sanitize() in view",
-      "file": "app/views/static_pages/info.html.erb",
-      "line": "100"
-    },
-    {
-      "fingerprint": "872008b1a51607e9aa6f4cc7e4d7b6d040228242dc772d4d81e10af98aad4189",
-      "noteB": "Potentially unsafe model attribute in `link_to` href",
-      "file": "app/views/static_pages/info.html.erb",
-      "line": "100"
-    },
-    {
-      "fingerprint": "3b165b0c2e7d2ef315c4acf99d0fd338371db4a0802c403a0855c7b449c739f1",
-      "noteA": "URLs are validated before saving, sanitize() in view",
-      "file": "app/views/static_pages/info.html.erb",
-      "line": "103"
-    },
-    {
-      "fingerprint": "e474079cbfdd5610c9b12851731ecee76baf7d33dc4f1e2f4e6e93d331b6bfa8",
-      "noteB": "Potentially unsafe model attribute in `link_to` href",
-      "file": "app/views/static_pages/info.html.erb",
-      "line": "103"
-    },
-    {
-      "fingerprint": "00ade159737af5d4c5486841f8fe95ba15c92c4e8f7a9b6bdde4852ca0fd60ca",
-      "noteA": "URLs are validated before saving, sanitize() in view",
-      "file": "app/views/static_pages/info.html.erb",
-      "line": "106"
-    },
-    {
-      "fingerprint": "00ade159737af5d4c5486841f8fe95ba15c92c4e8f7a9b6bdde4852ca0fd60ca",
-      "noteB": "Potentially unsafe model attribute in `link_to` href",
-      "file": "app/views/static_pages/info.html.erb",
-      "line": "106"
-    },
-    {
       "fingerprint": "12b18fb5b377e828c0a7c01917f60273020a4762223a2cb627cab00a6af536b8",
       "noteA": "False positive: filename comes from tone_index.json, not user input. Path traversal check in place."
     }
