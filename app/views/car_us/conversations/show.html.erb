@@ -26,7 +26,7 @@
         <%# Tech message — right aligned %>
         <div class="flex justify-end">
           <div class="max-w-[80%] rounded-2xl rounded-br-md px-4 py-3 bg-carus-green/15 border border-carus-green/20">
-            <p class="text-sm leading-[150%] text-white"><%= msg.content %></p>
+            <p class="text-sm leading-[150%] text-white break-words"><%= msg.content %></p>
             <% if msg.photo.attached? %>
               <%= image_tag msg.photo.variant(resize_to_limit: [300, 200]), class: "mt-2 rounded-xl w-full" %>
             <% end %>
@@ -44,7 +44,7 @@
             </svg>
           </div>
           <div class="max-w-[85%] rounded-2xl rounded-bl-md px-4 py-3 bg-carus-field border border-[#2A2A2A]">
-            <p class="text-sm leading-[150%] text-[#CCCCCC] whitespace-pre-wrap"><%= msg.content %></p>
+            <p class="text-sm leading-[150%] text-[#CCCCCC] whitespace-pre-wrap break-words"><%= msg.content %></p>
             <p class="mt-1 text-[10px]/[12px] text-[#FFFFFF33]"><%= msg.created_at.strftime("%-I:%M %p") %></p>
           </div>
         </div>
