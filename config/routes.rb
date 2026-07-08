@@ -63,7 +63,7 @@ Rails.application.routes.draw do
 
     # Tech mobile tools (authenticated technicians, Paper design)
     authenticate :technician do
-      resources :conversations, only: [ :index, :show, :create ], controller: "car_us/conversations" do
+      resources :conversations, only: [ :index, :show, :create, :destroy ], controller: "car_us/conversations" do
         member do
           post :create_message
           get :poll
