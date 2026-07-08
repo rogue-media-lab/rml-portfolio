@@ -46,7 +46,7 @@
           <div class="max-w-[85%] rounded-2xl rounded-bl-md px-4 py-3 bg-carus-field border border-[#2A2A2A]">
             <p class="text-sm leading-[150%] text-[#CCCCCC] whitespace-pre-wrap break-words"><%= msg.content %></p>
             <p class="mt-1 text-[10px]/[12px] text-[#FFFFFF33]"><%= msg.created_at.strftime("%-I:%M %p") %></p>
-            <%= button_to "Log Complete", complete_job_conversation_path(@conversation), method: :post, class: "mt-2 text-[10px] font-semibold text-carus-green hover:text-white transition", form_class: "inline" %>
+            <%= button_to "Start Job", complete_job_conversation_path(@conversation), method: :post, class: "mt-2 text-[10px] font-semibold text-carus-green hover:text-white transition", form_class: "inline" %>
           </div>
         </div>
       <% end %>
