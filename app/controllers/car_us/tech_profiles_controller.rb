@@ -11,8 +11,8 @@ def show
       @open_jobs     = jobs.open.recent.includes(:vehicle)
       @weekly_hours  = jobs.this_week.completed.sum(:book_hours)
       @weekly_jobs   = jobs.this_week.completed.count
-      @weekly_target = shop.target_hours
-      @target_services = shop.target_services
+      @weekly_target = current_technician.effective_target_hours
+      @target_services = current_technician.target_services
       @recent_jobs   = jobs.recent.includes(:vehicle)
     end
 
@@ -32,13 +32,16 @@ def show
       shop = current_technician.shop
       target_services = current_technician.target_services
       completed_services = jobs.pluck(:description)
+      today = Date.current
+      monday = today - ((today.wday - 1) % 7)
+      saturday = monday + 5
       @report = {
         completed: jobs,
         total_hours: jobs.sum(:book_hours),
         total_jobs: jobs.count,
         target: current_technician.effective_target_hours,
-        week_start: Date.today.beginning_of_week(:saturday),
-        week_end:   Date.today.end_of_week(:saturday),
+        week_start: monday,
+        week_end: saturday,
         by_day: jobs.group_by { |j| j.completed_at&.to_date },
         target_services: target_services.map { |ts|
           { name: ts, done: completed_services.any? { |cs| cs.downcase.include?(ts.downcase) } }
