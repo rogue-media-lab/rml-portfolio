@@ -17,6 +17,9 @@
         <p class="text-[11px]/[14px] text-[#FFFFFF4D]"><%= @conversation.vehicle.vin&.last(8) %> · <%= @conversation.messages.count %> messages</p>
       <% end %>
     </div>
+    <%= button_to conversation_path(@conversation), method: :delete, form: { data: { turbo_confirm: "Archive this conversation?" } }, class: "shrink-0 flex items-center justify-center rounded-[18px] bg-carus-field border border-[#2A2A2A] size-9 text-[#FFFFFF33] hover:text-[#FF6260] hover:border-[#FF6260]/30 transition" do %>
+      <svg width="14" height="14" viewBox="0 0 14 14"><path d="M3 4h8M5.5 4V3a1 1 0 011-1h1a1 1 0 011 1v1M11 4v7a1 1 0 01-1 1H4a1 1 0 01-1-1V4" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <% end %>
   </div>
 
   <%# Messages %>
