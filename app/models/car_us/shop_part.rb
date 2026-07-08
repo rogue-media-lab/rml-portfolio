@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CarUs::ShopPart < ApplicationRecord
   belongs_to :shop, class_name: "CarUs::Shop"
   belongs_to :vehicle_template, class_name: "CarUs::VehicleTemplate", optional: true
