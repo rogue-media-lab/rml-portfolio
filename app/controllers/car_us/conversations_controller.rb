@@ -268,11 +268,11 @@ module CarUs
         technician: current_technician,
         description: tech_msg&.content.presence || "Service completed",
         book_hours: hours&.positive? ? hours : nil,
-        status: "completed",
-        completed_at: Time.current
+        status: "open",
+        completed_at: nil
       )
 
-      redirect_to conversation_path(@conversation), notice: "Job logged — #{job.book_hours.present? ? "#{job.book_hours} hrs" : "hours TBD"}"
+      redirect_to conversation_path(@conversation), notice: "Job started — #{job.book_hours.present? ? "#{job.book_hours}h estimated" : "hours TBD"}"
     end
 
     private

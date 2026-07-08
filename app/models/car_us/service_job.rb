@@ -8,8 +8,21 @@ class CarUs::ServiceJob < ApplicationRecord
 
   scope :recent, -> { order(created_at: :desc).limit(10) }
   scope :completed, -> { where(status: "completed") }
+  scope :open, -> { where(status: "open") }
+  scope :this_week, -> { where(created_at: Date.today.all_week) }
+  scope :this_month, -> { where(created_at: Date.today.all_month) }
 
   def completed?
     status == "completed"
+  end
+
+  def open?
+    status == "open"
+  end
+
+  def complete!(hours = nil)
+    attrs = { status: "completed", completed_at: Time.current }
+    attrs[:book_hours] = hours if hours&.positive?
+    update!(attrs)
   end
 end
