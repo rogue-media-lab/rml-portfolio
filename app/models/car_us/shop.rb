@@ -50,6 +50,10 @@ class CarUs::Shop < ApplicationRecord
     settings["target_services"] || []
   end
 
+  def auto_update_parts?
+    settings["auto_update_parts"] == true || settings["auto_update_parts"] == "true"
+  end
+
   # Bulk update settings from a params hash
   def update_settings(params)
     new_settings = settings.merge(params.to_h.symbolize_keys)
