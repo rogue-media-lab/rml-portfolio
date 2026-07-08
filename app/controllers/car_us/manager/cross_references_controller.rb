@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module CarUs
   module Manager
     class CrossReferencesController < BaseController
@@ -85,7 +87,7 @@ module CarUs
         end
 
         redirect_to report_manager_cross_references_path,
-                    notice: "Cross-reference created: #{params[:oem_number]} → #{params[:brand]} #{params[:brand_number]}"
+                    notice: "Created: #{params[:oem_number]} → #{params[:brand]} #{params[:brand_number]}"
       end
 
       private
