@@ -9,7 +9,12 @@ class CarUs::ServiceJob < ApplicationRecord
   scope :recent, -> { order(created_at: :desc).limit(10) }
   scope :completed, -> { where(status: "completed") }
   scope :open, -> { where(status: "open") }
-  scope :this_week, -> { where(created_at: Date.today.all_week) }
+  scope :this_week, -> {
+    today = Date.current
+    monday = today - ((today.wday - 1) % 7)
+    saturday = monday + 5
+    where(completed_at: monday..saturday.end_of_day)
+  }
   scope :this_month, -> { where(created_at: Date.today.all_month) }
 
   def completed?
