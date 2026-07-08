@@ -13,7 +13,7 @@
   labor_times = CarUs::LaborTime.by_category
 %>
 
-<div class="min-h-screen bg-carus-black font-montserrat flex flex-col">
+<div class="max-w-[375px] mx-auto min-h-screen bg-carus-black font-montserrat flex flex-col">
   <div class="flex flex-col pt-14 gap-0.75 px-6">
     <p class="uppercase tracking-[1.5px] text-[11px]/[14px] font-semibold text-carus-green">Tech View</p>
     <h1 class="text-xl/[24px] font-extrabold text-white tracking-[-0.4px]"><%= [v.year, v.make, v.model].compact.join(" ") %></h1>
