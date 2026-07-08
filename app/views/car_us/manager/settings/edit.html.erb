@@ -83,6 +83,20 @@
       </div>
     </div>
 
+    <%# Parts Intelligence %>
+    <div class="bg-white rounded-lg border border-gray-200 p-6">
+      <h2 class="text-lg font-semibold text-gray-900 mb-4">Parts Intelligence</h2>
+
+      <div>
+        <label class="flex items-center gap-3">
+          <%= f.check_box "settings[auto_update_parts]", { checked: current_shop.auto_update_parts? },
+                true, false %>
+          <span class="text-sm font-medium text-gray-700">Auto-update parts from jobs</span>
+        </label>
+        <p class="text-xs text-gray-400 mt-1 ml-8">When enabled, completing a job with new parts prompts to save them as shop defaults for that vehicle type. Turn off for mobile mechanics who source from multiple retailers.</p>
+      </div>
+    </div>
+
     <%# Weekly Targets %>
     <div class="bg-white rounded-lg border border-gray-200 p-6">
       <h2 class="text-lg font-semibold text-gray-900 mb-4">Weekly Targets</h2>
