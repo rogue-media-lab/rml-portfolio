@@ -27,6 +27,19 @@
     specs = v.ai_specs.present? ? (JSON.parse(v.ai_specs) rescue {}) : {}
     suggestions = v.ai_suggestions.present? ? (JSON.parse(v.ai_suggestions) rescue []) : []
   end
+
+  # Map categories to spec keys for shop part lookup
+  shop_part_map = {
+    "oil_filter" => @shop_parts["oil_filter"],
+    "cabin_air_filter" => @shop_parts["cabin_air_filter"],
+    "engine_air_filter" => @shop_parts["engine_air_filter"],
+    "spark_plug" => @shop_parts["spark_plug"],
+    "oil_brand" => @shop_parts["oil_brand"],
+    "coolant_brand" => @shop_parts["coolant_brand"],
+    "trans_fluid_brand" => @shop_parts["trans_fluid_brand"],
+    "brake_fluid_brand" => @shop_parts["brake_fluid_brand"]
+  }.compact
+
   jobs = v.service_jobs.recent.includes(:job_parts)
   total_hours = v.service_jobs.sum(:book_hours)
   labor_times = CarUs::LaborTime.by_category
@@ -135,7 +148,10 @@
         <% [
           ["Viscosity", specs["oil_weight"] || "—"],
           ["Capacity", specs["oil_capacity_qts"] ? "#{specs["oil_capacity_qts"]} qts" : "—"],
-          ["Filter #", specs["oil_filter"] || "—"]
+          ["Filter #", [
+            specs["oil_filter"] || "—",
+            (sp = shop_part_map["oil_filter"]) ? "#{sp.brand} #{sp.shop_number}" : nil
+          ].compact.join(" · ")]
         ].each_with_index do |(label, val), i| %>
           <div class="<%= i == 2 ? 'grow-[1.4]' : 'grow' %> flex flex-col gap-0.5">
             <span class="text-[10px]/[12px] font-medium text-[#FFFFFF59]"><%= label %></span>
