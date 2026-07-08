@@ -78,7 +78,7 @@ Rails.application.routes.draw do
           post :complete_job
         end
       end
-      resource :tech_profile, only: [ :show ], controller: "car_us/tech_profiles" do
+      resource :tech_profile, only: [ :show, :edit, :update ], controller: "car_us/tech_profiles" do
         get :weekly_report, on: :member
       end
       resources :tech_lookups, only: [ :index, :show, :new, :create ], controller: "car_us/tech_lookups" do
