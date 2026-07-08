@@ -3,7 +3,7 @@ module CarUs
     before_action :authenticate_technician!
     layout "car_us/car_owner"
 
-    def show
+def show
       jobs = current_technician.service_jobs
       shop = current_technician.shop
       @total_hours   = jobs.sum(:book_hours)
@@ -11,9 +11,20 @@ module CarUs
       @open_jobs     = jobs.open.recent.includes(:vehicle)
       @weekly_hours  = jobs.this_week.completed.sum(:book_hours)
       @weekly_jobs   = jobs.this_week.completed.count
-      @weekly_target = current_technician.effective_target_hours
-      @target_services = current_technician.target_services
+      @weekly_target = shop.target_hours
+      @target_services = shop.target_services
       @recent_jobs   = jobs.recent.includes(:vehicle)
+    end
+
+    def edit
+    end
+
+    def update
+      if current_technician.update(preferred_hours: params[:technician][:preferred_hours].to_f)
+        redirect_to tech_profile_path, notice: "Target updated."
+      else
+        render :edit, status: :unprocessable_entity
+      end
     end
 
     def weekly_report

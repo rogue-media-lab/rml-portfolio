@@ -8,6 +8,18 @@ module CarUs
         @recent_flash_alerts = current_shop.flash_alerts.order(created_at: :desc).limit(5)
         @technicians = current_shop.technicians.order(:email)
 
+        # Weekly stats for report cards
+        today = Date.current
+        @week_start = today - ((today.wday - 1) % 7)
+        @week_end = @week_start + 5
+        @weekly_jobs = CarUs::ServiceJob
+          .completed
+          .joins(:technician)
+          .where(technicians: { shop_id: current_shop.id })
+          .where(completed_at: @week_start..@week_end.end_of_day)
+        @weekly_hours = @weekly_jobs.sum(:book_hours).to_f
+        @weekly_job_count = @weekly_jobs.count
+
         @upcoming_bookings = CarUs::BookingRequest
           .joins(vehicle: :car_owner)
           .where(car_owners: { shop_id: current_shop.id })
