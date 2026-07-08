@@ -1,1 +1,299 @@
-[{"id": 1, "service": "Oil Change", "category": "Maintenance", "hours": 0.4, "notes": null, "created_at": "2026-05-19 12:46:55", "updated_at": "2026-05-19 12:46:55"}, {"id": 2, "service": "Tire Rotation", "category": "Maintenance", "hours": 0.5, "notes": null, "created_at": "2026-05-19 12:47:02", "updated_at": "2026-05-19 12:47:02"}, {"id": 3, "service": "Brake Pads - Front", "category": "Brakes", "hours": 1.0, "notes": null, "created_at": "2026-05-19 12:47:02", "updated_at": "2026-05-19 12:47:02"}, {"id": 4, "service": "Brake Pads - Rear", "category": "Brakes", "hours": 1.0, "notes": null, "created_at": "2026-05-19 12:47:02", "updated_at": "2026-05-19 12:47:02"}, {"id": 5, "service": "Starter Replacement", "category": "Electrical", "hours": 0.8, "notes": null, "created_at": "2026-05-19 12:47:02", "updated_at": "2026-05-19 12:47:02"}, {"id": 6, "service": "Alternator Replacement", "category": "Electrical", "hours": 1.2, "notes": null, "created_at": "2026-05-19 12:47:03", "updated_at": "2026-05-19 12:47:03"}, {"id": 7, "service": "Radiator Replacement", "category": "Cooling", "hours": 1.5, "notes": null, "created_at": "2026-05-19 12:47:03", "updated_at": "2026-05-19 12:47:03"}, {"id": 8, "service": "Water Pump", "category": "Cooling", "hours": 2.0, "notes": null, "created_at": "2026-05-19 12:47:03", "updated_at": "2026-05-19 12:47:03"}, {"id": 9, "service": "Thermostat", "category": "Cooling", "hours": 0.8, "notes": null, "created_at": "2026-05-19 12:47:03", "updated_at": "2026-05-19 12:47:03"}, {"id": 10, "service": "Timing Belt", "category": "Engine", "hours": 2.5, "notes": null, "created_at": "2026-05-19 12:47:03", "updated_at": "2026-05-19 12:47:03"}, {"id": 11, "service": "Spark Plugs", "category": "Ignition", "hours": 0.6, "notes": null, "created_at": "2026-05-19 12:47:03", "updated_at": "2026-05-19 12:47:03"}, {"id": 12, "service": "Standard Tune Up (4 cylinder) w/ Coil Packs", "category": "Ignition", "hours": 1.5, "notes": "This is base and does not include time for removing the intake.", "created_at": "2026-05-23 22:04:56", "updated_at": "2026-05-23 22:04:56"}, {"id": 13, "service": "Camshaft Position Sensor Diagnosis", "category": "Diagnostic", "hours": 0.5, "notes": "Scope CMP signal, check wiring", "created_at": "2026-05-29 14:43:49", "updated_at": "2026-05-29 14:43:49"}, {"id": 14, "service": "Camshaft Position Sensor R&I (Single)", "category": "Engine", "hours": 0.5, "notes": "One CMP sensor, V6 engine", "created_at": "2026-05-29 14:43:49", "updated_at": "2026-05-29 14:43:49"}, {"id": 15, "service": "Camshaft Position Sensor R&I (Both)", "category": "Engine", "hours": 0.8, "notes": "Both CMP sensors, V6 engine", "created_at": "2026-05-29 14:43:49", "updated_at": "2026-05-29 14:43:49"}, {"id": 16, "service": "Camshaft Position Sensor R&I (4 cyl)", "category": "Engine", "hours": 0.4, "notes": "Single sensor, 4-cylinder", "created_at": "2026-05-29 14:43:49", "updated_at": "2026-05-29 14:43:49"}, {"id": 17, "service": "Alignment", "category": "Suspension", "hours": 1.0, "notes": "Standard wheel alignment", "created_at": "2026-06-09 21:27:11", "updated_at": "2026-06-09 21:27:11"}, {"id": 18, "service": "Battery Replacement", "category": "Electrical", "hours": 0.3, "notes": "Standard battery swap", "created_at": "2026-06-09 21:27:11", "updated_at": "2026-06-09 21:27:11"}, {"id": 19, "service": "Brake Flush", "category": "Brakes", "hours": 1.0, "notes": "Full brake fluid flush", "created_at": "2026-06-09 21:27:11", "updated_at": "2026-06-09 21:27:11"}, {"id": 20, "service": "Coolant Flush", "category": "Cooling", "hours": 0.8, "notes": "Full coolant flush", "created_at": "2026-06-09 21:27:11", "updated_at": "2026-06-09 21:27:11"}, {"id": 21, "service": "A/C Service", "category": "HVAC", "hours": 0.5, "notes": "A/C evacuate and recharge", "created_at": "2026-06-09 21:27:11", "updated_at": "2026-06-09 21:27:11"}, {"id": 22, "service": "A/C Compressor Install", "category": "HVAC", "hours": 4.0, "notes": "R&R compressor, recharge", "created_at": "2026-06-09 21:27:11", "updated_at": "2026-06-09 21:27:11"}, {"id": 23, "service": "Mount and Balance (single)", "category": "Tires", "hours": 0.2, "notes": "Single tire mount and balance", "created_at": "2026-06-09 21:27:11", "updated_at": "2026-06-09 21:27:11"}, {"id": 24, "service": "Mount and Balance (set)", "category": "Tires", "hours": 0.5, "notes": "Full set mount and balance", "created_at": "2026-06-09 21:27:11", "updated_at": "2026-06-09 21:27:11"}, {"id": 25, "service": "Oil Change + Air Filters", "category": "Engine", "hours": 0.7, "notes": "Oil change with engine and cabin air filters", "created_at": "2026-06-09 21:27:11", "updated_at": "2026-06-09 21:27:11"}, {"id": 26, "service": "Oil Change + Tire Rotation", "category": "Engine", "hours": 0.9, "notes": "Combined oil change and tire rotation", "created_at": "2026-06-09 21:27:11", "updated_at": "2026-06-09 21:27:11"}, {"id": 27, "service": "Brake Fluid Exchange", "category": "Brakes", "hours": 0.6, "notes": "Brake fluid exchange (not full flush)", "created_at": "2026-06-09 21:27:11", "updated_at": "2026-06-09 21:27:11"}, {"id": 28, "service": "Rear Differential Fluid Exchange", "category": "Drivetrain", "hours": 0.5, "notes": "Drain and refill rear differential fluid on 4WD/AWD vehicle", "created_at": "2026-06-15 13:52:07", "updated_at": "2026-06-15 13:52:07"}, {"id": 29, "service": "Wiper Transmission Assembly Replacement", "category": "Body/Electrical", "hours": 0.8, "notes": "Remove cowl, replace wiper linkage/transmission assembly", "created_at": "2026-06-15 13:52:07", "updated_at": "2026-06-15 13:52:07"}, {"id": 30, "service": "Transmission Swap - Nissan Rogue (AWD)", "category": null, "hours": 14.3, "notes": null, "created_at": "2026-06-17 12:37:47", "updated_at": "2026-06-17 12:37:47"}]
+[
+  {
+    "id": 1,
+    "service": "Oil Change",
+    "category": "Maintenance",
+    "hours": 0.3,
+    "notes": null,
+    "created_at": "2026-05-19 12:46:55",
+    "updated_at": "2026-05-19 12:46:55"
+  },
+  {
+    "id": 2,
+    "service": "Tire Rotation",
+    "category": "Maintenance",
+    "hours": 0.2,
+    "notes": null,
+    "created_at": "2026-05-19 12:47:02",
+    "updated_at": "2026-05-19 12:47:02"
+  },
+  {
+    "id": 3,
+    "service": "Brake Pads - Front",
+    "category": "Brakes",
+    "hours": 1.0,
+    "notes": null,
+    "created_at": "2026-05-19 12:47:02",
+    "updated_at": "2026-05-19 12:47:02"
+  },
+  {
+    "id": 4,
+    "service": "Brake Pads - Rear",
+    "category": "Brakes",
+    "hours": 1.0,
+    "notes": null,
+    "created_at": "2026-05-19 12:47:02",
+    "updated_at": "2026-05-19 12:47:02"
+  },
+  {
+    "id": 5,
+    "service": "Starter Replacement",
+    "category": "Electrical",
+    "hours": 0.8,
+    "notes": null,
+    "created_at": "2026-05-19 12:47:02",
+    "updated_at": "2026-05-19 12:47:02"
+  },
+  {
+    "id": 6,
+    "service": "Alternator Replacement",
+    "category": "Electrical",
+    "hours": 1.2,
+    "notes": null,
+    "created_at": "2026-05-19 12:47:03",
+    "updated_at": "2026-05-19 12:47:03"
+  },
+  {
+    "id": 7,
+    "service": "Radiator Replacement",
+    "category": "Cooling",
+    "hours": 1.5,
+    "notes": null,
+    "created_at": "2026-05-19 12:47:03",
+    "updated_at": "2026-05-19 12:47:03"
+  },
+  {
+    "id": 8,
+    "service": "Water Pump",
+    "category": "Cooling",
+    "hours": 2.0,
+    "notes": null,
+    "created_at": "2026-05-19 12:47:03",
+    "updated_at": "2026-05-19 12:47:03"
+  },
+  {
+    "id": 9,
+    "service": "Thermostat",
+    "category": "Cooling",
+    "hours": 0.8,
+    "notes": null,
+    "created_at": "2026-05-19 12:47:03",
+    "updated_at": "2026-05-19 12:47:03"
+  },
+  {
+    "id": 10,
+    "service": "Timing Belt",
+    "category": "Engine",
+    "hours": 2.5,
+    "notes": null,
+    "created_at": "2026-05-19 12:47:03",
+    "updated_at": "2026-05-19 12:47:03"
+  },
+  {
+    "id": 11,
+    "service": "Spark Plugs",
+    "category": "Ignition",
+    "hours": 0.6,
+    "notes": null,
+    "created_at": "2026-05-19 12:47:03",
+    "updated_at": "2026-05-19 12:47:03"
+  },
+  {
+    "id": 12,
+    "service": "Standard Tune Up (4 cylinder) w/ Coil Packs",
+    "category": "Ignition",
+    "hours": 1.5,
+    "notes": "This is base and does not include time for removing the intake.",
+    "created_at": "2026-05-23 22:04:56",
+    "updated_at": "2026-05-23 22:04:56"
+  },
+  {
+    "id": 13,
+    "service": "Camshaft Position Sensor Diagnosis",
+    "category": "Diagnostic",
+    "hours": 0.5,
+    "notes": "Scope CMP signal, check wiring",
+    "created_at": "2026-05-29 14:43:49",
+    "updated_at": "2026-05-29 14:43:49"
+  },
+  {
+    "id": 14,
+    "service": "Camshaft Position Sensor R&I (Single)",
+    "category": "Engine",
+    "hours": 0.5,
+    "notes": "One CMP sensor, V6 engine",
+    "created_at": "2026-05-29 14:43:49",
+    "updated_at": "2026-05-29 14:43:49"
+  },
+  {
+    "id": 15,
+    "service": "Camshaft Position Sensor R&I (Both)",
+    "category": "Engine",
+    "hours": 0.8,
+    "notes": "Both CMP sensors, V6 engine",
+    "created_at": "2026-05-29 14:43:49",
+    "updated_at": "2026-05-29 14:43:49"
+  },
+  {
+    "id": 16,
+    "service": "Camshaft Position Sensor R&I (4 cyl)",
+    "category": "Engine",
+    "hours": 0.4,
+    "notes": "Single sensor, 4-cylinder",
+    "created_at": "2026-05-29 14:43:49",
+    "updated_at": "2026-05-29 14:43:49"
+  },
+  {
+    "id": 17,
+    "service": "Alignment",
+    "category": "Suspension",
+    "hours": 1.0,
+    "notes": "Standard wheel alignment",
+    "created_at": "2026-06-09 21:27:11",
+    "updated_at": "2026-06-09 21:27:11"
+  },
+  {
+    "id": 18,
+    "service": "Battery Replacement",
+    "category": "Electrical",
+    "hours": 0.3,
+    "notes": "Standard battery swap",
+    "created_at": "2026-06-09 21:27:11",
+    "updated_at": "2026-06-09 21:27:11"
+  },
+  {
+    "id": 19,
+    "service": "Brake Flush",
+    "category": "Brakes",
+    "hours": 1.0,
+    "notes": "Full brake fluid flush",
+    "created_at": "2026-06-09 21:27:11",
+    "updated_at": "2026-06-09 21:27:11"
+  },
+  {
+    "id": 20,
+    "service": "Coolant Flush",
+    "category": "Cooling",
+    "hours": 0.8,
+    "notes": "Full coolant flush",
+    "created_at": "2026-06-09 21:27:11",
+    "updated_at": "2026-06-09 21:27:11"
+  },
+  {
+    "id": 21,
+    "service": "A/C Service",
+    "category": "HVAC",
+    "hours": 0.5,
+    "notes": "A/C evacuate and recharge",
+    "created_at": "2026-06-09 21:27:11",
+    "updated_at": "2026-06-09 21:27:11"
+  },
+  {
+    "id": 22,
+    "service": "A/C Compressor Install",
+    "category": "HVAC",
+    "hours": 4.0,
+    "notes": "R&R compressor, recharge",
+    "created_at": "2026-06-09 21:27:11",
+    "updated_at": "2026-06-09 21:27:11"
+  },
+  {
+    "id": 23,
+    "service": "Mount and Balance (single)",
+    "category": "Tires",
+    "hours": 0.2,
+    "notes": "Single tire mount and balance",
+    "created_at": "2026-06-09 21:27:11",
+    "updated_at": "2026-06-09 21:27:11"
+  },
+  {
+    "id": 24,
+    "service": "Mount and Balance (set)",
+    "category": "Tires",
+    "hours": 0.5,
+    "notes": "Full set mount and balance",
+    "created_at": "2026-06-09 21:27:11",
+    "updated_at": "2026-06-09 21:27:11"
+  },
+  {
+    "id": 25,
+    "service": "Oil Change + Air Filters",
+    "category": "Engine",
+    "hours": 0.7,
+    "notes": "Oil change with engine and cabin air filters",
+    "created_at": "2026-06-09 21:27:11",
+    "updated_at": "2026-06-09 21:27:11"
+  },
+  {
+    "id": 26,
+    "service": "Oil Change + Tire Rotation",
+    "category": "Engine",
+    "hours": 0.9,
+    "notes": "Combined oil change and tire rotation",
+    "created_at": "2026-06-09 21:27:11",
+    "updated_at": "2026-06-09 21:27:11"
+  },
+  {
+    "id": 27,
+    "service": "Brake Fluid Exchange",
+    "category": "Brakes",
+    "hours": 0.6,
+    "notes": "Brake fluid exchange (not full flush)",
+    "created_at": "2026-06-09 21:27:11",
+    "updated_at": "2026-06-09 21:27:11"
+  },
+  {
+    "id": 28,
+    "service": "Rear Differential Fluid Exchange",
+    "category": "Drivetrain",
+    "hours": 0.5,
+    "notes": "Drain and refill rear differential fluid on 4WD/AWD vehicle",
+    "created_at": "2026-06-15 13:52:07",
+    "updated_at": "2026-06-15 13:52:07"
+  },
+  {
+    "id": 29,
+    "service": "Wiper Transmission Assembly Replacement",
+    "category": "Body/Electrical",
+    "hours": 0.8,
+    "notes": "Remove cowl, replace wiper linkage/transmission assembly",
+    "created_at": "2026-06-15 13:52:07",
+    "updated_at": "2026-06-15 13:52:07"
+  },
+  {
+    "id": 30,
+    "service": "Transmission Swap - Nissan Rogue (AWD)",
+    "category": null,
+    "hours": 14.3,
+    "notes": null,
+    "created_at": "2026-06-17 12:37:47",
+    "updated_at": "2026-06-17 12:37:47"
+  },
+  {
+    "id": 31,
+    "service": "GDI Fuel System Service",
+    "category": "Fuel System",
+    "hours": 0.2,
+    "notes": null,
+    "created_at": "2026-07-08 12:00:00",
+    "updated_at": "2026-07-08 12:00:00"
+  },
+  {
+    "id": 32,
+    "service": "Engine Air Filter",
+    "category": "Maintenance",
+    "hours": 0.5,
+    "notes": null,
+    "created_at": "2026-07-08 12:00:00",
+    "updated_at": "2026-07-08 12:00:00"
+  },
+  {
+    "id": 33,
+    "service": "Cabin Air Filter",
+    "category": "Maintenance",
+    "hours": 0.2,
+    "notes": null,
+    "created_at": "2026-07-08 12:00:00",
+    "updated_at": "2026-07-08 12:00:00"
+  }
+]
