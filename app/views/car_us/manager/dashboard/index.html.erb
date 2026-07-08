@@ -7,27 +7,41 @@
     <%= link_to "Send Flash Sale", new_manager_flash_alert_path, class: "inline-flex items-center px-6 py-3 bg-blue-600 border border-transparent text-base font-medium rounded-md text-white hover:bg-blue-700 transition-colors" %>
   </div>
 
-  <div class="grid grid-cols-1 gap-5 sm:grid-cols-3">
+  <div class="grid grid-cols-1 gap-5 sm:grid-cols-4">
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+      <div class="px-4 py-5 sm:p-6">
+        <dt class="text-sm font-medium text-gray-500 truncate">Weekly Hours</dt>
+        <dd class="mt-1 text-3xl font-semibold text-green-600"><%= @weekly_hours.round(1) %></dd>
+        <dd class="mt-1 text-xs text-gray-400"><%= @week_start.strftime("%b %d") %> – <%= @week_end.strftime("%b %d") %></dd>
+      </div>
+    </div>
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+      <div class="px-4 py-5 sm:p-6">
+        <dt class="text-sm font-medium text-gray-500 truncate">Jobs This Week</dt>
+        <dd class="mt-1 text-3xl font-semibold text-gray-900"><%= @weekly_job_count %></dd>
+      </div>
+    </div>
     <div class="bg-white overflow-hidden shadow rounded-lg">
       <div class="px-4 py-5 sm:p-6">
         <dt class="text-sm font-medium text-gray-500 truncate">Total Customers</dt>
         <dd class="mt-1 text-3xl font-semibold text-gray-900"><%= @total_customers %></dd>
       </div>
     </div>
-
     <div class="bg-white overflow-hidden shadow rounded-lg">
       <div class="px-4 py-5 sm:p-6">
         <dt class="text-sm font-medium text-gray-500 truncate">Active Flash Sales</dt>
         <dd class="mt-1 text-3xl font-semibold text-blue-600"><%= @active_flash_alerts %></dd>
       </div>
     </div>
+  </div>
 
-    <div class="bg-white overflow-hidden shadow rounded-lg">
-      <div class="px-4 py-5 sm:p-6">
-        <dt class="text-sm font-medium text-gray-500 truncate">Total Redemptions</dt>
-        <dd class="mt-1 text-3xl font-semibold text-gray-900"><%= @total_redemptions %></dd>
-      </div>
-    </div>
+  <div class="flex gap-3">
+    <%= link_to manager_shop_report_path, class: "inline-flex items-center px-4 py-2 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100" do %>
+      Shop Report →
+    <% end %>
+    <%= link_to manager_tech_leaderboard_path, class: "inline-flex items-center px-4 py-2 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100" do %>
+      Tech Leaderboard →
+    <% end %>
   </div>
 
   <% if @unnotified_count > 0 %>
