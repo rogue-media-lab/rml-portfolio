@@ -59,6 +59,12 @@ Rails.application.routes.draw do
       resources :technicians, only: [ :index, :new, :create, :destroy ]
       resources :bookings, only: [ :edit, :update ], controller: "bookings"
       resource :settings, only: [ :edit, :update ], controller: "settings"
+      resources :cross_references, only: [ :index, :create ], controller: "cross_references" do
+        collection do
+          get :report
+          post :create_from_report
+        end
+      end
     end
 
     # Tech mobile tools (authenticated technicians, Paper design)
