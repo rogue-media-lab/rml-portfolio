@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CarUs::VehicleTemplate < ApplicationRecord
   belongs_to :verified_by_shop, class_name: "CarUs::Shop", optional: true
 

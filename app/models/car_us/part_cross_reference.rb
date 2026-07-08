@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CarUs::PartCrossReference < ApplicationRecord
   validates :oem_number, :brand, :brand_number, presence: true
   validates :brand_number, uniqueness: { scope: [:oem_number, :brand] }
