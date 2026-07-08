@@ -1,0 +1,71 @@
+<div class="space-y-6">
+  <div>
+    <%= link_to "← Back to Dashboard", manager_root_path, class: "text-sm font-medium text-blue-600 hover:text-blue-800" %>
+  </div>
+
+  <div class="flex justify-between items-center">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Shop Weekly Report</h1>
+      <p class="mt-1 text-sm text-gray-500">
+        <%= current_shop.name %> · <%= @week_start.strftime("%b %-d") %> – <%= @week_end.strftime("%b %-d, %Y") %>
+      </p>
+    </div>
+    <%= link_to "Leaderboard", manager_tech_leaderboard_path, class: "px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors" %>
+  </div>
+
+  <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+      <div class="px-4 py-5 sm:p-6">
+        <dt class="text-sm font-medium text-gray-500 truncate">Total Book Hours</dt>
+        <dd class="mt-1 text-3xl font-semibold text-gray-900"><%= number_with_precision(@total_hours, precision: 1) %></dd>
+      </div>
+    </div>
+
+    <div class="bg-white overflow-hidden shadow rounded-lg">
+      <div class="px-4 py-5 sm:p-6">
+        <dt class="text-sm font-medium text-gray-500 truncate">Jobs Completed</dt>
+        <dd class="mt-1 text-3xl font-semibold text-blue-600"><%= @total_jobs %></dd>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white shadow rounded-lg overflow-hidden">
+    <div class="px-4 py-5 sm:px-6">
+      <h2 class="text-lg font-medium text-gray-900">Service Breakdown</h2>
+    </div>
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Service</th>
+          <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Count</th>
+          <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Hours</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-200">
+        <% @services.each do |service| %>
+          <% stats = @service_counts[service] || { count: 0, hours: 0.0 } %>
+          <% if stats[:count] > 0 %>
+            <tr>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><%= service.name %></td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-700"><%= stats[:count] %></td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-700"><%= number_with_precision(stats[:hours], precision: 1) %></td>
+            </tr>
+          <% else %>
+            <tr class="bg-gray-50">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400"><%= service.name %></td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-400">0</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-400">0.0</td>
+            </tr>
+          <% end %>
+        <% end %>
+      </tbody>
+      <tfoot>
+        <tr class="bg-gray-100 font-semibold">
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Total</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900"><%= @total_jobs %></td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900"><%= number_with_precision(@total_hours, precision: 1) %></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>
