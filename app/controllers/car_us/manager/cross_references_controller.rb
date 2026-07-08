@@ -2,7 +2,7 @@ module CarUs
   module Manager
     class CrossReferencesController < BaseController
       def index
-        @cross_refs = CarUs::PartCrossReference.order(:oem_number, :brand).page(params[:page])
+        @cross_refs = CarUs::PartCrossReference.order(:oem_number, :brand).limit(200)
         @count = CarUs::PartCrossReference.count
       end
 
