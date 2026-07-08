@@ -40,6 +40,15 @@
     "brake_fluid_brand" => @shop_parts["brake_fluid_brand"]
   }.compact
 
+  # Helper: render cross-reference links for an OEM number
+  def cross_ref_html(oem)
+    refs = @cross_refs[oem]
+    return "" unless refs&.any?
+    refs.map { |r|
+      "<span class=\"text-[10px] text-carus-green font-semibold\">#{h r.brand}: #{h r.brand_number}</span>"
+    }.join(" · ").html_safe
+  end
+
   jobs = v.service_jobs.recent.includes(:job_parts)
   total_hours = v.service_jobs.sum(:book_hours)
   labor_times = CarUs::LaborTime.by_category
@@ -146,16 +155,30 @@
       <% end %>
       <div class="flex gap-2.5">
         <% [
-          ["Viscosity", specs["oil_weight"] || "—"],
-          ["Capacity", specs["oil_capacity_qts"] ? "#{specs["oil_capacity_qts"]} qts" : "—"],
+          ["Viscosity", specs["oil_weight"] || "—", false],
+          ["Capacity", specs["oil_capacity_qts"] ? "#{specs["oil_capacity_qts"]} qts" : "—", false],
           ["Filter #", [
             specs["oil_filter"] || "—",
             (sp = shop_part_map["oil_filter"]) ? "#{sp.brand} #{sp.shop_number}" : nil
-          ].compact.join(" · ")]
-        ].each_with_index do |(label, val), i| %>
+          ].compact.join(" · "), @cross_refs[specs["oil_filter"]]&.any?]
+        ].each_with_index do |(label, val, has_refs), i| %>
           <div class="<%= i == 2 ? 'grow-[1.4]' : 'grow' %> flex flex-col gap-0.5">
             <span class="text-[10px]/[12px] font-medium text-[#FFFFFF59]"><%= label %></span>
-            <span class="text-[15px]/[18px] font-extrabold text-white"><%= val %></span>
+            <% if has_refs %>
+              <div data-controller="cross-reference">
+                <button type="button" data-action="click->cross-reference#toggle"
+                  class="text-[15px]/[18px] font-extrabold text-white text-left hover:text-carus-green transition">
+                  <%= val %>
+                </button>
+                <div data-cross-reference-target="panel" class="hidden mt-1 flex flex-wrap gap-x-2 gap-y-0.5">
+                  <% (@cross_refs[specs["oil_filter"]] || []).each do |ref| %>
+                    <span class="text-[10px]/[12px] text-carus-green font-semibold"><%= ref.brand %>: <%= ref.brand_number %></span>
+                  <% end %>
+                </div>
+              </div>
+            <% else %>
+              <span class="text-[15px]/[18px] font-extrabold text-white"><%= val %></span>
+            <% end %>
           </div>
         <% end %>
       </div>

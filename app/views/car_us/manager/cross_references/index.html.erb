@@ -1,0 +1,52 @@
+<% content_for(:title, "Cross References — #{current_shop.name}") %>
+
+<div class="max-w-3xl mx-auto">
+  <div class="mb-6">
+    <%= link_to manager_root_path, class: "text-sm text-gray-500 hover:text-gray-700" do %>
+      ← Back to Dashboard
+    <% end %>
+  </div>
+
+  <h1 class="text-2xl font-bold text-gray-900 mb-1">Cross References</h1>
+  <p class="text-sm text-gray-500 mb-6"><%= @count %> entries · OEM to aftermarket mapping</p>
+
+  <%# CSV Import %>
+  <div class="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+    <h2 class="text-lg font-semibold text-gray-900 mb-3">Import CSV</h2>
+    <p class="text-sm text-gray-500 mb-4">
+      CSV must have columns: <code>oem_number</code>, <code>brand</code>, <code>brand_number</code>, <code>part_category</code>.
+      Duplicate OEM+brand combos are skipped.
+    </p>
+
+    <%= form_with url: manager_cross_references_path, method: :post, local: true, multipart: true, class: "flex items-center gap-3" do |f| %>
+      <%= f.file_field :file, accept: ".csv", class: "text-sm text-gray-600 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" %>
+      <%= f.submit "Import", class: "bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-5 py-2 rounded-lg cursor-pointer" %>
+    <% end %>
+  </div>
+
+  <%# Existing References %>
+  <div class="bg-white rounded-lg border border-gray-200">
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="border-b border-gray-200 text-left text-xs text-gray-500 uppercase tracking-wider">
+            <th class="px-4 py-3">OEM Number</th>
+            <th class="px-4 py-3">Brand</th>
+            <th class="px-4 py-3">Brand Number</th>
+            <th class="px-4 py-3">Category</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @cross_refs.each do |ref| %>
+            <tr class="border-b border-gray-100 hover:bg-gray-50">
+              <td class="px-4 py-2.5 font-mono text-xs"><%= ref.oem_number %></td>
+              <td class="px-4 py-2.5"><%= ref.brand %></td>
+              <td class="px-4 py-2.5 font-mono text-xs"><%= ref.brand_number %></td>
+              <td class="px-4 py-2.5 text-xs text-gray-500"><%= ref.part_category %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

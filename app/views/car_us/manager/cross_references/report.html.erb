@@ -1,0 +1,63 @@
+<% content_for(:title, "Cross-Reference Report — #{current_shop.name}") %>
+
+<div class="max-w-3xl mx-auto">
+  <div class="mb-6 flex justify-between items-center">
+    <div>
+      <%= link_to manager_cross_references_path, class: "text-sm text-gray-500 hover:text-gray-700" do %>
+        ← Cross References
+      <% end %>
+      <h1 class="text-2xl font-bold text-gray-900 mt-1">Daily Report</h1>
+      <p class="text-sm text-gray-500"><%= params[:date] || Date.today.strftime("%B %-d, %Y") %></p>
+    </div>
+    <% if @pairs.any? { |p| !p[:has_ref] } %>
+      <span class="text-sm text-amber-600 font-medium">
+        <%= @pairs.count { |p| !p[:has_ref] } %> missing
+      </span>
+    <% end %>
+  </div>
+
+  <% if @pairs.empty? %>
+    <div class="bg-white rounded-lg border border-gray-200 p-12 text-center">
+      <p class="text-gray-400">No parts to cross-reference today.</p>
+    </div>
+  <% else %>
+    <div class="space-y-4">
+      <% @pairs.group_by { |p| p[:job] }.each do |job, pairs| %>
+        <div class="bg-white rounded-lg border border-gray-200 p-5">
+          <div class="flex justify-between items-start mb-3">
+            <div>
+              <h3 class="font-semibold text-gray-900"><%= job.description %></h3>
+              <p class="text-sm text-gray-500">
+                <%= job.vehicle.year %> <%= job.vehicle.make %> <%= job.vehicle.model %>
+              </p>
+            </div>
+            <span class="text-xs text-gray-400"><%= time_ago_in_words(job.created_at) %> ago</span>
+          </div>
+
+          <% pairs.each do |pair| %>
+            <div class="flex items-center justify-between py-2 border-t border-gray-100">
+              <div class="text-sm">
+                <span class="font-medium text-gray-700"><%= pair[:part].name %></span>
+                <span class="text-gray-400 mx-2">→</span>
+                <span class="font-mono text-xs text-gray-500"><%= pair[:oem] %></span>
+              </div>
+              <% if pair[:has_ref] %>
+                <span class="text-xs text-green-600 font-medium">✓ Referenced</span>
+              <% else %>
+                <%= button_to create_from_report_manager_cross_references_path(
+                      oem_number: pair[:oem],
+                      brand: pair[:brand],
+                      brand_number: pair[:part].name,
+                      part_category: "engine_air_filter"
+                    ), method: :post,
+                    class: "text-xs bg-carus-green text-white font-bold px-3 py-1.5 rounded-lg hover:opacity-90 cursor-pointer" do %>
+                  Create Reference
+                <% end %>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</div>
