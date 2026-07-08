@@ -1,11 +1,18 @@
 module CarUs
   class ConversationsController < CarUs::BaseController
     before_action :authenticate_technician!
-    before_action :set_conversation, only: [ :show, :create_message, :poll, :complete_job ]
+    before_action :set_conversation, only: [ :show, :create_message, :poll, :complete_job, :destroy ]
     layout "car_us/car_owner"
 
     def index
-      @conversations = current_technician.conversations.active.includes(:vehicle)
+      base = current_technician.conversations.active.includes(:vehicle)
+      if params[:all].present?
+        @conversations = base
+        @showing_all = true
+      else
+        @conversations = base.where(updated_at: 2.days.ago..)
+        @showing_all = false
+      end
     end
 
     def show
@@ -273,6 +280,12 @@ module CarUs
       )
 
       redirect_to conversation_path(@conversation), notice: "Job started — #{job.book_hours.present? ? "#{job.book_hours}h estimated" : "hours TBD"}"
+    end
+
+    def destroy
+      @conversation = current_technician.conversations.find(params[:id])
+      @conversation.update!(active: false)
+      redirect_to conversations_path, notice: "Conversation archived."
     end
 
     private
