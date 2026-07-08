@@ -65,6 +65,8 @@ Rails.application.routes.draw do
           post :create_from_report
         end
       end
+      get "reports/shop", to: "reports#shop_weekly", as: :shop_report
+      get "reports/leaderboard", to: "reports#leaderboard", as: :tech_leaderboard
     end
 
     # Tech mobile tools (authenticated technicians, Paper design)
