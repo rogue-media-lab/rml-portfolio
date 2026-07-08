@@ -1,0 +1,44 @@
+<%= content_for :head do %>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<% end %>
+
+<div class="max-w-[375px] mx-auto min-h-screen bg-carus-black font-montserrat flex flex-col">
+  <div class="pt-14 pb-5 px-5">
+    <p class="opacity-45 tracking-[1.5px] uppercase mb-1 text-[11px]/[14px] font-semibold text-white">Settings</p>
+    <h1 class="text-[26px]/[32px] font-extrabold text-white tracking-[-0.5px]">My Target</h1>
+  </div>
+
+  <div class="flex flex-col pb-6 gap-3 px-5">
+    <% manager_target = current_technician.target_hours || current_technician.shop.target_hours %>
+
+    <%# Manager's minimum card %>
+    <div class="rounded-2xl p-5 bg-carus-field border border-[#2A2A2A]">
+      <p class="opacity-45 text-[10px]/[14px] font-semibold text-white mb-1">Manager's Minimum</p>
+      <p class="text-[28px]/[32px] font-extrabold text-carus-green"><%= manager_target %>h</p>
+      <p class="opacity-35 text-[10px]/[14px] font-medium text-white mt-2">Your preferred target must be at least this amount. Set a higher target to push yourself.</p>
+    </div>
+
+    <%# Preferred hours form %>
+    <%= form_with model: current_technician, url: tech_profile_path, method: :patch, html: { class: "rounded-2xl p-5 bg-carus-field border border-[#2A2A2A]" } do |f| %>
+      <label class="block mb-2 text-[13px]/[16px] font-semibold text-white">My Preferred Target (hours/week)</label>
+      <%= f.number_field :preferred_hours,
+          value: current_technician.preferred_hours,
+          step: 0.5,
+          min: 0,
+          class: "w-full rounded-xl py-3 px-4 bg-[#1A1A1A] border border-[#2A2A2A] text-white text-[17px]/[24px] font-semibold focus:outline-none focus:border-carus-green placeholder:text-[#FFFFFF33]",
+          placeholder: "#{manager_target}" %>
+
+      <div class="flex gap-3 mt-5">
+        <%= f.submit "Save Target",
+            class: "grow rounded-xl py-3 bg-carus-green text-[14px]/[18px] font-bold text-black cursor-pointer hover:opacity-90 transition" %>
+        <%= link_to "Cancel", tech_profile_path,
+            class: "rounded-xl py-3 px-6 bg-[#2A2A2A] text-[14px]/[18px] font-semibold text-white hover:bg-[#3A3A3A] transition" %>
+      </div>
+    <% end %>
+  </div>
+
+  <%# Tab bar — Profile active %>
+  <%= render "car_us/shared/tech_tab_bar" %>
+</div>

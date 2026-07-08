@@ -138,10 +138,10 @@
     <%# Account %>
     <p class="opacity-35 tracking-[1.5px] uppercase mt-2 mb-1 text-[10px]/[12px] font-bold text-white">Account</p>
     <div class="rounded-[14px] overflow-hidden bg-carus-field border border-[#2A2A2A]">
-      <div class="flex items-center justify-between p-4 border-b border-[#2A2A2A]">
+      <%= link_to edit_tech_profile_path, class: "flex items-center justify-between p-4 border-b border-[#2A2A2A]" do %>
         <span class="text-[13px]/[16px] font-semibold text-white">Edit Profile</span>
         <svg width="16" height="16" viewBox="0 0 16 16" class="shrink-0"><path d="M6 4L10 8L6 12" fill="none" stroke="#FFFFFF4D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </div>
+      <% end %>
       <div class="flex items-center justify-between p-4 border-b border-[#2A2A2A]">
         <span class="text-[13px]/[16px] font-semibold text-white">Notifications</span>
         <svg width="16" height="16" viewBox="0 0 16 16" class="shrink-0"><path d="M6 4L10 8L6 12" fill="none" stroke="#FFFFFF4D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
