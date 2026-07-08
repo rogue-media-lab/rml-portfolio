@@ -1,13 +1,13 @@
 module CarUs
   class ServiceJobsController < CarUs::BaseController
     before_action :authenticate_technician!
-    before_action :set_job, only: [ :show, :edit, :update, :destroy ]
+    before_action :set_job, only: [ :show, :edit, :update, :destroy, :complete ]
 
     def create
       @vehicle = CarUs::Vehicle.find(params[:tech_lookup_id])
       @job = @vehicle.service_jobs.build(job_params)
       @job.technician = current_technician
-      @job.status = "completed"
+      # Jobs default to "open" — tech completes them when the work is done
 
       # Auto-match hours if blank — look up labor_time by description
       if @job.book_hours.blank? && @job.description.present?
@@ -17,7 +17,8 @@ module CarUs
 
       if @job.save
         save_parts(@job) if params[:parts].present?
-        redirect_to tech_lookup_path(@vehicle), notice: "Job logged — #{@job.book_hours}h"
+        hrs_notice = @job.book_hours.present? ? "#{@job.book_hours}h estimated" : "hours TBD"
+        redirect_to tech_lookup_path(@vehicle), notice: "Job started — #{hrs_notice}"
       else
         redirect_to tech_lookup_path(@vehicle), alert: @job.errors.full_messages.to_sentence
       end
@@ -37,6 +38,16 @@ module CarUs
         redirect_to tech_lookup_service_job_path(@job.vehicle, @job), notice: "Job updated."
       else
         render :edit, status: :unprocessable_entity
+      end
+    end
+
+    def complete
+      hours = params[:book_hours].present? ? params[:book_hours].to_f : nil
+      if hours&.positive?
+        @job.complete!(hours)
+        redirect_to tech_lookup_path(@job.vehicle), notice: "Job complete — #{hours}h logged."
+      else
+        redirect_to tech_lookup_service_job_path(@job.vehicle, @job), alert: "Hours required to complete the job."
       end
     end
 

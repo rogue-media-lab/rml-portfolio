@@ -26,7 +26,7 @@
   <div class="grow flex flex-col pt-4.5 gap-2.5 px-6">
     <%# Log Job form %>
     <div class="rounded-2xl py-4 px-4.5 bg-carus-field border border-carus-green/20">
-      <p class="uppercase tracking-[1px] mb-3 text-[10px]/[12px] font-bold text-carus-green">Log Job</p>
+      <p class="uppercase tracking-[1px] mb-3 text-[10px]/[12px] font-bold text-carus-green">Start Job</p>
       <%= form_with model: [v, CarUs::ServiceJob.new], url: tech_lookup_service_jobs_path(v), method: :post, local: true, data: { turbo: false }, class: "flex flex-col gap-2" do |f| %>
         <div class="flex gap-2">
           <%= f.text_field :description, id: "job_desc", placeholder: "What was done", class: "grow bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg py-2.5 px-3 text-sm font-bold text-white placeholder:text-white/20 focus:outline-none focus:border-carus-green/40" %>
@@ -54,7 +54,7 @@
           <% end %>
         </div>
 
-        <%= f.submit "Log Job", class: "w-full rounded-lg py-2.5 bg-carus-green text-sm font-extrabold text-black cursor-pointer" %>
+        <%= f.submit "Start Job", class: "w-full rounded-lg py-2.5 bg-carus-green text-sm font-extrabold text-black cursor-pointer" %>
       <% end %>
     </div>
 
@@ -77,6 +77,9 @@
               <p class="text-[10px]/[12px] text-[#FFFFFF33] mt-0.5"><%= time_ago_in_words(job.created_at) %> ago</p>
             </div>
             <span class="text-sm/[18px] font-extrabold text-carus-green shrink-0 ml-3"><%= job.book_hours %>h</span>
+            <% if job.open? %>
+              <span class="rounded-lg py-0.5 px-1.5 bg-[#E8A020]/[0.15] border border-[#E8A020]/40 text-[9px] font-bold text-[#E8A020] shrink-0 ml-1.5">OPEN</span>
+            <% end %>
         <% end %>
       <% end %>
       </div>

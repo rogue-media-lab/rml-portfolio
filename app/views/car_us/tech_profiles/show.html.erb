@@ -29,17 +29,28 @@
       </div>
     </div>
 
-    <%# Stats %>
+    <%# Stats — Weekly + All-time %>
     <div class="flex gap-2">
       <div class="grow rounded-xl p-3.5 bg-carus-field border border-[#2A2A2A]">
-        <p class="mb-0.5 text-center text-lg/[22px] font-extrabold text-carus-green"><%= @total_hours.round(1) %></p>
-        <p class="opacity-35 tracking-[0.5px] uppercase text-center text-[9px]/[12px] font-semibold text-white">Book Hours</p>
+        <p class="mb-0.5 text-center text-lg/[22px] font-extrabold text-carus-green"><%= @weekly_hours.round(1) %></p>
+        <p class="opacity-35 tracking-[0.5px] uppercase text-center text-[9px]/[12px] font-semibold text-white">Hrs This Week</p>
       </div>
       <div class="grow rounded-xl p-3.5 bg-carus-field border border-[#2A2A2A]">
-        <p class="mb-0.5 text-center text-lg/[22px] font-extrabold text-[#E8A020]"><%= @total_jobs %></p>
-        <p class="opacity-35 tracking-[0.5px] uppercase text-center text-[9px]/[12px] font-semibold text-white">Jobs Done</p>
+        <p class="mb-0.5 text-center text-lg/[22px] font-extrabold text-[#E8A020]"><%= @weekly_jobs %></p>
+        <p class="opacity-35 tracking-[0.5px] uppercase text-center text-[9px]/[12px] font-semibold text-white">Jobs This Week</p>
       </div>
     </div>
+    <div class="flex gap-2 mt-2">
+      <div class="grow rounded-xl p-3 bg-carus-field border border-[#2A2A2A]">
+        <div class="flex items-center justify-between">
+          <span class="opacity-45 text-[10px]/[14px] font-medium text-white">All-time</span>
+          <span class="text-[12px]/[16px] font-bold text-white"><%= @total_hours.round(1) %>h · <%= @total_jobs %> jobs</span>
+        </div>
+      </div>
+    </div>
+    <%= link_to weekly_report_tech_profile_path, class: "flex items-center justify-center gap-2 rounded-xl py-2.5 mt-2 bg-carus-field border border-carus-green/30 hover:border-carus-green/60 transition" do %>
+      <span class="text-[12px]/[16px] font-semibold text-carus-green">Weekly Report →</span>
+    <% end %>
 
     <%# Quick Tools %>
     <p class="opacity-35 tracking-[1.5px] uppercase mt-2 mb-1 text-[10px]/[12px] font-bold text-white">Quick Tools</p>
@@ -72,7 +83,42 @@
       </div>
     </div>
 
-    <%# Flag a Concern link %>
+    <%# Open Jobs %>
+    <% if @open_jobs.any? %>
+      <p class="opacity-35 tracking-[1.5px] uppercase mt-2 mb-1 text-[10px]/[12px] font-bold text-white">Open Jobs</p>
+      <% @open_jobs.each do |job| %>
+        <div class="flex items-center rounded-xl gap-3 p-3.5 bg-carus-field border border-carus-green/30">
+          <div class="grow">
+            <p class="text-[13px]/[16px] font-semibold text-white"><%= job.description %></p>
+            <p class="opacity-45 text-[10px]/[14px] font-medium text-white"><%= job.vehicle&.year %> <%= job.vehicle&.make %> <%= job.vehicle&.model %></p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="rounded-lg py-1 px-2 bg-carus-green/[0.12] border border-carus-green/35 text-[10px] font-bold text-carus-green">
+              <%= job.book_hours.present? ? "#{job.book_hours}h" : "—" %>
+            </span>
+            <%= link_to "Complete", edit_tech_lookup_service_job_path(job.vehicle, job, complete: true), class: "rounded-lg py-1.5 px-3 bg-carus-green text-[10px] font-bold text-black" %>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+
+    <%# Recent Jobs %>
+    <p class="opacity-35 tracking-[1.5px] uppercase mt-3 mb-1 text-[10px]/[12px] font-bold text-white">Recent Jobs</p>
+    <% @recent_jobs.limit(5).each do |job| %>
+      <%= link_to tech_lookup_service_job_path(job.vehicle, job), class: "flex items-center rounded-xl gap-3 p-3 bg-carus-field border border-[#2A2A2A]" do %>
+        <div class="grow">
+          <p class="text-[12px]/[16px] font-semibold text-white"><%= job.description %></p>
+          <p class="opacity-35 text-[10px]/[14px] font-medium text-white"><%= job.vehicle&.make %> <%= job.vehicle&.model %> · <%= time_ago_in_words(job.created_at) %> ago</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <% if job.open? %>
+            <span class="rounded-lg py-0.5 px-2 bg-[#E8A020]/[0.15] border border-[#E8A020]/40 text-[10px] font-bold text-[#E8A020]">OPEN</span>
+          <% else %>
+            <span class="rounded-lg py-0.5 px-2 bg-carus-green/[0.12] border border-carus-green/35 text-[10px] font-bold text-carus-green"><%= job.book_hours %>h</span>
+          <% end %>
+        </div>
+      <% end %>
+    <% end %>
     <div class="flex items-center rounded-[14px] gap-3.5 p-4 bg-carus-field border border-[#2A2A2A]">
       <div class="flex items-center justify-center shrink-0 rounded-[10px] bg-[#2B0D0D] size-10">
         <svg width="20" height="20" viewBox="0 0 20 20" class="shrink-0">

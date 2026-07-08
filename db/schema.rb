@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_04_002913) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_08_003014) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -247,7 +247,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_04_002913) do
     t.bigint "technician_id", null: false
     t.string "description", null: false
     t.decimal "book_hours", precision: 4, scale: 2
-    t.string "status", default: "completed", null: false
+    t.string "status", default: "open", null: false
     t.text "notes"
     t.datetime "completed_at"
     t.datetime "created_at", null: false
@@ -295,7 +295,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_04_002913) do
   end
 
   create_table "car_us_vehicles", force: :cascade do |t|
-    t.bigint "car_owner_id", null: false
+    t.bigint "car_owner_id"
     t.string "vin"
     t.integer "year"
     t.string "make"
