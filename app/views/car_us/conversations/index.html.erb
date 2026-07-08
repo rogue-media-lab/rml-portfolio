@@ -45,7 +45,7 @@
             </div>
             <span class="text-[10px]/[12px] text-[#FFFFFF33] shrink-0"><%= time_ago_in_words(conv.updated_at) %> ago</span>
           <% end %>
-          <%= button_to conversation_path(conv), method: :delete, form: { data: { turbo_confirm: "Archive this conversation?" } }, class: "shrink-0 opacity-0 group-hover:opacity-100 text-[#FFFFFF33] hover:text-[#FF6260] transition px-1" do %>
+          <%= button_to conversation_path(conv), method: :delete, form: { data: { turbo_confirm: "Archive this conversation?" } }, class: "shrink-0 text-[#FFFFFF33] hover:text-[#FF6260] transition px-1" do %>
             <svg width="14" height="14" viewBox="0 0 14 14"><path d="M3 4h8M5.5 4V3a1 1 0 011-1h1a1 1 0 011 1v1M11 4v7a1 1 0 01-1 1H4a1 1 0 01-1-1V4" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
           <% end %>
         </div>
