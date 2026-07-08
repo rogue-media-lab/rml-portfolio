@@ -42,6 +42,13 @@ module CarUs
     def show
       @vehicle = CarUs::Vehicle.find(params[:id])
       @template = CarUs::VehicleTemplate.for_vehicle(@vehicle).first
+      @shop_parts = if @template && current_technician.shop
+        CarUs::ShopPart.for_shop(current_technician.shop)
+                       .for_template(@template)
+                       .index_by(&:part_category)
+      else
+        {}
+      end
     end
 
     def new

@@ -45,7 +45,27 @@ module CarUs
       hours = params[:book_hours].present? ? params[:book_hours].to_f : nil
       if hours&.positive?
         @job.complete!(hours)
-        redirect_to tech_lookup_path(@job.vehicle), notice: "Job complete — #{hours}h logged."
+
+        # Check if shop wants auto-update and there are new parts
+        notice = "Job complete — #{hours}h logged."
+        if current_technician.shop&.auto_update_parts? && @job.job_parts.any?
+          template = CarUs::VehicleTemplate.for_vehicle(@job.vehicle).first
+          if template
+            existing = CarUs::ShopPart.for_shop(current_technician.shop)
+                                     .for_template(template)
+                                     .pluck(:part_category)
+            new_parts = @job.job_parts.reject { |p|
+              cat = infer_part_category(p.name, p)
+              cat.nil? || existing.include?(cat)
+            }
+            if new_parts.any?
+              notice += " #{new_parts.size} new part(s) could be saved as shop defaults."
+              redirect_to tech_lookup_path(@job.vehicle, prompt_parts: 1), notice: notice and return
+            end
+          end
+        end
+
+        redirect_to tech_lookup_path(@job.vehicle), notice: notice
       else
         redirect_to tech_lookup_service_job_path(@job.vehicle, @job), alert: "Hours required to complete the job."
       end
@@ -76,6 +96,24 @@ module CarUs
           cost: part[:cost]
         )
       end
+    end
+
+    # Heuristic: guess part category from name for auto-update matching
+    def infer_part_category(name, part = nil)
+      return nil if name.blank?
+      n = name.downcase
+      return "oil_filter" if n.match?(/oil.filter|oil.filter/i) && !n.match?(/cabin|air/i)
+      return "cabin_air_filter" if n.match?(/cabin/i)
+      return "engine_air_filter" if n.match?(/engine.air|air.filter/i) && !n.match?(/cabin/i)
+      return "spark_plug" if n.match?(/spark.plug|plug/i)
+      return "oil_brand" if n.match?(/oil/i) && n.match?(/brand|synthetic|conventional|mobil|castrol|valvoline/i)
+      return "coolant_brand" if n.match?(/coolant|antifreeze/i)
+      return "trans_fluid_brand" if n.match?(/transmission|trans.fluid|atf|cvt/i)
+      return "brake_fluid_brand" if n.match?(/brake.fluid|dot/i)
+      return "wiper_blades" if n.match?(/wiper|blade/i)
+      return "battery" if n.match?(/battery/i)
+      return "serpentine_belt" if n.match?(/belt|serpentine/i)
+      nil
     end
   end
 end
