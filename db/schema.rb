@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_08_003014) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_08_120300) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -227,6 +227,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_08_003014) do
     t.index ["car_owner_id"], name: "index_car_us_notifications_on_car_owner_id"
   end
 
+  create_table "car_us_part_cross_references", force: :cascade do |t|
+    t.string "oem_number", null: false
+    t.string "brand", null: false
+    t.string "brand_number", null: false
+    t.string "part_category"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["oem_number", "brand"], name: "idx_cross_refs_on_oem_and_brand", unique: true
+  end
+
   create_table "car_us_redemptions", force: :cascade do |t|
     t.string "redeemable_type", null: false
     t.bigint "redeemable_id", null: false
@@ -280,6 +290,20 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_08_003014) do
     t.index ["shop_id"], name: "index_car_us_services_on_shop_id"
   end
 
+  create_table "car_us_shop_parts", force: :cascade do |t|
+    t.bigint "shop_id", null: false
+    t.bigint "vehicle_template_id"
+    t.string "part_category", null: false
+    t.string "oem_number"
+    t.string "shop_number", null: false
+    t.string "brand"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["shop_id", "vehicle_template_id", "part_category"], name: "idx_shop_parts_on_shop_template_category", unique: true
+    t.index ["shop_id"], name: "index_car_us_shop_parts_on_shop_id"
+    t.index ["vehicle_template_id"], name: "index_car_us_shop_parts_on_vehicle_template_id"
+  end
+
   create_table "car_us_shops", force: :cascade do |t|
     t.string "name"
     t.string "slug"
@@ -292,6 +316,36 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_08_003014) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.jsonb "settings", default: {}
+    t.boolean "auto_update_parts", default: false, null: false
+  end
+
+  create_table "car_us_vehicle_templates", force: :cascade do |t|
+    t.string "make", null: false
+    t.string "model", null: false
+    t.integer "year", null: false
+    t.string "engine_size"
+    t.string "trim"
+    t.string "oil_weight"
+    t.decimal "oil_capacity_qts", precision: 4, scale: 1
+    t.string "coolant_type"
+    t.string "transmission_fluid_spec"
+    t.string "brake_fluid_spec"
+    t.string "oil_filter_oem"
+    t.string "cabin_air_filter_oem"
+    t.string "engine_air_filter_oem"
+    t.integer "drain_plug_torque_ft_lbs"
+    t.string "spark_plug_spec"
+    t.string "tire_size"
+    t.integer "tire_pressure_f"
+    t.integer "tire_pressure_r"
+    t.text "ai_difficulty_notes"
+    t.jsonb "ai_suggestions"
+    t.string "source", default: "ai_generated", null: false
+    t.bigint "verified_by_shop_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["make", "model", "year", "engine_size"], name: "idx_vehicle_templates_on_make_model_year_engine", unique: true
+    t.index ["verified_by_shop_id"], name: "index_car_us_vehicle_templates_on_verified_by_shop_id"
   end
 
   create_table "car_us_vehicles", force: :cascade do |t|
@@ -952,6 +1006,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_08_003014) do
   add_foreign_key "car_us_service_jobs", "technicians"
   add_foreign_key "car_us_service_records", "car_us_vehicles", column: "vehicle_id"
   add_foreign_key "car_us_services", "car_us_shops", column: "shop_id"
+  add_foreign_key "car_us_shop_parts", "car_us_shops", column: "shop_id"
+  add_foreign_key "car_us_shop_parts", "car_us_vehicle_templates", column: "vehicle_template_id"
+  add_foreign_key "car_us_vehicle_templates", "car_us_shops", column: "verified_by_shop_id"
   add_foreign_key "car_us_vehicles", "car_owners"
   add_foreign_key "chat_messages", "chat_sessions"
   add_foreign_key "chat_sessions", "users"
