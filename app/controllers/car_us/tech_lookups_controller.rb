@@ -41,6 +41,7 @@ module CarUs
 
     def show
       @vehicle = CarUs::Vehicle.find(params[:id])
+      @template = CarUs::VehicleTemplate.for_vehicle(@vehicle).first
     end
 
     def new
@@ -72,14 +73,33 @@ module CarUs
 
     def update_specs
       @vehicle = CarUs::Vehicle.find(params[:id])
-      specs = JSON.parse(@vehicle.ai_specs.presence || "{}") rescue {}
-      specs.merge!(params.require(:specs).permit(
+      @template = CarUs::VehicleTemplate.for_vehicle(@vehicle).first_or_initialize
+
+      permitted = params.require(:specs).permit(
         :oil_weight, :oil_capacity_qts, :oil_filter, :drain_plug_torque_ft_lbs,
         :coolant_type, :transmission_fluid, :brake_fluid, :spark_plug,
         :cabin_air_filter, :engine_air_filter,
         :tire_pressure_f, :tire_pressure_r, :tire_size
-      ).to_h)
-      @vehicle.update!(ai_specs: specs.to_json)
+      ).to_h
+
+      # Map old field names to new column names
+      mapping = {
+        "oil_filter" => "oil_filter_oem",
+        "cabin_air_filter" => "cabin_air_filter_oem",
+        "engine_air_filter" => "engine_air_filter_oem",
+        "transmission_fluid" => "transmission_fluid_spec",
+        "brake_fluid" => "brake_fluid_spec",
+        "spark_plug" => "spark_plug_spec"
+      }
+
+      permitted.each do |key, value|
+        column = mapping[key] || key
+        @template[column] = value if @template.has_attribute?(column)
+      end
+
+      @template.source = "shop_curated" if @template.persisted?
+      @template.save!
+
       redirect_to tech_lookup_path(@vehicle), notice: "Specs updated."
     end
 
