@@ -56,7 +56,7 @@ Rails.application.routes.draw do
         end
       end
       resources :services, only: [ :index, :new, :create, :edit, :update, :destroy ]
-      resources :technicians, only: [ :index, :new, :create, :destroy ]
+      resources :technicians, only: [ :index, :new, :create, :edit, :update, :destroy ]
       resources :bookings, only: [ :edit, :update ], controller: "bookings"
       resource :settings, only: [ :edit, :update ], controller: "settings"
       resources :cross_references, only: [ :index, :create ], controller: "cross_references" do
