@@ -80,39 +80,3 @@
   <% end %>
 </div>
 
-<script>
-  // Stimulus controller inline — add/remove part rows
-  document.addEventListener("DOMContentLoaded", () => {
-    const list = document.querySelector("[data-job-parts-target='list']");
-    const addBtn = document.querySelector("[data-action='click->job-parts#add']");
-    if (!list || !addBtn) return;
-
-    addBtn.addEventListener("click", () => {
-      const idx = list.querySelectorAll("[data-job-parts-target='row']").length;
-      const row = document.createElement("div");
-      row.className = "flex gap-2 items-end mb-2";
-      row.setAttribute("data-job-parts-target", "row");
-      row.innerHTML = `
-        <div class="flex-1">
-          <input type="text" name="parts[${idx}][name]" placeholder="Part name" class="w-full rounded-lg bg-carus-black border border-[#2A2A2A] text-white text-sm px-3 py-2 focus:outline-none focus:border-carus-green/50 placeholder:text-[#FFFFFF33]">
-        </div>
-        <div class="w-16">
-          <input type="number" name="parts[${idx}][quantity]" value="1" min="1" class="w-full rounded-lg bg-carus-black border border-[#2A2A2A] text-white text-sm px-3 py-2 focus:outline-none focus:border-carus-green/50 placeholder:text-[#FFFFFF33]">
-        </div>
-        <div class="w-20">
-          <input type="text" name="parts[${idx}][cost]" placeholder="Cost" class="w-full rounded-lg bg-carus-black border border-[#2A2A2A] text-white text-sm px-3 py-2 focus:outline-none focus:border-carus-green/50 placeholder:text-[#FFFFFF33]">
-        </div>
-        <button type="button" class="shrink-0 text-[#FFFFFF33] hover:text-red-400 p-1">
-          <svg width="14" height="14" viewBox="0 0 14 14"><path d="M4 4l6 6M10 4l-6 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-        </button>
-      `;
-      row.querySelector("button").addEventListener("click", () => row.remove());
-      list.appendChild(row);
-    });
-
-    // Wire up existing remove buttons
-    list.querySelectorAll("button").forEach(btn => {
-      btn.addEventListener("click", () => btn.closest("[data-job-parts-target='row']").remove());
-    });
-  });
-</script>
