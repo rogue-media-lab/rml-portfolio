@@ -6,8 +6,27 @@
 
 <%
   v = @vehicle
-  specs = v.ai_specs.present? ? (JSON.parse(v.ai_specs) rescue {}) : {}
-  suggestions = v.ai_suggestions.present? ? (JSON.parse(v.ai_suggestions) rescue []) : []
+  if @template
+    specs = {
+      "oil_weight" => @template.oil_weight,
+      "oil_capacity_qts" => @template.oil_capacity_qts,
+      "oil_filter" => @template.oil_filter_oem,
+      "cabin_air_filter" => @template.cabin_air_filter_oem,
+      "engine_air_filter" => @template.engine_air_filter_oem,
+      "coolant_type" => @template.coolant_type,
+      "transmission_fluid" => @template.transmission_fluid_spec,
+      "brake_fluid" => @template.brake_fluid_spec,
+      "drain_plug_torque_ft_lbs" => @template.drain_plug_torque_ft_lbs,
+      "spark_plug" => @template.spark_plug_spec,
+      "tire_size" => @template.tire_size,
+      "tire_pressure_f" => @template.tire_pressure_f,
+      "tire_pressure_r" => @template.tire_pressure_r
+    }.compact
+    suggestions = @template.ai_suggestions || []
+  else
+    specs = v.ai_specs.present? ? (JSON.parse(v.ai_specs) rescue {}) : {}
+    suggestions = v.ai_suggestions.present? ? (JSON.parse(v.ai_suggestions) rescue []) : []
+  end
   jobs = v.service_jobs.recent.includes(:job_parts)
   total_hours = v.service_jobs.sum(:book_hours)
   labor_times = CarUs::LaborTime.by_category
