@@ -42,6 +42,14 @@ class CarUs::Shop < ApplicationRecord
     (settings["max_bookings_per_slot"] || 3).to_i
   end
 
+  def target_hours
+    (settings["target_hours"] || 40).to_f
+  end
+
+  def target_services
+    settings["target_services"] || []
+  end
+
   # Bulk update settings from a params hash
   def update_settings(params)
     new_settings = settings.merge(params.to_h.symbolize_keys)
