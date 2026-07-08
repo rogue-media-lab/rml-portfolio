@@ -28,8 +28,14 @@
           <p class="mt-1 text-sm font-bold text-carus-green"><%= @job.book_hours.present? ? "#{@job.book_hours} hrs" : "—" %></p>
         </div>
         <div>
-          <p class="opacity-50 tracking-[1px] uppercase text-[10px]/[12px] font-bold text-white">Completed</p>
-          <p class="mt-1 text-sm font-semibold text-white"><%= @job.completed_at&.strftime("%b %-d, %Y at %-I:%M %p") || @job.created_at&.strftime("%b %-d, %Y") %></p>
+          <p class="opacity-50 tracking-[1px] uppercase text-[10px]/[12px] font-bold text-white">Status</p>
+          <p class="mt-1 text-sm font-semibold">
+            <% if @job.open? %>
+              <span class="text-[#E8A020]">Open</span>
+            <% else %>
+              <span class="text-carus-green">Completed</span> <span class="opacity-50 text-[11px] text-white"><%= @job.completed_at&.strftime("%b %-d, %Y") %></span>
+            <% end %>
+          </p>
         </div>
       </div>
 
@@ -51,6 +57,18 @@
       </div>
     <% end %>
   </div>
+
+  <% if @job.open? %>
+    <%= form_with url: complete_tech_lookup_service_job_path(@job.vehicle, @job), method: :post, local: true, class: "px-6 py-2" do |f| %>
+      <div class="rounded-2xl p-4 bg-carus-field border border-carus-green/30 space-y-3">
+        <p class="text-[13px]/[16px] font-bold text-carus-green">Complete Job</p>
+        <div class="flex gap-3">
+          <%= f.number_field :book_hours, value: @job.book_hours, step: 0.1, placeholder: "Hours", class: "w-28 bg-[#1A1A1A] border border-[#2A2A2A] rounded-lg py-2.5 px-3 text-sm font-bold text-carus-green placeholder:text-white/20 focus:outline-none focus:border-carus-green/40" %>
+          <%= f.submit "Complete Job", class: "grow rounded-lg py-2.5 bg-carus-green text-sm font-extrabold text-black cursor-pointer" %>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
 
   <div class="px-6 py-4 flex gap-3">
     <%= link_to edit_tech_lookup_service_job_path(@job.vehicle, @job), class: "flex-1 flex items-center justify-center gap-2 rounded-xl bg-carus-field border border-[#2A2A2A] text-white text-[15px] font-bold py-3.5" do %>
