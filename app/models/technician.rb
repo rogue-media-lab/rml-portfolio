@@ -12,6 +12,21 @@ class Technician < ApplicationRecord
 
   enum :role, { tech: "tech", manager: "manager" }, default: :tech
 
+  # Per-tech weekly targets (manager sets floor, tech sets ambition)
+  def effective_target_hours
+    floor = target_hours || shop.target_hours
+    [preferred_hours.to_f, floor].max
+  end
+
+  def target_services
+    if target_service_ids.present?
+      shop.services.where(id: target_service_ids).pluck(:name)
+    else
+      # Fallback to old shop-level free-text target services
+      shop.target_services || []
+    end
+  end
+
   def display_name
     email.split("@").first.titleize
   end
