@@ -22,7 +22,7 @@ module CarUs
         today = Date.current
         monday = today - ((today.wday - 1) % 7)
         saturday = monday + 5
-        [monday, saturday]
+        [ monday, saturday ]
       end
 
       def current_shop_jobs_this_week
@@ -52,7 +52,7 @@ module CarUs
             .where(completed_at: monday..saturday.end_of_day)
           target_hours = tech.effective_target_hours
           total_hours = jobs.sum(:book_hours).to_f
-          pct = target_hours.positive? ? [(total_hours / target_hours * 100).round, 100].min : 0
+          pct = target_hours.positive? ? [ (total_hours / target_hours * 100).round, 100 ].min : 0
 
           tech_target_svcs = tech.target_services
           completed_descs = jobs.pluck(:description).map(&:downcase)
