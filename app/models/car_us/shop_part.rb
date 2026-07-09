@@ -6,7 +6,7 @@ class CarUs::ShopPart < ApplicationRecord
 
   validates :part_category, :shop_number, presence: true
   validates :part_category, uniqueness: {
-    scope: [:shop_id, :vehicle_template_id],
+    scope: [ :shop_id, :vehicle_template_id ],
     message: "already has a default for this shop and vehicle type"
   }
 
