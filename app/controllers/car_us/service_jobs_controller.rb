@@ -9,9 +9,13 @@ module CarUs
       @job.technician = current_technician
       # Jobs default to "open" — tech completes them when the work is done
 
-      # Auto-match hours if blank — look up labor_time by description
+      # Auto-match hours if blank — look up labor_time by description.
+      # Order by length (shortest first) so exact match wins over partial.
       if @job.book_hours.blank? && @job.description.present?
-        match = CarUs::LaborTime.find_by("LOWER(service) LIKE ?", "%#{@job.description.downcase}%")
+        match = CarUs::LaborTime
+          .where("LOWER(service) LIKE ?", "%#{@job.description.downcase}%")
+          .order(Arel.sql("LENGTH(service) ASC"))
+          .first
         @job.book_hours = match&.hours
       end
 
