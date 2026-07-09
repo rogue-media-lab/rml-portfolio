@@ -38,7 +38,7 @@ class CreateCarUsVehicleTemplates < ActiveRecord::Migration[8.0]
     end
 
     add_index :car_us_vehicle_templates,
-              [:make, :model, :year, :engine_size],
+              [ :make, :model, :year, :engine_size ],
               unique: true,
               name: "idx_vehicle_templates_on_make_model_year_engine"
   end

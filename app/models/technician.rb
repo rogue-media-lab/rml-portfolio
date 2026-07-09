@@ -15,7 +15,7 @@ class Technician < ApplicationRecord
   # Per-tech weekly targets (manager sets floor, tech sets ambition)
   def effective_target_hours
     floor = target_hours || shop.target_hours
-    [preferred_hours.to_f, floor].max
+    [ preferred_hours.to_f, floor ].max
   end
 
   def target_services
