@@ -1,7 +1,7 @@
 namespace :carus do
   desc "Backfill VehicleTemplates from existing vehicles with ai_specs"
   task backfill_templates: :environment do
-    vehicles = CarUs::Vehicle.where.not(ai_specs: [nil, ""])
+    vehicles = CarUs::Vehicle.where.not(ai_specs: [ nil, "" ])
     created = 0
     skipped = 0
 

@@ -2,7 +2,7 @@
 
 class CarUs::PartCrossReference < ApplicationRecord
   validates :oem_number, :brand, :brand_number, presence: true
-  validates :brand_number, uniqueness: { scope: [:oem_number, :brand] }
+  validates :brand_number, uniqueness: { scope: [ :oem_number, :brand ] }
 
   scope :for_oem, ->(oem) { where(oem_number: oem).order(:brand) }
   scope :by_brand, ->(brand) { where(brand: brand).order(:oem_number) }

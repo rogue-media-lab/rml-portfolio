@@ -50,8 +50,8 @@ module CarUs
         {}
       end
       @cross_refs = if @template
-        oems = [@template.oil_filter_oem, @template.cabin_air_filter_oem,
-                @template.engine_air_filter_oem, @template.spark_plug_spec].compact
+        oems = [ @template.oil_filter_oem, @template.cabin_air_filter_oem,
+                @template.engine_air_filter_oem, @template.spark_plug_spec ].compact
         CarUs::PartCrossReference.where(oem_number: oems).group_by(&:oem_number)
       else
         {}

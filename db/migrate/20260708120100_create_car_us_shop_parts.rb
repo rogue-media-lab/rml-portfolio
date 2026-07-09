@@ -12,7 +12,7 @@ class CreateCarUsShopParts < ActiveRecord::Migration[8.0]
     end
 
     add_index :car_us_shop_parts,
-              [:shop_id, :vehicle_template_id, :part_category],
+              [ :shop_id, :vehicle_template_id, :part_category ],
               unique: true,
               name: "idx_shop_parts_on_shop_template_category"
   end
