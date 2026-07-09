@@ -91,7 +91,7 @@ class CarUs::VehicleTemplateTest < ActiveSupport::TestCase
 
   test "verified? when verified_by_shop is set" do
     assert_not @civic.verified?
-    @civic.verified_by_shop = CarUs::Shop.new(name: "Midas Rock Hill")
+    @civic.verified_by_shop = CarUs::Shop.create!(name: "Midas Rock Hill")
     assert @civic.verified?
   end
 
@@ -117,8 +117,9 @@ class CarUs::VehicleTemplateTest < ActiveSupport::TestCase
     @civic.save!
 
     duplicate = CarUs::VehicleTemplate.new(
-      make: "Honda", model: "Civic", year: 2018, engine_size: "2.0L I4"
+      make: "Honda", model: "Civic", year: 2018, engine_size: "2.0L I4",
+      source: "ai_generated"
     )
-    assert_not duplicate.valid?
+    assert_raises(ActiveRecord::RecordNotUnique) { duplicate.save(validate: false) }
   end
 end
