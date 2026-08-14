@@ -16,6 +16,9 @@ class Song < ApplicationRecord
   accepts_nested_attributes_for :artist
   accepts_nested_attributes_for :album
 
+  validates :title, presence: true
+  validates :artist, presence: true
+
   delegate :name, to: :artist, prefix: true
   delegate :title, to: :album, prefix: true
 

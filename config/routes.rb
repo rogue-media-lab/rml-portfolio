@@ -300,7 +300,19 @@ Rails.application.routes.draw do
     get "/orders/:id/confirmation", to: "restaurants/orders#confirmation", as: :restaurant_order_confirmation
   end
 
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
+  # =====================================================================
+  # API v1 — Agent-facing endpoints for Zuke music management
+  # Used by the Hermes Agent to upload tracks and create playlists.
+  # Auth: Bearer token (see config/credentials — :api_token)
+  # =====================================================================
+  namespace :api, defaults: { format: :json } do
+    namespace :v1 do
+      resources :songs, only: [ :create ]
+      resources :playlists, only: [ :create ]
+    end
+  end
+
+  # Define your application routes per the DSL at https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
