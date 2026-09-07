@@ -282,7 +282,7 @@ Rails.application.routes.draw do
   # These routes MUST come after all specific portfolio routes
   # to avoid slug conflicts with /studio, /lab, /blog, /milk_admin, etc.
   scope "/:restaurant_slug" do
-    get "/", to: "restaurants/pages#home", as: :restaurant_home
+    # get "/", to: "restaurants/pages#home", as: :restaurant_home
     get "/menu", to: "restaurants/menu#index", as: :restaurant_menu
     get "/about", to: "restaurants/pages#about", as: :restaurant_about
     get "/contact", to: "restaurants/contact#index", as: :restaurant_contact
