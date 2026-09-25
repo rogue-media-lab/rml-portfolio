@@ -69,7 +69,7 @@
         <h3 class="text-base leading-[1.2] text-zinc-50 font-['Inter',system-ui,sans-serif] font-semibold m-0">Music Player</h3>
         <p class="text-xs leading-[1.5] text-zinc-400 font-['Inter',system-ui,sans-serif] m-0">Personal music library — songs, albums, playlists, EQ.</p>
         <div class="mt-auto flex items-center pt-2 gap-2 relative">
-          <%= link_to music_list_zuke_index_path, class: "flex items-center gap-2" do %>
+          <%= link_to music_list_zuke_index_path, class: "flex items-center gap-2", data: { turbo: false } do %>
             <span class="text-zinc-50 font-['Inter',system-ui,sans-serif] font-semibold text-[11px]">Open</span>
             <span class="text-blue-500 font-['Inter',system-ui,sans-serif] font-semibold text-[11px]">&rarr;</span>
           <% end %>
@@ -86,7 +86,7 @@
         <h3 class="text-base leading-[1.2] text-zinc-50 font-['Inter',system-ui,sans-serif] font-semibold m-0">Vehicle Relationships</h3>
         <p class="text-xs leading-[1.5] text-zinc-400 font-['Inter',system-ui,sans-serif] m-0">Two-sided platform connecting car owners with shops.</p>
         <div class="mt-auto flex items-center pt-2 gap-2 relative">
-          <%= link_to carus_root_path, class: "flex items-center gap-2" do %>
+          <%= link_to carus_root_path, class: "flex items-center gap-2", data: { turbo: false } do %>
             <span class="text-zinc-50 font-['Inter',system-ui,sans-serif] font-semibold text-[11px]">Open</span>
             <span class="text-green-500 font-['Inter',system-ui,sans-serif] font-semibold text-[11px]">&rarr;</span>
           <% end %>
@@ -103,7 +103,7 @@
         <h3 class="text-base leading-[1.2] text-zinc-50 font-['Inter',system-ui,sans-serif] font-semibold m-0">Minecraft Crew Hub</h3>
         <p class="text-xs leading-[1.5] text-zinc-400 font-['Inter',system-ui,sans-serif] m-0">Hermitcraft roster, seasons, and crew favorites.</p>
         <div class="mt-auto flex items-center pt-2 gap-2 relative">
-          <%= link_to hermits_path, class: "flex items-center gap-2" do %>
+          <%= link_to hermits_path, class: "flex items-center gap-2", data: { turbo: false } do %>
             <span class="text-zinc-50 font-['Inter',system-ui,sans-serif] font-semibold text-[11px]">Open</span>
             <span class="text-yellow-400 font-['Inter',system-ui,sans-serif] font-semibold text-[11px]">&rarr;</span>
           <% end %>
