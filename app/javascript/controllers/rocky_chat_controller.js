@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = [
-    "messages", "input", "sendButton", "counter",
+    "messages", "input", "sendButton",
     "toneGlow", "toneCircleOuter", "toneCircleInner", "toneDiamond",
     "speechbars"
   ]
@@ -10,8 +10,6 @@ export default class extends Controller {
     messagesUrl: String,
     ttsUrl:      String,
     toneUrl:     String,
-    promptCount: Number,
-    anonLimit:   Number,
     loggedIn:    Boolean
   }
 
@@ -34,7 +32,6 @@ export default class extends Controller {
 
     this.scrollToBottom()
     if (this.hasInputTarget) this.inputTarget.focus()
-    this._updateCounter()
   }
 
   disconnect() {
@@ -57,11 +54,6 @@ export default class extends Controller {
     const content = this.inputTarget.value.trim()
     if (!content || this._streaming) return
 
-    if (!this.loggedInValue && this.promptCountValue >= this.anonLimitValue) {
-      this._showLimitMessage()
-      return
-    }
-
     // Warm up AudioContext inside the user gesture (Enter keypress).
     // Mobile browsers require ctx creation + resume within a direct gesture;
     // by the time TTS audio arrives async, the gesture window has expired.
@@ -80,17 +72,8 @@ export default class extends Controller {
         body: JSON.stringify({ content })
       })
 
-      if (response.status === 403) {
-        const data = await response.json()
-        this._updateBubble(assistantBubble, data.message || "Limit reached.")
-        this._showLimitMessage()
-        return
-      }
-
       if (!response.ok) throw new Error(`HTTP ${response.status}`)
 
-      this.promptCountValue++
-      this._updateCounter()
       await this._consumeSSE(response, assistantBubble)
 
     } catch (error) {
@@ -570,35 +553,11 @@ export default class extends Controller {
     return el
   }
 
-  _showLimitMessage() {
-    const el = document.createElement("div")
-    el.className = "flex flex-col gap-3"
-    el.innerHTML = `
-      <div class="max-w-[580px] rounded-2xl bg-zinc-900/50 border border-zinc-800 p-7 text-center">
-        <p class="text-[16px] leading-[1.5] text-zinc-400 font-['Inter',system-ui,sans-serif]">
-          You've used all ${this.anonLimitValue} free prompts.
-        </p>
-        <p class="text-[14px] text-zinc-500 font-['Inter',system-ui,sans-serif] mt-2">
-          Sign in to keep chatting with Rocky.
-        </p>
-      </div>
-    `
-    this.messagesTarget.appendChild(el)
-    this.scrollToBottom()
-  }
-
   // ── UI state ────────────────────────────────────────────────────────────
 
   _setStreaming(val) {
     this._streaming = val
     if (this.hasSendButtonTarget) this.sendButtonTarget.disabled = val
-  }
-
-  _updateCounter() {
-    if (this.hasCounterTarget && !this.loggedInValue) {
-      const remaining = Math.max(0, this.anonLimitValue - this.promptCountValue)
-      this.counterTarget.textContent = `${remaining} prompts remaining`
-    }
   }
 
   scrollToBottom() {
