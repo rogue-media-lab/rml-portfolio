@@ -70,71 +70,120 @@
     </div>
   </div>
 
-  <%# ─── ROCKY MINI CORE INTERFACE ─── %>
-  <div class="flex justify-center w-full pb-16 md:pb-20 px-6 md:px-16">
-    <div class="w-full max-w-[700px] rounded-2xl overflow-hidden bg-[#050505] border border-zinc-800 shadow-[0_10px_40px_rgba(0,0,0,0.5)] flex flex-col md:flex-row md:h-40">
-      <%# Left — Rocky Visualizer %>
-      <div class="w-full md:w-40 h-44 md:h-full relative flex items-center justify-center shrink-0 overflow-hidden bg-zinc-950 border-b md:border-b-0 md:border-r border-zinc-800">
-        <div class="absolute w-50 h-50 rounded-full" style="background-image: radial-gradient(circle farthest-corner at 50% 50% in oklab, oklab(83.7% 0.016 0.164 / 10%) 0%, oklab(0% 0 .0001 / 0%) 70%)"></div>
-        <div class="w-10 h-10 rounded-lg relative bg-[#050505] border-2 border-yellow-400 shadow-[0_0_20px_rgba(251,191,36,0.3)] shrink-0" style="transform: rotate(45deg)"></div>
-        <div class="absolute flex items-center justify-center gap-[3px] w-full h-full">
-          <div class="w-[3px] h-5 rounded-[1px] bg-teal-400 shadow-[0_0_8px_rgba(45,212,191,0.8)] shrink-0"></div>
-          <div class="w-[3px] h-10 rounded-[1px] bg-teal-400 shadow-[0_0_8px_rgba(45,212,191,0.8)] shrink-0"></div>
-          <div class="w-[3px] h-[15px] rounded-[1px] bg-teal-400 shadow-[0_0_8px_rgba(45,212,191,0.8)] shrink-0"></div>
-          <div class="w-[3px] h-[35px] rounded-[1px] bg-teal-400 shadow-[0_0_8px_rgba(45,212,191,0.8)] shrink-0"></div>
+  <%# ─── ROCKY + PROJECTS (asymmetric: Rocky left, 2x2 projects right) ─── %>
+  <div class="flex flex-col lg:flex-row justify-center w-full pt-10 md:pt-15 pb-16 md:pb-20 gap-6 lg:gap-8 px-6 md:px-16">
+
+    <%# Left — Rocky (prominent) %>
+    <div class="lg:w-[42%] lg:max-w-[560px] flex">
+      <div class="w-full rounded-2xl overflow-hidden bg-[#050505] border border-zinc-800 shadow-[0_10px_40px_rgba(0,0,0,0.5)] flex flex-col md:flex-row md:h-56">
+        <%# Left — Rocky Visualizer %>
+        <div class="w-full md:w-56 h-44 md:h-full relative flex items-center justify-center shrink-0 overflow-hidden bg-zinc-950 border-b md:border-b-0 md:border-r border-zinc-800">
+          <div class="absolute w-50 h-50 rounded-full" style="background-image: radial-gradient(circle farthest-corner at 50% 50% in oklab, oklab(83.7% 0.016 0.164 / 10%) 0%, oklab(0% 0 .0001 / 0%) 70%)"></div>
+          <div class="w-12 h-12 rounded-lg relative bg-[#050505] border-2 border-yellow-400 shadow-[0_0_20px_rgba(251,191,36,0.3)] shrink-0" style="transform: rotate(45deg)"></div>
+          <div class="absolute flex items-center justify-center gap-[3px] w-full h-full">
+            <div class="w-[3px] h-6 rounded-[1px] bg-teal-400 shadow-[0_0_8px_rgba(45,212,191,0.8)] shrink-0"></div>
+            <div class="w-[3px] h-12 rounded-[1px] bg-teal-400 shadow-[0_0_8px_rgba(45,212,191,0.8)] shrink-0"></div>
+            <div class="w-[3px] h-[18px] rounded-[1px] bg-teal-400 shadow-[0_0_8px_rgba(45,212,191,0.8)] shrink-0"></div>
+            <div class="w-[3px] h-[42px] rounded-[1px] bg-teal-400 shadow-[0_0_8px_rgba(45,212,191,0.8)] shrink-0"></div>
+            <div class="w-[3px] h-7 rounded-[1px] bg-teal-400 shadow-[0_0_8px_rgba(45,212,191,0.8)] shrink-0"></div>
+            <div class="w-[3px] h-4 rounded-[1px] bg-teal-400 shadow-[0_0_8px_rgba(45,212,191,0.8)] shrink-0"></div>
+            <div class="w-[3px] h-9 rounded-[1px] bg-teal-400 shadow-[0_0_8px_rgba(45,212,191,0.8)] shrink-0"></div>
+          </div>
+        </div>
+        <%# Right — Rocky Interface %>
+        <div class="flex-1 flex flex-col justify-between relative p-5 md:p-6 gap-4 md:gap-0">
+          <div class="absolute top-0 left-0 w-full h-full" style="background-image: radial-gradient(circle farthest-corner at 50% 50% in oklab, oklab(83.7% 0.016 0.164 / 3%) 0%, oklab(0% 0 .0001 / 0%) 50%)"></div>
+          <div class="flex flex-col sm:flex-row justify-between items-start relative gap-3 sm:gap-0">
+            <div class="flex flex-col gap-1">
+              <span class="text-zinc-50 font-['Inter',system-ui,sans-serif] font-semibold text-base">Rocky // Lab Assistant</span>
+              <div class="flex items-center gap-1.5">
+                <div class="w-1.5 h-1.5 rounded-[3px] bg-green-400"></div>
+                <span class="text-zinc-500 font-mono text-[11px]"><span class="hidden sm:inline">STATUS: </span>ONLINE <span class="hidden sm:inline">// LISTENING_FOR_INPUT</span></span>
+              </div>
+            </div>
+            <%= link_to rocky_chat_path, class: "rounded-md py-2.5 px-4 bg-zinc-50 hover:bg-zinc-200 transition-colors cursor-pointer text-center sm:w-auto w-full", data: { turbo_frame: "workbench-hero" } do %>
+              <span class="uppercase text-zinc-950 font-['Inter',system-ui,sans-serif] font-bold text-[13px]">Initiate</span>
+            <% end %>
+          </div>
+          <p class="relative text-zinc-400 font-['Inter',system-ui,sans-serif] italic text-sm">"*harmonic hum* Good morning, friend. How can the Lab help today?"</p>
         </div>
       </div>
-      <%# Right — Rocky Interface %>
-      <div class="flex-1 flex flex-col justify-between relative p-5 md:p-6 gap-4 md:gap-0">
-        <div class="absolute top-0 left-0 w-full h-full" style="background-image: radial-gradient(circle farthest-corner at 50% 50% in oklab, oklab(83.7% 0.016 0.164 / 3%) 0%, oklab(0% 0 .0001 / 0%) 50%)"></div>
-        <div class="flex flex-col sm:flex-row justify-between items-start relative gap-3 sm:gap-0">
-          <div class="flex flex-col gap-1">
-            <span class="text-zinc-50 font-['Inter',system-ui,sans-serif] font-semibold text-base">Rocky // Lab Assistant</span>
-            <div class="flex items-center gap-1.5">
-              <div class="w-1.5 h-1.5 rounded-[3px] bg-green-400"></div>
-              <span class="text-zinc-500 font-mono text-[11px]"><span class="hidden sm:inline">STATUS: </span>ONLINE <span class="hidden sm:inline">// LISTENING_FOR_INPUT</span></span>
-            </div>
-          </div>
-          <%= link_to rocky_chat_path, class: "rounded-md py-2.5 px-4 bg-zinc-50 hover:bg-zinc-200 transition-colors cursor-pointer text-center sm:w-auto w-full", data: { turbo_frame: "workbench-hero" } do %>
-            <span class="uppercase text-zinc-950 font-['Inter',system-ui,sans-serif] font-bold text-[13px]">Initiate</span>
+    </div>
+
+    <%# Right — 2x2 project grid %>
+    <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6">
+
+      <%# Zuke %>
+      <div class="flex flex-col relative rounded-xl overflow-hidden gap-3 bg-zinc-900 border border-zinc-800 p-5">
+        <div class="absolute top-0 left-0 w-full h-1 bg-blue-500"></div>
+        <div class="flex justify-between items-center relative">
+          <span class="tracking-[0.05em] uppercase text-blue-500 font-['Barlow_Condensed',system-ui,sans-serif] font-bold text-lg">Zuke</span>
+          <span class="text-zinc-600 font-mono text-[10px]">/MUSIC</span>
+        </div>
+        <h3 class="text-lg leading-[1.2] text-zinc-50 font-['Inter',system-ui,sans-serif] font-semibold m-0">Music Player</h3>
+        <p class="text-sm leading-[1.5] text-zinc-400 font-['Inter',system-ui,sans-serif] m-0">Personal music library — songs, albums, playlists, EQ.</p>
+        <div class="mt-auto flex items-center pt-3 gap-2 relative">
+          <%= link_to music_list_zuke_index_path, class: "flex items-center gap-2" do %>
+            <span class="text-zinc-50 font-['Inter',system-ui,sans-serif] font-semibold text-xs">Open</span>
+            <span class="text-blue-500 font-['Inter',system-ui,sans-serif] font-semibold text-xs">&rarr;</span>
           <% end %>
         </div>
-        <p class="relative text-zinc-400 font-['Inter',system-ui,sans-serif] italic text-sm">"*harmonic hum* Good morning, friend. How can the Lab help today?"</p>
       </div>
+
+      <%# Carus %>
+      <div class="flex flex-col relative rounded-xl overflow-hidden gap-3 bg-zinc-900 border border-zinc-800 p-5">
+        <div class="absolute top-0 left-0 w-full h-1 bg-green-500"></div>
+        <div class="flex justify-between items-center relative">
+          <span class="tracking-[0.05em] uppercase text-green-500 font-['Barlow_Condensed',system-ui,sans-serif] font-bold text-lg">Carus</span>
+          <span class="text-zinc-600 font-mono text-[10px]">/VEHICLES</span>
+        </div>
+        <h3 class="text-lg leading-[1.2] text-zinc-50 font-['Inter',system-ui,sans-serif] font-semibold m-0">Vehicle Relationships</h3>
+        <p class="text-sm leading-[1.5] text-zinc-400 font-['Inter',system-ui,sans-serif] m-0">Two-sided platform connecting car owners with shops.</p>
+        <div class="mt-auto flex items-center pt-3 gap-2 relative">
+          <%= link_to carus_root_path, class: "flex items-center gap-2" do %>
+            <span class="text-zinc-50 font-['Inter',system-ui,sans-serif] font-semibold text-xs">Open</span>
+            <span class="text-green-500 font-['Inter',system-ui,sans-serif] font-semibold text-xs">&rarr;</span>
+          <% end %>
+        </div>
+      </div>
+
+      <%# Hermit Plus %>
+      <div class="flex flex-col relative rounded-xl overflow-hidden gap-3 bg-zinc-900 border border-zinc-800 p-5">
+        <div class="absolute top-0 left-0 w-full h-1 bg-yellow-400"></div>
+        <div class="flex justify-between items-center relative">
+          <span class="tracking-[0.05em] uppercase text-yellow-400 font-['Barlow_Condensed',system-ui,sans-serif] font-bold text-lg">Hermit Plus</span>
+          <span class="text-zinc-600 font-mono text-[10px]">/CREW</span>
+        </div>
+        <h3 class="text-lg leading-[1.2] text-zinc-50 font-['Inter',system-ui,sans-serif] font-semibold m-0">Minecraft Crew Hub</h3>
+        <p class="text-sm leading-[1.5] text-zinc-400 font-['Inter',system-ui,sans-serif] m-0">Hermitcraft roster, seasons, and crew favorites.</p>
+        <div class="mt-auto flex items-center pt-3 gap-2 relative">
+          <%= link_to hermits_path, class: "flex items-center gap-2" do %>
+            <span class="text-zinc-50 font-['Inter',system-ui,sans-serif] font-semibold text-xs">Open</span>
+            <span class="text-yellow-400 font-['Inter',system-ui,sans-serif] font-semibold text-xs">&rarr;</span>
+          <% end %>
+        </div>
+      </div>
+
+      <%# Waypoint (placeholder — private repo, not yet in portfolio) %>
+      <div class="flex flex-col relative rounded-xl overflow-hidden gap-3 bg-zinc-900/50 border border-dashed border-zinc-700 p-5 opacity-70">
+        <div class="absolute top-0 left-0 w-full h-1 bg-red-500"></div>
+        <div class="flex justify-between items-center relative">
+          <span class="tracking-[0.05em] uppercase text-red-500 font-['Barlow_Condensed',system-ui,sans-serif] font-bold text-lg">Waypoint</span>
+          <span class="text-zinc-600 font-mono text-[10px]">/SOON</span>
+        </div>
+        <h3 class="text-lg leading-[1.2] text-zinc-50 font-['Inter',system-ui,sans-serif] font-semibold m-0">Shop Floor Tracker</h3>
+        <p class="text-sm leading-[1.5] text-zinc-400 font-['Inter',system-ui,sans-serif] m-0">Service jobs and hours, tied to vehicles and technicians.</p>
+        <div class="mt-auto flex items-center pt-3 gap-2 relative">
+          <span class="text-zinc-600 font-['Inter',system-ui,sans-serif] font-semibold text-xs">Coming soon</span>
+        </div>
+      </div>
+
     </div>
   </div>
   </turbo-frame>
 
   <%# ─── THE PILLARS ─── %>
   <div class="flex flex-col md:flex-row justify-center w-full pt-10 md:pt-15 pb-20 md:pb-30 gap-6 md:gap-8 px-6 md:px-16">
-
-    <%# The Studio Card %>
-    <div class="flex-1 max-w-100 flex flex-col relative rounded-xl overflow-hidden gap-6 bg-zinc-900 border border-zinc-800 p-6 md:p-10">
-      <div class="absolute top-0 left-0 w-full h-1 bg-blue-500"></div>
-      <div class="flex justify-between items-center relative">
-        <span class="tracking-[0.05em] uppercase text-blue-500 font-['Barlow_Condensed',system-ui,sans-serif] font-bold text-xl">The Studio</span>
-        <span class="text-zinc-600 font-mono text-[11px]">/APPS</span>
-      </div>
-      <h3 class="text-[28px] leading-[1.2] relative text-zinc-50 font-['Inter',system-ui,sans-serif] font-semibold m-0">Consumer Applications &amp; Prototypes</h3>
-      <p class="text-[16px] leading-[1.5] relative text-zinc-400 font-['Inter',system-ui,sans-serif] m-0">Zuke Music Player, Notary Assistant, Hermit Plus. Showcasing polished, functional tools built with a blend of classic Rails and modern AI APIs.</p>
-      <div class="mt-auto flex items-center pt-8 gap-2 relative">
-        <%= link_to studio_path, class: "flex items-center gap-2" do %>
-          <span class="text-zinc-50 font-['Inter',system-ui,sans-serif] font-semibold text-sm">Explore The Studio</span>
-          <span class="text-blue-500 font-['Inter',system-ui,sans-serif] font-semibold text-sm">&rarr;</span>
-        <% end %>
-      </div>
-      <div class="w-full h-25 mt-4 flex items-center justify-center relative rounded-lg overflow-hidden bg-zinc-950 border border-zinc-800 shrink-0">
-        <div class="flex items-end h-10 gap-[3px]">
-          <div class="w-1 h-3 rounded-xs bg-blue-500 shrink-0"></div>
-          <div class="w-1 h-6 rounded-xs bg-blue-500 shrink-0"></div>
-          <div class="w-1 h-[18px] rounded-xs bg-blue-500 shrink-0"></div>
-          <div class="w-1 h-8 rounded-xs bg-blue-500 shrink-0"></div>
-          <div class="w-1 h-5 rounded-xs bg-blue-500 shrink-0"></div>
-          <div class="w-1 h-[14px] rounded-xs bg-blue-500 shrink-0"></div>
-          <div class="w-1 h-7 rounded-xs bg-blue-500 shrink-0"></div>
-        </div>
-      </div>
-    </div>
 
     <%# The Lab Card %>
     <div class="flex-1 max-w-100 flex flex-col relative rounded-xl overflow-hidden gap-6 bg-zinc-900 border border-zinc-800 p-6 md:p-10">
