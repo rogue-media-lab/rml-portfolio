@@ -4,8 +4,6 @@
        data-rocky-chat-messages-url-value="<%= rocky_messages_path %>"
        data-rocky-chat-tts-url-value="<%= rocky_tts_path %>"
        data-rocky-chat-tone-url-value="<%= rocky_tone_path %>"
-       data-rocky-chat-prompt-count-value="<%= @prompt_count %>"
-       data-rocky-chat-anon-limit-value="<%= @anon_limit %>"
        data-rocky-chat-logged-in-value="<%= @logged_in %>">
 
     <%# ─── ROCKY HEADER ─── %>
@@ -17,9 +15,6 @@
       <div class="flex items-center gap-3 md:gap-8 flex-wrap justify-center">
         <span class="hidden md:inline text-zinc-500 font-mono text-xs">TRANSLATION_LAYER: ACTIVE</span>
         <span class="hidden md:inline text-zinc-500 font-mono text-xs">ACOUSTIC_SYNCH: 100%</span>
-        <% unless @logged_in %>
-          <span class="text-zinc-600 font-mono text-xs" data-rocky-chat-target="counter"><%= @anon_limit - @prompt_count %> prompts remaining</span>
-        <% end %>
         <%= link_to root_path, class: "flex items-center gap-2 text-zinc-500 font-mono text-xs hover:text-zinc-300 transition-colors", data: { turbo_frame: "workbench-hero" } do %>
           <span>[ CLOSE ]</span>
         <% end %>

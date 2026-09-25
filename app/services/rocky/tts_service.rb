@@ -54,7 +54,7 @@ module Rocky
         voice:           @voice,
         speed:           @speed,
         response_format: "mp3",
-        instructions:    @instructions,
+        instructions:    @instructions
       }.to_json
 
       response = http.request(request)

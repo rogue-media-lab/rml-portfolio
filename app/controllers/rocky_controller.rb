@@ -9,8 +9,6 @@ class RockyController < ApplicationController
   def chat
     @session = find_or_build_session
     @messages = @session ? @session.chat_messages.ordered : []
-    @prompt_count = session[:rocky_prompts] || 0
-    @anon_limit = ROCKY_ANON_LIMIT
     @logged_in = user_signed_in?
 
     render :chat, formats: :html, layout: false
@@ -20,16 +18,6 @@ class RockyController < ApplicationController
   def create
     content = params[:content].to_s.strip
     return head(:unprocessable_entity) if content.blank?
-
-    # Rate limit anonymous users
-    @prompt_count = (session[:rocky_prompts] || 0)
-    unless user_signed_in?
-      if @prompt_count >= ROCKY_ANON_LIMIT
-        render json: { error: "limit_reached", message: "You've used all #{ROCKY_ANON_LIMIT} free prompts. Sign in to continue chatting with Rocky." }, status: :forbidden
-        return
-      end
-      session[:rocky_prompts] = @prompt_count + 1
-    end
 
     # Build message history
     chat_session = find_or_build_session
