@@ -8,7 +8,7 @@
   <%# Hero image banner %>
   <div class="relative w-full max-w-[1024px] mx-auto h-55 overflow-hidden shrink-0">
     <% if @vehicle.photo.attached? %>
-      <%= image_tag @vehicle.photo.variant(resize_to_limit: [780, 440]), class: "w-full h-full object-cover" %>
+      <%= image_tag @vehicle.photo.variant(resize_to_limit: [2048, 440]), class: "w-full h-full object-cover object-center" %>
     <% else %>
       <div class="w-full h-full bg-carus-field"></div>
     <% end %>
