@@ -4,9 +4,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <% end %>
 
-<div class="max-w-[375px] mx-auto min-h-screen bg-carus-black font-montserrat flex flex-col pb-20">
+<div class="w-full mx-auto min-h-screen bg-carus-black font-montserrat flex flex-col pb-20">
   <%# Hero image banner %>
-  <div class="relative w-full h-55 overflow-hidden shrink-0">
+  <div class="relative w-full max-w-[1024px] mx-auto h-55 overflow-hidden shrink-0">
     <% if @vehicle.photo.attached? %>
       <%= image_tag @vehicle.photo.variant(resize_to_limit: [780, 440]), class: "w-full h-full object-cover" %>
     <% else %>
@@ -40,7 +40,7 @@
   </div>
 
   <%# Title area %>
-  <div class="flex justify-between items-start pt-1 px-6">
+  <div class="w-full max-w-[1024px] mx-auto flex justify-between items-start pt-1 px-6">
     <div class="flex flex-col gap-0.5">
       <h2 class="text-xl/[24px] font-extrabold text-white tracking-[-0.4px]">
         <%= @vehicle.year %> <%= @vehicle.make %> <%= @vehicle.model %>
@@ -56,7 +56,7 @@
   </div>
 
   <%# Mileage card %>
-  <div class="mt-2.5 mb-0 flex items-center justify-between rounded-[14px] py-3 px-4 bg-carus-field border border-[#FFFFFF0F] mx-6">
+  <div class="w-full max-w-[1024px] mx-auto mt-2.5 mb-0 flex items-center justify-between rounded-[14px] py-3 px-4 bg-carus-field border border-[#FFFFFF0F]">
     <div class="flex flex-col gap-0.5">
       <p class="uppercase tracking-[0.8px] text-[9px]/[12px] font-semibold text-[#FFFFFF59]">Est. Current Mileage</p>
       <p class="text-lg/[22px] font-extrabold text-white">
@@ -72,7 +72,7 @@
 
   <%# Shop Services — from the linked shop %>
   <% if @services.any? %>
-    <div class="mt-2.5 mb-0 flex gap-2 mx-6 overflow-x-auto hide-scrollbar">
+    <div class="w-full max-w-[1024px] mx-auto mt-2.5 mb-0 flex gap-2 overflow-x-auto hide-scrollbar">
       <% @services.first(5).each do |svc| %>
         <div class="shrink-0 rounded-[11px] py-2.5 px-3.25 bg-carus-field border border-carus-border">
           <span class="text-xs/[16px] font-semibold text-[#FFFFFF66] whitespace-nowrap"><%= svc.name %></span>
@@ -82,7 +82,7 @@
   <% end %>
 
   <%# History — bookings + service records %>
-  <div class="grow flex flex-col pt-2.5 gap-2 px-6">
+  <div class="w-full max-w-[1024px] mx-auto grow flex flex-col pt-2.5 gap-2 px-6">
     <%# Book Service CTA %>
     <%= link_to new_vehicle_booking_request_path(@vehicle), class: "flex items-center justify-center rounded-2xl py-4 gap-2 bg-carus-green/10 border border-carus-green/20" do %>
       <span class="text-sm/[18px] font-bold text-carus-green">Book a Service</span>
