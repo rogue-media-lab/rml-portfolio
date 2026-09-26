@@ -15,10 +15,10 @@
   chat_messages = active_vehicle&.chat_messages.is_a?(Array) ? active_vehicle.chat_messages : []
 %>
 
-<div class="max-w-[375px] mx-auto min-h-screen bg-carus-black font-montserrat flex flex-col pb-20">
+<div class="w-full mx-auto min-h-screen bg-carus-black font-montserrat flex flex-col pb-20">
 
   <%# ── Header ──────────────────────────────────────────────────────── %>
-  <div class="shrink-0 pt-14 pb-3 px-5">
+  <div class="shrink-0 w-full max-w-[1024px] mx-auto pt-14 pb-3 px-5">
     <div class="flex justify-between items-center">
       <div>
         <p class="text-[11px]/[14px] font-semibold text-white opacity-45 tracking-[1.5px] uppercase">My Garage</p>
@@ -32,7 +32,7 @@
   </div>
 
   <%# ── Vehicle Cards (compact) ─────────────────────────────────────── %>
-  <div class="shrink-0 flex flex-col px-5 gap-3">
+  <div class="shrink-0 w-full max-w-[1024px] mx-auto flex flex-col px-5 gap-3">
     <% @vehicles.each do |vehicle| %>
       <% is_active = vehicle.id == active_id %>
       <% vspecs = vehicle.ai_specs.is_a?(Hash) ? vehicle.ai_specs : {} %>
@@ -99,7 +99,7 @@
 
   <%# ── Chat ─────────────────────────────────────────────────────────── %>
   <% if active_vehicle %>
-    <div class="flex-1 flex flex-col mt-4"
+    <div class="flex-1 w-full max-w-[1024px] mx-auto flex flex-col mt-4"
          data-controller="garage-chat"
          data-garage-chat-chat-url-value="<%= vehicle_chat_path(active_vehicle) %>">
 
@@ -209,7 +209,7 @@
       </div>
 
       <%# Input bar — wired to Stimulus %>
-      <div class="shrink-0 px-4 pb-3 pt-2 border-t border-[#FFFFFF08] bg-carus-black">
+      <div class="shrink-0 w-full max-w-[1024px] mx-auto px-4 pb-3 pt-2 border-t border-[#FFFFFF08] bg-carus-black">
         <div class="flex items-center gap-2 bg-carus-field rounded-full border border-[#2A2A2A] px-4 py-2.5">
           <input type="text"
                  placeholder="Reply to your <%= active_vehicle.make || 'car' %>..."
