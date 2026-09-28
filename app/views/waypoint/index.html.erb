@@ -1,0 +1,236 @@
+<%# Waypoint Demo — Discord-look mockup of the #waypoint channel %>
+<%# No model, no DB. Fake data only. Mobile responsive via waypoint_sidebar_controller. %>
+<% content_for(:title) { "Waypoint — Discord Shop Floor Demo" } %>
+<% content_for(:body_class) { "bg-zinc-950 text-zinc-50" } %>
+<% content_for(:main_class) { "flex flex-col min-h-screen w-full" } %>
+
+<%= render "shared/workbench_nav", active_page: "workbench" %>
+
+<div class="w-full bg-zinc-950 antialiased" data-controller="waypoint-sidebar">
+
+  <%# ─── DEMO BANNER ─── %>
+  <div class="w-full bg-zinc-900/50 border-b border-zinc-800 px-4 md:px-6 py-2.5 flex items-center justify-between gap-3">
+    <div class="flex items-center gap-2 min-w-0">
+      <span class="inline-flex items-center gap-1.5 text-[10px] font-mono font-bold uppercase tracking-wider text-yellow-400 bg-yellow-400/10 border border-yellow-400/30 rounded-sm px-1.5 py-0.5 shrink-0">Demo</span>
+      <span class="text-zinc-400 font-mono text-[11px] md:text-xs truncate">Sample of what Waypoint posts to Discord when a shop records a job.</span>
+    </div>
+    <a href="<%= root_path %>" class="text-zinc-500 hover:text-zinc-300 font-mono text-[11px] uppercase tracking-wider shrink-0 flex items-center gap-1">
+      <span class="hidden sm:inline">Back to</span> Workbench <span aria-hidden="true">&rarr;</span>
+    </a>
+  </div>
+
+  <%# ─── DISCORD MOCKUP ─── %>
+  <%# Discord palette: bg #36393F (main), #2F3136 (sidebar), #202225 (topbar), #5865F2 (blurple), #3BA55D (online) %>
+  <div class="flex w-full h-[calc(100vh-220px)] md:h-[calc(100vh-200px)] min-h-[640px] text-zinc-200 font-sans relative overflow-hidden">
+
+    <%# Mobile overlay (click to close) %>
+    <div data-waypoint-sidebar-target="overlay"
+         data-action="click->waypoint-sidebar#close"
+         class="hidden md:hidden fixed inset-0 bg-black/60 z-30"></div>
+
+    <%# ─── SERVER LIST (far left, hidden on mobile) ─── %>
+    <div class="hidden md:flex w-[72px] bg-[#1E1F22] flex-col items-center py-3 gap-2 shrink-0 border-r border-black/40">
+      <div class="w-12 h-12 rounded-2xl bg-[#5865F2] flex items-center justify-center text-white font-bold text-lg shadow-md">R</div>
+      <div class="w-12 h-12 rounded-2xl bg-zinc-800 flex items-center justify-center">
+        <span class="material-icons text-zinc-400 text-2xl">add</span>
+      </div>
+    </div>
+
+    <%# ─── CHANNEL SIDEBAR ─── %>
+    <aside data-waypoint-sidebar-target="sidebar"
+           data-controller="waypoint-threads"
+           class="fixed md:static inset-y-0 left-0 z-40 w-60 bg-[#2F3136] flex flex-col shrink-0 transform -translate-x-full md:translate-x-0 transition-transform duration-200 border-r border-black/40">
+
+      <%# Server header %>
+      <button class="h-12 px-4 flex items-center justify-between bg-[#2F3136] hover:bg-[#34373C] transition-colors border-b border-black/40 shadow-sm text-left">
+        <span class="font-semibold text-white text-[15px] truncate">Rogue Media Lab</span>
+        <span class="material-icons text-zinc-400 text-xl">expand_more</span>
+      </button>
+
+      <div class="flex-1 overflow-y-auto px-2 py-3 space-y-4 text-[14px]">
+
+        <%# Information category %>
+        <div>
+          <div class="flex items-center justify-between px-1 mb-1">
+            <span class="text-[11px] font-semibold uppercase tracking-wide text-zinc-400 hover:text-zinc-200 cursor-pointer flex items-center gap-0.5">
+              <span class="material-icons text-[14px]">expand_more</span> Information
+            </span>
+          </div>
+          <div class="space-y-0.5">
+                      <% %w[welcome-and-about announcements introductions resources substack].each do |ch| %>
+                        <% if ch == 'welcome-and-about' %>
+                          <%= link_to waypoint_welcome_path,
+                                      data: {
+                                        turbo_frame: "waypoint_chat",
+                                        turbo_action: "replace",
+                                        waypoint_threads_target: "welcomeChannel",
+                                        action: "click->waypoint-threads#setActiveChannel",
+                                        waypoint_thread: "welcome-and-about"
+                                      },
+                                      class: "flex items-center gap-1.5 px-2 py-1.5 rounded #{@active_channel == 'welcome-and-about' ? 'bg-[#404249] text-white font-medium' : 'text-zinc-400 hover:bg-[#34373C] hover:text-zinc-100'} cursor-pointer" do %>
+                            <span class="<%= @active_channel == 'welcome-and-about' ? 'text-zinc-300' : 'text-zinc-500' %> font-bold text-base leading-none">#</span>
+                            <span class="truncate"><%= ch.gsub('-', ' ') %></span>
+                          <% end %>
+                        <% else %>
+                          <div class="flex items-center gap-1.5 px-2 py-1.5 rounded text-zinc-400 hover:bg-[#34373C] hover:text-zinc-100 cursor-pointer">
+                            <span class="text-zinc-500 font-bold text-base leading-none">#</span>
+                            <span class="truncate"><%= ch.gsub('-', ' ') %></span>
+                          </div>
+                        <% end %>
+                      <% end %>
+                    </div>
+
+        <%# Lab Channels category %>
+        <div>
+          <div class="flex items-center justify-between px-1 mb-1">
+            <span class="text-[11px] font-semibold uppercase tracking-wide text-zinc-400 hover:text-zinc-200 cursor-pointer flex items-center gap-0.5">
+              <span class="material-icons text-[14px]">expand_more</span> Lab Channels
+            </span>
+          </div>
+          <div class="space-y-0.5">
+            <% %w[labs-lounge off-topic ai-tools rials].each do |ch| %>
+              <% if ch == 'labs-lounge' %>
+                <%= link_to waypoint_labs_lounge_path,
+                            data: {
+                              turbo_frame: "waypoint_chat",
+                              turbo_action: "replace",
+                              waypoint_threads_target: "labsLoungeChannel",
+                              action: "click->waypoint-threads#setActiveChannel",
+                              waypoint_thread: "labs-lounge"
+                            },
+                            class: "flex items-center gap-1.5 px-2 py-1.5 rounded text-zinc-400 hover:bg-[#34373C] hover:text-zinc-100 cursor-pointer" do %>
+                  <span class="text-zinc-500 font-bold text-base leading-none">#</span>
+                  <span class="truncate"><%= ch.gsub('-', ' ') %></span>
+                <% end %>
+              <% else %>
+                <div class="flex items-center gap-1.5 px-2 py-1.5 rounded text-zinc-400 hover:bg-[#34373C] hover:text-zinc-100 cursor-pointer">
+                  <span class="text-zinc-500 font-bold text-base leading-none">#</span>
+                  <span class="truncate"><%= ch.gsub('-', ' ') %></span>
+                </div>
+              <% end %>
+            <% end %>
+            <%# Active channel — waypoint with thread sub-items (L-connector) %>
+            <div data-waypoint-threads-target="waypointChannel">
+              <div class="flex items-center gap-1.5 px-2 py-1.5 rounded <%= @active_channel == 'waypoint' ? 'text-white font-medium' : 'text-zinc-400 hover:bg-[#34373C] hover:text-zinc-100' %> cursor-pointer">
+                <span class="<%= @active_channel == 'waypoint' ? 'text-zinc-300' : 'text-zinc-500' %> font-bold text-base leading-none">#</span>
+                <span class="truncate">waypoint</span>
+              </div>
+              <%# L-connector + 2 thread sub-items %>
+              <div class="relative pl-5 mt-0.5 space-y-0.5">
+                <%# Vertical rail (runs full height of thread list) %>
+                <div class="absolute left-2 top-0 bottom-1 w-px bg-zinc-500"></div>
+
+                <%# Thread 1 — CR-V brakes (link to turbo frame) %>
+                <div class="relative">
+                  <%# Horizontal stub from rail to item %>
+                  <div class="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-px bg-zinc-500"></div>
+                  <%= link_to waypoint_brakes_path,
+                              data: {
+                                turbo_frame: "waypoint_chat",
+                                turbo_action: "replace",
+                                waypoint_threads_target: "itemBrakes",
+                                action: "click->waypoint-threads#setActive",
+                                waypoint_thread: "brakes"
+                              },
+                              class: "flex items-center gap-1.5 pl-3 pr-2 py-1.5 rounded #{@active_thread == 'brakes' ? 'bg-[#404249] text-zinc-100' : 'bg-[#36393F] text-zinc-300 hover:bg-[#3A3C42]'} cursor-pointer" do %>
+                    <span class="text-[12px] truncate">Vehicle #042 — 2014 Honda CR-V</span>
+                  <% end %>
+                </div>
+
+                <%# Thread 2 — Accord radiator (link to turbo frame) %>
+                <div class="relative">
+                  <div class="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-px bg-zinc-500"></div>
+                  <%= link_to waypoint_radiator_path,
+                              data: {
+                                turbo_frame: "waypoint_chat",
+                                turbo_action: "replace",
+                                waypoint_threads_target: "itemRadiator",
+                                action: "click->waypoint-threads#setActive",
+                                waypoint_thread: "radiator"
+                              },
+                              class: "flex items-center gap-1.5 pl-3 pr-2 py-1.5 rounded #{@active_thread == 'radiator' ? 'bg-[#404249] text-zinc-100' : 'bg-[#36393F] text-zinc-300 hover:bg-[#3A3C42]'} cursor-pointer" do %>
+                    <span class="text-[12px] truncate">Vehicle #043 — 2011 Honda Accord</span>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <%# Voice (collapsed) %>
+        <div>
+          <div class="flex items-center justify-between px-1 mb-1">
+            <span class="text-[11px] font-semibold uppercase tracking-wide text-zinc-400 hover:text-zinc-200 cursor-pointer flex items-center gap-0.5">
+              <span class="material-icons text-[14px]">expand_more</span> Voice Channels
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <%# User panel %>
+      <div class="h-14 bg-[#292B2F] px-2 flex items-center gap-2 border-t border-black/40">
+        <div class="w-8 h-8 rounded-full bg-orange-600 flex items-center justify-center text-white font-bold text-xs shrink-0">MR</div>
+        <div class="flex-1 min-w-0">
+          <div class="text-[13px] font-semibold text-white truncate">Mason Roberts</div>
+          <div class="text-[11px] text-green-400">Online</div>
+        </div>
+        <span class="material-icons text-zinc-400 text-lg cursor-pointer hover:text-zinc-200">mic</span>
+        <span class="material-icons text-zinc-400 text-lg cursor-pointer hover:text-zinc-200">headset</span>
+        <span class="material-icons text-zinc-400 text-lg cursor-pointer hover:text-zinc-200">settings</span>
+      </div>
+    </aside>
+
+    <%# ─── MAIN CHAT AREA ─── %>
+    <main class="flex-1 flex flex-col bg-[#36393F] min-w-0">
+
+      <%# Turbo Frame: header + messages both swap on channel/thread click %>
+      <%= turbo_frame_tag "waypoint_chat", class: "flex-1 flex flex-col min-h-0" do %>
+        <%= render "waypoint/channel_header", channel_name: "welcome and about", channel_topic: "Read this first — what this demo is and isn't" %>
+        <div class="flex-1 overflow-y-auto px-2 md:px-4 py-4">
+          <%= render "waypoint/welcome" %>
+        </div>
+      <% end %>
+
+      <%# Message input %>
+      <div class="px-2 md:px-4 pb-4 pt-2 shrink-0">
+        <div class="flex items-center gap-2 bg-[#40444B] rounded-lg px-3 py-2.5">
+          <button class="w-7 h-7 rounded-full bg-[#5865F2] hover:bg-[#4752C4] flex items-center justify-center shrink-0">
+            <span class="material-icons text-white text-lg leading-none">add</span>
+          </button>
+          <input type="text" placeholder="Record vehicle repair order details" class="flex-1 bg-transparent text-zinc-100 placeholder-zinc-400 text-[14px] outline-none" disabled>
+          <span class="material-icons text-zinc-400 text-xl hidden sm:inline">redeem</span>
+          <span class="material-icons text-zinc-400 text-xl hidden sm:inline">gif</span>
+          <span class="material-icons text-zinc-400 text-xl hidden sm:inline">tag_faces</span>
+        </div>
+      </div>
+
+    </main>
+
+    <%# ─── MEMBER LIST (right, hidden on mobile) ─── %>
+    <aside class="hidden lg:flex w-60 bg-[#2F3136] flex-col shrink-0 border-l border-black/40 overflow-y-auto">
+      <div class="px-4 pt-4 pb-1 text-zinc-400 text-[11px] font-semibold uppercase tracking-wide">Online — 2</div>
+      <div class="px-2 py-1 space-y-0.5">
+        <div class="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-[#34373C] cursor-pointer">
+          <div class="relative shrink-0">
+            <div class="w-8 h-8 rounded-full bg-orange-600 flex items-center justify-center text-white font-bold text-xs">MR</div>
+            <div class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-yellow-500 border-2 border-[#2F3136] flex items-center justify-center">
+              <span class="material-icons text-[8px] text-[#2F3136]">crown</span>
+            </div>
+          </div>
+          <div class="text-[14px] text-zinc-200 truncate">Mason Roberts</div>
+        </div>
+        <div class="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-[#34373C] cursor-pointer">
+          <div class="relative shrink-0">
+            <div class="w-8 h-8 rounded-full bg-[#5865F2] flex items-center justify-center">
+              <span class="material-icons text-white text-base">smart_toy</span>
+            </div>
+            <div class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-[#3BA55D] border-2 border-[#2F3136]"></div>
+          </div>
+          <div class="text-[14px] text-zinc-200 truncate">Waypoint APP</div>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+
+</div>

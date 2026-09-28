@@ -261,6 +261,11 @@ Rails.application.routes.draw do
 
   # The Lab — Client-facing hire/contact page
   get "lab", to: "lab#index", as: :lab
+  get "waypoint", to: "waypoint#index", as: :waypoint
+  get "waypoint/welcome", to: "waypoint#welcome", as: :waypoint_welcome
+  get "waypoint/labs-lounge", to: "waypoint#labs_lounge", as: :waypoint_labs_lounge
+  get "waypoint/threads/brakes", to: "waypoint#brakes", as: :waypoint_brakes
+  get "waypoint/threads/radiator", to: "waypoint#radiator", as: :waypoint_radiator
 
   resources :contacts, only: [ :new, :create ]
   resources :projects, only: [ :index ]

@@ -1,0 +1,32 @@
+<%# Shared channel header — sticky bar + big channel topic divider. %>
+<%# Locals: channel_name (e.g. "waypoint"), channel_topic (e.g. "Record vehicle repair order details") %>
+
+<%# Sticky bar (top of chat) %>
+<header class="h-12 px-2 md:px-4 flex items-center justify-between border-b border-black/40 shadow-sm shrink-0 bg-[#36393F]">
+  <div class="flex items-center gap-2 min-w-0">
+    <button data-action="click->waypoint-sidebar#toggle" class="md:hidden text-zinc-300 p-1 -ml-1">
+      <span class="material-icons">menu</span>
+    </button>
+    <span class="text-zinc-500 font-bold text-2xl leading-none">#</span>
+    <h1 class="font-semibold text-white text-[15px] truncate"><%= channel_name %></h1>
+    <span class="hidden sm:inline text-zinc-400 text-[13px] ml-2 truncate border-l border-zinc-600 pl-3"><%= channel_topic %></span>
+  </div>
+  <div class="flex items-center gap-3 md:gap-4 text-zinc-400">
+    <span class="material-icons text-xl cursor-pointer hover:text-zinc-200 hidden sm:inline">push_pin</span>
+    <span class="material-icons text-xl cursor-pointer hover:text-zinc-200 hidden sm:inline">notifications</span>
+    <span class="material-icons text-xl cursor-pointer hover:text-zinc-200">group</span>
+    <div class="hidden md:block w-40 h-6 bg-[#202225] rounded-sm flex items-center px-2 text-zinc-400 text-[12px]">
+      <span class="material-icons text-base mr-1">search</span>
+      <span>Search</span>
+    </div>
+  </div>
+</header>
+
+<%# Big channel topic divider (top of messages) %>
+<div class="px-2 pt-2 pb-4 border-b border-zinc-700/60">
+  <div class="flex items-center gap-2 mb-1">
+    <span class="text-zinc-500 font-bold text-3xl leading-none">#</span>
+    <span class="text-white font-semibold text-xl"><%= channel_name %></span>
+  </div>
+  <p class="text-zinc-400 text-sm"><%= channel_topic %></p>
+</div>

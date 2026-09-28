@@ -110,19 +110,20 @@
         </div>
       </div>
 
-      <%# Waypoint (placeholder — private repo, not yet in portfolio) %>
-      <div class="flex flex-col relative rounded-xl overflow-hidden gap-2 bg-zinc-900/50 border border-dashed border-zinc-700 p-4 opacity-70">
+      <%# Waypoint (live demo — Discord-mockup view at /waypoint) %>
+      <%= link_to waypoint_path, class: "flex flex-col relative rounded-xl overflow-hidden gap-2 bg-zinc-900/50 border border-dashed border-zinc-700 p-4 opacity-70 hover:opacity-100 hover:border-red-500/60 transition-all", data: { turbo: false } do %>
         <div class="absolute top-0 left-0 w-full h-1 bg-red-500"></div>
         <div class="flex justify-between items-center relative">
           <span class="tracking-[0.05em] uppercase text-red-500 font-['Barlow_Condensed',system-ui,sans-serif] font-bold text-base">Waypoint</span>
-          <span class="text-zinc-600 font-mono text-[10px]">/SOON</span>
+          <span class="text-zinc-600 font-mono text-[10px]">/DEMO</span>
         </div>
         <h3 class="text-base leading-[1.2] text-zinc-50 font-['Inter',system-ui,sans-serif] font-semibold m-0">Shop Floor Tracker</h3>
         <p class="text-xs leading-[1.5] text-zinc-400 font-['Inter',system-ui,sans-serif] m-0">Service jobs and hours, tied to vehicles and technicians.</p>
         <div class="mt-auto flex items-center pt-2 gap-2 relative">
-          <span class="text-zinc-600 font-['Inter',system-ui,sans-serif] font-semibold text-[11px]">Coming soon</span>
+          <span class="text-zinc-50 font-['Inter',system-ui,sans-serif] font-semibold text-[11px]">View demo</span>
+          <span class="text-red-500 font-['Inter',system-ui,sans-serif] font-semibold text-[11px]">&rarr;</span>
         </div>
-      </div>
+      <% end %>
 
     </div>
   </div>

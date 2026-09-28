@@ -1,0 +1,7 @@
+<%# Frame response for /waypoint/threads/brakes — header + content %>
+<%= turbo_frame_tag "waypoint_chat", class: "flex-1 flex flex-col min-h-0" do %>
+  <%= render "waypoint/channel_header", channel_name: "waypoint", channel_topic: "Record vehicle repair order details" %>
+  <div class="flex-1 overflow-y-auto px-2 md:px-4 py-4">
+    <%= render "waypoint/brakes_thread" %>
+  </div>
+<% end %>
