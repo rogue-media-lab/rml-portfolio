@@ -51,7 +51,7 @@
             <div class="flex items-start gap-2.5">
               <span class="text-base shrink-0">💼</span>
               <div>
-                <span class="text-zinc-100 font-medium">Hire me to build or adapt it</span> — <%= link_to "Lab contact form", lab_path(anchor: "contact"), class: "text-[#00A8FC] hover:underline" %>
+                <span class="text-zinc-100 font-medium">Hire me to build or adapt it</span> — <%= link_to "Lab contact form", lab_path(anchor: "contact"), class: "text-[#00A8FC] hover:underline", data: { turbo_frame: "_top" } %>
                 <div class="text-zinc-400 text-[12px] mt-0.5">Waypoint is part of the Rogue Media Lab product line. Custom build, hosted, or adapted to your shop's workflow.</div>
               </div>
             </div>
