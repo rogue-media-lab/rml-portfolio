@@ -1,0 +1,66 @@
+<%# Welcome channel — explains this is a static portfolio demo, not a live bot %>
+<div class="space-y-4">
+
+  <%# Pinned system message %>
+  <div class="flex items-center gap-2 px-2 py-1 text-zinc-400 text-[13px]">
+    <span class="material-icons text-base text-zinc-500">push_pin</span>
+    <span><span class="text-white font-medium">Mason</span> pinned a message to this channel</span>
+    <span class="text-zinc-500 ml-auto text-[12px]">9/27/26, 2:10 PM</span>
+  </div>
+
+  <%# Mason's welcome message — pinned to the channel %>
+  <div class="flex gap-3 px-2 hover:bg-[#32353B] -mx-2 px-3 py-1 rounded">
+    <div class="w-10 h-10 rounded-full bg-orange-600 flex items-center justify-center text-white font-bold text-sm shrink-0 mt-0.5">MR</div>
+    <div class="flex-1 min-w-0">
+      <div class="flex items-baseline gap-2 flex-wrap">
+        <span class="font-semibold text-white">Mason Roberts</span>
+        <span class="inline-flex items-center text-[10px] font-bold uppercase tracking-wider text-yellow-400 bg-yellow-400/10 border border-yellow-400/30 rounded-sm px-1.5 py-0.5">OWNER</span>
+        <span class="text-zinc-500 text-[11px]">9/27/26, 2:12 PM</span>
+      </div>
+      <div class="text-zinc-100 text-[14px] mt-1 leading-relaxed space-y-3">
+        <p>Hey — Mason here. Quick note before you poke around: <strong class="text-white">this is a portfolio demo, not a live bot.</strong> It's a static HTML/CSS mockup of how Waypoint actually looks inside Discord.</p>
+
+        <div class="border-l-4 border-green-500/60 bg-green-500/5 rounded-r p-3">
+          <div class="text-green-400 font-semibold text-[13px] uppercase tracking-wider mb-1">What's real</div>
+          <ul class="list-disc list-inside text-zinc-200 text-[13px] space-y-0.5">
+            <li>The visual design — this is what Waypoint looks like in production</li>
+            <li>Message structure, threads, and the hourly report format are accurate</li>
+            <li>The "one thread per car" pattern for tracking the day is real</li>
+          </ul>
+        </div>
+
+        <div class="border-l-4 border-zinc-600 bg-zinc-800/40 rounded-r p-3">
+          <div class="text-zinc-400 font-semibold text-[13px] uppercase tracking-wider mb-1">What's not</div>
+          <ul class="list-disc list-inside text-zinc-300 text-[13px] space-y-0.5">
+            <li>All customer + vehicle data is <strong class="text-zinc-100">made up</strong> (Marcus Reyes, Diane Calloway — fictional)</li>
+            <li>Nothing is connected to Discord — every message is a static HTML block</li>
+            <li>No bot, no cron, no database writes — clicking around is all in-browser</li>
+          </ul>
+        </div>
+
+        <div class="border-l-4 border-[#5865F2] bg-[#5865F2]/5 rounded-r p-3">
+          <div class="text-[#5865F2] font-semibold text-[13px] uppercase tracking-wider mb-1">Want the real thing?</div>
+          <div class="space-y-2.5 text-[13px]">
+            <div class="flex items-start gap-2.5">
+              <span class="text-base shrink-0">🔧</span>
+              <div>
+                <span class="text-zinc-100 font-medium">Install it yourself</span> — the source for this mockup is on GitHub: <%= link_to "rogue-media-lab/waypoint", "https://github.com/rogue-media-lab/waypoint", target: "_blank", rel: "noopener noreferrer", class: "text-[#00A8FC] hover:underline break-all" %>
+                <div class="text-zinc-400 text-[12px] mt-0.5">Fork the <code class="text-zinc-300 bg-zinc-900 px-1 rounded">waypoint</code> views, swap the fake data, deploy.</div>
+              </div>
+            </div>
+            <div class="flex items-start gap-2.5">
+              <span class="text-base shrink-0">💼</span>
+              <div>
+                <span class="text-zinc-100 font-medium">Hire me to build or adapt it</span> — <%= link_to "Lab contact form", lab_path(anchor: "contact"), class: "text-[#00A8FC] hover:underline" %>
+                <div class="text-zinc-400 text-[12px] mt-0.5">Waypoint is part of the Rogue Media Lab product line. Custom build, hosted, or adapted to your shop's workflow.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <p class="text-zinc-400 text-[13px]">Click around to see it in action: <a href="<%= waypoint_brakes_path %>" data-turbo-frame="waypoint_chat" data-turbo-action="replace" class="text-[#00A8FC] hover:underline"># waypoint</a> · <a href="<%= waypoint_labs_lounge_path %>" data-turbo-frame="waypoint_chat" data-turbo-action="replace" class="text-[#00A8FC] hover:underline"># labs-lounge</a></p>
+      </div>
+    </div>
+  </div>
+
+</div>

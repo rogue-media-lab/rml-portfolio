@@ -1,0 +1,106 @@
+<%# Brakes thread — Mason's audio + Waypoint CR-V record + "View thread" indicator %>
+<div class="space-y-4">
+  <%# System rename message (waypoint channel only) %>
+  <div class="flex items-center gap-2 px-2 py-1 text-zinc-400 text-[13px]">
+    <span class="material-icons text-base text-zinc-500">edit</span>
+    <span><span class="text-white font-medium">Waypoint</span> changed the channel name: <span class="text-zinc-200">Record vehicle repair order details</span></span>
+    <span class="text-zinc-500 ml-auto text-[12px]">9/27/26, 2:14 PM</span>
+  </div>
+
+  <%# User message (audio) — Mason asks about a job %>
+  <div class="flex gap-3 px-2 hover:bg-[#32353B] -mx-2 px-3 py-1 rounded">
+    <div class="w-10 h-10 rounded-full bg-orange-600 flex items-center justify-center text-white font-bold text-sm shrink-0 mt-0.5">MR</div>
+    <div class="flex-1 min-w-0">
+      <div class="flex items-baseline gap-2">
+        <span class="font-semibold text-white">Mason Roberts</span>
+        <span class="text-zinc-500 text-[11px]">9/27/26, 2:16 PM</span>
+      </div>
+      <div class="text-zinc-200 text-[14px] mt-0.5 leading-relaxed">
+        <p>2014 Honda CR-V EX-L in for front brakes. Customer is hearing a grind above 30 mph, especially in the rain.</p>
+        <div class="mt-2 flex items-center gap-3 bg-[#292B2F] border-l-4 border-zinc-600 rounded-r p-3 max-w-md">
+          <button class="w-9 h-9 rounded-full bg-zinc-700 hover:bg-zinc-600 flex items-center justify-center">
+            <span class="material-icons text-white text-xl">play_arrow</span>
+          </button>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-0.5 h-6 mb-0.5">
+              <% 50.times do |i| %>
+                <div class="w-0.5 rounded-full bg-zinc-500" style="height: <%= 25 + (i * 7) % 80 %>%"></div>
+              <% end %>
+            </div>
+            <div class="flex items-center justify-between text-[11px] text-zinc-400 font-mono">
+              <span>1:41</span>
+              <span>1X</span>
+            </div>
+          </div>
+          <span class="material-icons text-zinc-400 text-xl">volume_up</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%# Waypoint APP message — vehicle + job record (FAKE DATA) %>
+  <div class="flex gap-3 px-2 hover:bg-[#32353B] -mx-2 px-3 py-1 rounded">
+    <div class="w-10 h-10 rounded-full bg-[#5865F2] flex items-center justify-center shrink-0 mt-0.5">
+      <span class="material-icons text-white text-lg">smart_toy</span>
+    </div>
+    <div class="flex-1 min-w-0">
+      <div class="flex items-baseline gap-2 flex-wrap">
+        <span class="font-semibold text-white">Waypoint</span>
+        <span class="inline-flex items-center text-[10px] font-bold uppercase tracking-wider text-[#5865F2] bg-[#5865F2]/15 border border-[#5865F2]/40 rounded-sm px-1.5 py-0.5">APP</span>
+        <span class="text-zinc-500 text-[11px]">9/27/26, 2:18 PM</span>
+      </div>
+      <div class="text-zinc-100 text-[14px] mt-1 leading-relaxed space-y-3">
+        <p>Done. Vehicle + job recorded.</p>
+
+        <div class="border-l-2 border-zinc-600 pl-3 space-y-1">
+          <div class="font-semibold text-white">Vehicle #042 — 2014 Honda CR-V EX-L (new record)</div>
+          <div class="text-zinc-300 text-[13px]">VIN: <span class="font-mono text-[#00A8FC]">2HKRM4H5XEH500123</span> — NHTSA decoded clean, AWD, 2.4L I4</div>
+          <div class="text-zinc-300 text-[13px]">Customer: Marcus Reyes, 1108 Cherry Rd, Rock Hill SC 29730</div>
+          <div class="text-zinc-300 text-[13px]">Phone: (803) 555-0142</div>
+          <div class="text-zinc-300 text-[13px]">License: KMR-7841</div>
+        </div>
+
+        <div class="border-l-2 border-zinc-600 pl-3 space-y-1">
+          <div class="font-semibold text-white">Job #217 — Front Brake Service</div>
+          <div class="text-zinc-300 text-[13px]">Dated 9/27/26, 2:18 PM @ 168,402 mi</div>
+          <div class="text-zinc-300 text-[13px]">Status: <span class="inline-flex items-center text-[11px] font-bold uppercase text-green-400 bg-green-400/10 border border-green-400/30 rounded-sm px-1.5 py-0.5">complete</span></div>
+
+          <div class="mt-2 space-y-2 text-zinc-300 text-[13px]">
+            <div>
+              <div class="text-zinc-200 font-medium">Brakes (Front)</div>
+              <ul class="list-disc list-inside text-zinc-400 ml-1">
+                <li>Akebono Pro-ACT ceramic pads (ACT787)</li>
+                <li>Centric 121.40047 rotors (drilled &amp; slotted)</li>
+                <li>Hardware kit, caliper slide pins greased</li>
+              </ul>
+            </div>
+            <div>
+              <div class="text-zinc-200 font-medium">Fluids</div>
+              <ul class="list-disc list-inside text-zinc-400 ml-1">
+                <li>DOT4 brake exchange (1 qt)</li>
+                <li>Honda DW-1 ATF drain &amp; fill (3 qts)</li>
+              </ul>
+            </div>
+            <div>
+              <div class="text-zinc-200 font-medium">Inspection</div>
+              <ul class="list-disc list-inside text-zinc-400 ml-1">
+                <li>Rear pads at 4mm — flag for next visit</li>
+                <li>Right front caliper slide pin boot torn — replaced</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-zinc-400 text-[12px] font-mono pt-1">Total: 1.8 hrs · Picked up 5:14 PM · Paid $684.20</div>
+      </div>
+    </div>
+  </div>
+
+  <%# Thread indicator (inline list with "View thread" link) %>
+  <div class="ml-3 md:ml-12 pl-3 mb-2 flex items-center gap-1.5 text-[12px] text-zinc-400 hover:text-zinc-200 cursor-pointer w-fit px-2 py-1 rounded hover:bg-[#34373C] -ml-2">
+    <span class="material-icons text-base text-zinc-500">forum</span>
+    <span>3 replies</span>
+    <span class="text-zinc-600">·</span>
+    <span class="hidden sm:inline">Last reply 5:20 PM</span>
+  </div>
+</div>
