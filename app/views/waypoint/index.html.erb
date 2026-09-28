@@ -72,9 +72,10 @@
                             <span class="truncate"><%= ch.gsub('-', ' ') %></span>
                           <% end %>
                         <% else %>
-                          <div class="flex items-center gap-1.5 px-2 py-1.5 rounded text-zinc-400 hover:bg-[#34373C] hover:text-zinc-100 cursor-pointer">
-                            <span class="text-zinc-500 font-bold text-base leading-none">#</span>
+                          <div class="flex items-center gap-1.5 px-2 py-1.5 rounded text-zinc-500 cursor-default" title="Demo placeholder — not functional">
+                            <span class="text-zinc-600 font-bold text-base leading-none">#</span>
                             <span class="truncate"><%= ch.gsub('-', ' ') %></span>
+                            <span class="material-icons text-zinc-600 text-[12px] ml-auto shrink-0">lock</span>
                           </div>
                         <% end %>
                       <% end %>
@@ -103,9 +104,10 @@
                   <span class="truncate"><%= ch.gsub('-', ' ') %></span>
                 <% end %>
               <% else %>
-                <div class="flex items-center gap-1.5 px-2 py-1.5 rounded text-zinc-400 hover:bg-[#34373C] hover:text-zinc-100 cursor-pointer">
-                  <span class="text-zinc-500 font-bold text-base leading-none">#</span>
+                <div class="flex items-center gap-1.5 px-2 py-1.5 rounded text-zinc-500 cursor-default" title="Demo placeholder — not functional">
+                  <span class="text-zinc-600 font-bold text-base leading-none">#</span>
                   <span class="truncate"><%= ch.gsub('-', ' ') %></span>
+                  <span class="material-icons text-zinc-600 text-[12px] ml-auto shrink-0">lock</span>
                 </div>
               <% end %>
             <% end %>
