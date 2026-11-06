@@ -264,6 +264,7 @@ Rails.application.routes.draw do
   get "waypoint", to: "waypoint#index", as: :waypoint
   get "waypoint/app", to: "waypoint#app", as: :waypoint_app
   get "waypoint/estimate", to: "waypoint#estimate", as: :waypoint_estimate
+  post "waypoint/capture", to: "waypoint#capture", as: :waypoint_capture
   post "waypoint/log", to: "waypoint#log", as: :waypoint_log
   patch "waypoint/jobs/:id", to: "waypoint#update", as: :waypoint_job_update
   get "waypoint/welcome", to: "waypoint#welcome", as: :waypoint_welcome

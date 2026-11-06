@@ -84,6 +84,53 @@ class WaypointController < ApplicationController
   # The quote. Labor comes from car_us_labor_times (vehicle-specific row wins over the
   # generic one), parts from the shop's parts list, torque from car_us_torque_specs.
   # Anything missing comes back as a gap rather than a guess.
+  # POST /waypoint/capture - one round trip: read however the tech said it, then price it.
+  #
+  # The parser lives on the server rather than in the browser for two reasons: it can be
+  # tested here, and SMS can use the same one. One parser, many doors.
+  def capture
+    parsed = Waypoint::CaptureParser.new(params[:text].to_s).call
+
+    if parsed.nil?
+      render json: { ok: false, reason: "no_service" }, status: :unprocessable_entity
+      return
+    end
+
+    vehicle = parsed[:vehicle] || {}
+
+    estimate = Waypoint::Estimator.new(
+      service: parsed[:service],
+      make: vehicle[:make],
+      model: vehicle[:model],
+      year: vehicle[:year],
+      mileage: parsed[:mileage],
+      rate: params[:rate]
+    ).call
+
+    # Flat, and in exactly the shape WaypointJob#to_draft produces, so a fresh quote and a
+    # reopened job render through the same code path.
+    render json: {
+      ok: true,
+      parsed: {
+        year: vehicle[:year],
+        make: vehicle[:make],
+        model: vehicle[:model],
+        vehicle: vehicle[:label],
+        service: parsed[:service],
+        mileage: parsed[:mileage],
+        vin: parsed[:vin],
+        plate: parsed[:plate],
+        plate_state: parsed[:plate_state],
+        engine: parsed[:engine],
+        color: parsed[:color],
+        customer: parsed[:customer],
+        amounts: parsed[:amounts],
+        raw: parsed[:raw]
+      },
+      estimate: estimate.to_h
+    }
+  end
+
   def estimate
     result = Waypoint::Estimator.new(
       service: params[:service],
@@ -106,6 +153,8 @@ class WaypointController < ApplicationController
       :service, :vehicle_year, :vehicle_make, :vehicle_model, :mileage,
       :labor_hours, :labor_rate, :labor_total, :parts_total, :total,
       :raw_capture, :status, :notes,
+      :vin, :plate, :plate_state, :vehicle_color, :vehicle_engine,
+      :customer_name, :customer_phone, :customer_address,
       parts:  %i[name part_number oem_number brand quantity unit_cost confidence verified_on_vehicle],
       torque: %i[fastener value unit confidence],
       gaps:   []

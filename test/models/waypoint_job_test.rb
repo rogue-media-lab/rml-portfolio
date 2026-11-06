@@ -147,6 +147,67 @@ class WaypointJobTest < ActiveSupport::TestCase
     assert_nil draft[:parsed][:vehicle]
   end
 
+  # ---- identity: the fields that make a job findable -------------------------
+
+  test "normalizes identity fields to one shape whatever the source" do
+    job = build(
+      vehicle_make: "GMC", vehicle_model: "Sierra ",
+      vin: "1gtr1lec6lz123456", plate: "abc-1234", plate_state: "sc",
+      vehicle_color: "White", vehicle_engine: " 5.3L "
+    )
+    job.save!
+
+    assert_equal "1GTR1LEC6LZ123456", job.vin
+    assert_equal "ABC1234", job.plate
+    assert_equal "SC", job.plate_state
+    assert_equal "gmc", job.vehicle_make
+    assert_equal "sierra", job.vehicle_model
+    assert_equal "white", job.vehicle_color
+    assert_equal "5.3L", job.vehicle_engine
+  end
+
+  test "accepts a real VIN" do
+    assert build(vin: "1GTR1LEC6LZ123456").valid?
+  end
+
+  # A VIN that is not a VIN looks like a key and opens nothing. Real VINs exclude I, O
+  # and Q, so a 17-character string containing one is a part number in the wrong field.
+  test "rejects a seventeen character string containing I, O or Q" do
+    job = build(vin: "1GTR1LECOLZ123456")
+    assert_not job.valid?
+    assert_includes job.errors[:vin].join, "no I, O or Q"
+  end
+
+  test "rejects a VIN of the wrong length" do
+    assert_not build(vin: "1GTR1LEC6LZ12345").valid?
+  end
+
+  test "allows no VIN at all" do
+    assert build(vin: nil).valid?
+    assert build(vin: "").valid?
+  end
+
+  test "to_draft carries identity and customer so a job reopens complete" do
+    job = build(
+      vin: "1GTR1LEC6LZ123456", plate: "abc1234", plate_state: "sc",
+      vehicle_color: "white", vehicle_engine: "5.3L",
+      customer_name: "Dave Miller", customer_phone: "803-555-0142",
+      customer_address: "412 Oak Street, Rock Hill SC 29730"
+    )
+    job.save!
+
+    parsed = job.to_draft[:parsed]
+
+    assert_equal "1GTR1LEC6LZ123456", parsed[:vin]
+    assert_equal "ABC1234", parsed[:plate]
+    assert_equal "SC", parsed[:plate_state]
+    assert_equal "white", parsed[:color]
+    assert_equal "5.3L", parsed[:engine]
+    assert_equal "Dave Miller", parsed[:customer][:name]
+    assert_equal "803-555-0142", parsed[:customer][:phone]
+    assert_equal "412 Oak Street, Rock Hill SC 29730", parsed[:customer][:address]
+  end
+
   test "vehicle_label joins what is present and stays nil when nothing is" do
     assert_equal "2020 gmc sierra", build.vehicle_label
     assert_equal "gmc sierra", build(vehicle_year: nil).vehicle_label

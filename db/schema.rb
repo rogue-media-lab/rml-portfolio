@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_11_05_140000) do
+ActiveRecord::Schema[8.0].define(version: 2026_11_06_150000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -1055,9 +1055,20 @@ ActiveRecord::Schema[8.0].define(version: 2026_11_05_140000) do
     t.text "notes"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "vin"
+    t.string "plate"
+    t.string "plate_state"
+    t.string "vehicle_color"
+    t.string "vehicle_engine"
+    t.string "customer_name"
+    t.string "customer_phone"
+    t.string "customer_address"
     t.index ["created_at"], name: "index_waypoint_jobs_on_created_at"
+    t.index ["customer_name"], name: "index_waypoint_jobs_on_customer_name"
+    t.index ["plate"], name: "index_waypoint_jobs_on_plate"
     t.index ["status"], name: "index_waypoint_jobs_on_status"
     t.index ["vehicle_make", "vehicle_model"], name: "index_waypoint_jobs_on_vehicle_make_and_vehicle_model"
+    t.index ["vin"], name: "index_waypoint_jobs_on_vin"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"

@@ -7,9 +7,10 @@ import { Controller } from "@hotwired/stimulus"
 //   2. look up a spec without leaving the conversation, and say so when we don't have it
 //   3. show the money the same day
 //
-// Parser is deliberately a fast regex path with no model call: the common shape
-// ("2018 civic oil change 84k 95 dollars") costs nothing to read. Anything it cannot
-// read it refuses, and the confirm card is what catches a wrong read.
+// Parsing lives on the server (Waypoint::CaptureParser) so it can be tested and so SMS
+// can use the same one. It is a fast regex path with no model call: the common shape
+// costs nothing to read. Anything it cannot read it refuses, and the confirm card is
+// what catches a wrong read.
 export default class extends Controller {
   static targets = [
     "panel", "tab",
@@ -50,79 +51,79 @@ export default class extends Controller {
 
   // ---- capture ------------------------------------------------------------
 
-  // Known service words. If none appear, this is not a job - it may be a question,
-  // and a parser that logs a question is worse than useless.
-  static services = [
-    "oil change", "brake", "battery", "tire", "tires", "diagnostic", "alternator",
-    "starter", "radiator", "transmission", "cvt", "spark plug", "filter", "alignment"
-  ]
-
-  send() {
+  async send() {
     const text = (this.inputFieldTarget.value || "").trim()
     if (!text) return
-    this.appendBubble("me", text)
 
-    const parsed = this.parse(text)
-    if (parsed) {
-      this.appendEstimate(parsed, text)
-    } else {
-      this.appendBubble("them", "I could not read that one. Try: 2018 civic oil change 84k 95 dollars.")
-    }
+    this.appendBubble("me", text)
     this.inputFieldTarget.value = ""
+    this.scrollThread()
+
+    const card = document.createElement("div")
+    card.className = "self-stretch rounded-xl border border-emerald-600/60 bg-emerald-950/30 p-3"
+    card.dataset.raw = text
+    card.innerHTML =
+      '<div class="text-[10px] uppercase tracking-widest font-extrabold text-emerald-400">Working out the quote...</div>'
+    this.threadTarget.appendChild(card)
+    this.scrollThread()
+
+    // Parsing happens on the server now, in the same parser SMS will use. The browser
+    // no longer keeps a second copy of the rules - two parsers is two things to drift.
+    const meta = document.querySelector('meta[name="csrf-token"]')
+    const token = meta ? meta.content : null
+
+    let res = null
+    try {
+      res = await fetch("/waypoint/capture", {
+        method: "POST",
+        headers: Object.assign(
+          { "Content-Type": "application/json", Accept: "application/json" },
+          token ? { "X-CSRF-Token": token } : {}
+        ),
+        body: JSON.stringify({ text: text })
+      })
+    } catch (e) {
+      card.innerHTML =
+        '<div class="text-[13px] text-zinc-300">Could not reach the parser - no connection. Your words are above.</div>'
+      return
+    }
+
+    if (res.status === 422) {
+      card.remove()
+      this.appendBubble(
+        "them",
+        "I could not find a job in that one. Try: alternator on a 2021 ford escape 84k."
+      )
+      return
+    }
+
+    if (!res.ok) {
+      card.innerHTML =
+        '<div class="text-[13px] text-zinc-300">Could not work out that quote. Your words are above - try again.</div>'
+      return
+    }
+
+    let data = null
+    try {
+      data = await res.json()
+    } catch (e) {
+      data = null
+    }
+
+    if (!data) {
+      card.innerHTML = '<div class="text-[13px] text-zinc-300">Could not read the answer. Try again.</div>'
+      return
+    }
+
+    const payload = { parsed: data.parsed, estimate: data.estimate }
+    card.dataset.payload = JSON.stringify(payload)
+    card.innerHTML = this.estimateMarkup(data.parsed, data.estimate)
+    this.applyDraft(card, payload)
     this.scrollThread()
   }
 
   submitOnEnter(event) {
     if (event.key === "Enter") this.send()
-  }
-
-  // Pull mileage out BEFORE anything else, so "92000 miles" cannot be mistaken for a
-  // model number - while "c/k 1500" survives, because 1500 has no unit after it.
-  parse(text) {
-    const t = text.toLowerCase()
-    const miles = t.match(/(\d{2,3})\s*k\b/) || t.match(/(\d{4,6})\s*(?:mi|miles)\b/)
-    const stripped = miles ? t.replace(miles[0], " ").replace(/\s+/g, " ").trim() : t
-
-    const service = this.constructor.services.join("|").replace(/\//g, "\\/")
-
-    // Two orders, because people say it both ways. "2021 ford escape alternator"
-    // and "alternator on a 2021 ford escape" are the same job.
-    let year, make, model, svc
-
-    const yearFirst = stripped.match(
-      new RegExp("(\\d{4})\\s+([a-z]+)(?:\\s+([a-z0-9\\/\\- ]+?))?\\s+(" + service + ")")
-    )
-
-    if (yearFirst) {
-      year = yearFirst[1]
-      make = yearFirst[2]
-      model = yearFirst[3] ? yearFirst[3].trim().replace(/\s+/g, " ") : null
-      svc = yearFirst[4]
-    } else {
-      const serviceFirst = stripped.match(
-        new RegExp("(" + service + ")\\s+(?:on\\s+)?(?:a\\s+)?(\\d{4})\\s+([a-z]+)(?:\\s+([a-z0-9\\/\\- ]+))?\\s*$")
-      )
-      if (!serviceFirst) return null
-      svc = serviceFirst[1]
-      year = serviceFirst[2]
-      make = serviceFirst[3]
-      model = serviceFirst[4] ? serviceFirst[4].trim().replace(/\s+/g, " ") : null
-    }
-
-    const amt = t.match(/\$?\s?(\d+(?:\.\d{1,2})?)\s*(?:dollars|bucks|\$)?\s*$/)
-
-    const parts = [year, make]
-    if (model) parts.push(model)
-
-    return {
-      vehicle: parts.join(" ").replace(/\b\w/g, (c) => c.toUpperCase()),
-      year: year,
-      make: make,
-      model: model,
-      service: svc,
-      mileage: miles ? (miles[1].length <= 3 ? String(Number(miles[1]) * 1000) : miles[1]) : null,
-      amount: amt ? amt[1] : null
-    }
   }
 
   appendBubble(who, text) {
@@ -191,6 +192,26 @@ export default class extends Controller {
     const money = (n) => (n == null ? "-" : "$" + Number(n).toFixed(2))
     const input =
       "rounded bg-zinc-800 border border-zinc-700 px-2 py-1 text-[12px] text-zinc-100 placeholder:text-zinc-600"
+    const cust = p.customer || {}
+    // Field values go into attributes, so a stray quote in a name must not break out.
+    const attr = (v) =>
+      String(v == null ? "" : v)
+        .replace(/&/g, "&amp;")
+        .replace(/"/g, "&quot;")
+        .replace(/</g, "&lt;")
+
+    // A label/input pair, because there are a lot of these now and they must scan fast
+    // on a phone in a driveway.
+    const row = (label, inner) =>
+      '<div class="mt-1.5 flex items-center gap-1.5">' +
+        '<label class="w-14 shrink-0 text-[11px] text-zinc-500">' + label + "</label>" +
+        inner +
+      "</div>"
+
+    const field = (dataAttr, value, placeholder, extra) =>
+      "<input type=\"text\" data-" + dataAttr +
+      ' data-action="input->waypoint-app#adjust" value="' + attr(value) +
+      '" placeholder="' + placeholder + '" class="' + (extra || "") + input + '" />'
 
     const torque = (est.torque || []).length
       ? est.torque.map((t) =>
@@ -264,6 +285,21 @@ export default class extends Controller {
             'class="shrink-0 rounded bg-zinc-700 px-2.5 py-1.5 text-[12px] font-bold text-zinc-100 hover:bg-zinc-600" ' +
             'title="Add part">+</button>' +
         "</div>" +
+
+        // You will not have all of this at the roadside. It is here so it can be filled in
+        // when you do - the VIN especially, because it is what makes the car findable
+        // again next time whatever anyone calls it.
+        '<div class="mt-2.5 border-t border-zinc-800 pt-2">' +
+          '<div class="text-[10px] uppercase tracking-wide text-zinc-500 font-bold mb-1">Vehicle &amp; customer</div>' +
+          row("VIN", field("edit-vin", p.vin, "17 characters", "min-w-0 flex-1 font-mono ")) +
+          row("Plate", field("edit-plate", p.plate, "ABC1234", "min-w-0 flex-1 ") +
+            field("edit-plate-state", p.plate_state, "SC", "w-12 uppercase ")) +
+          row("Engine", field("edit-engine", p.engine, "5.3L", "w-20 ")) +
+          row("Color", field("edit-color", p.color, "white", "min-w-0 flex-1 ")) +
+          row("Customer", field("edit-customer-name", cust.name, "name", "min-w-0 flex-1 ") +
+            field("edit-customer-phone", cust.phone, "phone", "w-24 ")) +
+          row("Address", field("edit-customer-address", cust.address, "street, city", "min-w-0 flex-1 ")) +
+        "</div>" +
       "</div>" +
 
       // A replaceable slot. An unsaved quote shows Log it / Not right; a saved job
@@ -322,6 +358,31 @@ export default class extends Controller {
       const v = hrs.value.trim()
       est.labor_hours = v === "" ? null : Number(v)
     }
+
+    // Identity and customer. These are read straight off the card so they can be filled
+    // in after the fact - a tech rarely has the VIN when he first says the job.
+    const fields = {
+      "[data-edit-vin]": "vin",
+      "[data-edit-plate]": "plate",
+      "[data-edit-plate-state]": "plate_state",
+      "[data-edit-engine]": "engine",
+      "[data-edit-color]": "color"
+    }
+    Object.keys(fields).forEach((selector) => {
+      const el = card.querySelector(selector)
+      if (el) parsed[fields[selector]] = el.value.trim() || null
+    })
+
+    parsed.customer = Object.assign({}, parsed.customer || {})
+    const customerFields = {
+      "[data-edit-customer-name]": "name",
+      "[data-edit-customer-phone]": "phone",
+      "[data-edit-customer-address]": "address"
+    }
+    Object.keys(customerFields).forEach((selector) => {
+      const el = card.querySelector(selector)
+      if (el) parsed.customer[customerFields[selector]] = el.value.trim() || null
+    })
 
     const round = (n) => Math.round(n * 100) / 100
 
@@ -536,6 +597,17 @@ export default class extends Controller {
         parts_total: est.parts_total,
         total: est.total,
         raw_capture: card.dataset.raw,
+
+        // Findability. Without these a job is a receipt you cannot search.
+        vin: parsed.vin,
+        plate: parsed.plate,
+        plate_state: parsed.plate_state,
+        vehicle_color: parsed.color,
+        vehicle_engine: parsed.engine,
+        customer_name: (parsed.customer || {}).name,
+        customer_phone: (parsed.customer || {}).phone,
+        customer_address: (parsed.customer || {}).address,
+
         parts: est.parts || [],
         torque: est.torque || [],
         gaps: est.gaps || []
