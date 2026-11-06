@@ -8,11 +8,20 @@ class WaypointJob < ApplicationRecord
   DOORS   = %w[app sms voice discord].freeze
   STATUSES = %w[quoted done paid].freeze
 
+  VIN_FORMAT = /\A[A-HJ-NPR-Z0-9]{17}\z/
+
   validates :service, presence: true
   validates :status, inclusion: { in: STATUSES }
   validates :door, inclusion: { in: DOORS }
 
+  # A VIN that is not a VIN is worse than no VIN: it looks like a key and opens nothing.
+  # Real VINs exclude I, O and Q, so a 17-character string containing one is a part
+  # number that wandered into the wrong field.
+  validates :vin, format: { with: VIN_FORMAT, message: "must be 17 characters, no I, O or Q" },
+                  allow_blank: true
+
   before_validation :stamp_quoted_at, on: :create
+  before_validation :normalize_identity
   before_save :stamp_status_dates
 
   scope :recent, -> { order(created_at: :desc) }
@@ -40,6 +49,16 @@ class WaypointJob < ApplicationRecord
         service: service,
         mileage: mileage,
         vehicle: vehicle_label,
+        vin: vin,
+        plate: plate,
+        plate_state: plate_state,
+        engine: vehicle_engine,
+        color: vehicle_color,
+        customer: {
+          name: customer_name,
+          phone: customer_phone,
+          address: customer_address
+        },
         raw: raw_capture
       },
       estimate: {
@@ -73,6 +92,19 @@ class WaypointJob < ApplicationRecord
 
   def stamp_quoted_at
     self.quoted_at ||= Time.current
+  end
+
+  # Identity fields are stored in one shape whatever the source: a plate read off a phone
+  # camera, spoken aloud, or typed by hand should not produce three spellings of one car.
+  def normalize_identity
+    self.vin = vin.to_s.upcase.gsub(/[^A-Z0-9]/, "").presence
+    self.plate = plate.to_s.upcase.gsub(/[^A-Z0-9]/, "").presence
+    self.plate_state = plate_state.to_s.upcase.presence
+
+    self.vehicle_make = vehicle_make.to_s.downcase.strip.presence
+    self.vehicle_model = vehicle_model.to_s.downcase.strip.presence
+    self.vehicle_color = vehicle_color.to_s.downcase.strip.presence
+    self.vehicle_engine = vehicle_engine.to_s.strip.presence
   end
 
   # Status carries dates. Setting it by string from the API has to stamp them exactly
