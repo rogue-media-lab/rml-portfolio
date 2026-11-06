@@ -63,7 +63,7 @@ export default class extends Controller {
 
     const parsed = this.parse(text)
     if (parsed) {
-      this.appendParsed(parsed, text)
+      this.appendEstimate(parsed, text)
     } else {
       this.appendBubble("them", "I could not read that one. Try: 2018 civic oil change 84k 95 dollars.")
     }
@@ -83,18 +83,42 @@ export default class extends Controller {
     const stripped = miles ? t.replace(miles[0], " ").replace(/\s+/g, " ").trim() : t
 
     const service = this.constructor.services.join("|").replace(/\//g, "\\/")
-    const re = new RegExp("(\\d{4})\\s+([a-z]+)(?:\\s+([a-z0-9\\/\\- ]+?))?\\s+(" + service + ")")
-    const m = stripped.match(re)
-    if (!m) return null
+
+    // Two orders, because people say it both ways. "2021 ford escape alternator"
+    // and "alternator on a 2021 ford escape" are the same job.
+    let year, make, model, svc
+
+    const yearFirst = stripped.match(
+      new RegExp("(\\d{4})\\s+([a-z]+)(?:\\s+([a-z0-9\\/\\- ]+?))?\\s+(" + service + ")")
+    )
+
+    if (yearFirst) {
+      year = yearFirst[1]
+      make = yearFirst[2]
+      model = yearFirst[3] ? yearFirst[3].trim().replace(/\s+/g, " ") : null
+      svc = yearFirst[4]
+    } else {
+      const serviceFirst = stripped.match(
+        new RegExp("(" + service + ")\\s+(?:on\\s+)?(?:a\\s+)?(\\d{4})\\s+([a-z]+)(?:\\s+([a-z0-9\\/\\- ]+))?\\s*$")
+      )
+      if (!serviceFirst) return null
+      svc = serviceFirst[1]
+      year = serviceFirst[2]
+      make = serviceFirst[3]
+      model = serviceFirst[4] ? serviceFirst[4].trim().replace(/\s+/g, " ") : null
+    }
 
     const amt = t.match(/\$?\s?(\d+(?:\.\d{1,2})?)\s*(?:dollars|bucks|\$)?\s*$/)
 
-    const parts = [m[1], m[2]]
-    if (m[3]) parts.push(m[3].trim().replace(/\s+/g, " "))
+    const parts = [year, make]
+    if (model) parts.push(model)
 
     return {
       vehicle: parts.join(" ").replace(/\b\w/g, (c) => c.toUpperCase()),
-      service: m[4],
+      year: year,
+      make: make,
+      model: model,
+      service: svc,
       mileage: miles ? (miles[1].length <= 3 ? String(Number(miles[1]) * 1000) : miles[1]) : null,
       amount: amt ? amt[1] : null
     }
@@ -109,55 +133,92 @@ export default class extends Controller {
     this.threadTarget.appendChild(wrap)
   }
 
-  // The confirm card. This is the whole trust argument: it asks when it is unsure.
-  appendParsed(p, raw) {
+  // The estimate card. This is the whole trust argument: it quotes what it can prove
+  // and names what it cannot, rather than filling a gap with a plausible number.
+  async appendEstimate(p, raw) {
     const card = document.createElement("div")
     card.className = "self-stretch rounded-xl border border-emerald-600/60 bg-emerald-950/30 p-3"
+    card.dataset.raw = raw
+    card.innerHTML = '<div class="text-[10px] uppercase tracking-widest font-extrabold text-emerald-400">Working out the quote...</div>'
+    this.threadTarget.appendChild(card)
+    this.scrollThread()
 
-    const header = document.createElement("div")
-    header.className = "flex items-center justify-between mb-2"
-    header.innerHTML = '<span class="text-[10px] uppercase tracking-widest font-extrabold text-emerald-400">Parsed</span>'
-
-    const fields = document.createElement("div")
-    fields.className = "grid grid-cols-2 gap-2"
-    const rows = [
-      ["Vehicle", p.vehicle],
-      ["Service", p.service],
-      ["Mileage", p.mileage ? Number(p.mileage).toLocaleString() : "not given"],
-      ["Collected", p.amount ? "$" + p.amount : "not given"]
-    ]
-    rows.forEach(([k, v]) => {
-      const cell = document.createElement("div")
-      const label = document.createElement("div")
-      label.className = "text-[10px] uppercase tracking-wide text-zinc-400 font-bold"
-      label.textContent = k
-      const val = document.createElement("div")
-      val.className = "text-[13px] font-semibold text-zinc-100"
-      val.textContent = v
-      cell.appendChild(label)
-      cell.appendChild(val)
-      fields.appendChild(cell)
+    const params = new URLSearchParams({
+      service: p.service,
+      make: p.make || "",
+      model: p.model || "",
+      year: p.year || "",
+      mileage: p.mileage || ""
     })
 
-    const actions = document.createElement("div")
-    actions.className = "flex gap-2 mt-3"
-    const yes = document.createElement("button")
-    yes.className = "flex-1 rounded-lg bg-emerald-600 px-3 py-2 text-[13px] font-bold text-white hover:bg-emerald-500"
-    yes.textContent = "Log it"
-    yes.dataset.action = "waypoint-app#commit"
-    const no = document.createElement("button")
-    no.className = "rounded-lg border border-zinc-700 px-3 py-2 text-[13px] font-bold text-zinc-300 hover:border-zinc-500"
-    no.textContent = "Not right"
-    no.dataset.action = "waypoint-app#reject"
+    let est = null
+    try {
+      const res = await fetch("/waypoint/estimate?" + params.toString(), {
+        headers: { Accept: "application/json" }
+      })
+      if (res.ok) est = await res.json()
+    } catch (e) {
+      est = null
+    }
 
-    actions.appendChild(yes)
-    actions.appendChild(no)
+    if (!est) {
+      card.innerHTML = '<div class="text-[13px] text-zinc-300">Could not reach the estimator. The parse is still good - try again.</div>'
+      return
+    }
 
-    card.appendChild(header)
-    card.appendChild(fields)
-    card.appendChild(actions)
-    this.threadTarget.appendChild(card)
-    card.dataset.raw = raw
+    card.innerHTML = this.estimateMarkup(p, est)
+    this.scrollThread()
+  }
+
+  estimateMarkup(p, est) {
+    const money = (n) => (n == null ? "-" : "$" + Number(n).toFixed(2))
+    const hours = est.labor_hours == null ? "-" : est.labor_hours + " h"
+    const source = est.labor_source
+      ? '<span class="rounded-full bg-zinc-800 px-2 py-0.5 text-[10px] font-bold text-zinc-300">' + est.labor_source + "</span>"
+      : ""
+
+    const parts = (est.parts || []).length
+      ? est.parts.map((pt) =>
+          '<div class="flex justify-between gap-2 text-[12px] text-zinc-300"><span class="truncate">' +
+          (pt.name || "part") + (pt.part_number ? " - " + pt.part_number : "") +
+          '</span><span class="shrink-0 font-semibold">' + money(pt.unit_cost) + "</span></div>"
+        ).join("")
+      : '<div class="text-[12px] text-amber-300">No part number on file for this service.</div>'
+
+    const torque = (est.torque || []).length
+      ? est.torque.map((t) =>
+          '<div class="flex justify-between gap-2 text-[12px] text-zinc-300"><span class="truncate">' +
+          t.fastener + '</span><span class="shrink-0 font-semibold">' + t.value + " " + t.unit + "</span></div>"
+        ).join("")
+      : '<div class="text-[12px] text-amber-300">No torque spec on file.</div>'
+
+    const mileage = est.mileage ? " - " + Number(est.mileage).toLocaleString() + " mi" : ""
+
+    return (
+      '<div class="flex items-center justify-between mb-2">' +
+        '<span class="text-[10px] uppercase tracking-widest font-extrabold text-emerald-400">Estimate</span>' +
+        '<span class="text-[11px] font-semibold text-zinc-400">' + p.vehicle + "</span>" +
+      "</div>" +
+      '<div class="flex items-baseline justify-between border-b border-emerald-800/60 pb-2">' +
+        '<span class="text-[12px] text-zinc-400">' + est.service + mileage + "</span>" +
+        '<span class="text-[22px] font-bold tracking-tight text-zinc-50">' + money(est.total) + "</span>" +
+      "</div>" +
+      '<div class="mt-2 flex items-center justify-between text-[12px] text-zinc-300">' +
+        "<span>Labor " + hours + " x " + money(est.labor_rate) + "/h</span>" +
+        '<span class="font-semibold">' + money(est.labor_total) + "</span>" +
+      "</div>" +
+      '<div class="mt-0.5">' + source + "</div>" +
+      '<div class="mt-2 border-t border-emerald-800/60 pt-2">' +
+        '<div class="text-[10px] uppercase tracking-wide text-zinc-500 font-bold mb-1">Parts</div>' + parts +
+      "</div>" +
+      '<div class="mt-2 border-t border-emerald-800/60 pt-2">' +
+        '<div class="text-[10px] uppercase tracking-wide text-zinc-500 font-bold mb-1">Torque</div>' + torque +
+      "</div>" +
+      '<div class="mt-3 flex gap-2">' +
+        '<button type="button" data-action="waypoint-app#commit" class="flex-1 rounded-lg bg-emerald-600 px-3 py-2 text-[13px] font-bold text-white hover:bg-emerald-500">Log it</button>' +
+        '<button type="button" data-action="waypoint-app#reject" class="rounded-lg border border-zinc-700 px-3 py-2 text-[13px] font-bold text-zinc-300 hover:border-zinc-500">Not right</button>' +
+      "</div>"
+    )
   }
 
   commit(event) {

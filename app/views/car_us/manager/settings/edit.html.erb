@@ -27,6 +27,18 @@
           </div>
         </div>
 
+        <%# Labor Rate — what an hour of labor bills at. Drives every Waypoint estimate. %>
+        <div class="border-t border-gray-100 pt-4">
+          <%= f.label "settings[labor_rate]", "Labor Rate ($/hour)", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <div class="flex items-center gap-2">
+            <%= f.number_field "settings[labor_rate]", value: current_shop.labor_rate,
+                  step: 0.01, min: 0,
+                  class: "w-32 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500" %>
+            <span class="text-sm text-gray-500">per hour</span>
+          </div>
+          <p class="mt-1 text-xs text-gray-500">Used to price labor on every estimate. Defaults to <%= CarUs::Shop::DEFAULT_LABOR_RATE %>.</p>
+        </div>
+
         <%# Supplies Fee %>
         <div class="border-t border-gray-100 pt-4">
           <label class="flex items-center gap-3 mb-2">

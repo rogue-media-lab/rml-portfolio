@@ -263,6 +263,7 @@ Rails.application.routes.draw do
   get "lab", to: "lab#index", as: :lab
   get "waypoint", to: "waypoint#index", as: :waypoint
   get "waypoint/app", to: "waypoint#app", as: :waypoint_app
+  get "waypoint/estimate", to: "waypoint#estimate", as: :waypoint_estimate
   get "waypoint/welcome", to: "waypoint#welcome", as: :waypoint_welcome
   get "waypoint/labs-lounge", to: "waypoint#labs_lounge", as: :waypoint_labs_lounge
   get "waypoint/threads/brakes", to: "waypoint#brakes", as: :waypoint_brakes
