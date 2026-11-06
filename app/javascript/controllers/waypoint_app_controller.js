@@ -194,6 +194,17 @@ export default class extends Controller {
 
     const mileage = est.mileage ? " - " + Number(est.mileage).toLocaleString() + " mi" : ""
 
+    // Anything the estimator could not source is shown, not swallowed. An estimate
+    // that hides its own holes is worse than one that admits them.
+    const gaps = (est.gaps || []).length
+      ? '<div class="mt-2 border-t border-amber-800/40 pt-2">' +
+          '<div class="text-[10px] uppercase tracking-wide text-amber-400 font-bold mb-1">Not on file</div>' +
+          est.gaps.map((g) =>
+            '<div class="text-[11px] leading-snug text-amber-300">' + g + "</div>"
+          ).join("") +
+        "</div>"
+      : ""
+
     return (
       '<div class="flex items-center justify-between mb-2">' +
         '<span class="text-[10px] uppercase tracking-widest font-extrabold text-emerald-400">Estimate</span>' +
@@ -214,6 +225,7 @@ export default class extends Controller {
       '<div class="mt-2 border-t border-emerald-800/60 pt-2">' +
         '<div class="text-[10px] uppercase tracking-wide text-zinc-500 font-bold mb-1">Torque</div>' + torque +
       "</div>" +
+      gaps +
       '<div class="mt-3 flex gap-2">' +
         '<button type="button" data-action="waypoint-app#commit" class="flex-1 rounded-lg bg-emerald-600 px-3 py-2 text-[13px] font-bold text-white hover:bg-emerald-500">Log it</button>' +
         '<button type="button" data-action="waypoint-app#reject" class="rounded-lg border border-zinc-700 px-3 py-2 text-[13px] font-bold text-zinc-300 hover:border-zinc-500">Not right</button>' +
