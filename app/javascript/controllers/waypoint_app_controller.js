@@ -14,7 +14,8 @@ export default class extends Controller {
   static targets = [
     "panel", "tab",
     "thread", "inputField", "micButton", "jobCount",
-    "specInput", "specResults"
+    "specInput", "specResults",
+    "moneyCollected", "moneyOutstanding", "moneyCount", "todayCount"
   ]
 
   static values = { specs: Array }
@@ -166,6 +167,7 @@ export default class extends Controller {
       return
     }
 
+    card.dataset.payload = JSON.stringify({ parsed: p, estimate: est })
     card.innerHTML = this.estimateMarkup(p, est)
     this.scrollThread()
   }
@@ -233,9 +235,90 @@ export default class extends Controller {
     )
   }
 
-  commit(event) {
+  async commit(event) {
     const card = event.currentTarget.closest("div[data-raw]")
+    if (!card) return
+
+    // Post exactly what was quoted. The row freezes this price - it must not re-derive
+    // from the catalog later and silently disagree with what the customer was told.
+    let payload = null
+    try {
+      payload = JSON.parse(card.dataset.payload || "null")
+    } catch (e) {
+      payload = null
+    }
+
+    if (!payload) {
+      this.finishCard(card, "Nothing to log - say the job again.")
+      return
+    }
+
+    const parsed = payload.parsed || {}
+    const est = payload.estimate || {}
+
+    const body = {
+      job: {
+        service: est.service,
+        vehicle_year: parsed.year,
+        vehicle_make: parsed.make,
+        vehicle_model: parsed.model,
+        mileage: parsed.mileage,
+        labor_hours: est.labor_hours,
+        labor_rate: est.labor_rate,
+        labor_total: est.labor_total,
+        parts_total: est.parts_total,
+        total: est.total,
+        raw_capture: card.dataset.raw,
+        parts: est.parts || [],
+        torque: est.torque || [],
+        gaps: est.gaps || []
+      }
+    }
+
+    const meta = document.querySelector('meta[name="csrf-token"]')
+    const token = meta ? meta.content : null
+
+    let res = null
+    try {
+      res = await fetch("/waypoint/log", {
+        method: "POST",
+        headers: Object.assign(
+          { "Content-Type": "application/json", Accept: "application/json" },
+          token ? { "X-CSRF-Token": token } : {}
+        ),
+        body: JSON.stringify(body)
+      })
+    } catch (e) {
+      this.finishCard(card, "Could not save that one - no connection. The quote is still good.")
+      return
+    }
+
+    if (!res || !res.ok) {
+      this.finishCard(card, "Could not save that one. It is still quoted - try again.")
+      return
+    }
+
+    let data = null
+    try {
+      data = await res.json()
+    } catch (e) {
+      data = null
+    }
+
+    this.updateMoney(data)
     this.finishCard(card, "Logged. Was the spec right for this one? One tap and I remember it.")
+  }
+
+  // The money panel is computed server-side. Reflect the new totals without a reload.
+  updateMoney(data) {
+    if (!data) return
+    const fmt = (n) => "$" + Number(n || 0).toFixed(2)
+    if (this.hasMoneyCollectedTarget) this.moneyCollectedTarget.textContent = fmt(data.collected_total)
+    if (this.hasMoneyOutstandingTarget) this.moneyOutstandingTarget.textContent = fmt(data.outstanding_total)
+    if (this.hasMoneyCountTarget) this.moneyCountTarget.textContent = String(data.job_count || 0)
+    if (this.hasTodayCountTarget) {
+      this.todayCountTarget.textContent = String(Number(this.todayCountTarget.textContent || 0) + 1)
+    }
   }
 
   reject(event) {

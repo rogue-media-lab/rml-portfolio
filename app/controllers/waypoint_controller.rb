@@ -38,9 +38,39 @@ class WaypointController < ApplicationController
   end
 
   # The app door. One page, four panels, switched client-side.
+  # The money and today panels are computed from waypoint_jobs, never from markup.
   def app
     @specs = SPEC_SEED
     @labor_rate = CarUs::Shop.first&.labor_rate || CarUs::Shop::DEFAULT_LABOR_RATE
+
+    @jobs_today      = WaypointJob.today.recent
+    @collected_total = WaypointJob.collected_total
+    @outstanding_total = WaypointJob.outstanding_total
+    @paid_count      = WaypointJob.paid.count
+    @total_count     = WaypointJob.count
+    @recent_jobs     = WaypointJob.recent.limit(6)
+  end
+
+  # POST /waypoint/log — turn a quote into a record.
+  # The estimate snapshot comes back with the request so the row freezes the price
+  # that was actually offered, rather than re-deriving it and silently repricing.
+  def log
+    job = WaypointJob.new(job_params)
+
+    if job.save
+      render json: {
+        ok: true,
+        id: job.id,
+        total: job.total.to_f,
+        status: job.status,
+        collected_total: WaypointJob.collected_total.to_f,
+        outstanding_total: WaypointJob.outstanding_total.to_f,
+        job_count: WaypointJob.count
+      }, status: :created
+    else
+      render json: { ok: false, errors: job.errors.full_messages },
+             status: :unprocessable_entity
+    end
   end
 
   # GET /waypoint/estimate?service=alternator&make=ford&model=escape&year=2021&mileage=84000
@@ -60,6 +90,23 @@ class WaypointController < ApplicationController
 
     render json: result.to_h
   end
+
+  private
+
+  def job_params
+    permitted = params.require(:job).permit(
+      :service, :vehicle_year, :vehicle_make, :vehicle_model, :mileage,
+      :labor_hours, :labor_rate, :labor_total, :parts_total, :total,
+      :raw_capture,
+      parts:  %i[name part_number oem_number brand quantity unit_cost confidence verified_on_vehicle],
+      torque: %i[fastener value unit confidence],
+      gaps:   []
+    )
+    permitted[:door] = "app"
+    permitted
+  end
+
+  public
 
   # Turbo frame responses — return only the thread content
   def welcome; end

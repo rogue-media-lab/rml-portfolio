@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_11_05_130000) do
+ActiveRecord::Schema[8.0].define(version: 2026_11_05_140000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -1030,6 +1030,34 @@ ActiveRecord::Schema[8.0].define(version: 2026_11_05_130000) do
     t.index ["hermit_video_id"], name: "index_watch_progresses_on_hermit_video_id"
     t.index ["user_id", "hermit_video_id"], name: "index_watch_progresses_on_user_id_and_hermit_video_id", unique: true
     t.index ["user_id"], name: "index_watch_progresses_on_user_id"
+  end
+
+  create_table "waypoint_jobs", force: :cascade do |t|
+    t.string "door", default: "app"
+    t.text "raw_capture"
+    t.integer "vehicle_year"
+    t.string "vehicle_make"
+    t.string "vehicle_model"
+    t.integer "mileage"
+    t.string "service", null: false
+    t.decimal "labor_hours", precision: 6, scale: 2
+    t.decimal "labor_rate", precision: 8, scale: 2
+    t.decimal "labor_total", precision: 10, scale: 2
+    t.decimal "parts_total", precision: 10, scale: 2
+    t.decimal "total", precision: 10, scale: 2
+    t.jsonb "parts", default: []
+    t.jsonb "torque", default: []
+    t.jsonb "gaps", default: []
+    t.string "status", default: "quoted", null: false
+    t.datetime "quoted_at"
+    t.datetime "completed_at"
+    t.datetime "paid_on"
+    t.text "notes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["created_at"], name: "index_waypoint_jobs_on_created_at"
+    t.index ["status"], name: "index_waypoint_jobs_on_status"
+    t.index ["vehicle_make", "vehicle_model"], name: "index_waypoint_jobs_on_vehicle_make_and_vehicle_model"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"

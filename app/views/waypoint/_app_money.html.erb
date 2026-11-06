@@ -1,21 +1,24 @@
-<%# Panel: money. The number he can measure in week one. %>
-<%# Locals: none. %>
+<%# Panel: money. Computed from waypoint_jobs rows, never from markup. %>
+<%# Locals: none. Uses @collected_total, @outstanding_total, @paid_count, @total_count, @recent_jobs %>
+<% fmt = ->(n) { number_to_currency(n || 0) } %>
 <div data-waypoint-app-target="panel" data-panel-name="money"
      class="hidden min-h-0 flex-1 flex-col overflow-y-auto px-4 py-4">
 
   <div class="rounded-xl border border-zinc-800 bg-zinc-900/60 p-3">
-    <div class="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Collected this month</div>
-    <div class="mt-1 text-3xl font-bold tracking-tight">$2,123.48</div>
-    <p class="mt-1 text-[11px] text-zinc-500">171 jobs paid &middot; 51 logged without an amount</p>
-    <div class="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-800">
-      <div class="h-full w-[78%] rounded-full bg-emerald-600"></div>
-    </div>
+    <div class="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Collected</div>
+    <div class="mt-1 text-3xl font-bold tracking-tight"
+         data-waypoint-app-target="moneyCollected"><%= fmt.call(@collected_total) %></div>
+    <p class="mt-1 text-[11px] text-zinc-500">
+      <span data-waypoint-app-target="moneyCount"><%= @total_count %></span> jobs logged
+      &middot; <%= @paid_count %> paid
+    </p>
   </div>
 
   <div class="mt-3 rounded-xl border border-zinc-800 bg-zinc-900/60 p-3">
     <div class="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Outstanding</div>
-    <div class="mt-1 text-xl font-bold tracking-tight">$551.00</div>
-    <p class="mt-1 text-[11px] text-zinc-500">2 jobs not collected &mdash; both under a week old</p>
+    <div class="mt-1 text-xl font-bold tracking-tight"
+         data-waypoint-app-target="moneyOutstanding"><%= fmt.call(@outstanding_total) %></div>
+    <p class="mt-1 text-[11px] text-zinc-500">Quoted and done, not yet collected.</p>
     <button type="button" data-action="waypoint-app#draftReminders"
             class="mt-2.5 rounded-lg bg-emerald-600 px-3 py-2 text-[13px] font-bold text-white transition-colors hover:bg-emerald-500">
       Draft reminders
@@ -24,17 +27,24 @@
 
   <div class="mt-3 rounded-xl border border-zinc-800 bg-zinc-900/60 p-3">
     <div class="mb-1.5 text-[10px] font-bold uppercase tracking-widest text-zinc-500">Recent</div>
-    <% [["225", "C/K 1500 &middot; diagnostic", "$95.00"],
-        ["224", "Sonata &middot; brake pads",     "$210.00"],
-        ["223", "Escape &middot; battery",        "$132.00"],
-        ["222", "Sonata &middot; oil change",     "$95.00"]].each do |num, what, amt| %>
-      <div class="flex items-center gap-2.5 border-b border-zinc-800 py-2 text-[12px] last:border-b-0">
-        <span class="w-8 shrink-0 font-bold text-zinc-500"><%= num %></span>
-        <span class="min-w-0 flex-1 truncate text-zinc-300"><%= raw what %></span>
-        <span class="shrink-0 font-bold text-zinc-100"><%= amt %></span>
-      </div>
+    <% if @recent_jobs.any? %>
+      <% @recent_jobs.each do |job| %>
+        <div class="flex items-center gap-2.5 border-b border-zinc-800 py-2 text-[12px] last:border-b-0">
+          <span class="min-w-0 flex-1 truncate text-zinc-300">
+            <%= job.vehicle_label.presence || "unknown vehicle" %> &middot; <%= job.service %>
+          </span>
+          <span class="shrink-0 font-bold text-zinc-100"><%= fmt.call(job.total) %></span>
+          <span class="shrink-0 rounded-full bg-zinc-800 px-2 py-0.5 text-[10px] font-bold text-zinc-400">
+            <%= job.status %>
+          </span>
+        </div>
+      <% end %>
+    <% else %>
+      <p class="py-2 text-[12px] text-zinc-500">
+        Nothing logged yet. Say a job on the Capture panel and tap Log it - it lands here.
+      </p>
     <% end %>
   </div>
 
-  <p class="mt-auto pt-4 text-[10px] text-zinc-600">He sees the number the day he earns it.</p>
+  <p class="mt-auto pt-4 text-[10px] text-zinc-600">Every row here came from a real quote.</p>
 </div>
