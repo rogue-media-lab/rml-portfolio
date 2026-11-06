@@ -55,18 +55,24 @@ class WaypointController < ApplicationController
   # The estimate snapshot comes back with the request so the row freezes the price
   # that was actually offered, rather than re-deriving it and silently repricing.
   def log
-    job = WaypointJob.new(job_params)
+    job = WaypointJob.new(job_params.merge(door: "app"))
 
     if job.save
-      render json: {
-        ok: true,
-        id: job.id,
-        total: job.total.to_f,
-        status: job.status,
-        collected_total: WaypointJob.collected_total.to_f,
-        outstanding_total: WaypointJob.outstanding_total.to_f,
-        job_count: WaypointJob.count
-      }, status: :created
+      render json: job_response(job), status: :created
+    else
+      render json: { ok: false, errors: job.errors.full_messages },
+             status: :unprocessable_entity
+    end
+  end
+
+  # PATCH /waypoint/jobs/:id - a repair order is wrong the moment it is saved.
+  # The mileage arrives later, a filter gets added, the customer pays. Amending it
+  # is the normal case, not an exception.
+  def update
+    job = WaypointJob.find(params[:id])
+
+    if job.update(job_params)
+      render json: job_response(job)
     else
       render json: { ok: false, errors: job.errors.full_messages },
              status: :unprocessable_entity
@@ -94,16 +100,29 @@ class WaypointController < ApplicationController
   private
 
   def job_params
-    permitted = params.require(:job).permit(
+    # door is not permitted - it records how the job arrived and must not be
+    # rewritten by an edit that came from the app.
+    params.require(:job).permit(
       :service, :vehicle_year, :vehicle_make, :vehicle_model, :mileage,
       :labor_hours, :labor_rate, :labor_total, :parts_total, :total,
-      :raw_capture,
+      :raw_capture, :status, :notes,
       parts:  %i[name part_number oem_number brand quantity unit_cost confidence verified_on_vehicle],
       torque: %i[fastener value unit confidence],
       gaps:   []
     )
-    permitted[:door] = "app"
-    permitted
+  end
+
+  def job_response(job)
+    {
+      ok: true,
+      id: job.id,
+      total: job.total.to_f,
+      status: job.status,
+      draft: job.to_draft,
+      collected_total: WaypointJob.collected_total.to_f,
+      outstanding_total: WaypointJob.outstanding_total.to_f,
+      job_count: WaypointJob.count
+    }
   end
 
   public

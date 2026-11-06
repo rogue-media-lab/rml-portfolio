@@ -29,16 +29,25 @@
     <div class="mb-1.5 text-[10px] font-bold uppercase tracking-widest text-zinc-500">Recent</div>
     <% if @recent_jobs.any? %>
       <% @recent_jobs.each do |job| %>
-        <div class="flex items-center gap-2.5 border-b border-zinc-800 py-2 text-[12px] last:border-b-0">
+        <%# Every row reopens in the same editor the capture card uses. A job that can
+            only be created and never corrected is a form, not a tool. %>
+        <button type="button"
+                data-action="waypoint-app#editJob"
+                data-job-id="<%= job.id %>"
+                data-job-status="<%= job.status %>"
+                data-job="<%= job.to_draft.to_json %>"
+                class="flex w-full items-center gap-2.5 border-b border-zinc-800 py-2 text-left text-[12px] transition-colors last:border-b-0 hover:bg-zinc-800/40">
           <span class="min-w-0 flex-1 truncate text-zinc-300">
             <%= job.vehicle_label.presence || "unknown vehicle" %> &middot; <%= job.service %>
           </span>
-          <span class="shrink-0 font-bold text-zinc-100"><%= fmt.call(job.total) %></span>
-          <span class="shrink-0 rounded-full bg-zinc-800 px-2 py-0.5 text-[10px] font-bold text-zinc-400">
+          <span data-row-total class="shrink-0 font-bold text-zinc-100"><%= fmt.call(job.total) %></span>
+          <span data-row-status class="shrink-0 rounded-full bg-zinc-800 px-2 py-0.5 text-[10px] font-bold text-zinc-400">
             <%= job.status %>
           </span>
-        </div>
+          <span class="shrink-0 text-zinc-600" aria-hidden="true">&#9998;</span>
+        </button>
       <% end %>
+      <p class="mt-1.5 text-[10px] text-zinc-600">Tap any job to change it.</p>
     <% else %>
       <p class="py-2 text-[12px] text-zinc-500">
         Nothing logged yet. Say a job on the Capture panel and tap Log it - it lands here.
