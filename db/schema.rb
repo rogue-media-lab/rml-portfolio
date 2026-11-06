@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_11_05_120100) do
+ActiveRecord::Schema[8.0].define(version: 2026_11_05_130000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -271,6 +271,31 @@ ActiveRecord::Schema[8.0].define(version: 2026_11_05_120100) do
     t.datetime "updated_at", null: false
     t.index ["technician_id"], name: "index_car_us_service_jobs_on_technician_id"
     t.index ["vehicle_id"], name: "index_car_us_service_jobs_on_vehicle_id"
+  end
+
+  create_table "car_us_service_parts", force: :cascade do |t|
+    t.string "service", null: false
+    t.string "part_name", null: false
+    t.string "part_number"
+    t.string "oem_number"
+    t.string "brand"
+    t.string "position"
+    t.decimal "quantity", precision: 6, scale: 2, default: "1.0"
+    t.decimal "unit_cost", precision: 8, scale: 2
+    t.string "supplier"
+    t.string "source"
+    t.string "confidence", default: "single_source"
+    t.boolean "verified_on_vehicle", default: false, null: false
+    t.text "notes"
+    t.string "make"
+    t.string "model"
+    t.integer "year_start"
+    t.integer "year_end"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["make", "model"], name: "index_car_us_service_parts_on_make_and_model"
+    t.index ["service", "part_name", "make", "model", "year_start", "year_end"], name: "index_car_us_service_parts_on_service_and_vehicle", unique: true
+    t.index ["service"], name: "index_car_us_service_parts_on_service"
   end
 
   create_table "car_us_service_records", force: :cascade do |t|

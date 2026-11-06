@@ -37,6 +37,14 @@ module Waypoint
       gaps << "no torque spec on file" if torque.empty?
       gaps << "mileage not given" if @mileage.nil?
 
+      # Absent and zero are different values. Parts that have no cost must not total to
+      # a silent $0.00, which reads as "free" - the same rule the capture parser follows
+      # for a missing amount.
+      uncosted = parts.count { |p| p[:unit_cost].nil? }
+      if uncosted.positive?
+        gaps << "#{uncosted} of #{parts.size} part(s) have no cost on file"
+      end
+
       Result.new(
         service: @service,
         labor_hours: labor&.hours&.to_f,
@@ -78,17 +86,26 @@ module Waypoint
       scope.where(make: nil).order(:hours).first
     end
 
-    # Parts come from the shop's own parts list where it exists. There is no
-    # vehicle-keyed parts catalog yet, so this stays deliberately conservative.
+    # Vehicle-specific parts win over generic, exactly like labor. A 1.5T Escape
+    # alternator is not the 2.5 alternator, so a generic row is the weaker claim.
     def find_parts
-      return [] unless defined?(CarUs::ShopPart)
+      return [] unless defined?(CarUs::ServicePart)
 
-      CarUs::ShopPart.where("name ILIKE ?", "%#{@service}%").limit(10).map do |p|
+      scope = CarUs::ServicePart.for_service(@service)
+      rows = scope.for_vehicle(@make, @model, @year).to_a
+      rows = scope.generic.to_a if rows.empty?
+
+      rows.map do |p|
         {
-          name: p.try(:name),
-          part_number: p.try(:part_number),
-          quantity: 1,
-          unit_cost: p.try(:cost) || p.try(:unit_cost)
+          name: p.part_name,
+          part_number: p.part_number,
+          oem_number: p.oem_number,
+          brand: p.brand,
+          position: p.position,
+          quantity: p.quantity.to_i.zero? ? 1 : p.quantity.to_i,
+          unit_cost: p.unit_cost&.to_f,
+          confidence: p.confidence,
+          verified_on_vehicle: p.verified_on_vehicle
         }
       end
     rescue StandardError
