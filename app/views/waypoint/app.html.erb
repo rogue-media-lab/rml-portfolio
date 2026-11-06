@@ -1,0 +1,37 @@
+<%# Waypoint — app view. The capture surface, built to be used rather than looked at. %>
+<%# Locals: none. Panels switch client-side via the waypoint-app Stimulus controller. %>
+<%# @specs comes from WaypointController::SPEC_SEED until the reference tables land in this app's Postgres. %>
+
+<div class="min-h-screen bg-zinc-950 text-zinc-100"
+     data-controller="waypoint-app"
+     data-waypoint-app-specs-value="<%= @specs.to_json %>">
+
+  <div class="mx-auto flex min-h-screen w-full max-w-md flex-col">
+
+    <header class="shrink-0 border-b border-zinc-800 px-4 pb-3 pt-5">
+      <div class="flex items-baseline justify-between gap-2">
+        <h1 class="text-[17px] font-bold tracking-tight">Waypoint</h1>
+        <span class="text-[11px] font-semibold text-zinc-500">the app door</span>
+      </div>
+      <p class="mt-1 text-[12px] text-zinc-500">Talk it in, confirm it, get paid the same day.</p>
+    </header>
+
+    <nav class="flex shrink-0 gap-1 border-b border-zinc-800 px-2 py-2">
+      <% [["capture", "Capture"], ["today", "Today"], ["specs", "Specs"], ["money", "Money"]].each do |name, label| %>
+        <button type="button"
+                data-waypoint-app-target="tab"
+                data-panel="<%= name %>"
+                data-action="waypoint-app#showTab"
+                class="flex-1 rounded-lg px-2 py-1.5 text-[12px] font-semibold transition-colors">
+          <%= label %>
+        </button>
+      <% end %>
+    </nav>
+
+    <%= render "waypoint/app_capture" %>
+    <%= render "waypoint/app_today" %>
+    <%= render "waypoint/app_specs" %>
+    <%= render "waypoint/app_money" %>
+
+  </div>
+</div>

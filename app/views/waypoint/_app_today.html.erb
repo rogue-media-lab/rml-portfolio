@@ -1,0 +1,59 @@
+<%# Panel: today. The route, with the unbillable hour made visible. %>
+<%# Locals: none. Numbers are illustrative; the real ones come from the jobs table. %>
+<div data-waypoint-app-target="panel" data-panel-name="today"
+     class="hidden min-h-0 flex-1 flex-col overflow-y-auto px-4 py-4">
+
+  <div class="rounded-xl border border-zinc-800 bg-zinc-900/60 p-3">
+    <div class="flex items-baseline justify-between">
+      <span class="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Billable so far</span>
+      <span class="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Travel</span>
+    </div>
+    <div class="mt-0.5 flex items-baseline justify-between">
+      <span class="text-3xl font-bold tracking-tight">$342.00</span>
+      <span class="text-[15px] font-semibold text-zinc-400">38 min</span>
+    </div>
+    <div class="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-800">
+      <div class="h-full w-[62%] rounded-full bg-emerald-600"></div>
+    </div>
+    <p class="mt-2 text-[11px] text-zinc-500">3 of 5 stops done &middot; $551 booked</p>
+  </div>
+
+  <div class="mt-3 rounded-xl border border-zinc-800 bg-zinc-900/60 p-3">
+    <% [
+      ["9:15",  "2013 Hyundai Sonata",      "Rock Hill &middot; driveway",  "Brake pads",         "$210", true,  "done"],
+      ["10:40", "2018 Ford Escape",         "Fort Mill &middot; office lot","Battery + terminals","$132", true,  "paid"],
+      ["12:30", "1997 Chevrolet C/K 1500",  "Rock Hill &middot; shop bay",  "Diagnostic",         "$95",  true,  "in progress"],
+      ["2:00",  "2019 Nissan Rogue",        "Charlotte &middot; 22 min travel", "CVT service",    "$240", false, nil]
+    ].each do |time, veh, where, work, money, done, status| %>
+      <div class="flex gap-3 border-b border-zinc-800 py-2.5 last:border-b-0">
+        <div class="w-11 shrink-0 pt-0.5 text-[12px] font-bold text-zinc-400"><%= time %></div>
+        <div class="min-w-0 flex-1">
+          <div class="text-[13px] font-semibold text-zinc-100"><%= veh %></div>
+          <div class="mt-0.5 text-[11px] text-zinc-500"><%= raw where %></div>
+          <div class="mt-1 flex flex-wrap items-center gap-2 text-[11px] text-zinc-400">
+            <span><%= work %></span>
+            <span class="font-semibold text-zinc-300"><%= money %></span>
+            <% if status %>
+              <span class="rounded-full bg-zinc-800 px-2 py-0.5 text-[10px] font-bold text-zinc-300"><%= status %></span>
+            <% end %>
+          </div>
+        </div>
+        <div class="shrink-0 pt-1">
+          <span class="material-icons text-lg <%= done ? "text-emerald-500" : "text-zinc-700" %>">
+            <%= done ? "check_circle" : "radio_button_unchecked" %>
+          </span>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="mt-3 rounded-xl border border-zinc-800 bg-zinc-900/60 p-3">
+    <div class="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Next up</div>
+    <div class="mt-1 text-[14px] font-semibold text-zinc-100">Rogue &mdash; transmission fluid</div>
+    <p class="mt-1 text-[12px] text-zinc-400">Waypoint has NS-3 for eight Rogue codes. Confirmed, not guessed.</p>
+    <button type="button" data-action="waypoint-app#showTab" data-panel="specs"
+            class="mt-2.5 rounded-lg bg-emerald-600 px-3 py-2 text-[13px] font-bold text-white transition-colors hover:bg-emerald-500">
+      Check the spec
+    </button>
+  </div>
+</div>
