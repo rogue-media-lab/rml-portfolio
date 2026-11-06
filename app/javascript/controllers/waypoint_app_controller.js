@@ -136,6 +136,17 @@ export default class extends Controller {
 
   // The estimate card. This is the whole trust argument: it quotes what it can prove
   // and names what it cannot, rather than filling a gap with a plausible number.
+  // One card, built the same way for a fresh quote and for a job being reopened.
+  buildCard(payload, raw) {
+    const card = document.createElement("div")
+    card.className = "self-stretch rounded-xl border border-emerald-600/60 bg-emerald-950/30 p-3"
+    card.dataset.raw = raw || ""
+    card.dataset.payload = JSON.stringify(payload)
+    card.innerHTML = this.estimateMarkup(payload.parsed || {}, payload.estimate || {})
+    this.applyDraft(card, payload)
+    return card
+  }
+
   async appendEstimate(p, raw) {
     const card = document.createElement("div")
     card.className = "self-stretch rounded-xl border border-emerald-600/60 bg-emerald-950/30 p-3"
@@ -255,7 +266,9 @@ export default class extends Controller {
         "</div>" +
       "</div>" +
 
-      '<div class="mt-3 flex gap-2">' +
+      // A replaceable slot. An unsaved quote shows Log it / Not right; a saved job
+      // shows Save changes and a status, without rebuilding the card around it.
+      '<div data-card-footer class="mt-3 flex gap-2">' +
         '<button type="button" data-action="waypoint-app#commit" class="flex-1 rounded-lg bg-emerald-600 px-3 py-2 text-[13px] font-bold text-white hover:bg-emerald-500">Log it</button>' +
         '<button type="button" data-action="waypoint-app#reject" class="rounded-lg border border-zinc-700 px-3 py-2 text-[13px] font-bold text-zinc-300 hover:border-zinc-500">Not right</button>' +
       "</div>"
@@ -337,6 +350,7 @@ export default class extends Controller {
     if (!card) return
     const draft = this.readDraft(card)
     if (draft) this.applyDraft(card, draft)
+    if (card.dataset.jobId) this.markDirty(card)
   }
 
   applyDraft(card, payload) {
@@ -429,6 +443,7 @@ export default class extends Controller {
     if (costEl) costEl.value = ""
 
     this.applyDraft(card, this.readDraft(card, draft) || draft)
+    if (card.dataset.jobId) this.markDirty(card)
     if (nameEl) nameEl.focus()
   }
 
@@ -445,6 +460,7 @@ export default class extends Controller {
     draft.estimate.parts = parts
 
     this.applyDraft(card, this.readDraft(card, draft) || draft)
+    if (card.dataset.jobId) this.markDirty(card)
   }
 
   async commit(event) {
@@ -463,24 +479,7 @@ export default class extends Controller {
     const parsed = payload.parsed || {}
     const est = payload.estimate || {}
 
-    const body = {
-      job: {
-        service: est.service,
-        vehicle_year: parsed.year,
-        vehicle_make: parsed.make,
-        vehicle_model: parsed.model,
-        mileage: est.mileage != null ? est.mileage : parsed.mileage,
-        labor_hours: est.labor_hours,
-        labor_rate: est.labor_rate,
-        labor_total: est.labor_total,
-        parts_total: est.parts_total,
-        total: est.total,
-        raw_capture: card.dataset.raw,
-        parts: est.parts || [],
-        torque: est.torque || [],
-        gaps: est.gaps || []
-      }
-    }
+    const body = this.jobBody(card, payload)
 
     const meta = document.querySelector('meta[name="csrf-token"]')
     const token = meta ? meta.content : null
@@ -512,8 +511,188 @@ export default class extends Controller {
       data = null
     }
 
+    if (data && data.id) card.dataset.jobId = data.id
     this.updateMoney(data)
-    this.finishCard(card, "Logged. Was the spec right for this one? One tap and I remember it.")
+
+    // The card stays live afterwards. A job that can be logged but never corrected is
+    // a form, not a tool - and the mileage usually turns up after the quote does.
+    this.showSavedFooter(card, "Logged")
+  }
+
+  // Shared by Log it and Save changes, so both send exactly the same shape.
+  jobBody(card, payload) {
+    const parsed = payload.parsed || {}
+    const est = payload.estimate || {}
+    return {
+      job: {
+        service: est.service,
+        vehicle_year: parsed.year,
+        vehicle_make: parsed.make,
+        vehicle_model: parsed.model,
+        mileage: est.mileage != null ? est.mileage : parsed.mileage,
+        labor_hours: est.labor_hours,
+        labor_rate: est.labor_rate,
+        labor_total: est.labor_total,
+        parts_total: est.parts_total,
+        total: est.total,
+        raw_capture: card.dataset.raw,
+        parts: est.parts || [],
+        torque: est.torque || [],
+        gaps: est.gaps || []
+      }
+    }
+  }
+
+  // ── Editing a job that is already saved ────────────────────────────────────
+  // The Recent list reopens a logged job in this same card. Nothing here is a
+  // second editor: it reads and writes the identical draft shape.
+
+  showSavedFooter(card, message) {
+    const footer = card.querySelector("[data-card-footer]")
+    if (!footer) return
+
+    const current = card.dataset.status || "quoted"
+    const statuses = ["quoted", "done", "paid"]
+
+    footer.className = "mt-3 border-t border-emerald-800/60 pt-2"
+    footer.innerHTML =
+      '<div class="flex items-center justify-between gap-2">' +
+        '<span data-save-note class="text-[11px] font-semibold text-emerald-300">' +
+          (message || "Saved") +
+        "</span>" +
+        '<button type="button" data-action="waypoint-app#saveJob" ' +
+          'class="rounded-lg bg-emerald-600 px-3 py-1.5 text-[12px] font-bold text-white hover:bg-emerald-500">' +
+          "Save changes</button>" +
+      "</div>" +
+      '<div class="mt-2 flex items-center gap-1.5">' +
+        '<span class="text-[10px] font-bold uppercase tracking-wide text-zinc-500">Status</span>' +
+        statuses.map((s) => this.statusButton(s, s === current)).join("") +
+      "</div>"
+    this.scrollThread()
+  }
+
+  statusButton(status, on) {
+    return (
+      '<button type="button" data-action="waypoint-app#setStatus" data-status="' + status + '" ' +
+      'class="rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide ' +
+      (on ? "bg-emerald-600 text-white" : "bg-zinc-800 text-zinc-400 hover:text-zinc-200") + '">' +
+      status + "</button>"
+    )
+  }
+
+  setStatus(event) {
+    const card = event.currentTarget.closest("div[data-raw]")
+    if (!card) return
+    card.dataset.status = event.currentTarget.dataset.status
+    card.querySelectorAll("[data-status]").forEach((b) => {
+      const on = b.dataset.status === card.dataset.status
+      b.className = "rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide " +
+        (on ? "bg-emerald-600 text-white" : "bg-zinc-800 text-zinc-400 hover:text-zinc-200")
+    })
+    this.markDirty(card)
+  }
+
+  // Say out loud that there is something to save. A silent edit that only lands if
+  // you remember to tap Save is how a wrong number stays in the record.
+  markDirty(card) {
+    const note = card.querySelector("[data-save-note]")
+    if (note) note.textContent = "Unsaved changes"
+  }
+
+  editJob(event) {
+    const row = event.currentTarget
+
+    let draft = null
+    try {
+      draft = JSON.parse(row.dataset.job || "null")
+    } catch (e) {
+      draft = null
+    }
+    if (!draft) return
+
+    this.activatePanel("capture")
+
+    const card = this.buildCard(draft, (draft.parsed && draft.parsed.raw) || "")
+    card.dataset.jobId = row.dataset.jobId
+    card.dataset.status = row.dataset.jobStatus || "quoted"
+    this.threadTarget.appendChild(card)
+
+    this.showSavedFooter(card, "Editing job #" + row.dataset.jobId + " - change what you need, then save.")
+  }
+
+  async saveJob(event) {
+    const card = event.currentTarget.closest("div[data-raw]")
+    if (!card) return
+
+    const jobId = card.dataset.jobId
+    if (!jobId) {
+      this.saveNote(card, "Not saved yet - tap Log it first.", true)
+      return
+    }
+
+    const payload = this.readDraft(card)
+    if (!payload) return
+
+    const body = this.jobBody(card, payload)
+    if (card.dataset.status) body.job.status = card.dataset.status
+
+    const meta = document.querySelector('meta[name="csrf-token"]')
+    const token = meta ? meta.content : null
+
+    let res = null
+    try {
+      res = await fetch("/waypoint/jobs/" + jobId, {
+        method: "PATCH",
+        headers: Object.assign(
+          { "Content-Type": "application/json", Accept: "application/json" },
+          token ? { "X-CSRF-Token": token } : {}
+        ),
+        body: JSON.stringify(body)
+      })
+    } catch (e) {
+      this.saveNote(card, "Could not save - no connection. Your change is still on screen.", true)
+      return
+    }
+
+    if (!res || !res.ok) {
+      this.saveNote(card, "Could not save that change. Try again.", true)
+      return
+    }
+
+    let data = null
+    try {
+      data = await res.json()
+    } catch (e) {
+      data = null
+    }
+
+    this.updateMoney(data)
+    this.saveNote(card, "Saved")
+    if (data && data.draft) this.refreshRow(jobId, data)
+  }
+
+  saveNote(card, text, bad) {
+    const note = card.querySelector("[data-save-note]")
+    if (!note) return
+    note.textContent = text
+    note.className = "text-[11px] font-semibold " + (bad ? "text-red-400" : "text-emerald-300")
+  }
+
+  // Keep the Recent list honest without a full reload.
+  refreshRow(jobId, data) {
+    const row = document.querySelector(
+      '[data-action="waypoint-app#editJob"][data-job-id="' + jobId + '"]'
+    )
+    if (!row) return
+
+    row.dataset.job = JSON.stringify(data.draft)
+    row.dataset.jobStatus = data.status
+
+    const total = row.querySelector("[data-row-total]")
+    if (total) total.textContent = "$" + Number(data.total || 0).toFixed(2)
+
+    const status = row.querySelector("[data-row-status]")
+    if (status) status.textContent = data.status
   }
 
   // The money panel is computed server-side. Reflect the new totals without a reload.

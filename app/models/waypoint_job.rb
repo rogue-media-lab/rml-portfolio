@@ -13,6 +13,7 @@ class WaypointJob < ApplicationRecord
   validates :door, inclusion: { in: DOORS }
 
   before_validation :stamp_quoted_at, on: :create
+  before_save :stamp_status_dates
 
   scope :recent, -> { order(created_at: :desc) }
   scope :paid,   -> { where(status: "paid") }
@@ -28,21 +29,65 @@ class WaypointJob < ApplicationRecord
     unpaid.sum(:total)
   end
 
+  # The shape the capture card already speaks ({parsed, estimate}). A logged job
+  # reopens in the same editor rather than a second one that drifts out of sync.
+  def to_draft
+    {
+      parsed: {
+        year: vehicle_year,
+        make: vehicle_make,
+        model: vehicle_model,
+        service: service,
+        mileage: mileage,
+        vehicle: vehicle_label,
+        raw: raw_capture
+      },
+      estimate: {
+        service: service,
+        labor_hours: labor_hours&.to_f,
+        labor_rate: labor_rate&.to_f,
+        labor_total: labor_total&.to_f,
+        parts_total: parts_total&.to_f,
+        total: total&.to_f,
+        mileage: mileage,
+        parts: parts || [],
+        torque: torque || [],
+        gaps: gaps || []
+      }
+    }
+  end
+
   def vehicle_label
     [ vehicle_year, vehicle_make, vehicle_model ].compact_blank.join(" ").presence
   end
 
   def mark_done!
-    update!(status: "done", completed_at: Time.current)
+    update!(status: "done")
   end
 
   def mark_paid!
-    update!(status: "paid", completed_at: completed_at || Time.current, paid_on: Time.current)
+    update!(status: "paid")
   end
 
   private
 
   def stamp_quoted_at
     self.quoted_at ||= Time.current
+  end
+
+  # Status carries dates. Setting it by string from the API has to stamp them exactly
+  # as mark_paid! does, or "paid" becomes a label with nothing behind it and the books
+  # cannot answer when the money actually arrived. Un-paying clears them again, because
+  # a job that is no longer paid should not still carry a paid date.
+  def stamp_status_dates
+    return unless status_changed?
+
+    if %w[done paid].include?(status)
+      self.completed_at ||= Time.current
+    else
+      self.completed_at = nil
+    end
+
+    self.paid_on = status == "paid" ? (paid_on || Time.current) : nil
   end
 end
