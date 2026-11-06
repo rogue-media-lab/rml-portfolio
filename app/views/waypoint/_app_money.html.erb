@@ -1,0 +1,40 @@
+<%# Panel: money. The number he can measure in week one. %>
+<%# Locals: none. %>
+<div data-waypoint-app-target="panel" data-panel-name="money"
+     class="hidden min-h-0 flex-1 flex-col overflow-y-auto px-4 py-4">
+
+  <div class="rounded-xl border border-zinc-800 bg-zinc-900/60 p-3">
+    <div class="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Collected this month</div>
+    <div class="mt-1 text-3xl font-bold tracking-tight">$2,123.48</div>
+    <p class="mt-1 text-[11px] text-zinc-500">171 jobs paid &middot; 51 logged without an amount</p>
+    <div class="mt-2 h-1.5 overflow-hidden rounded-full bg-zinc-800">
+      <div class="h-full w-[78%] rounded-full bg-emerald-600"></div>
+    </div>
+  </div>
+
+  <div class="mt-3 rounded-xl border border-zinc-800 bg-zinc-900/60 p-3">
+    <div class="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Outstanding</div>
+    <div class="mt-1 text-xl font-bold tracking-tight">$551.00</div>
+    <p class="mt-1 text-[11px] text-zinc-500">2 jobs not collected &mdash; both under a week old</p>
+    <button type="button" data-action="waypoint-app#draftReminders"
+            class="mt-2.5 rounded-lg bg-emerald-600 px-3 py-2 text-[13px] font-bold text-white transition-colors hover:bg-emerald-500">
+      Draft reminders
+    </button>
+  </div>
+
+  <div class="mt-3 rounded-xl border border-zinc-800 bg-zinc-900/60 p-3">
+    <div class="mb-1.5 text-[10px] font-bold uppercase tracking-widest text-zinc-500">Recent</div>
+    <% [["225", "C/K 1500 &middot; diagnostic", "$95.00"],
+        ["224", "Sonata &middot; brake pads",     "$210.00"],
+        ["223", "Escape &middot; battery",        "$132.00"],
+        ["222", "Sonata &middot; oil change",     "$95.00"]].each do |num, what, amt| %>
+      <div class="flex items-center gap-2.5 border-b border-zinc-800 py-2 text-[12px] last:border-b-0">
+        <span class="w-8 shrink-0 font-bold text-zinc-500"><%= num %></span>
+        <span class="min-w-0 flex-1 truncate text-zinc-300"><%= raw what %></span>
+        <span class="shrink-0 font-bold text-zinc-100"><%= amt %></span>
+      </div>
+    <% end %>
+  </div>
+
+  <p class="mt-auto pt-4 text-[10px] text-zinc-600">He sees the number the day he earns it.</p>
+</div>
