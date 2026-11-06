@@ -14,8 +14,18 @@ class CarUs::Shop < ApplicationRecord
 
   # --- Settings accessors with defaults ---
 
+  # Default shop labor rate. Changeable per shop via settings["labor_rate"].
+  DEFAULT_LABOR_RATE = 158.84
+
   def tax_rate
     (settings["tax_rate"] || 0).to_f
+  end
+
+  # What an hour of labor bills at. Falls back to the default when unset, so an
+  # estimate always has a number rather than silently quoting zero.
+  def labor_rate
+    raw = settings["labor_rate"]
+    raw.present? ? raw.to_f : DEFAULT_LABOR_RATE
   end
 
   def supplies_fee_enabled?

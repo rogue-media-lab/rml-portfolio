@@ -40,6 +40,25 @@ class WaypointController < ApplicationController
   # The app door. One page, four panels, switched client-side.
   def app
     @specs = SPEC_SEED
+    @labor_rate = CarUs::Shop.first&.labor_rate || CarUs::Shop::DEFAULT_LABOR_RATE
+  end
+
+  # GET /waypoint/estimate?service=alternator&make=ford&model=escape&year=2021&mileage=84000
+  #
+  # The quote. Labor comes from car_us_labor_times (vehicle-specific row wins over the
+  # generic one), parts from the shop's parts list, torque from car_us_torque_specs.
+  # Anything missing comes back as a gap rather than a guess.
+  def estimate
+    result = Waypoint::Estimator.new(
+      service: params[:service],
+      make: params[:make],
+      model: params[:model],
+      year: params[:year],
+      mileage: params[:mileage],
+      rate: params[:rate]
+    ).call
+
+    render json: result.to_h
   end
 
   # Turbo frame responses — return only the thread content

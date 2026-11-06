@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_08_225703) do
+ActiveRecord::Schema[8.0].define(version: 2026_11_05_120100) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -203,7 +203,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_08_225703) do
     t.text "notes"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["service"], name: "index_car_us_labor_times_on_service", unique: true
+    t.string "make"
+    t.string "model"
+    t.integer "year_start"
+    t.integer "year_end"
+    t.string "engine_size"
+    t.string "generation"
+    t.index ["make", "model"], name: "index_car_us_labor_times_on_make_and_model"
+    t.index ["service", "make", "model", "year_start", "year_end"], name: "index_car_us_labor_times_on_service_and_vehicle", unique: true
   end
 
   create_table "car_us_messages", force: :cascade do |t|
@@ -317,6 +324,22 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_08_225703) do
     t.datetime "updated_at", null: false
     t.jsonb "settings", default: {}
     t.boolean "auto_update_parts", default: false, null: false
+  end
+
+  create_table "car_us_torque_specs", force: :cascade do |t|
+    t.string "component", null: false
+    t.string "fastener", null: false
+    t.decimal "value", precision: 8, scale: 2, null: false
+    t.string "unit", default: "ft-lb", null: false
+    t.string "applies_to"
+    t.string "source"
+    t.string "confidence", default: "single_source"
+    t.boolean "verified_on_vehicle", default: false, null: false
+    t.text "notes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["component", "fastener"], name: "index_car_us_torque_specs_on_component_and_fastener", unique: true
+    t.index ["component"], name: "index_car_us_torque_specs_on_component"
   end
 
   create_table "car_us_vehicle_templates", force: :cascade do |t|

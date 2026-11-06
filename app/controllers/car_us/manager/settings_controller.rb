@@ -16,7 +16,7 @@ module CarUs
 
       def settings_params
         params.require(:settings).permit(
-          :tax_rate, :max_bookings_per_slot,
+          :tax_rate, :labor_rate, :max_bookings_per_slot,
           :supplies_fee_enabled, :supplies_fee,
           :travel_fee_enabled, :travel_fee, :travel_fee_label,
           :target_hours, :auto_update_parts,
@@ -28,6 +28,7 @@ module CarUs
       def cast_settings(raw)
         {
           tax_rate:              raw[:tax_rate].to_f,
+          labor_rate:            raw[:labor_rate].to_f,
           max_bookings_per_slot: raw[:max_bookings_per_slot].to_i,
           supplies_fee_enabled:  ActiveModel::Type::Boolean.new.cast(raw[:supplies_fee_enabled]),
           supplies_fee:          raw[:supplies_fee].to_f,
