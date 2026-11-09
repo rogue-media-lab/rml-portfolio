@@ -1,0 +1,67 @@
+[
+ {
+  "id": 1,
+  "job_id": 1,
+  "step_number": 1,
+  "title": "Drain engine oil",
+  "description": "Remove drain plug, drain into approved container",
+  "time_estimate_minutes": 10,
+  "difficulty": "easy",
+  "tools_needed": "Drain pan, 14mm socket",
+  "pain_points": null,
+  "tips": "Warm engine first",
+  "created_at": "2026-09-27 15:50:20"
+ },
+ {
+  "id": 2,
+  "job_id": 1,
+  "step_number": 2,
+  "title": "Replace oil filter",
+  "description": "Spin off old filter, lubricate new gasket, hand-tighten",
+  "time_estimate_minutes": 5,
+  "difficulty": "easy",
+  "tools_needed": "Filter wrench",
+  "pain_points": null,
+  "tips": null,
+  "created_at": "2026-09-27 15:50:20"
+ },
+ {
+  "id": 3,
+  "job_id": 1,
+  "step_number": 3,
+  "title": "Refill with new oil",
+  "description": "Pour per spec, check dipstick",
+  "time_estimate_minutes": 10,
+  "difficulty": "easy",
+  "tools_needed": "Funnel",
+  "pain_points": null,
+  "tips": "Do not overfill",
+  "created_at": "2026-09-27 15:50:20"
+ },
+ {
+  "id": 4,
+  "job_id": 1,
+  "step_number": 4,
+  "title": "Rotate tires per pattern",
+  "description": "Front-to-rear or cross-rotation per drivetrain",
+  "time_estimate_minutes": 15,
+  "difficulty": "easy",
+  "tools_needed": "Torque wrench, jack",
+  "pain_points": null,
+  "tips": "Verify lug torque",
+  "created_at": "2026-09-27 15:50:20"
+ },
+ {
+  "id": 5,
+  "job_id": 1,
+  "step_number": 5,
+  "title": "Multi-point inspection",
+  "description": "Lights, wipers, belts, hoses, fluid levels",
+  "time_estimate_minutes": 10,
+  "difficulty": "easy",
+  "tools_needed": "Inspection sheet",
+  "pain_points": null,
+  "tips": null,
+  "created_at": "2026-09-27 15:50:20"
+ }
+]

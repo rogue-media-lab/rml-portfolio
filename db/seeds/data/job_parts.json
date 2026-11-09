@@ -1,0 +1,122 @@
+[
+ {
+  "id": 1,
+  "job_id": 1,
+  "part_name": "Engine Oil 5W-30 (5qt)",
+  "part_number": "OIL5W30-5Q",
+  "oem_number": null,
+  "quantity": 1,
+  "unit_cost": 28.5,
+  "supplier": "Generic",
+  "notes": "Synthetic demo record",
+  "created_at": "2026-09-27 15:50:20"
+ },
+ {
+  "id": 2,
+  "job_id": 1,
+  "part_name": "Oil Filter",
+  "part_number": "OILFILTER-GEN",
+  "oem_number": "GEN-OF-001",
+  "quantity": 1,
+  "unit_cost": 8.95,
+  "supplier": "Generic",
+  "notes": "Synthetic demo record",
+  "created_at": "2026-09-27 15:50:20"
+ },
+ {
+  "id": 3,
+  "job_id": 2,
+  "part_name": "Front Brake Pads (Set)",
+  "part_number": "BRKPAD-FRT-GEN",
+  "oem_number": null,
+  "quantity": 1,
+  "unit_cost": 65.0,
+  "supplier": "Generic",
+  "notes": "Synthetic demo record",
+  "created_at": "2026-09-27 15:50:20"
+ },
+ {
+  "id": 4,
+  "job_id": 3,
+  "part_name": "Coolant 50/50 (1gal)",
+  "part_number": "COOL50-1G",
+  "oem_number": null,
+  "quantity": 1,
+  "unit_cost": 22.0,
+  "supplier": "Generic",
+  "notes": "Synthetic demo record",
+  "created_at": "2026-09-27 15:50:20"
+ },
+ {
+  "id": 5,
+  "job_id": 3,
+  "part_name": "Thermostat Assembly",
+  "part_number": "THERM-GEN-001",
+  "oem_number": "GEN-TH-100",
+  "quantity": 1,
+  "unit_cost": 45.0,
+  "supplier": "Generic",
+  "notes": "Synthetic demo record",
+  "created_at": "2026-09-27 15:50:20"
+ },
+ {
+  "id": 6,
+  "job_id": 8,
+  "part_name": "CVT Fluid NS-3 (4qt)",
+  "part_number": "CVTFLUID-NS3-4Q",
+  "oem_number": null,
+  "quantity": 1,
+  "unit_cost": 72.0,
+  "supplier": "Generic",
+  "notes": "Synthetic demo record",
+  "created_at": "2026-09-27 15:50:20"
+ },
+ {
+  "id": 7,
+  "job_id": 10,
+  "part_name": "Transfer Case Fluid (2qt)",
+  "part_number": "TCFLUID-GEN-2Q",
+  "oem_number": null,
+  "quantity": 1,
+  "unit_cost": 38.0,
+  "supplier": "Generic",
+  "notes": "Synthetic demo record",
+  "created_at": "2026-09-27 15:50:20"
+ },
+ {
+  "id": 8,
+  "job_id": 12,
+  "part_name": "Spark Plug Iridium (4pk)",
+  "part_number": "NGK-IR-4PK",
+  "oem_number": "ILKAR8H7",
+  "quantity": 1,
+  "unit_cost": 48.0,
+  "supplier": "Generic",
+  "notes": "Synthetic demo record",
+  "created_at": "2026-09-27 15:50:20"
+ },
+ {
+  "id": 9,
+  "job_id": 13,
+  "part_name": "Starter Motor",
+  "part_number": "STRT-GEN-001",
+  "oem_number": "GEN-ST-200",
+  "quantity": 1,
+  "unit_cost": 145.0,
+  "supplier": "Generic",
+  "notes": "Synthetic demo record",
+  "created_at": "2026-09-27 15:50:20"
+ },
+ {
+  "id": 10,
+  "job_id": 15,
+  "part_name": "Coolant Expansion Tank",
+  "part_number": "COOLTANK-GEN-001",
+  "oem_number": "GEN-CT-300",
+  "quantity": 1,
+  "unit_cost": 85.0,
+  "supplier": "Generic",
+  "notes": "Synthetic demo record",
+  "created_at": "2026-09-27 15:50:20"
+ }
+]
