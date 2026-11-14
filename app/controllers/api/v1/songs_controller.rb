@@ -10,6 +10,9 @@
 #   song[artist_name]      — required (string, not nested attrs — simpler for API callers)
 #   song[album_title]      — optional
 #   song[audio_file]       — required (mp3/m4a/flac file upload)
+#   song[preview_audio]    — optional (30-second cut of audio_file). The public player
+#                            serves THIS, so a visitor never receives the full track.
+#                            Cut it with ffmpeg before posting; see the Maestro skill.
 #   song[image]            — optional (album art / cover image)
 #   song[banner_video]     — optional (short looping video)
 #   song[image_credit]     — optional
@@ -68,6 +71,12 @@ module Api
           song.banner_video.attach(song_params[:banner_video])
         end
 
+        # 30-second preview, cut client-side by the caller (ffmpeg). Optional so existing
+        # callers keep working; when absent the song simply has no public preview yet.
+        if song_params[:preview_audio].present?
+          song.preview_audio.attach(song_params[:preview_audio])
+        end
+
         # Metadata / credits
         song.image_credit       = song_params[:image_credit]       if song_params[:image_credit].present?
         song.image_credit_url   = song_params[:image_credit_url]   if song_params[:image_credit_url].present?
@@ -92,7 +101,7 @@ module Api
       def song_params
         params.require(:song).permit(
           :title, :artist_name, :album_title,
-          :audio_file, :image, :banner_video,
+          :audio_file, :preview_audio, :image, :banner_video,
           :image_credit, :image_credit_url, :image_license,
           :audio_source, :audio_license, :additional_credits,
           :focal_point_x, :focal_point_y

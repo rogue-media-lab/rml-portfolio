@@ -2,6 +2,11 @@ class Song < ApplicationRecord
   has_one_attached :image
   has_one_attached :banner_video
   has_one_attached :audio_file
+  # A 30-second cut of audio_file, generated up front (ffmpeg, with fades) so the public
+  # player can serve the preview without the full track ever reaching the browser.
+  # Stopping playback at 30s in the player is not a limit — the whole file is already
+  # in the page. See docs: zuke previews spec, 2026-11-14.
+  has_one_attached :preview_audio
   has_one_attached :waveform_data
   belongs_to :artist
   belongs_to :album, optional: true, inverse_of: :songs
