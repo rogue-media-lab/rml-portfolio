@@ -240,6 +240,7 @@ class MilkAdmin::SongsController < ApplicationController
   def song_params
     params.require(:song).permit(:image,
                                   :audio_file,
+                                  :preview_audio,
                                   :banner_video,
                                   :title,
                                   :focal_point_x,
