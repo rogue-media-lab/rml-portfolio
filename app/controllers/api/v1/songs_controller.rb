@@ -10,9 +10,10 @@
 #   song[artist_name]      — required (string, not nested attrs — simpler for API callers)
 #   song[album_title]      — optional
 #   song[audio_file]       — required (mp3/m4a/flac file upload)
-#   song[preview_audio]    — optional (30-second cut of audio_file). The public player
-#                            serves THIS, so a visitor never receives the full track.
-#                            Cut it with ffmpeg before posting; see the Maestro skill.
+#   song[preview_audio]    — optional (30-second cut of audio_file), stored so the public
+#                            player CAN serve it instead of the full track. Wiring the
+#                            presenter/views to prefer it is a separate change. Cut it
+#                            with ffmpeg before posting; see the Maestro skill.
 #   song[image]            — optional (album art / cover image)
 #   song[banner_video]     — optional (short looping video)
 #   song[image_credit]     — optional
