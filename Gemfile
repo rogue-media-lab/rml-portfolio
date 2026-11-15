@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 
 # Running ruby version
-ruby "3.3.7"
+ruby "~> 3.3"
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
 gem "rails", "~> 8.0.2"
 # The modern asset pipeline for Rails [https://github.com/rails/propshaft]
