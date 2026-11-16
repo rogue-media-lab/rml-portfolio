@@ -24,8 +24,12 @@
             <% songs = @artist_songs[artist.id] || [] %>
             <div class="artist-card group">
               <div class="artist-name flex items-center mb-2">
-                <% artwork = artist.albums.first&.cover_art || artist.image %>
-                <% if artwork.present? %>
+                <%# An ActiveStorage attachment proxy is truthy even when nothing
+                    is attached, so `cover_art || artist.image` never reached the
+                    fallback. Ask .attached? explicitly instead. %>
+                <%- album_cover = artist.albums.first&.cover_art -%>
+                <%- artwork = album_cover&.attached? ? album_cover : artist.image -%>
+                <% if artwork&.attached? %>
                   <%= image_tag artwork,
                       class: "rounded-lg w-10 mr-2 h-auto border-2 border-gray-200",
                       alt: artist.name %>

@@ -10,8 +10,9 @@
     # "#<ActiveStorage::Attached::One:0x...>" — so every play button in this tab
     # was broken. It now renders the shared component, which takes presenter keys.
     #
-    # The count comes from @grouped_genres so a song that renders no card is still
-    # counted in the library total. %>
+    # The count comes from @grouped_genres (every song with this genre) while only
+    # playable songs are serialized, so the heading can legitimately say a genre
+    # has tracks and then render none of them. %>
 <%= turbo_frame_tag "music-frame" do %>
   <div id="music_frame" class="w-full">
     <% @grouped_genres.each do |genre, songs| %>

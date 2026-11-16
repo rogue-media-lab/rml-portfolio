@@ -20,12 +20,15 @@ class ZukeController < ApplicationController
   # view renders the shared smart-image component. Previously the partial reached
   # for first_song.audio_file, which renders an attachment object, not a URL.
   def artists
-    @artists = Artist.includes(:songs).order(:name)
+    # Eager-load each artist's songs AND the attachments SongPresenter reads,
+    # so serializing a collection does not fire a query per song per attachment.
+    song_includes = [ :image_attachment, :audio_file_attachment,
+                      :banner_video_attachment, :waveform_data_attachment ]
+    @artists = Artist.includes(songs: song_includes).order(:name)
     @grouped_artists = @artists.group_by { |a| a.name.first.upcase }
 
     @artist_songs = @artists.each_with_object({}) do |artist, memo|
-      songs, = serialize_songs_for_player(artist.songs)
-      memo[artist.id] = songs
+      memo[artist.id] = serialize_playable_songs(artist.songs)
     end
 
     render partial: "zuke/turbo_frames/artists", formats: [ :html ]
@@ -38,11 +41,12 @@ class ZukeController < ApplicationController
   # of reaching for a raw attachment. Before this, the partial named here did not
   # exist and the route returned a 500.
   def albums
-    all_albums = Album.includes(:artist, :songs).order(:title)
+    song_includes = [ :image_attachment, :audio_file_attachment,
+                      :banner_video_attachment, :waveform_data_attachment ]
+    all_albums = Album.includes(:artist, songs: song_includes).order(:title)
 
     @album_songs = all_albums.each_with_object({}) do |album, memo|
-      songs, = serialize_songs_for_player(album.songs)
-      memo[album.id] = songs
+      memo[album.id] = serialize_playable_songs(album.songs)
     end
 
     @albums = all_albums.group_by { |a| a.title.first.upcase }
@@ -68,9 +72,11 @@ class ZukeController < ApplicationController
 
     song_ids = ActiveRecord::Base.connection.execute(sql).pluck("id")
 
-    # Eager load the songs and their associations
-    songs_with_genres = Song.includes(:artist, :album, :genres)
-                            .where(id: song_ids)
+    # Eager load the songs, their associations, and the attachments SongPresenter
+    # reads — without the attachments this comment's "no N+1" claim was false.
+    songs_with_genres = with_zuke_attachments(
+      Song.includes(:artist, :album, :genres)
+    ).where(id: song_ids)
 
     # Group the songs by genre for the view
     @grouped_genres = songs_with_genres
@@ -81,11 +87,11 @@ class ZukeController < ApplicationController
       .to_h
 
     # Serialize through the presenter so the view renders the shared smart-image
-    # component. Passing raw records meant the partial inlined its own markup and
-    # interpolated song.audio_file directly, which renders an Active Storage
-    # object rather than a URL.
+    # component (previously it inlined its own markup and interpolated a raw
+    # attachment). Only playable songs are serialized, so the view's empty branch
+    # is genuinely reachable rather than dead code.
     @genre_songs = @grouped_genres.transform_values do |songs|
-      serialize_songs_for_player(songs).first
+      serialize_playable_songs(songs)
     end
 
     render partial: "zuke/turbo_frames/genres", formats: [ :html ]
@@ -197,5 +203,27 @@ class ZukeController < ApplicationController
   def serialize_songs_for_player(songs)
     song_hashes = songs.map { |song| SongPresenter.new(song).to_song_hash }
     [ song_hashes, song_hashes.to_json ]
+  end
+
+  # Serializes only the songs that can actually be played.
+  #
+  # SongPresenter returns url: nil when no audio_file is attached, and the
+  # smart-image component renders a play affordance unconditionally — so an
+  # unplayable song became a card that dispatched an empty URL on click. Dropping
+  # them here means the views never receive one, and the "nothing playable"
+  # branches are reachable.
+  #
+  # @return [Array<Hash>] song hashes for songs with an attached audio file
+  def serialize_playable_songs(songs)
+    serialize_songs_for_player(songs.select { |song| song.audio_file.attached? }).first
+  end
+
+  # Eager-loads everything SongPresenter touches for one song, so serializing a
+  # collection does not fire a query per song per attachment.
+  def with_zuke_attachments(relation)
+    relation.with_attached_image
+            .with_attached_audio_file
+            .with_attached_banner_video
+            .with_attached_waveform_data
   end
 end

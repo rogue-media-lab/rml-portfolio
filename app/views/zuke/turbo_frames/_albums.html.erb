@@ -6,9 +6,9 @@
     # than inlining its own markup and reaching for a raw attachment.
     #
     # Replaces a partial that was referenced by the controller but did not exist,
-    # which made GET /zuke/albums a 500. The old _albums-fix partial is left in
-    # place for reference but is no longer routed to; it referenced a
-    # music--album Stimulus controller that has never existed. %>
+    # which made GET /zuke/albums a 500. The broken _albums-fix partial it was
+    # confused with is deleted — it referenced a music--album Stimulus controller
+    # that has never existed. %>
 <%= turbo_frame_tag "music-frame" do %>
   <div class="w-full flex flex-col text-gray-100">
     <% @albums.each do |letter, albums| %>

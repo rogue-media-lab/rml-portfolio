@@ -59,24 +59,47 @@ class ZukeControllerTest < ActionDispatch::IntegrationTest
   # GET /zuke/albums rendered "zuke/turbo_frames/albums", a partial that did not
   # exist, so the route returned a 500. Nothing exercised it, which is why it
   # survived. This test is the guard that was missing.
-  test "albums action renders and serializes each album's songs" do
+  #
+  # The assertion that matters is on a PLAYABLE song: with no fixture attachment
+  # every url is nil, and asserting "key present" or "not an attachment object"
+  # both pass on nil — the test would have passed even if the presenter were
+  # broken to always return url: nil. So this attaches a real file first.
+  test "albums action serializes playable songs and drops unplayable ones" do
+    # SongPresenter calls audio_file.url, which needs a request host in tests.
+    # Nothing in this suite had exercised that path with a real attachment before.
+    # host! sets it on the request; assigning ActiveStorage::Current.url_options
+    # here does not work because Current is reset per request.
+    host! "example.com"
+
+    playable = songs(:one)
+    playable.audio_file.attach(
+      io: File.open(Rails.root.join("test/fixtures/files/audio.mp3")),
+      filename: "audio.mp3",
+      content_type: "audio/mpeg"
+    )
+
     get music_albums_zuke_index_url
     assert_response :success
-
-    grouped = assigns(:albums)
-    assert_not_nil grouped, "Should assign @albums"
 
     serialized = assigns(:album_songs)
     assert_not_nil serialized, "Should assign @album_songs"
 
-    # Every song hash must carry the presenter's keys, not a raw attachment.
-    serialized.each_value do |songs|
-      songs.each do |song|
-        assert song.key?(:url), "serialized song is missing :url"
-        assert song.key?(:title), "serialized song is missing :title"
-        assert_not_kind_of ActiveStorage::Attached::One, song[:url],
-          "view received an attachment object instead of a URL"
-      end
+    # songs(:one) belongs to first_album and is now playable.
+    first_album_songs = serialized[albums(:first_album).id]
+    assert_equal 1, first_album_songs.size,
+      "only the playable song should be serialized"
+
+    song = first_album_songs.first
+    assert_not_nil song[:url], "a playable song must have a non-nil url"
+    assert_kind_of String, song[:url], "url must be a string, not an attachment object"
+    assert_match(/http|blob|rails/, song[:url], "url should look like a URL")
+
+    # Every other fixture song has no audio_file, so nothing else should appear.
+    serialized.each do |album_id, songs_for_album|
+      next if album_id == albums(:first_album).id
+
+      assert_empty songs_for_album,
+        "album #{album_id} has no playable songs and should serialize none"
     end
   end
 

@@ -1,4 +1,11 @@
 class ApplicationController < ActionController::Base
+  # Populates ActiveStorage::Current.url_options from the request, so calling
+  # .url on an attachment works. Rails' own ApplicationController includes this;
+  # this one never did, which went unnoticed because production's S3 service is
+  # public: true and needs no host. The test Disk service does, so any test that
+  # attached a file and asked for its URL raised ArgumentError.
+  include ActiveStorage::SetCurrent
+
   before_action :set_meta_data
   allow_browser versions: :modern
   layout :layout_by_resource
