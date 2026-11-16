@@ -647,34 +647,46 @@ export default class extends Controller {
    *
    * @returns {Promise<boolean>} true once the element reports it can play.
    */
-  waitForPlayableMedia(timeout = 5000) {
+  waitForPlayableMedia(url, timeout = 5000) {
     const media = this.wavesurfer?.getMediaElement()
     if (!media) return Promise.resolve(false)
 
-    // HAVE_FUTURE_DATA (3) is what canplay signals, and this reading belongs to THIS song:
-    // playSongFromQueue empties the media element before loading, which resets readyState
-    // to 0, so a 3 here cannot be the previous track still reporting itself ready.
-    if (media.readyState >= 3) return Promise.resolve(true)
+    const outgoing = this.outgoingMediaSrc
+    // ReadyState alone is not enough, and assuming otherwise is what let play() restart the
+    // outgoing song: the element keeps that song loaded after it ends, still reporting
+    // HAVE_FUTURE_DATA, so a bare readyState check passes while the OLD track is in the
+    // element. The source must have turned over as well — matched against the requested URL
+    // so re-loading the same song still counts, and against the outgoing src so anything
+    // new counts.
+    const isThisTrack = () =>
+      media.currentSrc === url || (!!media.currentSrc && media.currentSrc !== outgoing)
+    const playable = () => isThisTrack() && media.readyState >= 3
+
+    if (playable()) return Promise.resolve(true)
 
     return new Promise((resolve) => {
       let settled = false
+      let timer = null
+      const events = ["canplay", "loadeddata", "loadedmetadata"]
+
       const finish = (value) => {
         if (settled) return
         settled = true
-        clearTimeout(timer)
-        media.removeEventListener("canplay", onCanPlay)
+        if (timer) clearTimeout(timer)
+        events.forEach((name) => media.removeEventListener(name, onProgress))
         resolve(value)
       }
-      // canplay fires on the shared element, so one queued by the previous source can still
-      // arrive after this listener is registered. Re-read readyState and, when it is low,
-      // keep waiting: a stale event is not this track being unplayable, and resolving false
-      // here would abandon a track that is in fact loading.
-      const onCanPlay = () => {
-        if (media.readyState >= 3) finish(true)
+      // Re-check on every progress event instead of resolving: these fire on the shared
+      // element, so one queued by the previous source can still arrive after this listener
+      // is registered. A stale event is not this track being unplayable, and resolving
+      // false there would abandon a track that is in fact still loading. waiting for
+      // readyState >= 3 also means loadedmetadata (rs=1) does not count as ready.
+      const onProgress = () => {
+        if (playable()) finish(true)
       }
-      const timer = setTimeout(() => finish(false), timeout)
 
-      media.addEventListener("canplay", onCanPlay)
+      events.forEach((name) => media.addEventListener(name, onProgress))
+      timer = setTimeout(() => finish(false), timeout)
     })
   }
 
@@ -1215,6 +1227,12 @@ export default class extends Controller {
         return;
       }
 
+      // Remember what the element is holding right now. It keeps the OUTGOING track loaded
+      // after that track ends — still reporting HAVE_FUTURE_DATA — so the playable check in
+      // attemptPlayback has to be able to tell the two apart, or play() restarts the song
+      // that just finished instead of the one being loaded.
+      this.outgoingMediaSrc = this.wavesurfer?.getMediaElement()?.currentSrc || null
+
       // Clear current track completely before loading new one
       this.wavesurfer?.stop();
       this.wavesurfer?.empty();
@@ -1276,7 +1294,7 @@ export default class extends Controller {
             // settles the promise and never restarts playback, so the track stays silent
             // while the player reports it as playing.
             const generation = this.playGeneration;
-            const playable = await this.waitForPlayableMedia();
+            const playable = await this.waitForPlayableMedia(song.url);
             if (generation !== this.playGeneration) {
               // A different track is loading and owns isChangingTrack now, so leaving the
               // flag set is correct — clearing it here would let the older handoff unlock
