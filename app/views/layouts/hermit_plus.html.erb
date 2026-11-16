@@ -30,10 +30,34 @@
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
 
-    <% if Rails.env.development? || params[:debug] == "true" %>
-      <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-      <script>eruda.init();</script>
-    <% end %>
+    <%#
+      Mobile debugging console (Eruda).
+      On by default everywhere, production included, so the icon is on the phone.
+      ?debug=false turns it off and ?debug=true turns it back on; either sticks in
+      localStorage, because the installed PWA starts from the manifest URL and carries
+      no query string — a URL-only switch would be unreachable from the app icon.
+    %>
+    <% eruda_on = true %>
+    <% eruda_enable = params[:debug] == "true" %>
+    <% eruda_disable = params[:debug] == "false" %>
+    <script>
+      (function () {
+        // Booleans only: the param itself is never echoed into the script, where an
+        // entity like &quot; would not be decoded and a value like </script> would escape
+        // the tag. Neither can happen when all that is emitted is true or false.
+        if (<%= eruda_enable.to_json %>) localStorage.setItem("eruda", "1");
+        if (<%= eruda_disable.to_json %>) localStorage.setItem("eruda", "0");
+
+        var flag = localStorage.getItem("eruda");
+        var on = (<%= eruda_on.to_json %> && flag !== "0") || flag === "1";
+        if (!on) return;
+
+        var script = document.createElement("script");
+        script.src = "https://cdn.jsdelivr.net/npm/eruda";
+        script.onload = function () { eruda.init(); };
+        document.head.appendChild(script);
+      })();
+    </script>
 
     <script>
       if (localStorage.getItem('color-theme') === 'dark' ||
