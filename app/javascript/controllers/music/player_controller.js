@@ -294,6 +294,11 @@ export default class extends Controller {
     // Existing listeners
     window.addEventListener("player:play-requested", this.handlePlayRequest.bind(this));
     document.addEventListener("player:play", () => {
+      // This is the player's main Play button. The equalizer's AudioContext is created
+      // suspended on page load, so without resuming it the track runs with no sound —
+      // and because the button carries a data-action, the tap-to-resume listener
+      // deliberately skips it, so nothing else would do this.
+      this.resumeAudioContext()
       const playPromise = this.wavesurfer.play()
       if (playPromise !== undefined) {
         playPromise.catch((error) => {
@@ -389,32 +394,56 @@ export default class extends Controller {
 
     const generation = this.playGeneration
 
-    console.log("🔊 Autoplay was blocked — trying the muted start for:", song?.title)
+    console.log("🔊 Autoplay was blocked — checking the audio path for:", song?.title)
 
-    const wasMuted = media.muted
-    try {
-      media.muted = true
-      await media.play()
-      // The EQ routes the media element through Web Audio, and a suspended
-      // AudioContext runs the playhead with no sound at all. Resume it before
-      // unmuting, or "recovered" means silently advancing.
-      await this.ensureAudioContextResumed()
-      media.muted = wasMuted
-      this.isChangingTrack = false
-      console.log("▶️ Autoplay recovered: started muted, now unmuted")
-      return
-    } catch (error) {
-      media.muted = wasMuted
-      console.warn("🔇 Muted start refused too:", error?.name)
-    }
+    // Every await is a window in which the user can start another track, and this
+    // recovery belongs to the track that got blocked. So wait FIRST, then check whether
+    // it is still current, and only then touch shared state — acting on a track that
+    // has been replaced would clear its load lock or pause it out from under.
+    const audible = await this.resumeAudioContext()
 
-    // A track started loading while the muted start was being attempted, so this
-    // block belongs to a track that is no longer playing. Arming now would leave a
-    // listener behind that plays whatever has replaced it, out of turn.
     if (generation !== this.playGeneration) {
       console.log("↩️ Superseded block ignored - a different track is loading")
       return
     }
+
+    const wasMuted = media.muted
+    let recovered = false
+
+    if (audible) {
+      // The context can run, so what refused us was the media element — and muted
+      // autoplay is permitted, which is the way around that.
+      try {
+        media.muted = true
+        await media.play()
+
+        if (generation !== this.playGeneration) {
+          media.pause()
+          media.muted = wasMuted
+          console.log("↩️ Superseded during the muted start - stopping")
+          return
+        }
+
+        media.muted = wasMuted
+        recovered = true
+        console.log("▶️ Autoplay recovered: started muted, now unmuted")
+      } catch (error) {
+        media.muted = wasMuted
+        console.warn("🔇 Muted start refused too:", error?.name)
+      }
+    } else {
+      // The context will not run, so this track could only advance inaudibly. Starting
+      // it and pausing 250ms later would just flicker the controls and nudge the
+      // playhead forward, so do not start it — wait for the tap that can fix this.
+      console.warn("🔇 AudioContext will not run - waiting for a tap instead")
+    }
+
+    // The track is loaded on every path out of here, so the change is over. Leaving
+    // this set would make handleTrackEnd() bail out and auto-advance would never run
+    // again — the exact failure this change exists to fix.
+    this.isChangingTrack = false
+
+    if (recovered) return
 
     console.log("👆 Waiting for a tap to resume playback")
 
@@ -423,27 +452,31 @@ export default class extends Controller {
     this.disarmResumeOnInteraction()
 
     const resume = (event) => {
-      // Single use: the next interaction consumes the intent, whichever branch acts
-      // on it. Disarming first is what stops this staying armed when the control
-      // branch below returns early — otherwise a later unrelated tap or keypress
-      // would start playback out of turn.
+      // Single use either way: the next interaction consumes the intent.
       this.disarmResumeOnInteraction()
 
-      // Pointerdown fires in the capture phase, so it runs BEFORE the click handler
-      // of whatever was tapped. If the tap landed on a player control, that control
-      // decides what happens — resuming here too would start the track and the
-      // control would then immediately skip or pause it.
+      // A tap on one of the player's own controls belongs to that control — it will
+      // resume or skip on its own, and doing it here as well would fight it.
       if (event?.target instanceof Element && event.target.closest("[data-action]")) return
+
+      // Both calls are synchronous inside the gesture on purpose. On touch, activation
+      // is granted on click/pointerup rather than pointerdown, and deferring the resume
+      // into a promise continuation would land it after the activation window shut —
+      // so neither the context nor playback would actually start.
+      this.resumeAudioContext()
 
       const playPromise = this.wavesurfer?.play()
       if (playPromise !== undefined) {
-        playPromise.then(() => this.ensureAudioContextResumed())
-          .catch((error) => console.warn("Resume after tap failed:", error))
+        playPromise.catch((error) => console.warn("Resume after tap failed:", error))
       }
     }
 
     this.resumeOnInteraction = resume
-    document.addEventListener("pointerdown", resume, true)
+    // Not pointerdown: for touch pointer types it does not grant user activation — that
+    // only arrives on pointerup/click — so a listener there would fire without the very
+    // activation it needs and be disarmed by its own first event.
+    document.addEventListener("click", resume, true)
+    document.addEventListener("pointerup", resume, true)
     document.addEventListener("keydown", resume, true)
   }
 
@@ -458,7 +491,8 @@ export default class extends Controller {
     const resume = this.resumeOnInteraction
     if (!resume) return
 
-    document.removeEventListener("pointerdown", resume, true)
+    document.removeEventListener("click", resume, true)
+    document.removeEventListener("pointerup", resume, true)
     document.removeEventListener("keydown", resume, true)
     this.resumeOnInteraction = null
   }
@@ -556,20 +590,46 @@ export default class extends Controller {
   }
 
   /**
-   * Ensure AudioContext is resumed (critical for mobile Safari with WebAudio backend)
+   * Try to get the equalizer's AudioContext running, and say whether it worked.
+   *
+   * The equalizer owns the AudioContext and routes the media element through it, so a
+   * suspended context runs the playhead with no sound at all — "playing" that nobody
+   * can hear. The context belongs to the music--equalizer controller; the media element
+   * WaveSurfer creates is a plain <audio> with no .context of its own.
+   *
+   * resume() is deliberately NOT awaited on its own. Without user activation it does
+   * not reject, it stays pending until a gesture, so awaiting it would hang whatever
+   * called this — and it is called from autoplay recovery, where hanging means the
+   * recovery never finishes and auto-advance wedges. It is raced against a short
+   * timer and the state read back instead.
+   *
+   * @returns {Promise<boolean>} true when the context is running, or when there is no
+   *   context to worry about — callers should only treat false as "no sound".
    */
-  async ensureAudioContextResumed() {
+  async resumeAudioContext() {
     try {
-      // Only needed for WebAudio backend
-      if (this.isMobile()) {
-        const mediaElement = this.wavesurfer?.getMediaElement?.()
-        if (mediaElement && mediaElement.context && mediaElement.context.state === 'suspended') {
-          console.log("Resuming suspended AudioContext...")
-          await mediaElement.context.resume()
-        }
-      }
+      const eqElement = document.querySelector('[data-controller*="music--equalizer"]')
+      if (!eqElement) return true
+
+      const eqController = this.application.getControllerForElementAndIdentifier(eqElement, "music--equalizer")
+      const context = eqController?.audioContext
+      if (!context) return true
+      if (context.state === "running") return true
+
+      // Not only "suspended": iOS reports "interrupted" after a call, Siri or a lock
+      // screen, and a resume is the way out of that too. Racing it against a timer is
+      // what keeps a pending resume from hanging whoever awaited it.
+      console.log("Resuming equalizer AudioContext from:", context.state)
+      await Promise.race([
+        context.resume(),
+        new Promise((resolve) => setTimeout(resolve, 250)),
+      ])
+
+      return context.state === "running"
     } catch (error) {
+      // Unknowable state is not a reason to refuse playback.
       console.warn("Could not resume AudioContext:", error)
+      return true
     }
   }
 
@@ -1057,6 +1117,11 @@ export default class extends Controller {
     try {
       this.isChangingTrack = true;
 
+      // Resume the EQ's AudioContext if it already exists. On the very first track it
+      // does not yet — the equalizer builds it on audio:ready, after the peaks load —
+      // so attemptPlayback() repeats this once the context is actually there.
+      this.resumeAudioContext()
+
       // A track change voids any pending "tap to resume": it was armed for the track
       // that got blocked, not for this one. The generation bump covers the case where
       // the block is still awaiting its muted-start attempt and would otherwise arm
@@ -1142,18 +1207,35 @@ export default class extends Controller {
       const attemptPlayback = () => {
         if (playOnLoad) {
           console.log("✅ Play on load is active. Attempting to play...");
-          const playPromise = this.wavesurfer.play();
-          if (playPromise !== undefined) {
-            playPromise.then(() => {
+          // The equalizer builds its AudioContext on audio:ready, after the peak fetch
+          // and the load, so the resume in playSongFromQueue runs too early to see it on
+          // the first track. This is the first point at which it exists.
+          //
+          // The answer matters: play() resolves on a media element that has already been
+          // unlocked while the context stays silent, so a resolved play() is not evidence
+          // of sound. When the context will not run, hand it to the recovery, which waits
+          // for the gesture that can actually fix it, instead of playing inaudibly.
+          this.resumeAudioContext().then((audible) => {
+            if (!audible) {
+              console.warn("🔇 AudioContext will not run - not starting inaudibly");
               this.isChangingTrack = false;
-            }).catch((error) => {
-              console.error("🚫 Autoplay blocked by browser or failed:", error);
+              document.dispatchEvent(new CustomEvent("player:autoplay-blocked", { detail: { song } }));
+              return;
+            }
+
+            const playPromise = this.wavesurfer.play();
+            if (playPromise !== undefined) {
+              playPromise.then(() => {
+                this.isChangingTrack = false;
+              }).catch((error) => {
+                console.error("🚫 Autoplay blocked by browser or failed:", error);
+                this.isChangingTrack = false;
+                document.dispatchEvent(new CustomEvent("player:autoplay-blocked", { detail: { song, error } }));
+              });
+            } else {
               this.isChangingTrack = false;
-              document.dispatchEvent(new CustomEvent("player:autoplay-blocked", { detail: { song, error } }));
-            });
-          } else {
-            this.isChangingTrack = false;
-          }
+            }
+          });
         } else {
            console.log("⏸️ Play on load is inactive. Waiting for user interaction.");
            this.isChangingTrack = false;
@@ -1271,6 +1353,10 @@ export default class extends Controller {
    * Toggle between play and pause states
    */
   togglePlayback() {
+    // This click is a gesture, and the equalizer's AudioContext is created suspended
+    // before any gesture exists. Without resuming it playback runs with the playhead
+    // moving and no sound, so do it here rather than only in autoplay recovery.
+    this.resumeAudioContext()
     this.wavesurfer.playPause()
   }
 
