@@ -22,10 +22,16 @@ class ZukeControllerTest < ActionDispatch::IntegrationTest
     get music_list_zuke_index_url
     assert_response :success
 
-    loaded_songs = assigns(:songs_for_display)
-    assert_not_nil loaded_songs, "Should assign @songs_for_display"
+    # Visibility: the scope the guest may see. This is what this test is about.
+    scope = assigns(:songs_scope)
+    assert_not_nil scope, "Should assign @songs_scope"
+    assert_equal 27, scope.size, "Should load all 27 public songs"
 
-    assert_equal 27, loaded_songs.size, "Should load all 27 public songs"
+    # Playability is separate: no fixture song has an attached audio_file, so
+    # nothing renders. Asserting it here keeps the two concerns from being
+    # confused — display filtering must not silently change visibility counts.
+    assert_equal 0, assigns(:songs_for_display).size,
+      "no fixture song has an audio_file, so none is playable"
   end
 
   test "milk admin should see all songs in music" do
@@ -34,10 +40,26 @@ class ZukeControllerTest < ActionDispatch::IntegrationTest
     get music_list_zuke_index_url
     assert_response :success
 
-    loaded_songs = assigns(:songs_for_display)
-    assert_not_nil loaded_songs
+    scope = assigns(:songs_scope)
+    assert_not_nil scope
+    assert_equal 27, scope.size, "Should load all 27 songs"
+  end
 
-    assert_equal 27, loaded_songs.size, "Should load all 27 songs"
+  test "music hides songs that cannot be played" do
+    host! "example.com"
+    songs(:one).audio_file.attach(
+      io: File.open(Rails.root.join("test/fixtures/files/audio.mp3")),
+      filename: "audio.mp3",
+      content_type: "audio/mpeg"
+    )
+
+    get music_list_zuke_index_url
+    assert_response :success
+
+    assert_equal 27, assigns(:songs_scope).size, "visibility is unchanged"
+    display = assigns(:songs_for_display)
+    assert_equal 1, display.size, "only the playable song should be displayed"
+    assert_not_nil display.first[:url], "the displayed song must have a URL"
   end
 
   test "genres action should be performant and limit songs" do

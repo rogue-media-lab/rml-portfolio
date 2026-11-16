@@ -9,8 +9,14 @@ class ZukeController < ApplicationController
   def index; end
 
   # Serves the main music player interface, loading all applicable songs.
+  #
+  # @songs_scope is the visible library (who sees whose songs). @songs_for_display
+  # is what actually renders — visibility plus playability, since a song with no
+  # attached audio_file cannot be played. Keeping them separate means the
+  # visibility tests measure visibility and not playability.
   def music
     local_songs = load_songs
+    @songs_scope = local_songs
     @songs_for_display, @songs_data = serialize_songs_for_player(local_songs)
   end
 
@@ -20,15 +26,18 @@ class ZukeController < ApplicationController
   # view renders the shared smart-image component. Previously the partial reached
   # for first_song.audio_file, which renders an attachment object, not a URL.
   def artists
-    # Eager-load each artist's songs AND the attachments SongPresenter reads,
-    # so serializing a collection does not fire a query per song per attachment.
-    song_includes = [ :image_attachment, :audio_file_attachment,
-                      :banner_video_attachment, :waveform_data_attachment ]
-    @artists = Artist.includes(songs: song_includes).order(:name)
+    # Eager-load each artist's songs, their artist, the attachments (blobs
+    # included) that SongPresenter reads, and the artwork the view falls back to,
+    # so serializing and rendering fire no per-artist or per-song query.
+    @artists = Artist.includes(
+      { image_attachment: :blob },
+      { albums: { cover_art_attachment: :blob } },
+      songs: song_serialization_includes
+    ).order(:name)
     @grouped_artists = @artists.group_by { |a| a.name.first.upcase }
 
     @artist_songs = @artists.each_with_object({}) do |artist, memo|
-      memo[artist.id] = serialize_playable_songs(artist.songs)
+      memo[artist.id] = serialize_songs_for_player(artist.songs).first
     end
 
     render partial: "zuke/turbo_frames/artists", formats: [ :html ]
@@ -41,12 +50,14 @@ class ZukeController < ApplicationController
   # of reaching for a raw attachment. Before this, the partial named here did not
   # exist and the route returned a 500.
   def albums
-    song_includes = [ :image_attachment, :audio_file_attachment,
-                      :banner_video_attachment, :waveform_data_attachment ]
-    all_albums = Album.includes(:artist, songs: song_includes).order(:title)
+    all_albums = Album.includes(
+      :artist,
+      { cover_art_attachment: :blob },
+      songs: song_serialization_includes
+    ).order(:title)
 
     @album_songs = all_albums.each_with_object({}) do |album, memo|
-      memo[album.id] = serialize_playable_songs(album.songs)
+      memo[album.id] = serialize_songs_for_player(album.songs).first
     end
 
     @albums = all_albums.group_by { |a| a.title.first.upcase }
@@ -88,10 +99,10 @@ class ZukeController < ApplicationController
 
     # Serialize through the presenter so the view renders the shared smart-image
     # component (previously it inlined its own markup and interpolated a raw
-    # attachment). Only playable songs are serialized, so the view's empty branch
-    # is genuinely reachable rather than dead code.
+    # attachment). serialize_songs_for_player also drops unplayable songs, so the
+    # view's empty branch is genuinely reachable rather than dead code.
     @genre_songs = @grouped_genres.transform_values do |songs|
-      serialize_playable_songs(songs)
+      serialize_songs_for_player(songs).first
     end
 
     render partial: "zuke/turbo_frames/genres", formats: [ :html ]
@@ -197,33 +208,45 @@ class ZukeController < ApplicationController
 
   # Serializes a collection of Song objects for the Zuke player.
   #
-  # @param songs [ActiveRecord::Relation<Song>] The songs to serialize.
+  # Songs with no attached audio_file are dropped here rather than in each
+  # caller. SongPresenter returns url: nil for them and the smart-image component
+  # renders a play affordance unconditionally, so an unplayable song became a
+  # card that dispatched an empty URL on click. Filtering in one place means
+  # every caller is covered — earlier this guard was applied to three of the
+  # seven callers and the main player kept the bug.
+  #
+  # @param songs [ActiveRecord::Relation<Song>, Array<Song>] songs to serialize
   # @return [Array(Array<Hash>, String)] A tuple containing the array of song
   #   hashes and the JSON representation of that array.
   def serialize_songs_for_player(songs)
-    song_hashes = songs.map { |song| SongPresenter.new(song).to_song_hash }
+    playable = songs.select { |song| song.audio_file.attached? }
+    song_hashes = playable.map { |song| SongPresenter.new(song).to_song_hash }
     [ song_hashes, song_hashes.to_json ]
   end
 
-  # Serializes only the songs that can actually be played.
+  # Eager-loads everything SongPresenter reads from a song, blobs included.
   #
-  # SongPresenter returns url: nil when no audio_file is attached, and the
-  # smart-image component renders a play affordance unconditionally — so an
-  # unplayable song became a card that dispatched an empty URL on click. Dropping
-  # them here means the views never receive one, and the "nothing playable"
-  # branches are reachable.
+  # `includes(songs: [:image_attachment])` loads only the attachment rows; the
+  # blob lookup still fires a query per song. `{ attachment: :blob }` is what
+  # actually preloads it — the same thing with_attached_* does.
   #
-  # @return [Array<Hash>] song hashes for songs with an attached audio file
-  def serialize_playable_songs(songs)
-    serialize_songs_for_player(songs.select { |song| song.audio_file.attached? }).first
-  end
-
-  # Eager-loads everything SongPresenter touches for one song, so serializing a
-  # collection does not fire a query per song per attachment.
+  # @param relation [ActiveRecord::Relation<Song>] a Song relation
   def with_zuke_attachments(relation)
     relation.with_attached_image
             .with_attached_audio_file
             .with_attached_banner_video
             .with_attached_waveform_data
+  end
+
+  # The includes hash for a collection of songs being serialized through
+  # SongPresenter, blob preloading included.
+  def song_serialization_includes
+    [
+      :artist,
+      { image_attachment: :blob },
+      { audio_file_attachment: :blob },
+      { banner_video_attachment: :blob },
+      { waveform_data_attachment: :blob }
+    ]
   end
 end
