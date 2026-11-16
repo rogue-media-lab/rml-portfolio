@@ -1,0 +1,48 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Cut a 30-second Zuke preview.
+#
+#   bin/zuke-cut-preview IN.mp3                 # writes ./preview.mp3
+#   bin/zuke-cut-preview IN.m4a /tmp/out.m4a    # writes exactly there
+#   bin/zuke-cut-preview IN.flac OUTDIR/        # writes OUTDIR/preview.flac
+#
+# The preview path is echoed on stdout; progress and failures go to stderr, so
+# a caller can capture the path with $(...).
+#
+# This exists so Maestro cuts the file it already holds, before upload, instead
+# of the server downloading a full track from S3 to cut it. Zero dyno CPU, zero
+# extra S3 round-trips. It runs on plain Ruby with no Rails boot, which is the
+# whole point — see Zuke::PreviewCutter.
+require_relative "../app/services/zuke/preview_cutter"
+require "fileutils"
+
+source, destination = ARGV
+if source.nil? || source.start_with?("-")
+  warn "usage: bin/zuke-cut-preview IN [OUT]"
+  exit 1
+end
+
+unless File.file?(source)
+  warn "zuke-cut-preview: no such file: #{source}"
+  exit 1
+end
+
+begin
+  result = Zuke::PreviewCutter.call(source, filename: source)
+
+  if destination
+    # A trailing slash, or an existing directory, means "put it in here".
+    destination = File.join(destination, result.filename) if destination.end_with?("/") || File.directory?(destination)
+    FileUtils.mkdir_p(File.dirname(destination))
+    FileUtils.mv(result.path, destination)
+    result.path = destination
+  end
+
+  warn "zuke-cut-preview: #{result.trimmed ? 'cut to' : 'kept'} " \
+       "#{result.duration.round(2)}s#{result.normalized ? '' : ' (plain copy — loudnorm failed)'}"
+  puts result.path
+rescue Zuke::PreviewCutter::CutError => e
+  warn "zuke-cut-preview: #{e.message}"
+  exit 1
+end

@@ -14,8 +14,10 @@ class SongPresenter
   def to_song_hash
     {
       id: @song.id,
-      # Audio needs a direct URL for the player
-      url: @song.audio_file.attached? ? @song.audio_file.url : nil,
+      # The PREVIEW, never audio_file. This hash is rendered on public surfaces,
+      # and the preview is the only audio the public surface may emit; the full
+      # track stays behind the admin. See Song.playable.
+      url: @song.preview_audio.attached? ? @song.preview_audio.url : nil,
       title: @song.title,
       artist: @song.artist&.name,
       # Images can use the redirecting blob URL, which is stable
@@ -29,12 +31,23 @@ class SongPresenter
       audioSource: @song.audio_source,
       audioLicense: @song.audio_license,
       additionalCredits: @song.additional_credits,
-      waveformUrl: proxy_url_for_blob(@song.waveform_data),
-      duration: @song.audio_file.attached? ? (@song.audio_file.metadata["duration"] || 0) : 0
+      # The preview's own waveform, so the scrubber describes the file that is
+      # actually playing. Not the full track's.
+      waveformUrl: proxy_url_for_blob(@song.preview_waveform_data),
+      duration: preview_duration
     }
   end
 
   private
+
+  # The preview's real length, falling back to the 30s window when Active Storage
+  # has not analysed it. The player should never wait on an analyser job to learn
+  # how long a file is, which is why the cut passes duration in as metadata.
+  def preview_duration
+    return 0 unless @song.preview_audio.attached?
+
+    @song.preview_audio.metadata["duration"] || Zuke::PreviewCutter::PREVIEW_SECONDS
+  end
 
   # Generates a stable, redirecting URL for a blob.
   def url_for_blob(attachment)

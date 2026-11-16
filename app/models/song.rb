@@ -1,16 +1,20 @@
 class Song < ApplicationRecord
   has_one_attached :image
   has_one_attached :banner_video
+  # The full track. NEVER served on a public surface — see .playable below. It
+  # exists so the library keeps the master, and so the admin surface can play it.
   has_one_attached :audio_file
-  # A 30-second cut of audio_file, generated up front (ffmpeg, with fades).
-  #
-  # Stored here so the public player CAN serve this instead of the full track — stopping
-  # playback at 30s in the player is not a limit, because the whole file is already in
-  # the page. Wiring the player and the presenter to actually prefer this is a separate
-  # change; until then SongPresenter and the Zuke views still serve audio_file.
+  # A 30-second cut of audio_file, with fades. This is what the public player
+  # serves; stopping at 30s in the player is not a limit, because the file on the
+  # page IS 30 seconds. Cut by Zuke::PreviewCutter (bin/zuke-cut-preview), which
+  # Maestro runs before upload so the server never downloads the full track.
   # Spec: zuke previews, 2026-11-14.
   has_one_attached :preview_audio
+  # Waveforms are per file, not per song. The preview's waveform is a SEPARATE
+  # attachment from the full track's: generating one onto the other would make
+  # the scrubber describe a file it is not playing.
   has_one_attached :waveform_data
+  has_one_attached :preview_waveform_data
   belongs_to :artist
   belongs_to :album, optional: true, inverse_of: :songs
 
@@ -27,31 +31,41 @@ class Song < ApplicationRecord
   validates :title, presence: true
   validates :artist, presence: true
 
-  # Songs that can actually be played.
+  # Songs that can actually be played *by the public player*.
   #
-  # A song with no attached audio_file has no URL to serve, and the smart-image
-  # component renders a play affordance unconditionally — so it became a card
-  # that dispatched an empty URL on click. The scope and the predicate below are
-  # the two expressions of one rule (SQL for relations, Ruby for collections);
-  # nothing else should restate it.
-  scope :playable, -> { joins(:audio_file_attachment) }
+  # The public player serves the preview, so a preview is what makes a song
+  # playable. A song with only the full track has nothing the public surface may
+  # emit, and the smart-image component renders a play affordance
+  # unconditionally — so it would become a card that dispatched an empty URL on
+  # click. The scope and the predicate are the two expressions of one rule (SQL
+  # for relations, Ruby for in-memory collections); nothing else restates it.
+  #
+  # Consequence, deliberate: on the day this ships, songs that have not been
+  # backfilled with a preview disappear from the public player. Backfill before
+  # deploying, not after.
+  scope :playable, -> { joins(:preview_audio_attachment) }
 
-  # The same rule for a single in-memory record. Used by the serializer so the
-  # Ruby path cannot drift from the scope.
+  # The same rule for a single in-memory record, so the Ruby path cannot drift
+  # from the scope.
   def playable?
-    audio_file.attached?
+    preview_audio.attached?
   end
 
   # What a song collection must preload before being serialized through
   # SongPresenter — every attachment it reads, blobs included, plus the artist.
   # `includes(songs: [:image_attachment])` loads attachment rows only; the blob
   # lookup still fires per song unless it is `{ attachment: :blob }`.
+  #
+  # audio_file and waveform_data are deliberately ABSENT. Nothing on a public
+  # surface may read them, so preloading them here would paper over a leak
+  # instead of surfacing one — a leaked full-track URL should be a failing test,
+  # not a quiet extra query.
   SERIALIZATION_INCLUDES = [
     :artist,
     { image_attachment: :blob },
-    { audio_file_attachment: :blob },
-    { banner_video_attachment: :blob },
-    { waveform_data_attachment: :blob }
+    { preview_audio_attachment: :blob },
+    { preview_waveform_data_attachment: :blob },
+    { banner_video_attachment: :blob }
   ].freeze
 
   delegate :name, to: :artist, prefix: true
@@ -131,12 +145,18 @@ class Song < ApplicationRecord
 
   private
 
+  # Each attachment gets its own waveform job. A preview and a full track are
+  # different audio, so one JSON cannot describe both.
   def schedule_waveform_generation
-    # Trigger job only when a new audio file is attached.
-    # The blob's `saved_change_to_id?` confirms it was just created.
-    if audio_file.attached? && audio_file.attachment.blob.saved_change_to_id?
-      GenerateWaveformJob.perform_later(self)
-    end
+    GenerateWaveformJob.perform_later(self) if newly_attached?(:audio_file)
+    GenerateWaveformJob.perform_later(self, "preview_audio") if newly_attached?(:preview_audio)
+  end
+
+  # The blob's `saved_change_to_id?` confirms the file was just created, so a
+  # save that touches anything else does not re-queue a waveform.
+  def newly_attached?(name)
+    attachment = public_send(name)
+    attachment.attached? && attachment.attachment.blob.saved_change_to_id?
   end
 
   def calculate_mobile_crop

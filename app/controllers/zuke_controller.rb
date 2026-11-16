@@ -12,7 +12,7 @@ class ZukeController < ApplicationController
   #
   # @songs_scope is the visible library (who sees whose songs). @songs_for_display
   # is what actually renders — visibility plus playability, since a song with no
-  # attached audio_file cannot be played. Keeping them separate means the
+  # preview cannot be played on a public surface. Keeping them separate means the
   # visibility tests measure visibility and not playability.
   def music
     local_songs = load_songs
@@ -84,7 +84,7 @@ class ZukeController < ApplicationController
         INNER JOIN active_storage_attachments asa
           ON asa.record_type = 'Song'
          AND asa.record_id = s.id
-         AND asa.name = 'audio_file'
+         AND asa.name = 'preview_audio'
       ) ranked_songs
       WHERE rn <= 20
     SQL
@@ -219,12 +219,12 @@ class ZukeController < ApplicationController
 
   # Serializes a collection of Song objects for the Zuke player.
   #
-  # Songs with no attached audio_file are dropped here rather than in each
-  # caller. SongPresenter returns url: nil for them and the smart-image component
-  # renders a play affordance unconditionally, so an unplayable song became a
-  # card that dispatched an empty URL on click. Filtering in one place means
-  # every caller is covered — earlier this guard was applied to three of the
-  # seven callers and the main player kept the bug.
+  # Songs with no preview are dropped here rather than in each caller.
+  # SongPresenter returns url: nil for them and the smart-image component renders
+  # a play affordance unconditionally, so a song with no preview became a card
+  # that dispatched an empty URL on click. Filtering in one place means every
+  # caller is covered — earlier this guard was applied to three of the seven
+  # callers and the main player kept the bug.
   #
   # @param songs [ActiveRecord::Relation<Song>, Array<Song>] songs to serialize
   # @return [Array(Array<Hash>, String)] A tuple containing the array of song

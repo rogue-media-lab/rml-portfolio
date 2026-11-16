@@ -27,11 +27,11 @@ class ZukeControllerTest < ActionDispatch::IntegrationTest
     assert_not_nil scope, "Should assign @songs_scope"
     assert_equal 27, scope.size, "Should load all 27 public songs"
 
-    # Playability is separate: no fixture song has an attached audio_file, so
-    # nothing renders. Asserting it here keeps the two concerns from being
-    # confused — display filtering must not silently change visibility counts.
+    # Playability is separate: no fixture song has a preview attached, so nothing
+    # renders. Asserting it here keeps the two concerns from being confused —
+    # display filtering must not silently change visibility counts.
     assert_equal 0, assigns(:songs_for_display).size,
-      "no fixture song has an audio_file, so none is playable"
+      "no fixture song has a preview, so none is playable"
   end
 
   test "milk admin should see all songs in music" do
@@ -45,9 +45,12 @@ class ZukeControllerTest < ActionDispatch::IntegrationTest
     assert_equal 27, scope.size, "Should load all 27 songs"
   end
 
+  # The public player serves the preview, so a preview is what makes a song
+  # playable. A song with the full track attached but no preview must NOT render
+  # — that is the whole point of the boundary, and this is the test that says so.
   test "music hides songs that cannot be played" do
     host! "example.com"
-    songs(:one).audio_file.attach(
+    songs(:one).preview_audio.attach(
       io: File.open(Rails.root.join("test/fixtures/files/audio.mp3")),
       filename: "audio.mp3",
       content_type: "audio/mpeg"
@@ -62,18 +65,45 @@ class ZukeControllerTest < ActionDispatch::IntegrationTest
     assert_not_nil display.first[:url], "the displayed song must have a URL"
   end
 
+  # The other half of that rule, and the one that actually protects the master:
+  # a full track alone gets a song onto NO public surface, and its URL never
+  # reaches the JSON the player loads.
+  test "a song with only the full track is not playable and its URL never ships" do
+    host! "example.com"
+    song = songs(:one)
+    song.audio_file.attach(
+      io: File.open(Rails.root.join("test/fixtures/files/audio.mp3")),
+      filename: "full_track.mp3",
+      content_type: "audio/mpeg"
+    )
+
+    assert_not song.playable?, "a full track with no preview is not playable"
+    assert_empty Song.playable.where(id: song.id), "the playable scope must agree"
+
+    # A path helper, not `.url`: `.url` needs ActiveStorage::Current, which a
+    # request has and this line does not.
+    full_track_path = rails_blob_path(song.audio_file.blob)
+
+    get music_list_zuke_index_url
+    assert_response :success
+
+    assert_empty assigns(:songs_for_display), "nothing with only a full track may display"
+    assert_not_includes response.body, full_track_path,
+      "the full-track URL must never reach a public response"
+  end
+
   # The genres action ranks the top 20 songs per genre in SQL. Two things have to
   # hold at once: the ranking must only consider playable songs (so the window
   # does not fill with songs that will be dropped), and the limit must still
-  # apply. No fixture song has an audio_file, so this attaches one to enough
-  # songs to actually exercise the limit.
+  # apply. No fixture song has a preview, so this attaches one to every song to
+  # actually exercise the limit.
   test "genres action returns only playable songs and still limits to 20" do
     host! "example.com"
 
     # NB: with no argument the fixture accessor returns an Array of records, not
     # the old name => record Hash. Destructuring |_name, song| yields nil here.
     songs.each do |song|
-      song.audio_file.attach(
+      song.preview_audio.attach(
         io: File.open(Rails.root.join("test/fixtures/files/audio.mp3")),
         filename: "audio.mp3",
         content_type: "audio/mpeg"
@@ -127,7 +157,7 @@ class ZukeControllerTest < ActionDispatch::IntegrationTest
     host! "example.com"
 
     playable = songs(:one)
-    playable.audio_file.attach(
+    playable.preview_audio.attach(
       io: File.open(Rails.root.join("test/fixtures/files/audio.mp3")),
       filename: "audio.mp3",
       content_type: "audio/mpeg"

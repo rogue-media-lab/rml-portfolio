@@ -1,50 +1,59 @@
 # frozen_string_literal: true
 
-# The GenerateWaveformJob is responsible for creating a JSON waveform file from a Song's attached audio file.
-# It is designed to be enqueued by an after_commit hook on the Song model, ensuring it only runs when
-# an audio file has been newly attached or changed.
+# Builds a JSON waveform for one of a Song's audio attachments.
+#
+# Parameterised by source because a song has two pieces of audio — the full track
+# and the 30-second preview — and one waveform JSON cannot describe both. The
+# preview's waveform goes to +preview_waveform_data+, never onto the full track's,
+# or the public scrubber would describe a file it is not playing.
 class GenerateWaveformJob < ApplicationJob
   queue_as :default
 
-  # The main logic for generating the waveform.
-  def perform(song)
-    # Ensure the song has an audio file attached before proceeding.
-    return unless song.audio_file.attached?
+  # source attachment name => where the generated JSON is attached
+  SOURCES = {
+    "audio_file" => :waveform_data,
+    "preview_audio" => :preview_waveform_data
+  }.freeze
 
-    # Purge any old waveform data to ensure a fresh generation. This is a safeguard; the model's callback
-    # should prevent this job from running if the audio hasn't changed.
-    song.waveform_data.purge if song.waveform_data.attached?
+  # @param song [Song]
+  # @param source [String] "audio_file" (default) or "preview_audio"
+  def perform(song, source = "audio_file")
+    target = SOURCES.fetch(source) { raise ArgumentError, "unknown waveform source: #{source.inspect}" }
+    audio = song.public_send(source)
 
-    # Active Storage's #open method downloads the file to a temporary location on disk, which is required
-    # for command-line tools like audiowaveform. The block ensures the temp file is removed afterward.
-    song.audio_file.blob.open do |temp_audio_file|
-      # Define a unique temporary path for the JSON output to avoid race conditions.
+    unless audio.attached?
+      Rails.logger.info("GenerateWaveformJob: Song ##{song.id} has no #{source}; nothing to do")
+      return
+    end
+
+    # Purge any old waveform so the JSON always describes the current audio.
+    song.public_send(target).purge if song.public_send(target).attached?
+
+    # Active Storage's #open downloads the file to a temporary location on disk,
+    # which is required for command-line tools like audiowaveform. The block
+    # ensures the temp file is removed afterward.
+    audio.blob.open do |temp_audio_file|
+      # A unique temporary path avoids two jobs racing on the same output file.
       output_path = Rails.root.join("tmp", "#{song.id}-#{SecureRandom.uuid}_waveform.json")
 
-      # Construct the shell command for audiowaveform using Shellwords to prevent injection vulnerabilities.
-      # Options:
-      # -i: input file
-      # -o: output file
-      # -b 8: bit depth of 8 for a smaller file size, which is sufficient for visualization.
-      command = "audiowaveform -i #{Shellwords.escape(temp_audio_file.path)} -o #{Shellwords.escape(output_path)} -b 8"
+      # Shellwords prevents injection. -b 8 keeps the file small, which is plenty
+      # for a visualisation.
+      command = "audiowaveform -i #{Shellwords.escape(temp_audio_file.path)} " \
+                "-o #{Shellwords.escape(output_path.to_s)} -b 8"
 
-      # Execute the command.
       system(command)
 
-      # After execution, check if the output file was created successfully.
       if File.exist?(output_path)
-        # If successful, attach the generated JSON file to the song model with a descriptive name.
-        song.waveform_data.attach(
+        song.public_send(target).attach(
           io: File.open(output_path),
-          filename: "#{song.title.parameterize}_waveform.json",
+          filename: "#{song.title.parameterize}_#{source}_waveform.json",
           content_type: "application/json"
         )
       else
-        # If the command failed for any reason, log an error for debugging purposes.
-        Rails.logger.error "Waveform generation failed for Song ##{song.id}. Command: #{command}"
+        Rails.logger.error "Waveform generation failed for Song ##{song.id} (#{source}). Command: #{command}"
       end
     ensure
-      # Ensure the temporary JSON file is always deleted, even if an error occurred during processing.
+      # Always clean up, even if the command failed.
       File.delete(output_path) if File.exist?(output_path)
     end
   end
