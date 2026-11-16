@@ -172,12 +172,11 @@ class ZukeController < ApplicationController
     end
   end
 
-  # Loads all songs within the current scope with necessary associations.
+  # Loads all songs within the current scope with the associations and
+  # attachments SongPresenter reads. Missing banner_video here meant a query per
+  # song for every playable track on the main player.
   def load_songs
-    base_songs_scope.includes(:album, :artist)
-                    .with_attached_image
-                    .with_attached_audio_file
-                    .with_attached_waveform_data
+    with_zuke_attachments(base_songs_scope.includes(:album, :artist))
   end
 
   def perform_local_song_search(query)
@@ -239,14 +238,9 @@ class ZukeController < ApplicationController
   end
 
   # The includes hash for a collection of songs being serialized through
-  # SongPresenter, blob preloading included.
+  # SongPresenter. Defined on the model so controllers that build their own
+  # collections (PlaylistsController) preload the same set.
   def song_serialization_includes
-    [
-      :artist,
-      { image_attachment: :blob },
-      { audio_file_attachment: :blob },
-      { banner_video_attachment: :blob },
-      { waveform_data_attachment: :blob }
-    ]
+    Song::SERIALIZATION_INCLUDES
   end
 end

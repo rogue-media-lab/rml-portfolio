@@ -27,6 +27,27 @@ class Song < ApplicationRecord
   validates :title, presence: true
   validates :artist, presence: true
 
+  # Songs that can actually be played.
+  #
+  # A song with no attached audio_file has no URL to serve, and the smart-image
+  # component renders a play affordance unconditionally — so it became a card
+  # that dispatched an empty URL on click. This is the one definition of
+  # "playable"; controllers that build their own song collections filter through
+  # it rather than reimplementing the rule.
+  scope :playable, -> { joins(:audio_file_attachment) }
+
+  # What a song collection must preload before being serialized through
+  # SongPresenter — every attachment it reads, blobs included, plus the artist.
+  # `includes(songs: [:image_attachment])` loads attachment rows only; the blob
+  # lookup still fires per song unless it is `{ attachment: :blob }`.
+  SERIALIZATION_INCLUDES = [
+    :artist,
+    { image_attachment: :blob },
+    { audio_file_attachment: :blob },
+    { banner_video_attachment: :blob },
+    { waveform_data_attachment: :blob }
+  ].freeze
+
   delegate :name, to: :artist, prefix: true
   delegate :title, to: :album, prefix: true
 

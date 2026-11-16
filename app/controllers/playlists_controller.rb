@@ -39,12 +39,12 @@ class PlaylistsController < ApplicationController
       end.compact # Remove any nil entries from skipped tracks
       @songs_data = @songs.to_json
     else
-      song_records = @playlist.ordered_songs.includes(
-        :artist, :album,
-        { audio_file_attachment: :blob },
-        { image_attachment: :blob }, # For mobile_image_variant
-        :banner_video_attachment,
-        { waveform_data_attachment: :blob }
+      # .playable — the same rule every other caller uses, so an unplayable song
+      # cannot reach the player here either. Song::SERIALIZATION_INCLUDES
+      # preloads the blobs the presenter reads ({ attachment: :blob }); a bare
+      # :banner_video_attachment would still fire a query per song.
+      song_records = @playlist.ordered_songs.playable.includes(
+        Song::SERIALIZATION_INCLUDES
       )
 
       @songs = song_records.map { |song| SongPresenter.new(song).to_song_hash }
