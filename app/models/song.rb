@@ -74,6 +74,7 @@ class Song < ApplicationRecord
   before_validation :associate_album_artist
 
   after_commit :schedule_waveform_generation, on: %i[create update]
+  after_commit :schedule_preview_generation, on: %i[create update]
 
   # Ransack: Allow searching on specific attributes
   def self.ransackable_attributes(auth_object = nil)
@@ -150,6 +151,26 @@ class Song < ApplicationRecord
   def schedule_waveform_generation
     GenerateWaveformJob.perform_later(self) if newly_attached?(:audio_file)
     GenerateWaveformJob.perform_later(self, "preview_audio") if newly_attached?(:preview_audio)
+  end
+
+  # Cuts a preview when a song arrives with a master and none.
+  #
+  # This is the wire that closes the admin-upload hole: MilkAdmin.new's form
+  # attaches an audio_file and nothing else, so without this the song would be
+  # created, saved, and then silently absent from every public surface, because
+  # .playable requires a preview. Maestro and the API are expected to send their
+  # own cut before upload; when they do, the preview is already attached here and
+  # this does nothing.
+  #
+  # It runs on production's :async adapter, i.e. on a thread inside the web dyno
+  # rather than on a worker. That is acceptable for an admin upload — a deliberate
+  # human action, and rare — and it is strictly better than a song that saves
+  # successfully and can never be played.
+  def schedule_preview_generation
+    return if preview_audio.attached?
+    return unless newly_attached?(:audio_file)
+
+    GeneratePreviewJob.perform_later(self)
   end
 
   # The blob's `saved_change_to_id?` confirms the file was just created, so a

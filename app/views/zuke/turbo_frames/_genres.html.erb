@@ -10,9 +10,11 @@
     # "#<ActiveStorage::Attached::One:0x...>" — so every play button in this tab
     # was broken. It now renders the shared component, which takes presenter keys.
     #
-    # The count comes from @grouped_genres (every song with this genre) while only
-    # playable songs are serialized, so the heading can legitimately say a genre
-    # has tracks and then render none of them. %>
+    # @grouped_genres is already playable-only. The genre ranking joins the
+    # preview attachment in SQL, so a genre with nothing playable is absent from
+    # the hash entirely rather than present and empty — and a genre's heading
+    # count therefore cannot disagree with the cards under it. (It could when the
+    # filter ran after the window; that is what the pre-filter ranking fixed.) %>
 <%= turbo_frame_tag "music-frame" do %>
   <div id="music_frame" class="w-full">
     <% @grouped_genres.each do |genre, songs| %>
@@ -24,17 +26,17 @@
           <span class="text-sm font-normal text-gray-400"><%= songs.size %> tracks</span>
         </div>
 
-        <% if serialized.any? %>
-          <div class="albums-grid grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 px-4 py-2">
-            <% serialized.each do |song| %>
-              <div class="album-card group">
-                <%= render partial: "zuke/components/smart-image", locals: { controller_name: "smart-image", song: song } %>
-              </div>
-            <% end %>
-          </div>
-        <% else %>
-          <div class="px-4 py-2 text-sm text-gray-400">No playable tracks yet.</div>
-        <% end %>
+        <%# No empty branch: every song in @grouped_genres is playable by
+            construction, so `serialized` is never empty here. The branch that
+            used to sit here said "No playable tracks yet" and could not be
+            reached. %>
+        <div class="albums-grid grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 px-4 py-2">
+          <% serialized.each do |song| %>
+            <div class="album-card group">
+              <%= render partial: "zuke/components/smart-image", locals: { controller_name: "smart-image", song: song } %>
+            </div>
+          <% end %>
+        </div>
       </div>
     <% end %>
   </div>

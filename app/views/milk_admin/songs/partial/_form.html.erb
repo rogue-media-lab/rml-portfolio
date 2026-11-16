@@ -52,6 +52,26 @@
       <%= form.file_field :audio_file, class: "block w-full text-sm border rounded-lg cursor-pointer text-base-dark focus:outline-hidden bg-gray-100 border-gray-100" %>
     </div>
 
+    <%# The 30-second cut the public player actually serves. Supplying it here
+        means the web dyno does not have to download the master and cut it; if
+        it is left empty the server cuts one on save (GeneratePreviewJob). A
+        song with no preview is not publicly playable, so this is not cosmetic. %>
+    <div class="rounded-md p-2">
+      <div class="flex items-center my-4">
+        <%= form.label :preview_audio, "Select Preview (30s cut, optional)" %>&nbsp;
+        <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 13V8m0 8h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+        </svg>
+        <span class="text-sm ml-2 text-gray-500">Leave empty to cut one on the server</span>
+      </div>
+      <%= form.file_field :preview_audio, accept: "audio/*", class: "block w-full text-sm border rounded-lg cursor-pointer text-base-dark focus:outline-hidden bg-gray-100 border-gray-100" %>
+      <% if song.persisted? && song.preview_audio.attached? %>
+        <p class="text-sm text-green-600 mt-2">✓ Preview attached: <%= song.preview_audio.filename %></p>
+      <% elsif song.persisted? %>
+        <p class="text-sm text-amber-600 mt-2">No preview yet — this song is not publicly playable.</p>
+      <% end %>
+    </div>
+
     <div class="rounded-md p-2">
       <div class="flex items-center my-4">
         <%= form.label :banner_video, "Select Banner Video (optional)" %>&nbsp;

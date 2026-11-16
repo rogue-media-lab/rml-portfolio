@@ -49,7 +49,7 @@
               <div class="flex items-center justify-between">
                 <div>
                   <h4 class="font-medium text-white"><%= artist.name %></h4>
-                  <p class="text-sm text-gray-400"><%= pluralize(artist.songs.count, 'song') %></p>
+                  <p class="text-sm text-gray-400"><%= pluralize(artist.songs.playable.count, 'song') %></p>
                 </div>
               </div>
             </div>
@@ -73,7 +73,7 @@
               <div class="flex items-center justify-between">
                 <div>
                   <h4 class="font-medium text-white"><%= album.title %></h4>
-                  <p class="text-sm text-gray-400"><%= album.artist.name %> • <%= pluralize(album.songs.count, 'song') %></p>
+                  <p class="text-sm text-gray-400"><%= album.artist.name %> • <%= pluralize(album.songs.playable.count, 'song') %></p>
                 </div>
               </div>
             </div>

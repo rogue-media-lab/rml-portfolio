@@ -51,8 +51,25 @@ module Zuke
 
     # trimmed   — the source was longer than the preview window and was cut
     # normalized — loudnorm succeeded; false means we fell back to a plain copy
-    Result = Struct.new(:path, :filename, :content_type, :duration, :trimmed, :normalized, keyword_init: true) do
+    # cleanup_dir — the temp directory this cut was written into, when the cutter
+    #   created it. nil when the caller supplied its own output_dir.
+    Result = Struct.new(:path, :filename, :content_type, :duration, :trimmed, :normalized,
+                        :cleanup_dir, keyword_init: true) do
       def trimmed? = trimmed
+
+      # Removes the temporary directory this preview was cut into, when the
+      # cutter made it. A caller that passed its own output_dir owns that
+      # directory, so this is a no-op for them.
+      #
+      # Without this, every GeneratePreviewJob run and every CLI invocation left
+      # an orphaned /tmp/zuke-preview* directory behind: #initialize calls
+      # Dir.mktmpdir without a block, and nothing downstream removed it.
+      def cleanup
+        return false unless cleanup_dir && File.directory?(cleanup_dir)
+
+        FileUtils.remove_entry(cleanup_dir)
+        true
+      end
     end
 
     def self.call(...) = new(...).call
@@ -60,6 +77,7 @@ module Zuke
     def initialize(path, filename: nil, output_dir: nil)
       @path = path.to_s
       @filename = filename
+      @owns_output_dir = output_dir.nil?
       @output_dir = output_dir || Dir.mktmpdir("zuke-preview")
     end
 
@@ -90,7 +108,8 @@ module Zuke
         content_type: content_type,
         duration: trimmed ? PREVIEW_SECONDS : duration,
         trimmed: trimmed,
-        normalized: normalized
+        normalized: normalized,
+        cleanup_dir: (@owns_output_dir ? @output_dir : nil)
       )
     end
 

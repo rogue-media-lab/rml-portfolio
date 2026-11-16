@@ -15,10 +15,18 @@ require "test_helper"
 # fine, and the previous bugs are documented in exactly those comments.
 class ZukePublicBoundaryTest < ActiveSupport::TestCase
   # Every file that can put text in front of a signed-out visitor.
+  #
+  # app/views/playlists and PlaylistsController were missing from this list when
+  # it was first written, and a guard assembled from the files that come to mind
+  # is exactly the guard that misses one — the failure this test exists to
+  # prevent. They render into Zuke's public "music-frame" for signed-out
+  # visitors, so they belong here.
   PUBLIC_SURFACE = %w[
     app/views/zuke
+    app/views/playlists
     app/presenters/song_presenter.rb
     app/controllers/zuke_controller.rb
+    app/controllers/playlists_controller.rb
     app/helpers
   ].freeze
 

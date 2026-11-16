@@ -12,7 +12,9 @@
               <% if playlist.description.present? %>
                 <p class="text-sm text-gray-400 mb-2 line-clamp-2"><%= playlist.description %></p>
               <% end %>
-              <p class="text-sm text-gray-500"><%= pluralize(playlist.try(:song_count) || playlist.songs.count, "song") %></p>
+              <%# Playable, so the card agrees with what opening the playlist shows.
+                  The virtual SoundCloud playlist supplies its own song_count. %>
+              <p class="text-sm text-gray-500"><%= pluralize(playlist.try(:song_count) || playlist.songs.playable.count, "song") %></p>
             </div>
           <% end %>
         <% end %>

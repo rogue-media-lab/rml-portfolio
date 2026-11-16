@@ -157,6 +157,41 @@ class Zuke::PreviewCutterTest < ActiveSupport::TestCase
     assert_match(/no such file/, err)
   end
 
+  # The cutter creates its own temp directory when the caller does not pass one,
+  # so removing it is the cutter's job. It was nobody's, and every job run and
+  # CLI invocation orphaned a /tmp/zuke-preview* tree.
+  test "removes the temporary directory it created" do
+    result = Zuke::PreviewCutter.call(SHORT, filename: "audio.mp3")
+    dir = result.cleanup_dir
+
+    assert dir, "the cutter should report the directory it created"
+    assert File.directory?(dir), "the cut should exist before cleanup"
+    assert result.cleanup, "cleanup should report that it removed something"
+    assert_not File.exist?(dir), "the temp directory outlived the cut"
+  end
+
+  test "leaves a caller-supplied output directory alone" do
+    result = Zuke::PreviewCutter.call(SHORT, filename: "audio.mp3", output_dir: @tmpdir)
+
+    assert_nil result.cleanup_dir, "the caller's directory is not ours to remove"
+    assert_not result.cleanup
+    assert File.exist?(result.path), "the caller's preview must survive cleanup"
+  end
+
+  # The usage line promises ./preview.mp3 with no destination. The CLI left the
+  # file in the cutter's temp directory instead and printed that path.
+  test "bin/zuke-cut-preview with no destination writes into the current directory" do
+    out, err, status = Open3.capture3(
+      Rails.root.join("bin/zuke-cut-preview").to_s, SHORT, chdir: @tmpdir
+    )
+
+    assert status.success?, "CLI failed: #{err}"
+    written = out.strip
+    assert_equal File.join(@tmpdir, "preview.mp3"), written,
+      "the CLI should report an absolute path in the working directory"
+    assert File.exist?(written), "the CLI reported a path it did not write"
+  end
+
   private
 
   def duration_of(path)

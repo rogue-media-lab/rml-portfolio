@@ -107,8 +107,9 @@ class ZukeController < ApplicationController
 
     # Serialize through the presenter so the view renders the shared smart-image
     # component (previously it inlined its own markup and interpolated a raw
-    # attachment). serialize_songs_for_player also drops unplayable songs, so the
-    # view's empty branch is genuinely reachable rather than dead code.
+    # attachment). Every song here is already playable — the ranking joined the
+    # preview attachment — so the presenter's filter is a second expression of
+    # the same rule rather than a live guard.
     @genre_songs = @grouped_genres.transform_values do |songs|
       serialize_songs_for_player(songs).first
     end

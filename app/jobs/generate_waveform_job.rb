@@ -44,11 +44,15 @@ class GenerateWaveformJob < ApplicationJob
       system(command)
 
       if File.exist?(output_path)
-        song.public_send(target).attach(
-          io: File.open(output_path),
-          filename: "#{song.title.parameterize}_#{source}_waveform.json",
-          content_type: "application/json"
-        )
+        # A block, not File.open(...) inline as the io: — the inline form leaks
+        # the descriptor until GC, once per job run.
+        File.open(output_path) do |io|
+          song.public_send(target).attach(
+            io: io,
+            filename: "#{song.title.parameterize}_#{source}_waveform.json",
+            content_type: "application/json"
+          )
+        end
       else
         Rails.logger.error "Waveform generation failed for Song ##{song.id} (#{source}). Command: #{command}"
       end

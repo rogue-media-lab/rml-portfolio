@@ -31,17 +31,25 @@ end
 begin
   result = Zuke::PreviewCutter.call(source, filename: source)
 
-  if destination
-    # A trailing slash, or an existing directory, means "put it in here".
-    destination = File.join(destination, result.filename) if destination.end_with?("/") || File.directory?(destination)
+  # No destination means the current directory, which is what the usage line
+  # above promises. Leaving it in the cutter's temp dir contradicted that and
+  # left the directory behind.
+  destination = File.join(".", result.filename) if destination.nil?
+  # A trailing slash, or an existing directory, means "put it in here".
+  destination = File.join(destination, result.filename) if destination.end_with?("/") || File.directory?(destination)
+
+  begin
     FileUtils.mkdir_p(File.dirname(destination))
     FileUtils.mv(result.path, destination)
-    result.path = destination
+  ensure
+    # The cutter made this directory, so it is ours to remove. Without this the
+    # CLI orphaned a /tmp/zuke-preview* tree on every run.
+    result.cleanup
   end
 
   warn "zuke-cut-preview: #{result.trimmed ? 'cut to' : 'kept'} " \
        "#{result.duration.round(2)}s#{result.normalized ? '' : ' (plain copy — loudnorm failed)'}"
-  puts result.path
+  puts File.expand_path(destination)
 rescue Zuke::PreviewCutter::CutError => e
   warn "zuke-cut-preview: #{e.message}"
   exit 1

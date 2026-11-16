@@ -51,6 +51,39 @@ class GeneratePreviewJobTest < ActiveJob::TestCase
     assert_not @song.reload.preview_audio.attached?
   end
 
+  # The wire, not the cut. This job was documented as the fallback for admin and
+  # browser uploads and enqueued by nothing at all, so a song uploaded through
+  # MilkAdmin was saved successfully and could never be played publicly — the job
+  # existed while the behaviour it promised did not.
+  test "a song saved with a master and no preview enqueues the cut" do
+    song = Song.new(title: "Needs a Cut", artist: artists(:first_artist))
+    song.audio_file.attach(
+      io: File.open(Rails.root.join("test/fixtures/files/audio.mp3")),
+      filename: "audio.mp3",
+      content_type: "audio/mpeg"
+    )
+
+    assert_enqueued_with(job: GeneratePreviewJob) { song.save! }
+  end
+
+  # Maestro and the API are expected to send their own cut. When they do, the
+  # server must not download the master and cut it again.
+  test "a song that arrives with its own preview does not enqueue a cut" do
+    song = Song.new(title: "Already Cut", artist: artists(:first_artist))
+    song.audio_file.attach(
+      io: File.open(Rails.root.join("test/fixtures/files/audio.mp3")),
+      filename: "audio.mp3",
+      content_type: "audio/mpeg"
+    )
+    song.preview_audio.attach(
+      io: File.open(Rails.root.join("test/fixtures/files/audio.mp3")),
+      filename: "preview.mp3",
+      content_type: "audio/mpeg"
+    )
+
+    assert_no_enqueued_jobs(only: GeneratePreviewJob) { song.save! }
+  end
+
   private
 
   def attach_full_track(song, fixture)
