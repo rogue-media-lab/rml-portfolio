@@ -42,9 +42,10 @@
     <% eruda_disable = params[:debug] == "false" %>
     <script>
       (function () {
-        // Booleans only: the param itself is never echoed into the script, where an
-        // entity like &quot; would not be decoded and a value like </script> would escape
-        // the tag. Neither can happen when all that is emitted is true or false.
+        // Booleans only. The param is never echoed into this script: escaping would turn
+        // a quote into an entity the browser does not decode here, and a raw value could
+        // end this tag early. Emitting true or false makes both impossible.
+        // (And never write a closing script tag inside a script, even in a comment.)
         if (<%= eruda_enable.to_json %>) localStorage.setItem("eruda", "1");
         if (<%= eruda_disable.to_json %>) localStorage.setItem("eruda", "0");
 
