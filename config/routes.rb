@@ -317,7 +317,7 @@ Rails.application.routes.draw do
   # =====================================================================
   namespace :api, defaults: { format: :json } do
     namespace :v1 do
-      resources :songs, only: [ :create ]
+      resources :songs, only: [ :create, :destroy ]
       resources :playlists, only: [ :create ]
     end
   end

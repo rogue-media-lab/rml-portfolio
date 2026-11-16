@@ -27,6 +27,22 @@
 #   201 Created: { id, title, artist, album, url (player link) }
 #   422 Unprocessable Entity: { errors: { field: ["message"] } }
 #   401 Unauthorized: { error: "Unauthorized" }
+#
+# DELETE /api/v1/songs/:id
+#   Authorization: Bearer ***
+#
+#   Permanently removes a song and purges every file attached to it. There is no
+#   undo, and no read endpoint to check the id first, so the caller owns the id it
+#   sends.
+#
+#   This is what makes a published row fixable. The API is create-only, so a track
+#   that went live with no preview or wrong credits could previously only be
+#   corrected from a shell on production. Delete it, then re-POST it correctly.
+#
+# Returns:
+#   200 OK: { id, title, artist, deleted: true, purged_files: n }
+#   404 Not Found: { error: "Not found" }
+#   401 Unauthorized: { error: "Unauthorized" }
 module Api
   module V1
     class SongsController < BaseController
@@ -42,7 +58,62 @@ module Api
         end
       end
 
+      # DELETE /api/v1/songs/:id
+      def destroy
+        song = Song.find_by(id: params[:id])
+        return render json: { error: "Not found" }, status: :not_found unless song
+
+        # Read everything the response needs, and hold the attachments, before the
+        # record goes — afterwards there is nothing left to read them from.
+        summary = { id: song.id, title: song.title, artist: song.artist&.name }
+        attachments = attached_files(song)
+
+        # Purge the files FIRST, while the row that names them still exists. Two
+        # separate constraints force this shape, and both were checked rather than
+        # assumed:
+        #
+        # 1. Destroying a Song deletes its attachment ROWS but only ENQUEUES the
+        #    blob purges (Rails 8.0.2). Production runs the :async adapter, where a
+        #    queued job dies with the dyno — and a purge that never ran leaves the
+        #    master in a public-read bucket, fetchable by anyone holding the URL.
+        #    That is the leak the preview work existed to close.
+        # 2. A blob cannot be destroyed while an attachment row still points at it.
+        #    ActiveStorage::Blob#purge raises ActiveRecord::InvalidForeignKey, and
+        #    returns nil as though nothing happened. So purging blob-by-blob before
+        #    the record goes cannot work at all, and purging after it goes is
+        #    unrecoverable: the caller's retry answers 404 with the master orphaned
+        #    and no longer reachable through anything.
+        #
+        # Attached::One#purge is the primitive that does both, in the only workable
+        # order — it destroys the attachment row, which releases the foreign key,
+        # and then purges the blob. The song is still present throughout, so a purge
+        # that fails leaves a request the caller can simply retry.
+        #
+        # Nothing is rescued. A failed purge means the master is still public, and
+        # the caller must not learn that from a cheerful 200.
+        attachments.each(&:purge)
+
+        song.destroy!
+
+        render json: summary.merge(deleted: true, purged_files: attachments.size), status: :ok
+      end
+
       private
+
+      # The attached-file proxies themselves, not their blobs. Purging has to go
+      # through the attachment: the attachment row is what holds the foreign key to
+      # the blob, and the blob cannot be destroyed until that row is gone.
+      #
+      # The list comes off the model rather than from an array kept here. A
+      # hand-maintained list is precisely what quietly misses the attachment
+      # someone adds to Song next month, and the caller has no read endpoint that
+      # would ever reveal what was left behind.
+      def attached_files(song)
+        song.class.attachment_reflections.keys.filter_map do |name|
+          attachment = song.public_send(name)
+          attachment if attachment.attached?
+        end
+      end
 
       # Assign all attributes from the flattened API params to the Song model.
       # Unlike the admin controller which uses nested attributes (artist_attributes:),
