@@ -44,6 +44,20 @@ export default class extends Controller {
   currentUrl = null
   isChangingTrack = false
 
+  /** "Tap anywhere to resume" listener, armed only while autoplay is blocked. */
+  resumeOnInteraction = null
+
+  /** Bound player:autoplay-blocked handler, kept so disconnect() can remove it. */
+  onAutoplayBlocked = null
+
+  /**
+   * Bumped every time a track starts loading. recoverBlockedAutoplay() is async and
+   * captures this before its awaits, so a block that is superseded by a track change
+   * mid-flight can tell that it is stale instead of arming a listener for a track
+   * that is gone.
+   */
+  playGeneration = 0
+
   // ========================
   //  Lifecycle Methods
   // ========================
@@ -119,6 +133,15 @@ export default class extends Controller {
    * Stops playback and destroys WaveSurfer instance
    */
   disconnect() {
+    this.disarmResumeOnInteraction()
+
+    // This handler lives on document, which outlives the controller — a stale
+    // instance still bound to it would recover playback alongside the new one.
+    if (this.onAutoplayBlocked) {
+      document.removeEventListener("player:autoplay-blocked", this.onAutoplayBlocked)
+      this.onAutoplayBlocked = null
+    }
+
     this.destroyWaveSurfer()
   }
 
@@ -342,6 +365,102 @@ export default class extends Controller {
       console.log("🎵 PLAYER: Seek backward requested:", seconds, "seconds")
       this.seekRelative(-seconds)
     })
+
+    // Browsers refuse an audible play() that is not tied to a gesture, and at the
+    // end of a track there is no gesture to tie it to — so auto-advance lands on
+    // exactly the case the autoplay policy blocks. Until this listener existed the
+    // event went nowhere: the next song loaded, never started, and nothing said so.
+    this.onAutoplayBlocked = (event) => this.recoverBlockedAutoplay(event.detail)
+    document.addEventListener("player:autoplay-blocked", this.onAutoplayBlocked)
+  }
+
+  /**
+   * Get playback going again after the browser refused an automatic play().
+   *
+   * Muted autoplay is always permitted, so the first attempt is to start the
+   * track muted and unmute the instant it is running — that restores genuine
+   * hands-free advancing rather than just reporting the problem. If even that is
+   * refused, the next touch anywhere resumes, so the player is never left sitting
+   * silently stopped with no way forward.
+   */
+  async recoverBlockedAutoplay({ song } = {}) {
+    const media = this.wavesurfer?.getMediaElement()
+    if (!media) return
+
+    const generation = this.playGeneration
+
+    console.log("🔊 Autoplay was blocked — trying the muted start for:", song?.title)
+
+    const wasMuted = media.muted
+    try {
+      media.muted = true
+      await media.play()
+      // The EQ routes the media element through Web Audio, and a suspended
+      // AudioContext runs the playhead with no sound at all. Resume it before
+      // unmuting, or "recovered" means silently advancing.
+      await this.ensureAudioContextResumed()
+      media.muted = wasMuted
+      this.isChangingTrack = false
+      console.log("▶️ Autoplay recovered: started muted, now unmuted")
+      return
+    } catch (error) {
+      media.muted = wasMuted
+      console.warn("🔇 Muted start refused too:", error?.name)
+    }
+
+    // A track started loading while the muted start was being attempted, so this
+    // block belongs to a track that is no longer playing. Arming now would leave a
+    // listener behind that plays whatever has replaced it, out of turn.
+    if (generation !== this.playGeneration) {
+      console.log("↩️ Superseded block ignored - a different track is loading")
+      return
+    }
+
+    console.log("👆 Waiting for a tap to resume playback")
+
+    // Arm exactly one pair of listeners. A second blocked track would otherwise
+    // stack another closure on top, and every stacked one plays on the next tap.
+    this.disarmResumeOnInteraction()
+
+    const resume = (event) => {
+      // Single use: the next interaction consumes the intent, whichever branch acts
+      // on it. Disarming first is what stops this staying armed when the control
+      // branch below returns early — otherwise a later unrelated tap or keypress
+      // would start playback out of turn.
+      this.disarmResumeOnInteraction()
+
+      // Pointerdown fires in the capture phase, so it runs BEFORE the click handler
+      // of whatever was tapped. If the tap landed on a player control, that control
+      // decides what happens — resuming here too would start the track and the
+      // control would then immediately skip or pause it.
+      if (event?.target instanceof Element && event.target.closest("[data-action]")) return
+
+      const playPromise = this.wavesurfer?.play()
+      if (playPromise !== undefined) {
+        playPromise.then(() => this.ensureAudioContextResumed())
+          .catch((error) => console.warn("Resume after tap failed:", error))
+      }
+    }
+
+    this.resumeOnInteraction = resume
+    document.addEventListener("pointerdown", resume, true)
+    document.addEventListener("keydown", resume, true)
+  }
+
+  /**
+   * Drop the pending tap-to-resume listeners, if any.
+   *
+   * Called before arming another pair, by the resume callback itself (the intent is
+   * single use), at the start of playSongFromQueue(), and on disconnect — a listener
+   * left armed outlives the block it was created for.
+   */
+  disarmResumeOnInteraction() {
+    const resume = this.resumeOnInteraction
+    if (!resume) return
+
+    document.removeEventListener("pointerdown", resume, true)
+    document.removeEventListener("keydown", resume, true)
+    this.resumeOnInteraction = null
   }
 
   // ========================
@@ -414,13 +533,17 @@ export default class extends Controller {
         this.resetPlayback()
       }
     } else if (this.repeatModeValue === 'all' && this.currentQueue.length > 0) {
-      // Repeat All: play next track (loops back to start)
-      console.log("🔁 Repeat All - playing next track...")
+      // Repeat All: advance to another song in the library.
+      //
+      // Random rather than next-in-line, deliberately: the queue is the whole
+      // library, and Mason wants the player to wander it rather than walk it, so
+      // a set-and-forget player does not march through everything in order.
+      console.log("🔁 Repeat All - advancing to a random song...")
       try {
         // CRITICAL: Call playNext() immediately to preserve iOS gesture context
         // setTimeout would break the autoplay permission on iOS Safari
-        console.log("▶️ Calling playNext() immediately...")
-        this.playNext()
+        console.log("▶️ Calling playNext(random) immediately...")
+        this.playNext(true)
       } catch (error) {
         console.error("❌ Error during repeat all:", error)
         this.resetPlayback()
@@ -800,10 +923,21 @@ export default class extends Controller {
   }
 
   /**
-   * Play the next song in queue
+   * Play the next song in the queue.
+   *
+   * @param {boolean} random - Pick any other song rather than the following one.
+   *   Used by auto-advance, where the library is the pool and the order should
+   *   not matter. The Next button stays sequential, which is what a skip means.
    */
-  playNext() {
-    console.log("🔄 playNext() called - Index:", this.currentIndex, "Queue:", this.currentQueue.length, "Shuffle:", this.shuffleValue)
+  playNext(random = false) {
+    // Stimulus calls an action method with the triggering DOM Event as its first
+    // argument, and a DOM Event is truthy — so testing `random` directly made every
+    // click of the Next button (data-action="click->music--player#playNext") pick at
+    // random, the opposite of what a skip means. Only an explicit `true` counts, and
+    // auto-advance is the one caller that passes it.
+    const pickRandom = random === true
+
+    console.log("🔄 playNext() called - Index:", this.currentIndex, "Queue:", this.currentQueue.length, "Shuffle:", this.shuffleValue, "Random:", pickRandom)
 
     if (this.currentQueue.length === 0) {
       console.warn("⚠️ Cannot play next - queue is empty")
@@ -817,8 +951,8 @@ export default class extends Controller {
 
     let nextIndex;
 
-    if (this.shuffleValue) {
-      // Shuffle mode: pick random song avoiding recently played
+    if (pickRandom || this.shuffleValue) {
+      // Pick any other song, preferring ones not played recently
       nextIndex = this.getRandomIndex();
     } else {
       // Normal mode: sequential playback
@@ -847,6 +981,18 @@ export default class extends Controller {
     }
 
     if (nextSong.url === this.currentUrl) {
+      // getRandomIndex() hands back the current song when it is the only one there
+      // is. Repeat All means repeat, so restart it rather than stopping dead.
+      if (this.currentQueue.length === 1) {
+        console.log("🔂 Only one song in the queue - restarting it")
+        this.wavesurfer?.seekTo(0)
+        const restartPromise = this.wavesurfer?.play()
+        if (restartPromise !== undefined) {
+          restartPromise.catch((error) => console.warn("Restart failed:", error))
+        }
+        return
+      }
+
       console.warn("⚠️ Next song is same as current - skipping")
       return;
     }
@@ -859,35 +1005,32 @@ export default class extends Controller {
   }
 
   /**
-   * Get random index avoiding recently played songs
+   * Get an index for another song in the queue.
+   *
+   * Always excludes the song already playing, however small the queue is. The
+   * previous version skipped that check for queues of three or fewer and picked
+   * purely at random, so with a small library it would regularly hand back the
+   * current track — and playNext() refuses to reload the song that is already
+   * loaded, so auto-advance would simply stop with no error.
    */
   getRandomIndex() {
     const queueLength = this.currentQueue.length;
 
-    // If queue is small, just pick random
-    if (queueLength <= 3) {
-      return Math.floor(Math.random() * queueLength);
-    }
-
-    // Build available indices (excluding recently played)
-    const maxRecent = Math.min(5, Math.floor(queueLength / 3)); // Track last 5 or 1/3 of queue
-    const recentSet = new Set(this.recentlyPlayed.slice(-maxRecent));
-
-    const availableIndices = [];
+    const others = [];
     for (let i = 0; i < queueLength; i++) {
-      if (!recentSet.has(i) && i !== this.currentIndex) {
-        availableIndices.push(i);
-      }
+      if (i !== this.currentIndex) others.push(i);
     }
 
-    // If no available indices (shouldn't happen), reset recently played
-    if (availableIndices.length === 0) {
-      this.recentlyPlayed = [];
-      return Math.floor(Math.random() * queueLength);
-    }
+    // Only one song in the library: there is nothing else to move to.
+    if (others.length === 0) return this.currentIndex;
 
-    // Pick random from available
-    return availableIndices[Math.floor(Math.random() * availableIndices.length)];
+    // Prefer songs that have not been played recently, when there is room to.
+    const maxRecent = Math.min(5, Math.floor(queueLength / 3));
+    const recentSet = new Set(this.recentlyPlayed.slice(-maxRecent));
+    const preferred = others.filter(i => !recentSet.has(i));
+    const pool = preferred.length > 0 ? preferred : others;
+
+    return pool[Math.floor(Math.random() * pool.length)];
   }
 
   /**
@@ -913,6 +1056,13 @@ export default class extends Controller {
   async playSongFromQueue(song, playOnLoad = this.playOnLoadValue) {
     try {
       this.isChangingTrack = true;
+
+      // A track change voids any pending "tap to resume": it was armed for the track
+      // that got blocked, not for this one. The generation bump covers the case where
+      // the block is still awaiting its muted-start attempt and would otherwise arm
+      // after this point.
+      this.disarmResumeOnInteraction()
+      this.playGeneration++
 
       // If the song is from SoundCloud, refresh its data to get a fresh stream URL
       if (song.audioSource === 'SoundCloud') {
@@ -1352,6 +1502,11 @@ export default class extends Controller {
    * Handle audio errors
    */
   handleAudioError() {
+    // A track that fails to load never reaches attemptPlayback, which is the only
+    // other place this flag is cleared — so without resetting it here a single bad
+    // file would wedge auto-advance permanently, because handleTrackEnd bails out
+    // while it is still true.
+    this.isChangingTrack = false
     this.hideLoadingIndicator()
     window.dispatchEvent(new CustomEvent("audio:error", {
       detail: { url: this.currentUrl }
