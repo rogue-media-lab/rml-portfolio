@@ -1,8 +1,8 @@
 {
   "repoPath": "/home/masonroberts/Rogue-Media-Lab/Studio-Projects/RML-Portfolio/rml-portfolio",
   "storagePath": "/home/masonroberts/Rogue-Media-Lab/Studio-Projects/RML-Portfolio/rml-portfolio/.gitnexus",
-  "lastCommit": "144901a73f99cd1059b6dd070872395db1dfb5b6",
-  "indexedAt": "2026-11-16T00:49:52.777Z",
+  "lastCommit": "70de2adbf4421adce85ca30a283287124dc70b35",
+  "indexedAt": "2026-11-16T00:51:36.240Z",
   "contentRetention": "full",
   "contentRetentionSchemaVersion": 1,
   "ftsProfile": "full",
@@ -31,17 +31,17 @@
       "manifestPath": "/home/masonroberts/.npm/_npx/5e786f48223a616c/node_modules/gitnexus/package.json",
       "lockfilePath": "/home/masonroberts/.npm/_npx/5e786f48223a616c/package-lock.json",
       "canonicalization": "gitnexus-analyzer-dependency-runtime-v4",
-      "packageCount": 253,
-      "artifactCount": 12365,
-      "digest": "sha256:1edaf4af27a41ae533198ee845b14a1e1f6087dc0e8c78a887375336cea0b33e"
+      "packageCount": 252,
+      "artifactCount": 12155,
+      "digest": "sha256:c5c04eb3226d2093da02aa159b2a72f25e33668a7f1f8a771dc2160c390897a3"
     }
   },
   "branch": "main",
   "remoteUrl": "git@github.com-rogue:rogue-media-lab/rml-portfolio",
   "stats": {
     "files": 812,
-    "nodes": 3003,
-    "edges": 3789,
+    "nodes": 2991,
+    "edges": 3777,
     "communities": 54,
     "processes": 42,
     "embeddings": 0
@@ -345,10 +345,10 @@
   "cjkSegmentation": "none",
   "embeddingDims": 384,
   "fileHashes": {
-    "AGENTS.md": "b65cf7d0c71e6b6f018f3315edd82bd82db99491cafce389e07dd2c20c6aec08",
+    "AGENTS.md": "01837a6760b1b01bb79cb3394ca758045a136601708b00d90be2a6f09b9a1da4",
     "Aptfile": "d5722403849c543fed3e5c86eb7cfbe7aa7fa0b5e44231151e40ea7ee9fb9475",
     "BACKLOG.md": "5551de19cb279c9bbe41c14513fd4ba7084796341d6293eb08822cdb4af8f7e6",
-    "CLAUDE.md": "b65cf7d0c71e6b6f018f3315edd82bd82db99491cafce389e07dd2c20c6aec08",
+    "CLAUDE.md": "01837a6760b1b01bb79cb3394ca758045a136601708b00d90be2a6f09b9a1da4",
     "Dockerfile": "0cd1b716f874d172eca2db85712246017335d92d1921a15af54e3e0c8c053c06",
     "Gemfile": "335fb9c58c4065042c7d1f92b88c823bf7edfea52c88adaa5322799c6b7b9235",
     "Procfile": "c79839e85131a4c733831af79aceede5c9cf304ed9474daf8c8d60041e9ba8d0",
@@ -1160,11 +1160,7 @@
   },
   "indexCoverage": {
     "maxFileSizeBytes": 524288,
-    "dirtyPaths": [
-      "app/controllers/playlists_controller.rb",
-      "app/controllers/zuke_controller.rb",
-      "app/models/song.rb"
-    ]
+    "dirtyPaths": []
   },
   "cacheKeys": [
     "a7710321a928b3235d1a4c063074bb5515b7038814e2b87b95d01027a5a024fa",
