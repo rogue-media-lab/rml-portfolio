@@ -55,4 +55,35 @@ class ZukeControllerTest < ActionDispatch::IntegrationTest
     # Pop genre has 1 song in fixtures
     assert_equal 1, grouped_genres[@pop_genre].size
   end
+
+  # GET /zuke/albums rendered "zuke/turbo_frames/albums", a partial that did not
+  # exist, so the route returned a 500. Nothing exercised it, which is why it
+  # survived. This test is the guard that was missing.
+  test "albums action renders and serializes each album's songs" do
+    get music_albums_zuke_index_url
+    assert_response :success
+
+    grouped = assigns(:albums)
+    assert_not_nil grouped, "Should assign @albums"
+
+    serialized = assigns(:album_songs)
+    assert_not_nil serialized, "Should assign @album_songs"
+
+    # Every song hash must carry the presenter's keys, not a raw attachment.
+    serialized.each_value do |songs|
+      songs.each do |song|
+        assert song.key?(:url), "serialized song is missing :url"
+        assert song.key?(:title), "serialized song is missing :title"
+        assert_not_kind_of ActiveStorage::Attached::One, song[:url],
+          "view received an attachment object instead of a URL"
+      end
+    end
+  end
+
+  # An artist with no songs raised NoMethodError on first_song.id while rendering
+  # /zuke/artists. The fixture artist below has no songs on purpose.
+  test "artists action renders an artist with no songs" do
+    get music_artists_zuke_index_url
+    assert_response :success
+  end
 end

@@ -1,0 +1,53 @@
+<%# Album list, grouped by the first letter of the album title.
+    #
+    # Rendered by ZukeController#albums. Each album's songs arrive already
+    # serialized through SongPresenter in @album_songs, so this view renders the
+    # shared smart-image component — the same one the main player uses — rather
+    # than inlining its own markup and reaching for a raw attachment.
+    #
+    # Replaces a partial that was referenced by the controller but did not exist,
+    # which made GET /zuke/albums a 500. The old _albums-fix partial is left in
+    # place for reference but is no longer routed to; it referenced a
+    # music--album Stimulus controller that has never existed. %>
+<%= turbo_frame_tag "music-frame" do %>
+  <div class="w-full flex flex-col text-gray-100">
+    <% @albums.each do |letter, albums| %>
+      <div class="letter-group mb-8">
+        <h2 class="letter-heading sticky top-0 bg-gray-900 text-white py-2 px-4 text-xl font-bold z-10">
+          <%= letter %>
+        </h2>
+
+        <% albums.each do |album| %>
+          <% songs = @album_songs[album.id] || [] %>
+          <div class="album-block px-4 py-3">
+            <div class="mb-2 flex items-baseline gap-2">
+              <h3 class="font-medium text-gray-100"><%= album.title %></h3>
+              <span class="text-sm text-gray-400"><%= album.artist&.name %></span>
+            </div>
+
+            <% if songs.any? %>
+              <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
+                <% songs.each do |song| %>
+                  <div class="flex justify-center">
+                    <%= render partial: "zuke/components/smart-image", locals: { controller_name: "smart-image", song: song } %>
+                  </div>
+                <% end %>
+              </div>
+            <% else %>
+              <%# An album with no playable songs renders its cover and says so,
+                  rather than a play button that would dispatch an empty URL. %>
+              <div class="flex items-center gap-3">
+                <% if album.cover_art.present? %>
+                  <%= image_tag album.cover_art,
+                      class: "rounded-lg w-16 h-16 object-cover border-2 border-gray-700",
+                      alt: "Cover art for #{album.title}" %>
+                <% end %>
+                <span class="text-sm text-gray-400">No tracks yet</span>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+<% end %>

@@ -15,18 +15,37 @@ class ZukeController < ApplicationController
   end
 
   # Renders the list of all artists, grouped by the first letter of their name.
+  #
+  # Each artist's songs are serialized through the presenter (see #albums) so the
+  # view renders the shared smart-image component. Previously the partial reached
+  # for first_song.audio_file, which renders an attachment object, not a URL.
   def artists
     @artists = Artist.includes(:songs).order(:name)
     @grouped_artists = @artists.group_by { |a| a.name.first.upcase }
+
+    @artist_songs = @artists.each_with_object({}) do |artist, memo|
+      songs, = serialize_songs_for_player(artist.songs)
+      memo[artist.id] = songs
+    end
 
     render partial: "zuke/turbo_frames/artists", formats: [ :html ]
   end
 
   # Renders the list of all albums, grouped by the first letter of their title.
+  #
+  # Each album's songs are serialized through the presenter (same shape the main
+  # player uses) so the view can render the shared smart-image component instead
+  # of reaching for a raw attachment. Before this, the partial named here did not
+  # exist and the route returned a 500.
   def albums
-    @albums = Album.includes(:artist, :songs)
-                   .order(:title)
-                   .group_by { |a| a.title.first.upcase }
+    all_albums = Album.includes(:artist, :songs).order(:title)
+
+    @album_songs = all_albums.each_with_object({}) do |album, memo|
+      songs, = serialize_songs_for_player(album.songs)
+      memo[album.id] = songs
+    end
+
+    @albums = all_albums.group_by { |a| a.title.first.upcase }
 
     render partial: "zuke/turbo_frames/albums", formats: [ :html ]
   end
@@ -60,6 +79,14 @@ class ZukeController < ApplicationController
       .transform_values { |genre_song_pairs| genre_song_pairs.map { |_, song| song } }
       .sort_by { |genre, _songs| genre.name }
       .to_h
+
+    # Serialize through the presenter so the view renders the shared smart-image
+    # component. Passing raw records meant the partial inlined its own markup and
+    # interpolated song.audio_file directly, which renders an Active Storage
+    # object rather than a URL.
+    @genre_songs = @grouped_genres.transform_values do |songs|
+      serialize_songs_for_player(songs).first
+    end
 
     render partial: "zuke/turbo_frames/genres", formats: [ :html ]
   end

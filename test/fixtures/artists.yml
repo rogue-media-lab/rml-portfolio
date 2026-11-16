@@ -5,3 +5,8 @@ first_artist:
 
 second_artist:
   name: "second_artist"
+
+# Deliberately has no songs. /zuke/artists used to raise NoMethodError on
+# first_song.id for an artist with an empty song list.
+no_songs_artist:
+  name: "zzz_no_songs_artist"

@@ -1,3 +1,15 @@
+<%# Artist list, grouped by first letter. Rendered by ZukeController#artists.
+    #
+    # @grouped_artists holds raw Artist records (for names and artwork);
+    # @artist_songs holds each artist's songs already serialized through
+    # SongPresenter, keyed by artist id.
+    #
+    # Two bugs lived here. The card interpolated `first_song.audio_file` into a
+    # data attribute, which renders an Active Storage object rather than a URL, so
+    # the play button was broken; and it called `first_song.id` without a nil
+    # check, so an artist with no songs raised NoMethodError. Both are gone: songs
+    # render through the shared smart-image component, and an artist with nothing
+    # playable still renders without a play affordance. %>
 <%= turbo_frame_tag "music-frame" do %>
   <div id="music_frame" class="w-full">
     <% @grouped_artists.each do |letter, artists| %>
@@ -6,30 +18,30 @@
         <div class="letter-heading sticky top-0 bg-zinc-900 text-white py-2 px-4 text-xl font-bold z-10">
           <%= letter %>
         </div>
-        
-        <!-- Artists list -->
+
         <div class="artists-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 px-4 py-2">
           <% artists.each do |artist| %>
-            <% first_song = artist.songs.first %>
+            <% songs = @artist_songs[artist.id] || [] %>
             <div class="artist-card group">
-              <!-- Play button and artist name -->
-              <div data-controller="music--smart-image"
-                   data-music--smart-image-id-value="<%= first_song.id %>"
-                   data-music--smart-image-url-value="<%= first_song.audio_file %>"
-                   data-music--smart-image-title-value="<%= first_song.title %>"
-                   data-music--smart-image-artist-value="<%= artist.name %>"
-                   data-music--smart-image-banner-value="<%= artist.image %>"
-                   class="artist-name flex items-center mb-2">
-                <!-- Album image -->
-                <% if artist.albums.any? %>
-                  <img data-music--smart-image-target="playButton"
-                       data-action="click->music--smart-image#playRequest"
-                       class="rounded-lg w-10 mr-2 h-auto border-2 border-gray-200 hover:border-[#1DB954] transition-colors cursor-pointer"
-                       src="<%= artist.albums.first.cover_art || artist.image %>" 
-                       alt="<%= artist.name %>" />
+              <div class="artist-name flex items-center mb-2">
+                <% artwork = artist.albums.first&.cover_art || artist.image %>
+                <% if artwork.present? %>
+                  <%= image_tag artwork,
+                      class: "rounded-lg w-10 mr-2 h-auto border-2 border-gray-200",
+                      alt: artist.name %>
                 <% end %>
                 <span class="font-medium text-lg truncate"><%= artist.name %></span>
               </div>
+
+              <% if songs.any? %>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  <% songs.each do |song| %>
+                    <%= render partial: "zuke/components/smart-image", locals: { controller_name: "smart-image", song: song } %>
+                  <% end %>
+                </div>
+              <% else %>
+                <span class="text-sm text-gray-400">No tracks yet</span>
+              <% end %>
             </div>
           <% end %>
         </div>

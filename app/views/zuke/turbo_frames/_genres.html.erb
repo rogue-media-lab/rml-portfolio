@@ -1,47 +1,39 @@
+<%# Genre list. Rendered by ZukeController#genres.
+    #
+    # @grouped_genres holds the top songs per genre (raw records, used for the
+    # heading count); @genre_songs holds the same songs already serialized through
+    # SongPresenter, keyed by genre.
+    #
+    # This partial used to inline its own copy of the smart-image markup and pass
+    # song.audio_file as the URL value. That interpolates an Active Storage
+    # attachment object — `<%= song.audio_file %>` renders
+    # "#<ActiveStorage::Attached::One:0x...>" — so every play button in this tab
+    # was broken. It now renders the shared component, which takes presenter keys.
+    #
+    # The count comes from @grouped_genres so a song that renders no card is still
+    # counted in the library total. %>
 <%= turbo_frame_tag "music-frame" do %>
   <div id="music_frame" class="w-full">
     <% @grouped_genres.each do |genre, songs| %>
+      <% serialized = @genre_songs[genre] || [] %>
       <div class="genre-group mb-8">
         <!-- Genre heading -->
         <div class="genre-heading sticky top-0 bg-zinc-900 text-white py-2 px-4 text-xl font-bold z-10">
           <%= genre.name %>
+          <span class="text-sm font-normal text-gray-400"><%= songs.size %> tracks</span>
         </div>
-        
-        <!-- Albums list -->
-        <div class="albums-grid grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 px-4 py-2">
-          <% songs.each do |song| %>
-            <div class="album-card group">
-              <div data-controller="music--smart-image"
-                   data-music--smart-image-id-value="<%= song.id %>"
-                   data-music--smart-image-url-value="<%= song.audio_file %>"
-                   data-music--smart-image-title-value="<%= song.title %>"
-                   data-music--smart-image-artist-value="<%= song.artist.name %>"
-                   data-music--smart-image-banner-value="<%= song.album&.cover_art || song.artist.image %>">
-                <!-- Album image with play button -->
-                <div class="relative">
-                  <img data-music--smart-image-target="playButton"
-                       class="w-full rounded-lg aspect-square object-cover border-2 border-gray-200 hover:border-[#1DB954] transition-colors cursor-pointer"
-                       src="<%= song.album&.cover_art || song.artist.image %>" 
-                       alt="<%= song.title %>" />
-                  <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <div
-                         data-action="click->music--smart-image#playRequest"
-                         class="bg-[#1DB954] bg-opacity-50 rounded-full p-2 cursor-pointer">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-                <!-- Song info -->
-                <div class="mt-2 px-1">
-                  <div class="font-medium truncate"><%= song.title %></div>
-                  <div class="text-sm text-[#1e1e1e] truncate"><%= song.artist.name %></div>
-                </div>
+
+        <% if serialized.any? %>
+          <div class="albums-grid grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 px-4 py-2">
+            <% serialized.each do |song| %>
+              <div class="album-card group">
+                <%= render partial: "zuke/components/smart-image", locals: { controller_name: "smart-image", song: song } %>
               </div>
-            </div>
-          <% end %>
-        </div>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="px-4 py-2 text-sm text-gray-400">No playable tracks yet.</div>
+        <% end %>
       </div>
     <% end %>
   </div>
