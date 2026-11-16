@@ -634,6 +634,51 @@ export default class extends Controller {
   }
 
   /**
+   * Resolve once the media element can actually play, or false if it never gets there.
+   *
+   * WaveSurfer's "ready" fires for the waveform peaks, not for a playable media element:
+   * right after empty() + load() the element sits at readyState 0, so a play() sent then
+   * is issued into the gap before loadstart. Chrome queues that request and recovers, so
+   * the defect is invisible there; iOS Safari settles the promise and never restarts
+   * playback, leaving the track silent while the player reports it playing.
+   *
+   * Bounded, because a source that never becomes ready must not leave the caller waiting:
+   * isChangingTrack would stay true and every later auto-advance would bail out.
+   *
+   * @returns {Promise<boolean>} true once the element reports it can play.
+   */
+  waitForPlayableMedia(timeout = 5000) {
+    const media = this.wavesurfer?.getMediaElement()
+    if (!media) return Promise.resolve(false)
+
+    // HAVE_FUTURE_DATA (3) is what canplay signals, and this reading belongs to THIS song:
+    // playSongFromQueue empties the media element before loading, which resets readyState
+    // to 0, so a 3 here cannot be the previous track still reporting itself ready.
+    if (media.readyState >= 3) return Promise.resolve(true)
+
+    return new Promise((resolve) => {
+      let settled = false
+      const finish = (value) => {
+        if (settled) return
+        settled = true
+        clearTimeout(timer)
+        media.removeEventListener("canplay", onCanPlay)
+        resolve(value)
+      }
+      // canplay fires on the shared element, so one queued by the previous source can still
+      // arrive after this listener is registered. Re-read readyState and, when it is low,
+      // keep waiting: a stale event is not this track being unplayable, and resolving false
+      // here would abandon a track that is in fact loading.
+      const onCanPlay = () => {
+        if (media.readyState >= 3) finish(true)
+      }
+      const timer = setTimeout(() => finish(false), timeout)
+
+      media.addEventListener("canplay", onCanPlay)
+    })
+  }
+
+  /**
    * Smart EQ coordination: Wait for EQ to be ready before playing
    * Uses event-based coordination with timeout fallback to preserve user gesture
    */
@@ -1215,11 +1260,39 @@ export default class extends Controller {
           // unlocked while the context stays silent, so a resolved play() is not evidence
           // of sound. When the context will not run, hand it to the recovery, which waits
           // for the gesture that can actually fix it, instead of playing inaudibly.
-          this.resumeAudioContext().then((audible) => {
+          this.resumeAudioContext().then(async (audible) => {
             if (!audible) {
               console.warn("🔇 AudioContext will not run - not starting inaudibly");
               this.isChangingTrack = false;
               document.dispatchEvent(new CustomEvent("player:autoplay-blocked", { detail: { song } }));
+              return;
+            }
+
+            // WaveSurfer fires "ready" when the peaks are ready, not when the media
+            // element can play. Immediately after empty() + load() the element sits at
+            // readyState 0 — the new source has not even begun loading — so a play()
+            // issued here lands in the gap before loadstart. Chrome queues that request
+            // and recovers, which is why this never showed up on desktop; iOS Safari
+            // settles the promise and never restarts playback, so the track stays silent
+            // while the player reports it as playing.
+            const generation = this.playGeneration;
+            const playable = await this.waitForPlayableMedia();
+            if (generation !== this.playGeneration) {
+              // A different track is loading and owns isChangingTrack now, so leaving the
+              // flag set is correct — clearing it here would let the older handoff unlock
+              // auto-advance while the newer one is still in flight.
+              console.log("↩️ Superseded while waiting for media - not playing");
+              return;
+            }
+            if (!playable) {
+              // Deliberately NOT dispatching player:autoplay-blocked. Nothing refused us
+              // here — the source simply never became ready — and that event's handler
+              // (recoverBlockedAutoplay) calls media.play() straight away, which is the
+              // very request this wait exists to avoid. It would also report a successful
+              // recovery, so no tap-to-resume would be armed. The track stays loaded and
+              // the play button works from here.
+              console.warn("⏳ Media never became playable - leaving the track for a tap");
+              this.isChangingTrack = false;
               return;
             }
 
