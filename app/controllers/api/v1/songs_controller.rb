@@ -98,6 +98,36 @@ module Api
         render json: summary.merge(deleted: true, purged_files: attachments.size), status: :ok
       end
 
+      # GET /api/v1/songs/:id/download[?file=master|preview|image|banner_video]
+      #
+      # The agent's door to a song's actual files. It exists because recovering a
+      # song's own audio without it meant reading a page snapshot taken before a
+      # deploy — the only remaining route to a master's URL once a song has left
+      # the public player.
+      #
+      # "The agent presents its token" is the same rule as "the user logs in":
+      # nothing anonymous gets a file. It deliberately does not call
+      # Song#downloadable_by?, because that predicate is about a person's
+      # relationship to a song, and this caller is the operator rather than one of
+      # the users a song belongs to.
+      def download
+        song = Song.find_by(id: params[:id])
+        return render json: { error: "Not found" }, status: :not_found if song.nil?
+
+        attachment = song.downloadable_file(params[:file])
+        if attachment.nil?
+          return render json: { error: "No such file" }, status: :not_found
+        end
+
+        # Streamed rather than redirected to the storage URL: the master's bucket
+        # URL is what the preview work deliberately stopped publishing, and a
+        # redirect would hand it over for as long as the signed link lives.
+        send_data attachment.download,
+                  filename: attachment.filename.to_s,
+                  type: attachment.content_type,
+                  disposition: "attachment"
+      end
+
       private
 
       # The attached-file proxies themselves, not their blobs. Purging has to go

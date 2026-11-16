@@ -198,6 +198,10 @@ Rails.application.routes.draw do
   # Public Playlists routes (for Zuke music player)
   resources :playlists, only: [ :index, :show ]
 
+  # Downloading a song's own files. Streaming is public; taking a copy is not, so
+  # this one asks for an account. The rule itself lives in Song#downloadable_by?.
+  get "/zuke/songs/:id/download", to: "zuke_downloads#show", as: :zuke_song_download
+
 
   # root for hermits
   get "hermit-plus", to: "hermit_plus#landing", as: :hermits
@@ -317,7 +321,11 @@ Rails.application.routes.draw do
   # =====================================================================
   namespace :api, defaults: { format: :json } do
     namespace :v1 do
-      resources :songs, only: [ :create, :destroy ]
+      resources :songs, only: [ :create, :destroy ] do
+        member do
+          get :download
+        end
+      end
       resources :playlists, only: [ :create ]
     end
   end

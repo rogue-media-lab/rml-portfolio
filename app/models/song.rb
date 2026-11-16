@@ -51,6 +51,41 @@ class Song < ApplicationRecord
     preview_audio.attached?
   end
 
+  # The files a caller may ask for by name. "master" first because that is the
+  # default — asking for a song's file means the song.
+  DOWNLOADABLE_FILES = {
+    "master" => :audio_file,
+    "preview" => :preview_audio,
+    "image" => :image,
+    "banner_video" => :banner_video
+  }.freeze
+
+  # The attachment behind +name+, or nil if the name is unknown or nothing is
+  # attached. An unknown name is nil rather than a default, so a typo'd ?file=
+  # cannot quietly hand back the master.
+  def downloadable_file(name = nil)
+    attachment_name = DOWNLOADABLE_FILES[name.to_s.presence || "master"]
+    return nil unless attachment_name
+
+    attachment = public_send(attachment_name)
+    attachment if attachment.attached?
+  end
+
+  # Who may take a copy of this song's files.
+  #
+  # Ownership is the first answer: a user's own uploads are theirs. `can_download`
+  # is the second door, for accounts allowed to pull from the curated library too.
+  # Anonymous callers get nothing.
+  #
+  # This is the single place the rule lives. The session endpoint and the
+  # token-authenticated API endpoint both call it, so loosening or tightening the
+  # rule never means editing endpoints.
+  def downloadable_by?(user)
+    return false if user.nil?
+
+    users.exists?(user.id) || user.can_download?
+  end
+
   # What a song collection must preload before being serialized through
   # SongPresenter — every attachment it reads, blobs included, plus the artist.
   # `includes(songs: [:image_attachment])` loads attachment rows only; the blob
