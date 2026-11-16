@@ -31,10 +31,16 @@ class Song < ApplicationRecord
   #
   # A song with no attached audio_file has no URL to serve, and the smart-image
   # component renders a play affordance unconditionally — so it became a card
-  # that dispatched an empty URL on click. This is the one definition of
-  # "playable"; controllers that build their own song collections filter through
-  # it rather than reimplementing the rule.
+  # that dispatched an empty URL on click. The scope and the predicate below are
+  # the two expressions of one rule (SQL for relations, Ruby for collections);
+  # nothing else should restate it.
   scope :playable, -> { joins(:audio_file_attachment) }
+
+  # The same rule for a single in-memory record. Used by the serializer so the
+  # Ruby path cannot drift from the scope.
+  def playable?
+    audio_file.attached?
+  end
 
   # What a song collection must preload before being serialized through
   # SongPresenter — every attachment it reads, blobs included, plus the artist.

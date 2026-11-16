@@ -67,8 +67,12 @@ class ZukeController < ApplicationController
 
   # Renders a list of genres, each with a sample of associated songs.
   def genres
-    # This SQL query uses a window function to find the top 20 songs for each genre
-    # without causing an N+1 query. It's significantly more performant.
+    # Top 20 songs per genre, ranked in SQL to avoid an N+1.
+    #
+    # The playable join is in the query, not applied afterwards: taking 20 rows
+    # and then dropping the unplayable ones loses playable songs that fell
+    # outside the window, and makes the heading's track count disagree with the
+    # cards actually rendered.
     sql = <<-SQL
       SELECT id FROM (
         SELECT
@@ -77,6 +81,10 @@ class ZukeController < ApplicationController
           ROW_NUMBER() OVER(PARTITION BY sg.genre_id ORDER BY s.created_at DESC) as rn
         FROM songs s
         INNER JOIN song_genres sg ON s.id = sg.song_id
+        INNER JOIN active_storage_attachments asa
+          ON asa.record_type = 'Song'
+         AND asa.record_id = s.id
+         AND asa.name = 'audio_file'
       ) ranked_songs
       WHERE rn <= 20
     SQL
@@ -180,7 +188,11 @@ class ZukeController < ApplicationController
   end
 
   def perform_local_song_search(query)
-    load_songs.joins(:artist)
+    # .playable before .limit — the limit must apply to the songs that can
+    # actually be played, or a search returns fewer than 10 results while more
+    # playable matches exist behind the rejected rows.
+    load_songs.playable
+              .joins(:artist)
               .left_joins(:album)
               .where("songs.title ILIKE :q OR artists.name ILIKE :q OR albums.title ILIKE :q", q: "%#{query}%")
               .distinct
@@ -218,23 +230,20 @@ class ZukeController < ApplicationController
   # @return [Array(Array<Hash>, String)] A tuple containing the array of song
   #   hashes and the JSON representation of that array.
   def serialize_songs_for_player(songs)
-    playable = songs.select { |song| song.audio_file.attached? }
+    playable = songs.select(&:playable?)
     song_hashes = playable.map { |song| SongPresenter.new(song).to_song_hash }
     [ song_hashes, song_hashes.to_json ]
   end
 
   # Eager-loads everything SongPresenter reads from a song, blobs included.
   #
-  # `includes(songs: [:image_attachment])` loads only the attachment rows; the
-  # blob lookup still fires a query per song. `{ attachment: :blob }` is what
-  # actually preloads it — the same thing with_attached_* does.
+  # Expressed through Song::SERIALIZATION_INCLUDES rather than with_attached_*,
+  # so there is one preload definition in the app instead of a second copy here
+  # that can drift from the one PlaylistsController uses.
   #
   # @param relation [ActiveRecord::Relation<Song>] a Song relation
   def with_zuke_attachments(relation)
-    relation.with_attached_image
-            .with_attached_audio_file
-            .with_attached_banner_video
-            .with_attached_waveform_data
+    relation.includes(Song::SERIALIZATION_INCLUDES)
   end
 
   # The includes hash for a collection of songs being serialized through

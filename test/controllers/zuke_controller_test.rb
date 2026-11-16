@@ -62,20 +62,53 @@ class ZukeControllerTest < ActionDispatch::IntegrationTest
     assert_not_nil display.first[:url], "the displayed song must have a URL"
   end
 
-  test "genres action should be performant and limit songs" do
+  # The genres action ranks the top 20 songs per genre in SQL. Two things have to
+  # hold at once: the ranking must only consider playable songs (so the window
+  # does not fill with songs that will be dropped), and the limit must still
+  # apply. No fixture song has an audio_file, so this attaches one to enough
+  # songs to actually exercise the limit.
+  test "genres action returns only playable songs and still limits to 20" do
+    host! "example.com"
+
+    # NB: with no argument the fixture accessor returns an Array of records, not
+    # the old name => record Hash. Destructuring |_name, song| yields nil here.
+    songs.each do |song|
+      song.audio_file.attach(
+        io: File.open(Rails.root.join("test/fixtures/files/audio.mp3")),
+        filename: "audio.mp3",
+        content_type: "audio/mpeg"
+      )
+    end
+
     get music_genres_zuke_index_url
     assert_response :success
 
     grouped_genres = assigns(:grouped_genres)
     assert_not_nil grouped_genres
-    assert_equal 2, grouped_genres.size # Rock and Pop
+    assert_equal 2, grouped_genres.size, "Rock and Pop"
 
-    # Rock genre has 25 songs in fixtures + song 'one' = 26 songs
-    # The query should limit this to 20
-    assert_equal 20, grouped_genres[@rock_genre].size
-
-    # Pop genre has 1 song in fixtures
+    # Rock has 25 fixture songs plus song 'one' = 26 playable, so the limit bites.
+    assert_equal 20, grouped_genres[@rock_genre].size,
+      "the 20-song window must still apply, and apply to playable songs"
     assert_equal 1, grouped_genres[@pop_genre].size
+
+    # Every song that reached the view must be playable.
+    assigns(:genre_songs).each_value do |serialized|
+      serialized.each do |song|
+        assert_not_nil song[:url], "an unplayable song reached the view"
+      end
+    end
+  end
+
+  # A genre whose songs are all unplayable renders no cards, and its heading
+  # count must agree — that disagreement is what the pre-filter ranking caused.
+  test "genres action shows nothing when no song is playable" do
+    get music_genres_zuke_index_url
+    assert_response :success
+
+    assigns(:grouped_genres).each_value do |songs|
+      assert_empty songs, "unplayable songs must not be ranked into the window"
+    end
   end
 
   # GET /zuke/albums rendered "zuke/turbo_frames/albums", a partial that did not
