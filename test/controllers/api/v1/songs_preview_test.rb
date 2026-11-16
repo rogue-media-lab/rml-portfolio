@@ -12,6 +12,8 @@ require "test_helper"
 #      why the two uploads use DIFFERENT fixture files and assert on the resulting
 #      filenames. With one shared fixture, a crossed wire passes silently.
 class Api::V1::SongsPreviewTest < ActionDispatch::IntegrationTest
+  include ActiveJob::TestHelper
+
   TOKEN = "test_api_token_secret_hex_64_chars_long_enough_for_comparison_xxxx"
 
   setup do
@@ -55,7 +57,12 @@ class Api::V1::SongsPreviewTest < ActionDispatch::IntegrationTest
                  "preview_audio holds the wrong file — the two attachments are crossed"
   end
 
-  test "preview is optional — a song without one still saves" do
+  # Omitting the preview no longer leaves a song permanently unplayable: the model
+  # now schedules a server-side cut. The assertion that used to sit here — "a
+  # caller that sends no preview must not get one invented for it" — described the
+  # behaviour before that wire existed, and passed only because the test adapter
+  # buffers enqueued jobs instead of running them.
+  test "preview is optional — the song saves and the server schedules the cut" do
     post api_v1_songs_url,
          params: {
            song: {
@@ -69,8 +76,14 @@ class Api::V1::SongsPreviewTest < ActionDispatch::IntegrationTest
     assert_response :created
     song = Song.find(JSON.parse(response.body)["id"])
     assert song.audio_file.attached?
+
+    # Nothing is cut during the request...
     assert_not song.preview_audio.attached?,
-               "a caller that sends no preview must not get one invented for it"
+               "the cut belongs out of band, not in the request"
+
+    # ...but it is scheduled, so the song is not left publicly invisible. This is
+    # the assertion that would have caught the job being wired to nothing.
+    assert_enqueued_with(job: GeneratePreviewJob)
   end
 
   test "an unauthenticated request cannot attach a preview" do

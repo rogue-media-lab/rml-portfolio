@@ -111,9 +111,20 @@ module Zuke
         normalized: normalized,
         cleanup_dir: (@owns_output_dir ? @output_dir : nil)
       )
+    rescue StandardError
+      # The happy path hands cleanup to the caller via Result#cleanup. A raise
+      # returns no Result at all, so nobody would ever remove the directory —
+      # a missing source or a file ffmpeg cannot decode orphaned one per call.
+      # Nothing usable was produced, so there is nothing to preserve.
+      discard_own_output_dir
+      raise
     end
 
     private
+
+    def discard_own_output_dir
+      FileUtils.remove_entry(@output_dir) if @owns_output_dir && File.directory?(@output_dir)
+    end
 
     # Seconds, or 0.0 when the file cannot be measured. Zero is treated as "too
     # short to trim" rather than as an error — the cut still runs, it just never

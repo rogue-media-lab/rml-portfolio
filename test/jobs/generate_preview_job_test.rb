@@ -33,17 +33,18 @@ class GeneratePreviewJobTest < ActiveJob::TestCase
     assert_in_delta 3.03, @song.preview_audio.metadata["duration"].to_f, 0.5
   end
 
-  # An upstream cut is the better cut, and re-cutting on every save would churn
-  # S3 for nothing.
-  test "never overwrites a preview that is already attached" do
-    existing = attach_preview(@song)
-    attach_full_track(@song, "long_audio.mp3")
+  # An upstream cut is the better cut, and re-cutting on every replace would churn
+  # S3 and swap a deliberate cut for a generic one. The callback enqueues whenever
+  # a master lands, so the job is what has to decline the work.
+  test "an upload that brings its own preview is left alone" do
+    attach_full_track(@song, "long_audio.mp3")   # master first,
+    existing = attach_preview(@song)             # then the cut, as the API does
 
     GeneratePreviewJob.perform_now(@song)
     @song.reload
 
     assert_equal existing, @song.preview_audio.blob.id,
-      "the job replaced a preview that was already there"
+      "the job replaced a preview the caller supplied"
   end
 
   test "does nothing, quietly, when there is no full track to cut" do
@@ -66,22 +67,43 @@ class GeneratePreviewJobTest < ActiveJob::TestCase
     assert_enqueued_with(job: GeneratePreviewJob) { song.save! }
   end
 
-  # Maestro and the API are expected to send their own cut. When they do, the
-  # server must not download the master and cut it again.
-  test "a song that arrives with its own preview does not enqueue a cut" do
-    song = Song.new(title: "Already Cut", artist: artists(:first_artist))
+  # Replacing a master must not leave the previous recording playing. The song is
+  # edited in MilkAdmin, a new audio_file lands, the optional preview field is left
+  # blank — and without this the public player keeps serving a cut of the track
+  # that was replaced, with no control in the admin to remove it.
+  test "replacing the master discards the preview cut from the old one" do
+    old_blob_id = attach_preview(@song)          # a cut of the OLD master
+    attach_full_track(@song, "audio.mp3")        # the master is replaced
+
+    GeneratePreviewJob.perform_now(@song)
+    @song.reload
+
+    assert_not_equal old_blob_id, @song.preview_audio.blob.id,
+      "the song is still serving a cut of the audio that was replaced"
+    assert_nil ActiveStorage::Blob.find_by(id: old_blob_id),
+      "the stale preview blob should be purged, not merely detached"
+    assert @song.preview_audio.attached?, "a replacement master needs a fresh cut"
+  end
+
+  # The distinction the staleness rule turns on: equal or newer means current.
+  # Age, not presence, is what decides — an upload's own cut arrives after its
+  # master and must survive; an orphaned cut from a replaced master must not.
+  test "a preview is considered stale only when it predates the master" do
+    song = Song.new(title: "Order Matters", artist: artists(:first_artist))
     song.audio_file.attach(
       io: File.open(Rails.root.join("test/fixtures/files/audio.mp3")),
-      filename: "audio.mp3",
+      filename: "master.mp3",
       content_type: "audio/mpeg"
     )
     song.preview_audio.attach(
       io: File.open(Rails.root.join("test/fixtures/files/audio.mp3")),
-      filename: "preview.mp3",
+      filename: "cut.mp3",
       content_type: "audio/mpeg"
     )
+    song.save!
 
-    assert_no_enqueued_jobs(only: GeneratePreviewJob) { song.save! }
+    assert_operator song.preview_audio.blob.created_at, :>=, song.audio_file.blob.created_at,
+      "the API/upload order attaches the master first, so its own cut never predates it"
   end
 
   private

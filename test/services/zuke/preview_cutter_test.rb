@@ -192,6 +192,29 @@ class Zuke::PreviewCutterTest < ActiveSupport::TestCase
     assert File.exist?(written), "the CLI reported a path it did not write"
   end
 
+  # The happy path hands cleanup to the caller through Result#cleanup. A raise
+  # returns no Result at all, so the directory had no owner and one was orphaned
+  # per failed call — a missing source, or audio ffmpeg cannot decode.
+  test "removes its temp directory when the cut fails" do
+    cutter = Zuke::PreviewCutter.new(
+      File.join(@tmpdir, "missing.mp3"), filename: "missing.mp3"
+    )
+    dir = cutter.instance_variable_get(:@output_dir)
+
+    assert File.directory?(dir), "the cutter should have created its own directory"
+    assert_raises(Zuke::PreviewCutter::CutError) { cutter.call }
+    assert_not File.exist?(dir), "a failed cut orphaned its temp directory"
+  end
+
+  # The mirror: a caller-supplied directory is not ours to delete, even on failure.
+  test "does not remove a caller-supplied directory when the cut fails" do
+    assert_raises(Zuke::PreviewCutter::CutError) do
+      Zuke::PreviewCutter.call(File.join(@tmpdir, "missing.mp3"), output_dir: @tmpdir)
+    end
+
+    assert File.directory?(@tmpdir), "the caller's directory was removed"
+  end
+
   private
 
   def duration_of(path)

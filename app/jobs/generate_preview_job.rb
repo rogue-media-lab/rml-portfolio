@@ -28,13 +28,15 @@ class GeneratePreviewJob < ApplicationJob
   queue_as :default
 
   def perform(song)
-    if song.preview_audio.attached?
-      Rails.logger.info("GeneratePreviewJob: Song ##{song.id} already has a preview; leaving it alone")
+    unless song.audio_file.attached?
+      Rails.logger.info("GeneratePreviewJob: Song ##{song.id} has no audio_file to cut")
       return
     end
 
-    unless song.audio_file.attached?
-      Rails.logger.info("GeneratePreviewJob: Song ##{song.id} has no audio_file to cut")
+    discard_stale_preview(song)
+
+    if song.preview_audio.attached?
+      Rails.logger.info("GeneratePreviewJob: Song ##{song.id} already has a preview; leaving it alone")
       return
     end
 
@@ -65,5 +67,31 @@ class GeneratePreviewJob < ApplicationJob
         result.cleanup
       end
     end
+  end
+
+  private
+
+  # A preview older than the master beside it describes a recording that has since
+  # been replaced. Left alone, the song keeps publicly serving audio that is no
+  # longer the track, and MilkAdmin has no control that removes it.
+  #
+  # Equal age counts as current: an upload attaches the master first and its cut
+  # second, so a preview is the cut of the master it arrived with. Only a preview
+  # that predates the master is stale.
+  #
+  # This lives in the job rather than in the model callback because it destroys
+  # attachments, and doing that inside after_commit re-enters the commit chain —
+  # an infinite loop that ends in a stack overflow, not a purge.
+  def discard_stale_preview(song)
+    return unless song.preview_audio.attached?
+
+    master_at = song.audio_file.blob.created_at
+    preview_at = song.preview_audio.blob.created_at
+    return if master_at.nil? || preview_at.nil?
+    return if preview_at >= master_at
+
+    Rails.logger.info("GeneratePreviewJob: Song ##{song.id} preview predates its master; re-cutting")
+    song.preview_audio.purge
+    song.preview_waveform_data.purge if song.preview_waveform_data.attached?
   end
 end

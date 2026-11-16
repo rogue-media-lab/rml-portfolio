@@ -153,21 +153,23 @@ class Song < ApplicationRecord
     GenerateWaveformJob.perform_later(self, "preview_audio") if newly_attached?(:preview_audio)
   end
 
-  # Cuts a preview when a song arrives with a master and none.
+  # Enqueues the preview cut whenever a master is attached or replaced.
   #
-  # This is the wire that closes the admin-upload hole: MilkAdmin.new's form
-  # attaches an audio_file and nothing else, so without this the song would be
-  # created, saved, and then silently absent from every public surface, because
-  # .playable requires a preview. Maestro and the API are expected to send their
-  # own cut before upload; when they do, the preview is already attached here and
-  # this does nothing.
+  # This is the wire that closes the admin-upload hole: MilkAdmin's form attaches
+  # an audio_file and nothing else, so without this the song would be created,
+  # saved, and then silently absent from every public surface, because .playable
+  # requires a preview.
+  #
+  # It only enqueues. Deciding whether an existing preview is stale means
+  # destroying attachments, and destroying one inside after_commit re-enters the
+  # commit chain — which is a stack overflow, not a purge. GeneratePreviewJob owns
+  # that decision, including the replacement case.
   #
   # It runs on production's :async adapter, i.e. on a thread inside the web dyno
-  # rather than on a worker. That is acceptable for an admin upload — a deliberate
-  # human action, and rare — and it is strictly better than a song that saves
-  # successfully and can never be played.
+  # rather than on a worker. That is acceptable here — an attached master is a
+  # deliberate human action and rare — and it is strictly better than a song that
+  # saves successfully and can never be played.
   def schedule_preview_generation
-    return if preview_audio.attached?
     return unless newly_attached?(:audio_file)
 
     GeneratePreviewJob.perform_later(self)
