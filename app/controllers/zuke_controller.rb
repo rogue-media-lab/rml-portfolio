@@ -26,18 +26,21 @@ class ZukeController < ApplicationController
   # view renders the shared smart-image component. Previously the partial reached
   # for first_song.audio_file, which renders an attachment object, not a URL.
   def artists
-    # Eager-load each artist's songs, their artist, the attachments (blobs
-    # included) that SongPresenter reads, and the artwork the view falls back to,
-    # so serializing and rendering fire no per-artist or per-song query.
+    # Eager-load the artwork the view falls back to, so rendering fires no per-artist
+    # query.
     @artists = Artist.includes(
       { image_attachment: :blob },
-      { albums: { cover_art_attachment: :blob } },
-      songs: song_serialization_includes
+      { albums: { cover_art_attachment: :blob } }
     ).order(:name)
     @grouped_artists = @artists.group_by { |a| a.name.first.upcase }
 
+    # Songs come from the same visibility scope the player uses, so an artist card cannot
+    # offer a song the music page hides. Grouped in Ruby rather than eager-loaded through
+    # the association, because an `includes` scope cannot ask "visible to whom".
+    songs_by_artist = load_songs.group_by(&:artist_id)
+
     @artist_songs = @artists.each_with_object({}) do |artist, memo|
-      memo[artist.id] = serialize_songs_for_player(artist.songs).first
+      memo[artist.id] = serialize_songs_for_player(songs_by_artist[artist.id] || []).first
     end
 
     render partial: "zuke/turbo_frames/artists", formats: [ :html ]
@@ -52,12 +55,14 @@ class ZukeController < ApplicationController
   def albums
     all_albums = Album.includes(
       :artist,
-      { cover_art_attachment: :blob },
-      songs: song_serialization_includes
+      { cover_art_attachment: :blob }
     ).order(:title)
 
+    # Same visibility scope as the player, for the same reason as artists above.
+    songs_by_album = load_songs.group_by(&:album_id)
+
     @album_songs = all_albums.each_with_object({}) do |album, memo|
-      memo[album.id] = serialize_songs_for_player(album.songs).first
+      memo[album.id] = serialize_songs_for_player(songs_by_album[album.id] || []).first
     end
 
     @albums = all_albums.group_by { |a| a.title.first.upcase }
@@ -73,6 +78,12 @@ class ZukeController < ApplicationController
     # and then dropping the unplayable ones loses playable songs that fell
     # outside the window, and makes the heading's track count disagree with the
     # cards actually rendered.
+    # Visibility is part of the ranking, not a filter run afterwards: dropping rows after
+    # the window would leave a genre with fewer than 20 songs while more sat behind the
+    # cut. Song.visible_to supplies the ids, so this asks the same question every other
+    # surface asks instead of restating the rule in SQL.
+    visible_ids = Song.visible_to(zuke_listener).select(:id).to_sql
+
     sql = <<-SQL
       SELECT id FROM (
         SELECT
@@ -85,6 +96,7 @@ class ZukeController < ApplicationController
           ON asa.record_type = 'Song'
          AND asa.record_id = s.id
          AND asa.name = 'preview_audio'
+        WHERE s.id IN (#{visible_ids})
       ) ranked_songs
       WHERE rn <= 20
     SQL
@@ -170,21 +182,11 @@ class ZukeController < ApplicationController
 
   private
 
-  # Establishes the base scope for songs based on user authentication.
-  #
-  # The public library is every song tied to no account. A signed-in user also sees the
-  # songs that are theirs, because ownership is checked here as well as in
-  # Song#full_audio_for?: a song a user cannot see is a song they cannot hear, so scoping
-  # owned songs out made the ownership half of that rule unreachable from the player.
+  # The songs this visitor may see. The rule itself lives on the model — Song.visible_to —
+  # so every surface asks one question and none can hide a song another shows. This method
+  # only supplies who is asking.
   def base_songs_scope
-    return Song.all if zuke_admin?
-
-    public_songs = Song.left_joins(:users).where(users: { id: nil })
-    return public_songs unless current_user
-
-    public_songs
-      .or(Song.left_joins(:users).where(users: { id: current_user.id }))
-      .distinct
+    Song.visible_to(zuke_listener)
   end
 
   # Loads all songs within the current scope with the associations and

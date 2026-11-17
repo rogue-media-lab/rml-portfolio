@@ -25,6 +25,14 @@ class PlaylistsController < ApplicationController
     )
 
     @playlists = [ soundcloud_likes_playlist ] + local_playlists
+
+    # Each card's count has to agree with what opening the playlist shows, so it asks the
+    # same visibility scope the show action does. Without this a song the playlist itself
+    # would hide was still counted on its card.
+    @playlist_counts = local_playlists.each_with_object({}) do |playlist, memo|
+      memo[playlist.id] = visible_playable_songs(playlist, zuke_listener).count
+    end
+
     render layout: false if turbo_frame_request?
   end
 
@@ -49,9 +57,8 @@ class PlaylistsController < ApplicationController
       # to the full track, so both the preloads and the presenter take the listener. A
       # signed-out visitor gets the master-free list and the preview, exactly as before.
       listener = zuke_listener
-      song_records = @playlist.ordered_songs.playable.includes(
-        listener ? Song::FULL_AUDIO_INCLUDES : Song::SERIALIZATION_INCLUDES
-      )
+      song_records = visible_playable_songs(@playlist, listener)
+                       .includes(listener ? Song::FULL_AUDIO_INCLUDES : Song::SERIALIZATION_INCLUDES)
 
       @songs = song_records.map { |song| SongPresenter.new(song, listener: listener).to_song_hash }
       @songs_data = @songs.to_json
@@ -60,6 +67,16 @@ class PlaylistsController < ApplicationController
   end
 
   private
+
+  # The songs of a playlist that this listener may see AND play. One expression, used by the
+  # show action and by the index counts, so a card and the playlist it opens cannot disagree
+  # — which is what the index count test asserts, and what made the card and the playlist
+  # diverge for an account-owned song.
+  def visible_playable_songs(playlist, listener)
+    playlist.ordered_songs
+            .playable
+            .where(id: Song.visible_to(listener).select(:id))
+  end
 
   def set_playlist
     if params[:id] == "soundcloud-likes"

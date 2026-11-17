@@ -35,6 +35,15 @@ module ZukeAuth
     current_user
   end
 
+  # A before_action for a door any signed-in listener may knock on — the MilkAdmin who
+  # curates the collection, or a User of the library. Which songs they walk away with is
+  # Song#full_audio_for?'s question, not this filter's.
+  def authenticate_zuke_listener!
+    return if zuke_listener
+
+    redirect_to new_user_session_path, alert: "Sign in to download this song."
+  end
+
   # A before_action filter to ensure the user is an authorized music administrator.
   def authenticate_zuke_admin!
     # In the Portfolio, we leverage Devise's built-in helper.

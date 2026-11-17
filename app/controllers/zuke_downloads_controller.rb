@@ -1,14 +1,17 @@
 # frozen_string_literal: true
 
-# Downloading a song's files, for a signed-in user.
+# Downloading a song's files, for a signed-in listener.
 #
 # Playing is public; taking a copy is not. This is the session-authenticated door —
 # the agent uses the token-authenticated one under api/v1. Both ask
 # Song#downloadable_by?, so the rule has exactly one home.
+#
+# Either listener may knock: the MilkAdmin who curates the collection, or a User of the
+# library. Who may take THIS song's files is the rule's question, not the filter's.
 class ZukeDownloadsController < ApplicationController
   include ZukeAuth
 
-  before_action :authenticate_user!
+  before_action :authenticate_zuke_listener!
 
   # GET /zuke/songs/:id/download[?file=master|preview|image|banner_video]
   def show
@@ -17,7 +20,7 @@ class ZukeDownloadsController < ApplicationController
 
     # 403 rather than 404: the song is public, so pretending it does not exist
     # would be a lie the player itself contradicts.
-    return head :forbidden unless song.downloadable_by?(current_user)
+    return head :forbidden unless song.downloadable_by?(zuke_listener)
 
     attachment = song.downloadable_file(params[:file])
     return head :not_found if attachment.nil?

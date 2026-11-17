@@ -279,6 +279,51 @@ class ZukeControllerTest < ActionDispatch::IntegrationTest
     assert_equal 26, scope.size
   end
 
+  # Visibility is one rule, and every surface has to ask it: a song belonging to an account
+  # is not public, so it must not reach artists, albums or genres either. The scope used to
+  # be applied only to the main player, which let one surface hide a song that three others
+  # showed.
+  test "a guest does not see an owned song on artists, albums or genres" do
+    host! "example.com"
+    owner = User.create!(email: "surface-owner@example.com", password: "password123")
+    song = songs(:one)
+    attach_playable_audio(song)
+    song.genres << genres(:rock)
+    song.users << owner
+
+    get music_artists_zuke_index_url
+    assert_response :success
+    assert_empty assigns(:artist_songs)[song.artist_id],
+      "an owned song must not reach an artist card"
+
+    get music_albums_zuke_index_url
+    assert_response :success
+    assert_empty assigns(:album_songs)[song.album_id],
+      "an owned song must not reach an album card"
+
+    get music_genres_zuke_index_url
+    assert_response :success
+    assert_not_includes assigns(:grouped_genres).values.flatten, song,
+      "an owned song must not reach a genre card"
+  end
+
+  # The other half of the same rule, on a surface that was not asking it before: the owner
+  # still sees their own song where the guest does not.
+  test "their own song still reaches the artist card for the user who owns it" do
+    host! "example.com"
+    owner = User.create!(email: "surface-owner-2@example.com", password: "password123")
+    song = songs(:one)
+    attach_playable_audio(song)
+    song.users << owner
+
+    sign_in owner
+    get music_artists_zuke_index_url
+    assert_response :success
+
+    assert_equal 1, assigns(:artist_songs)[song.artist_id].size,
+      "a user's own song must reach their artist card"
+  end
+
   private
 
   # Attaches a master and a preview with distinct filenames, so whichever one the

@@ -88,7 +88,7 @@ class Song < ApplicationRecord
   # see Api::V1::SongsController#download.
   def full_audio_for?(listener)
     return false if listener.nil?
-    return true if librarian?(listener)
+    return true if Song.librarian?(listener)
     return true if listener.respond_to?(:can_download?) && listener.can_download?
 
     # Ownership is per song, so this is the one lookup that cannot be short-circuited.
@@ -174,6 +174,32 @@ class Song < ApplicationRecord
   delegate :name, to: :artist, prefix: true
   delegate :title, to: :album, prefix: true
 
+  # Anyone the host application calls a curator of this collection. Asked on the listener
+  # rather than tested as a type, so this model does not need to know which class signs
+  # administrators in — ZukeAuth owns that translation.
+  def self.librarian?(listener)
+    listener.respond_to?(:zuke_librarian?) && listener.zuke_librarian?
+  end
+
+  # The songs a listener may see at all: the public library — every song tied to no
+  # account — plus the ones that are theirs. A librarian sees everything, because they
+  # curate it. An anonymous visitor sees the public library and nothing else.
+  #
+  # Visibility lives here for the same reason full_audio_for? does: a song a listener
+  # cannot see is a song they cannot hear, so the two questions belong together. Until
+  # now only the main player asked it, while artists, albums, genres and playlists
+  # selected songs directly — so one surface could hide a song that four others showed.
+  def self.visible_to(listener)
+    return all if librarian?(listener)
+
+    public_songs = left_joins(:users).where(users: { id: nil })
+    return public_songs unless listener.respond_to?(:song_ids)
+
+    public_songs
+      .or(left_joins(:users).where(users: { id: listener.id }))
+      .distinct
+  end
+
   before_validation :associate_album_artist
 
   after_commit :schedule_waveform_generation, on: %i[create update]
@@ -248,13 +274,6 @@ class Song < ApplicationRecord
   end
 
   private
-
-  # Anyone the host application calls a curator of this collection. Asked on the listener
-  # rather than tested as a type, so this model does not need to know which class signs
-  # administrators in — ZukeAuth owns that translation.
-  def librarian?(listener)
-    listener.respond_to?(:zuke_librarian?) && listener.zuke_librarian?
-  end
 
   # The duration Active Storage analysed, or nil when it has not run yet. The preview
   # and the master read it the same way; only the fallback differs.

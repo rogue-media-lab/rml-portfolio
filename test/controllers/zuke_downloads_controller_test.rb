@@ -102,6 +102,17 @@ class ZukeDownloadsControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
+  # The admin curates the collection, so the rule that lets them hear a track in full lets
+  # them take a copy of it: the door asks the one rule, for whichever listener is signed in.
+  test "the milk admin may take a copy" do
+    sign_in milk_admins(:admin_one)
+
+    get zuke_song_download_url(@song)
+
+    assert_response :success
+    assert_equal "audio/mpeg", response.media_type
+  end
+
   private
 
   def attach(song, name, fixture, content_type)
