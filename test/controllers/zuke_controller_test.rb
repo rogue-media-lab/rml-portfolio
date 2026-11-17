@@ -194,4 +194,106 @@ class ZukeControllerTest < ActionDispatch::IntegrationTest
     get music_artists_zuke_index_url
     assert_response :success
   end
+
+  # --- who hears full tracks -----------------------------------------------------
+  #
+  # The wire-up from controller to presenter is the part that can silently be nil, and a
+  # listener that never arrives looks exactly like an unentitled one. These go through the
+  # action rather than calling the presenter directly, so a reverted `listener:` is caught.
+
+  test "a milk admin hears full tracks on the player" do
+    host! "example.com"
+    attach_playable_audio(songs(:one))
+
+    sign_in @milk_admin
+    get music_list_zuke_index_url
+    assert_response :success
+
+    assert_match(/full_track\.mp3/, assigns(:songs_for_display).first[:url],
+      "the admin curates these songs, so the player must serve the master")
+  end
+
+  test "a guest still hears only previews on the player" do
+    host! "example.com"
+    attach_playable_audio(songs(:one))
+
+    get music_list_zuke_index_url
+    assert_response :success
+
+    url = assigns(:songs_for_display).first[:url]
+    assert_match(/preview\.mp3/, url)
+    assert_no_match(/full_track\.mp3/, url,
+      "the master must never reach a signed-out visitor")
+  end
+
+  # Creating an account is not itself a licence to the full track. Only ownership or
+  # `can_download` is — the same rule the download endpoints ask.
+  test "a signed-in user with no right still hears only previews" do
+    host! "example.com"
+    attach_playable_audio(songs(:one))
+
+    stranger = User.create!(email: "player-stranger@example.com", password: "password123")
+    sign_in stranger
+    get music_list_zuke_index_url
+    assert_response :success
+
+    url = assigns(:songs_for_display).first[:url]
+    assert_match(/preview\.mp3/, url)
+    assert_no_match(/full_track\.mp3/, url)
+  end
+
+  # --- who sees whose songs ------------------------------------------------------
+  #
+  # Visibility and entitlement are separate concerns, and both have to hold: a song a user
+  # cannot see is a song they cannot hear. The scope used to exclude every song tied to an
+  # account, which hid a user's own upload from that user.
+
+  test "a signed-in user sees the songs that are theirs" do
+    host! "example.com"
+    owner = User.create!(email: "scope-owner@example.com", password: "password123")
+    songs(:one).users << owner
+
+    sign_in owner
+    get music_list_zuke_index_url
+    assert_response :success
+
+    scope = assigns(:songs_scope)
+    assert_includes scope, songs(:one),
+      "a user's own upload must be visible to them"
+    assert_equal 27, scope.size,
+      "their own song plus the 26 songs that belong to no account"
+  end
+
+  # Ownership still hides a song from everyone else — that half already worked, and this
+  # keeps the fix above from having quietly loosened it.
+  test "a guest does not see songs that belong to an account" do
+    host! "example.com"
+    owner = User.create!(email: "scope-guest-owner@example.com", password: "password123")
+    songs(:one).users << owner
+
+    get music_list_zuke_index_url
+    assert_response :success
+
+    scope = assigns(:songs_scope)
+    assert_not_includes scope, songs(:one)
+    assert_equal 26, scope.size
+  end
+
+  private
+
+  # Attaches a master and a preview with distinct filenames, so whichever one the
+  # presenter chose is readable off the serialized hash.
+  def attach_playable_audio(song)
+    song.audio_file.attach(
+      io: File.open(Rails.root.join("test/fixtures/files/audio.mp3")),
+      filename: "full_track.mp3",
+      content_type: "audio/mpeg"
+    )
+    song.preview_audio.attach(
+      io: File.open(Rails.root.join("test/fixtures/files/audio.mp3")),
+      filename: "preview.mp3",
+      content_type: "audio/mpeg"
+    )
+    song
+  end
 end

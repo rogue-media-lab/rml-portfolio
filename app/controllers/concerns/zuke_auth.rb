@@ -23,6 +23,18 @@ module ZukeAuth
     milk_admin_signed_in?
   end
 
+  # The entity listening to the player right now, or nil for a visitor who is not signed
+  # in. Either the MilkAdmin who curates the collection, or a User of the library.
+  #
+  # Nothing is decided here: Song#full_audio_for? knows what each kind of listener may
+  # hear. This answers only "who is listening", which is the part that is specific to the
+  # host application — everything else in Zuke stays portable.
+  def zuke_listener
+    return current_milk_admin if milk_admin_signed_in?
+
+    current_user
+  end
+
   # A before_action filter to ensure the user is an authorized music administrator.
   def authenticate_zuke_admin!
     # In the Portfolio, we leverage Devise's built-in helper.

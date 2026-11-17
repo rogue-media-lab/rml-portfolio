@@ -171,14 +171,20 @@ class ZukeController < ApplicationController
   private
 
   # Establishes the base scope for songs based on user authentication.
+  #
+  # The public library is every song tied to no account. A signed-in user also sees the
+  # songs that are theirs, because ownership is checked here as well as in
+  # Song#full_audio_for?: a song a user cannot see is a song they cannot hear, so scoping
+  # owned songs out made the ownership half of that rule unreachable from the player.
   def base_songs_scope
-    if zuke_admin?
-      Song.all
-    else
-      # When users are implemented, this will correctly scope to public songs.
-      # For now, if no songs are associated with users, it returns all songs.
-      Song.left_joins(:users).where(users: { id: nil })
-    end
+    return Song.all if zuke_admin?
+
+    public_songs = Song.left_joins(:users).where(users: { id: nil })
+    return public_songs unless current_user
+
+    public_songs
+      .or(Song.left_joins(:users).where(users: { id: current_user.id }))
+      .distinct
   end
 
   # Loads all songs within the current scope with the associations and
@@ -232,7 +238,7 @@ class ZukeController < ApplicationController
   #   hashes and the JSON representation of that array.
   def serialize_songs_for_player(songs)
     playable = songs.select(&:playable?)
-    song_hashes = playable.map { |song| SongPresenter.new(song).to_song_hash }
+    song_hashes = playable.map { |song| SongPresenter.new(song, listener: zuke_listener).to_song_hash }
     [ song_hashes, song_hashes.to_json ]
   end
 
@@ -244,13 +250,17 @@ class ZukeController < ApplicationController
   #
   # @param relation [ActiveRecord::Relation<Song>] a Song relation
   def with_zuke_attachments(relation)
-    relation.includes(Song::SERIALIZATION_INCLUDES)
+    relation.includes(song_serialization_includes)
   end
 
   # The includes hash for a collection of songs being serialized through
   # SongPresenter. Defined on the model so controllers that build their own
   # collections (PlaylistsController) preload the same set.
+  #
+  # A signed-in listener may be entitled to the full track, so the set widens to the
+  # master's attachments; a signed-out visitor keeps the master-free set, preserving
+  # the rule the comment on SERIALIZATION_INCLUDES lays out.
   def song_serialization_includes
-    Song::SERIALIZATION_INCLUDES
+    zuke_listener ? Song::FULL_AUDIO_INCLUDES : Song::SERIALIZATION_INCLUDES
   end
 end

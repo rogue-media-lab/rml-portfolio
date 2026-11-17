@@ -1,6 +1,8 @@
 require "ostruct"
 
 class PlaylistsController < ApplicationController
+  include ZukeAuth
+
   before_action :set_playlist, only: [ :show ]
 
   # GET /playlists
@@ -43,11 +45,15 @@ class PlaylistsController < ApplicationController
       # cannot reach the player here either. Song::SERIALIZATION_INCLUDES
       # preloads the blobs the presenter reads ({ attachment: :blob }); a bare
       # :banner_video_attachment would still fire a query per song.
+      # The same rule a third time: a signed-in listener — admin or user — may be entitled
+      # to the full track, so both the preloads and the presenter take the listener. A
+      # signed-out visitor gets the master-free list and the preview, exactly as before.
+      listener = zuke_listener
       song_records = @playlist.ordered_songs.playable.includes(
-        Song::SERIALIZATION_INCLUDES
+        listener ? Song::FULL_AUDIO_INCLUDES : Song::SERIALIZATION_INCLUDES
       )
 
-      @songs = song_records.map { |song| SongPresenter.new(song).to_song_hash }
+      @songs = song_records.map { |song| SongPresenter.new(song, listener: listener).to_song_hash }
       @songs_data = @songs.to_json
     end
     render layout: false if turbo_frame_request?

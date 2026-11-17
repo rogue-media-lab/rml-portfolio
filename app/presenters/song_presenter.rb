@@ -7,17 +7,25 @@
 class SongPresenter
   include Rails.application.routes.url_helpers
 
-  def initialize(song)
+  # How long a listener's audio URL stays valid, where the storage service honours it.
+  # Comfortably longer than any track, so a URL cannot lapse mid-playback.
+  AUDIO_URL_TTL = 10.minutes
+
+  def initialize(song, listener: nil)
     @song = song
+    @listener = listener
   end
 
   def to_song_hash
+    # What this listener may hear, decided in one place by Song#listening_source_for:
+    # the preview for anyone anonymous or unentitled, the full track for a listener the
+    # song's own rule allows. Audio, waveform and length come back together, so the
+    # scrubber always describes the file that is actually playing.
+    source = @song.listening_source_for(@listener)
+
     {
       id: @song.id,
-      # The PREVIEW, never audio_file. This hash is rendered on public surfaces,
-      # and the preview is the only audio the public surface may emit; the full
-      # track stays behind the admin. See Song.playable.
-      url: @song.preview_audio.attached? ? @song.preview_audio.url : nil,
+      url: audio_url(source[:audio]),
       title: @song.title,
       artist: @song.artist&.name,
       # Images can use the redirecting blob URL, which is stable
@@ -31,22 +39,22 @@ class SongPresenter
       audioSource: @song.audio_source,
       audioLicense: @song.audio_license,
       additionalCredits: @song.additional_credits,
-      # The preview's own waveform, so the scrubber describes the file that is
-      # actually playing. Not the full track's.
-      waveformUrl: proxy_url_for_blob(@song.preview_waveform_data),
-      duration: preview_duration
+      waveformUrl: proxy_url_for_blob(source[:waveform]),
+      duration: source[:seconds]
     }
   end
 
   private
 
-  # The preview's real length, falling back to the 30s window when Active Storage
-  # has not analysed it. The player should never wait on an analyser job to learn
-  # how long a file is, which is why the cut passes duration in as metadata.
-  def preview_duration
-    return 0 unless @song.preview_audio.attached?
+  # Explicitly time-boxed where the storage service honours it. A PUBLIC S3 bucket does
+  # not: Active Storage returns the public URL with no signature and ignores the expiry,
+  # so until the service is private this asks for something the bucket does not enforce.
+  # The gate that actually matters is who is handed a URL at all — see
+  # Song#full_audio_for?.
+  def audio_url(attachment)
+    return nil unless attachment.attached?
 
-    @song.preview_audio.metadata["duration"] || Zuke::PreviewCutter::PREVIEW_SECONDS
+    attachment.url(expires_in: AUDIO_URL_TTL)
   end
 
   # Generates a stable, redirecting URL for a blob.

@@ -71,19 +71,74 @@ class Song < ApplicationRecord
     attachment if attachment.attached?
   end
 
-  # Who may take a copy of this song's files.
+  # Who may use this song's full audio — hearing it in full, or taking a copy of it.
   #
-  # Ownership is the first answer: a user's own uploads are theirs. `can_download`
-  # is the second door, for accounts allowed to pull from the curated library too.
-  # Anonymous callers get nothing.
+  # Three listeners qualify. A librarian of the collection — the MilkAdmin who curates
+  # these songs and the previews the public hears, and who therefore hears all of them. A
+  # user whose own upload this is. And a user flagged `can_download`, for accounts allowed
+  # to pull from the curated library. Anonymous callers get nothing.
   #
-  # This is the single place the rule lives. The session endpoint and the
-  # token-authenticated API endpoint both call it, so loosening or tightening the
-  # rule never means editing endpoints.
-  def downloadable_by?(user)
-    return false if user.nil?
+  # `zuke_librarian?` is asked on the listener rather than tested as a MilkAdmin type, so
+  # the model stays unaware of which class the host application signs administrators in
+  # with. ZukeAuth is where that translation lives, and where it would change if Zuke
+  # moved to another platform.
+  #
+  # The player's presenter asks this. The session download endpoint asks it through
+  # Song#downloadable_by?. The token-authenticated API endpoint deliberately does not —
+  # see Api::V1::SongsController#download.
+  def full_audio_for?(listener)
+    return false if listener.nil?
+    return true if librarian?(listener)
+    return true if listener.respond_to?(:can_download?) && listener.can_download?
 
-    users.exists?(user.id) || user.can_download?
+    # Ownership is per song, so this is the one lookup that cannot be short-circuited.
+    users.exists?(listener.id)
+  end
+
+  # Taking a copy. The same rule as hearing it in full — see full_audio_for? — kept
+  # under its own name because that is what the download endpoints are doing.
+  def downloadable_by?(listener)
+    full_audio_for?(listener)
+  end
+
+  # The audio a listener may hear, the waveform that describes it, and how long it is,
+  # answered together so the three cannot drift apart.
+  #
+  # Drift is the whole reason: waveforms are per FILE, so pairing the master with the
+  # preview's waveform would leave the scrubber describing a 30-second cut while the
+  # full track plays. Choosing the file has to choose the waveform and the length with
+  # it.
+  #
+  # The decision lives here rather than in SongPresenter so that the public serializer
+  # and the public views never name the master at all — ZukePublicBoundaryTest is a
+  # source-level guard over exactly those files.
+  #
+  # @param user [User, nil] the listener, or nil for an anonymous one
+  # @return [Hash] :audio and :waveform are attachments, :seconds is a number
+  def listening_source_for(user)
+    if full_audio_for?(user) && audio_file.attached?
+      { audio: audio_file, waveform: waveform_data, seconds: audio_file_seconds }
+    else
+      { audio: preview_audio, waveform: preview_waveform_data, seconds: preview_seconds }
+    end
+  end
+
+  # The preview's real length, falling back to the 30s window when Active Storage has
+  # not analysed it. The cut passes duration in as metadata, so the player never waits
+  # on an analyser job to learn how long a file is.
+  #
+  # 0 when nothing is attached: there is no length to describe, and the caller is a song
+  # that `playable?` already excludes.
+  def preview_seconds
+    return 0 unless preview_audio.attached?
+
+    attachment_seconds(preview_audio) || Zuke::PreviewCutter::PREVIEW_SECONDS
+  end
+
+  # The master's length, or 0 when Active Storage has not analysed it — the player
+  # already handles a zero duration by using raw peaks without resampling.
+  def audio_file_seconds
+    attachment_seconds(audio_file) || 0
   end
 
   # What a song collection must preload before being serialized through
@@ -102,6 +157,19 @@ class Song < ApplicationRecord
     { preview_waveform_data_attachment: :blob },
     { banner_video_attachment: :blob }
   ].freeze
+
+  # The same list plus the master's own attachments, for a request where the caller may
+  # be allowed to hear the full track.
+  #
+  # Kept separate from SERIALIZATION_INCLUDES so the public path's preloads stay
+  # master-free — preloading the master there would paper over a leak instead of
+  # surfacing one, which is what the comment above is protecting.
+  FULL_AUDIO_INCLUDES = (
+    SERIALIZATION_INCLUDES + [
+      { audio_file_attachment: :blob },
+      { waveform_data_attachment: :blob }
+    ]
+  ).freeze
 
   delegate :name, to: :artist, prefix: true
   delegate :title, to: :album, prefix: true
@@ -180,6 +248,21 @@ class Song < ApplicationRecord
   end
 
   private
+
+  # Anyone the host application calls a curator of this collection. Asked on the listener
+  # rather than tested as a type, so this model does not need to know which class signs
+  # administrators in — ZukeAuth owns that translation.
+  def librarian?(listener)
+    listener.respond_to?(:zuke_librarian?) && listener.zuke_librarian?
+  end
+
+  # The duration Active Storage analysed, or nil when it has not run yet. The preview
+  # and the master read it the same way; only the fallback differs.
+  def attachment_seconds(attachment)
+    return nil unless attachment.attached?
+
+    attachment.metadata["duration"]
+  end
 
   # Each attachment gets its own waveform job. A preview and a full track are
   # different audio, so one JSON cannot describe both.
