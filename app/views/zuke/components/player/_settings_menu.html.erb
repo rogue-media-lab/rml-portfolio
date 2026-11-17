@@ -118,13 +118,25 @@
       <!-- Navigation Links -->
       <div class="border-t border-gray-700">
 
-        <!-- Admin Sign In Link -->
-        <%= link_to new_milk_admin_session_path,
-                    class: "flex items-center gap-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800 transition-colors" do %>
-          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path fill-rule="evenodd" d="M12 4a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm-2 9a4 4 0 0 0-4 4v1a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-1a4 4 0 0 0-4-4h-4Z" clip-rule="evenodd"/>
-          </svg>
-          <span class="text-sm">Admin Sign In</span>
+        <%# One door each way. Signed in as the curator this becomes the way back to the
+            admin; without it, signing in from the player was a one-way trip, and an
+            installed PWA has no address bar to escape it with. %>
+        <% if milk_admin_signed_in? %>
+          <%= link_to milk_admin_root_path,
+                      class: "flex items-center gap-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800 transition-colors" do %>
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" d="M12 4a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm-2 9a4 4 0 0 0-4 4v1a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-1a4 4 0 0 0-4-4h-4Z" clip-rule="evenodd"/>
+            </svg>
+            <span class="text-sm">Admin Dashboard</span>
+          <% end %>
+        <% else %>
+          <%= link_to new_milk_admin_session_path,
+                      class: "flex items-center gap-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800 transition-colors" do %>
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" d="M12 4a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm-2 9a4 4 0 0 0-4 4v1a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-1a4 4 0 0 0-4-4h-4Z" clip-rule="evenodd"/>
+            </svg>
+            <span class="text-sm">Admin Sign In</span>
+          <% end %>
         <% end %>
 
         <!-- About Link -->

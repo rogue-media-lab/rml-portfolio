@@ -324,6 +324,26 @@ class ZukeControllerTest < ActionDispatch::IntegrationTest
       "a user's own song must reach their artist card"
   end
 
+  # Signing in from the player used to be a one-way trip: the menu still offered "Admin Sign
+  # In" while signed in, and nothing anywhere linked back to the player — which strands you on
+  # a device with no address bar. These two links are the only way across.
+  test "the player offers a way back to the admin once signed in, and sign-in otherwise" do
+    host! "example.com"
+
+    get music_list_zuke_index_url
+    assert_response :success
+    assert_match(/Admin Sign In/, response.body)
+    assert_no_match(/Admin Dashboard/, response.body,
+      "a visitor who is not signed in must not be offered the dashboard")
+
+    sign_in @milk_admin
+    get music_list_zuke_index_url
+    assert_response :success
+    assert_match(/Admin Dashboard/, response.body,
+      "signed in, the menu must lead back to the admin")
+    assert_no_match(/Admin Sign In/, response.body)
+  end
+
   private
 
   # Attaches a master and a preview with distinct filenames, so whichever one the
