@@ -143,6 +143,74 @@ class Api::V1::SongsControllerTest < ActionDispatch::IntegrationTest
     assert_response :created
   end
 
+  # Uploading into an account is what makes the per-user library reachable: before this every
+  # API upload was ownerless, and therefore public.
+  test "an owner_email puts the upload in that account, and out of the public library" do
+    owner = User.create!(email: "uploader@example.com", password: "password123")
+    audio_file = fixture_file_upload("test_audio.mp3", "audio/mpeg")
+
+    post api_v1_songs_url,
+         params: {
+           song: {
+             title: "Mine",
+             artist_name: "Test Artist",
+             audio_file: audio_file,
+             owner_email: owner.email
+           }
+         },
+         headers: auth_headers
+
+    assert_response :created
+    assert_equal [ owner.email ], JSON.parse(response.body)["owners"]
+
+    song = Song.find(JSON.parse(response.body)["id"])
+    assert_equal [ owner.id ], song.users.map(&:id)
+
+    # The consequence, asserted rather than assumed: an owned song is not public.
+    assert_not_includes Song.visible_to(nil), song,
+      "an owned upload must not be in the library a signed-out visitor sees"
+    assert_includes Song.visible_to(owner), song,
+      "it belongs to the account it was uploaded for"
+  end
+
+  # A mistyped address must not quietly publish the song to everyone. Refusing is the point:
+  # the caller asked for a private upload and would otherwise get a public one, with a 201
+  # saying it worked.
+  test "an owner_email with no account is refused, and nothing is created" do
+    audio_file = fixture_file_upload("test_audio.mp3", "audio/mpeg")
+
+    assert_no_difference("Song.count") do
+      post api_v1_songs_url,
+           params: {
+             song: {
+               title: "Orphan",
+               artist_name: "Test Artist",
+               audio_file: audio_file,
+               owner_email: "nobody@example.com"
+             }
+           },
+           headers: auth_headers
+    end
+
+    assert_response :unprocessable_entity
+    assert_equal [ "no account with that email" ],
+      JSON.parse(response.body)["errors"]["owner_email"]
+  end
+
+  # No owner still means the library, exactly as before the field existed.
+  test "an upload with no owner_email stays in the public library" do
+    audio_file = fixture_file_upload("test_audio.mp3", "audio/mpeg")
+
+    post api_v1_songs_url,
+         params: { song: { title: "Public", artist_name: "Test Artist", audio_file: audio_file } },
+         headers: auth_headers
+
+    assert_response :created
+    body = JSON.parse(response.body)
+    assert_equal [], body["owners"]
+    assert_includes Song.visible_to(nil), Song.find(body["id"])
+  end
+
   private
 
   def auth_headers

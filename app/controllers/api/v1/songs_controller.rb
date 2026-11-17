@@ -22,6 +22,14 @@
 #   song[image_credit_url] — optional
 #   song[audio_source]     — optional (e.g. "YouTube")
 #   song[additional_credits] — optional
+#   song[owner_email]      — optional. The account this upload belongs to. Omit it and the
+#                            song joins the CURATED PUBLIC LIBRARY, which is what every
+#                            upload did before this field existed. Name an address and the
+#                            song becomes that account's own instead: it leaves the public
+#                            player entirely — guests, other users, and can_download
+#                            accounts all stop seeing it — and only that account (and the
+#                            MilkAdmin) can see it and hear it in full. An address with no
+#                            account is a 422, never a silent public upload.
 #
 # Returns:
 #   201 Created: { id, title, artist, album, url (player link) }
@@ -48,14 +56,27 @@ module Api
     class SongsController < BaseController
       # POST /api/v1/songs
       def create
+        owner, owner_error = owner_for_upload
+        if owner_error
+          return render json: { errors: { owner_email: [ owner_error ] } },
+                        status: :unprocessable_entity
+        end
+
         song = Song.new
         assign_attributes!(song)
 
-        if song.save
-          render json: song_response(song), status: :created
-        else
-          render json: { errors: song.errors }, status: :unprocessable_entity
+        # Claimed in the same transaction as the save. A song that saved but did not take its
+        # owner would sit in the public library instead of being private to an account — the
+        # same silent outcome the unknown-address check above exists to prevent, and one the
+        # caller could not see, because the response would read 201 either way.
+        Song.transaction do
+          song.save!
+          song.users << owner if owner
         end
+
+        render json: song_response(song), status: :created
+      rescue ActiveRecord::RecordInvalid
+        render json: { errors: song.errors }, status: :unprocessable_entity
       end
 
       # DELETE /api/v1/songs/:id
@@ -192,12 +213,33 @@ module Api
         song.focal_point_y      = song_params[:focal_point_y]      if song_params[:focal_point_y].present?
       end
 
+      # The account this upload belongs to, if the caller named one.
+      #
+      # An unknown address is refused rather than ignored. Dropping it silently would publish
+      # the song to the curated library — the opposite of what the caller asked for, and
+      # invisible in the response. Same shape as an unrecognised ?file= being a 404 rather
+      # than a fallback to the master.
+      #
+      # @return [Array] [user or nil, error message or nil]
+      def owner_for_upload
+        email = song_params[:owner_email]
+        return [ nil, nil ] if email.blank?
+
+        user = User.find_by(email: email.to_s.strip)
+        return [ user, nil ] if user
+
+        [ nil, "no account with that email" ]
+      end
+
       def song_response(song)
         {
           id: song.id,
           title: song.title,
           artist: song.artist&.name,
           album: song.album&.title,
+          # Empty means the curated library, which is public. A non-empty list means the song
+          # belongs to that account and is no longer served to the public player.
+          owners: song.users.map(&:email),
           url: "#{request.base_url}/zuke/music"
         }
       end
@@ -208,7 +250,7 @@ module Api
           :audio_file, :preview_audio, :image, :banner_video,
           :image_credit, :image_credit_url, :image_license,
           :audio_source, :audio_license, :additional_credits,
-          :focal_point_x, :focal_point_y
+          :focal_point_x, :focal_point_y, :owner_email
         )
       end
     end
