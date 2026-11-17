@@ -1,29 +1,53 @@
-<h2>Sign up</h2>
-
-<%= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
-  <%= render "devise/shared/error_messages", resource: resource %>
-
-  <div class="field">
-    <%= f.label :email %><br />
-    <%= f.email_field :email, autofocus: true, autocomplete: "email" %>
+<div class="w-full">
+  <%# Brand header — scoped to the resource, because this is the SHARED devise view. %>
+  <div class="text-center mb-8">
+    <% if resource_name == :milk_admin %>
+      <h1 class="font-teko text-5xl font-bold text-hermit-yellow uppercase tracking-wider">Milk Admin</h1>
+      <p class="text-gray-400 text-sm mt-1 font-mPlusCode">Rogue Media Lab Dashboard</p>
+    <% else %>
+      <h1 class="font-teko text-5xl font-bold text-hermit-yellow uppercase tracking-wider">Zuke</h1>
+      <p class="text-gray-400 text-sm mt-1 font-mPlusCode">Your music, at Rogue Media Lab</p>
+    <% end %>
   </div>
 
-  <div class="field">
-    <%= f.label :password %>
-    <% if @minimum_password_length %>
-    <em>(<%= @minimum_password_length %> characters minimum)</em>
-    <% end %><br />
-    <%= f.password_field :password, autocomplete: "new-password" %>
-  </div>
+  <%# Create-account card. This view was stock Devise scaffolding — plain unstyled fields on a
+      dark site — and it is the first page anyone sees when they make an account, so it matches
+      the sign-in card beside it. %>
+  <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl shadow-2xl p-8">
+    <h2 class="text-xl font-semibold text-white mb-6 text-center">Create Account</h2>
 
-  <div class="field">
-    <%= f.label :password_confirmation %><br />
-    <%= f.password_field :password_confirmation, autocomplete: "new-password" %>
-  </div>
+    <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: "space-y-5" }) do |f| %>
+      <%= render "devise/shared/error_messages", resource: resource %>
 
-  <div class="actions">
-    <%= f.submit "Sign up" %>
-  </div>
-<% end %>
+      <div>
+        <%= f.label :email, class: "block text-sm font-medium text-gray-300 mb-1.5" %>
+        <%= f.email_field :email, autofocus: true, autocomplete: "email",
+              class: "w-full bg-gray-800/60 border border-gray-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" %>
+      </div>
 
-<%= render "devise/shared/links" %>
+      <div>
+        <%= f.label :password, class: "block text-sm font-medium text-gray-300 mb-1.5" %>
+        <% if @minimum_password_length %>
+          <p class="text-xs text-gray-500 mb-1.5"><%= @minimum_password_length %> characters minimum</p>
+        <% end %>
+        <%= f.password_field :password, autocomplete: "new-password",
+              class: "w-full bg-gray-800/60 border border-gray-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" %>
+      </div>
+
+      <div>
+        <%= f.label :password_confirmation, class: "block text-sm font-medium text-gray-300 mb-1.5" %>
+        <%= f.password_field :password_confirmation, autocomplete: "new-password",
+              class: "w-full bg-gray-800/60 border border-gray-600 rounded-lg px-4 py-2.5 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" %>
+      </div>
+
+      <div>
+        <%= f.submit "Create Account",
+              class: "w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 rounded-lg transition-colors cursor-pointer" %>
+      </div>
+    <% end %>
+
+    <div class="mt-6 pt-5 border-t border-white/10">
+      <%= render "devise/shared/links" %>
+    </div>
+  </div>
+</div>

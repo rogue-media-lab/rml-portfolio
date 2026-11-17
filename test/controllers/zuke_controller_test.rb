@@ -344,6 +344,63 @@ class ZukeControllerTest < ActionDispatch::IntegrationTest
     assert_no_match(/Admin Sign In/, response.body)
   end
 
+  # The account door. The player is the whole of the installed PWA, so if these are missing
+  # there is no way to sign in or to make an account from the only surface a phone shows —
+  # which leaves the per-user library unreachable from the device it exists for.
+  test "the player offers sign in and create account to a visitor, and sign out to a user" do
+    host! "example.com"
+
+    get music_list_zuke_index_url
+    assert_response :success
+    assert_match(%r{/users/sign_up}, response.body, "a visitor needs a way to make an account")
+    assert_match(%r{/users/sign_in}, response.body, "and a way to sign in")
+    assert_no_match(/Sign Out/, response.body,
+      "someone who is not signed in must not be offered sign out")
+
+    sign_in User.create!(email: "player-tester@example.com", password: "password123")
+    get music_list_zuke_index_url
+    assert_response :success
+    assert_match(%r{/users/sign_out}, response.body)
+    assert_match(/Sign Out/, response.body)
+    assert_no_match(/Create Account/, response.body)
+    assert_no_match(%r{/users/sign_in}, response.body,
+      "a signed-in user must not be offered a sign-in link")
+  end
+
+  # A new account used to land on the home page. after_sign_up_path_for written on
+  # ApplicationController is dead code — Devise::RegistrationsController defines its own and
+  # inherits from this class, so its version wins — which means this landing is decided by
+  # after_sign_in_path_for, and that is what this pins.
+  test "a new User lands on the player, not the home page" do
+    host! "example.com"
+
+    post user_registration_url,
+         params: {
+           user: {
+             email: "brand-new@example.com",
+             password: "password123",
+             password_confirmation: "password123"
+           }
+         }
+
+    assert_response :redirect
+    assert_match(%r{/zuke/music}, response.location,
+      "a new account must land where it can be used")
+  end
+
+  # Signing out must not drop a User out of the player and onto the home page — the same
+  # one-way trip the sign-in link was added to fix, in the other direction.
+  test "signing out keeps a User on the player" do
+    host! "example.com"
+    sign_in User.create!(email: "signer-outer@example.com", password: "password123")
+
+    delete destroy_user_session_url
+
+    assert_response :redirect
+    assert_match(%r{/zuke/music}, response.location,
+      "signing out must not strand a User on the home page")
+  end
+
   private
 
   # Attaches a master and a preview with distinct filenames, so whichever one the

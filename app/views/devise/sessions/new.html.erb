@@ -1,8 +1,15 @@
 <div class="w-full">
-  <%# Brand header %>
+  <%# Brand header — scoped to which Devise resource is signing in. This is the SHARED
+      devise view, so a User arriving from the player was being told they were entering the
+      Milk Admin dashboard. %>
   <div class="text-center mb-8">
-    <h1 class="font-teko text-5xl font-bold text-hermit-yellow uppercase tracking-wider">Milk Admin</h1>
-    <p class="text-gray-400 text-sm mt-1 font-mPlusCode">Rogue Media Lab Dashboard</p>
+    <% if resource_name == :milk_admin %>
+      <h1 class="font-teko text-5xl font-bold text-hermit-yellow uppercase tracking-wider">Milk Admin</h1>
+      <p class="text-gray-400 text-sm mt-1 font-mPlusCode">Rogue Media Lab Dashboard</p>
+    <% else %>
+      <h1 class="font-teko text-5xl font-bold text-hermit-yellow uppercase tracking-wider">Zuke</h1>
+      <p class="text-gray-400 text-sm mt-1 font-mPlusCode">Your music, at Rogue Media Lab</p>
+    <% end %>
   </div>
 
   <%# Sign-in card %>
