@@ -70,4 +70,29 @@ class SongTest < ActiveSupport::TestCase
     song.image_credit = "Photographer"
     assert song.has_credits?
   end
+
+  # The ownership check reads the association when the caller preloaded it. `exists?` issues
+  # a query even against already-loaded rows, which turned this into one EXISTS per song on
+  # every collection a signed-in user saw. :users is in SERIALIZATION_INCLUDES so the
+  # callers preload it; this pins that the check then costs nothing.
+  test "the ownership check asks no query when :users is preloaded" do
+    owner = User.create!(email: "nplus1@example.com", password: "password123")
+    song = Song.create!(title: "Mine", artist: @artist)
+    song.users << owner
+
+    loaded = Song.includes(:users).find(song.id)
+    assert loaded.users.loaded?, "the includes must have loaded the association"
+
+    queries = []
+    watcher = ->(_name, _started, _finished, _id, payload) do
+      queries << payload[:sql] unless payload[:name] == "SCHEMA"
+    end
+
+    ActiveSupport::Notifications.subscribed(watcher, "sql.active_record") do
+      assert loaded.full_audio_for?(owner), "the owner must still qualify"
+      assert_not loaded.full_audio_for?(User.new(id: -1)), "a stranger must still not"
+    end
+
+    assert_empty queries, "the ownership check must not query when :users is preloaded"
+  end
 end

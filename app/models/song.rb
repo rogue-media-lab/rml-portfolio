@@ -89,10 +89,20 @@ class Song < ApplicationRecord
   def full_audio_for?(listener)
     return false if listener.nil?
     return true if Song.librarian?(listener)
-    return true if listener.respond_to?(:can_download?) && listener.can_download?
 
-    # Ownership is per song, so this is the one lookup that cannot be short-circuited.
-    users.exists?(listener.id)
+    # The ownership rows answer both questions below, so they are read once. With :users
+    # preloaded — it is in SERIALIZATION_INCLUDES, and this is why — that read is free;
+    # without, it is a single query rather than the one-per-song `exists?` this used to run.
+    owners = users.to_a
+
+    # Your own upload is yours.
+    return true if owners.any? { |owner| owner.id == listener.id }
+
+    # `can_download` opens the curated public library — the songs tied to no account — and
+    # nothing more. Without the `owners.empty?` half, an account with `can_download` could
+    # pull a song the player will not even show it, which contradicts Song.visible_to and the
+    # "hearing in full and taking a copy share one rule" decision recorded above.
+    owners.empty? && can_download?(listener)
   end
 
   # Taking a copy. The same rule as hearing it in full — see full_audio_for? — kept
@@ -152,6 +162,7 @@ class Song < ApplicationRecord
   # not a quiet extra query.
   SERIALIZATION_INCLUDES = [
     :artist,
+    :users,
     { image_attachment: :blob },
     { preview_audio_attachment: :blob },
     { preview_waveform_data_attachment: :blob },
@@ -274,6 +285,12 @@ class Song < ApplicationRecord
   end
 
   private
+
+  # Whether this listener's account is flagged to pull from the curated library. Asked on the
+  # listener, so the model needs no knowledge of which class the host application uses.
+  def can_download?(listener)
+    listener.respond_to?(:can_download?) && listener.can_download?
+  end
 
   # The duration Active Storage analysed, or nil when it has not run yet. The preview
   # and the master read it the same way; only the fallback differs.

@@ -113,6 +113,30 @@ class ZukeDownloadsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "audio/mpeg", response.media_type
   end
 
+  # `can_download` opens the curated public library, not another person's private upload. The
+  # player already hides that song from this account, and the door asks the same rule —
+  # hearing in full and taking a copy share it.
+  test "can_download does not open someone else's private upload" do
+    @other.update!(can_download: true)
+    @song.users << @user
+    sign_in @other
+
+    get zuke_song_download_url(@song)
+
+    assert_response :forbidden
+  end
+
+  # The other half: it does still open the curated library, which is what the flag is for.
+  test "can_download opens a song tied to no account" do
+    @other.update!(can_download: true)
+    sign_in @other
+
+    get zuke_song_download_url(@song)
+
+    assert_response :success
+    assert_equal "audio/mpeg", response.media_type
+  end
+
   private
 
   def attach(song, name, fixture, content_type)
